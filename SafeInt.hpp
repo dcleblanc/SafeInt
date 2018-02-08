@@ -1,6 +1,6 @@
 /*-----------------------------------------------------------------------------------------------------------
 SafeInt.hpp
-Version 3.0.15p
+Version 3.0.16p
 
 This software is licensed under the Microsoft Public License (Ms-PL).
 For more information about Microsoft open source licenses, refer to 
@@ -64,6 +64,8 @@ Version 3.0
 #endif
 
 #include <assert.h>
+// Need this for ptrdiff_t on some compilers
+#include <cstddef>
 
 #if !defined __GNUC__ && defined _M_AMD64
 	#include <intrin.h>
@@ -82,26 +84,33 @@ Version 3.0
 #define NEEDS_INT_DEFINED
 
 #if !defined NULL
-#define NULL ((void*)0)
+#define NULL 0
 #endif
 
-// Need this for ptrdiff_t
-#include <cstddef>
 #include <stdint.h>
 
-// These two may not be defined, either
-#if !defined uintptr_t
-#define uintptr_t size_t
 #endif
 
-#if !defined intptr_t
-#define intptr_t ptrdiff_t
+// If the user made a choice, respect it #if !defined 
+#if !defined NEEDS_NULLPTR_DEFINED
+   // Visual Studio 2010 and higher support this
+   #if defined(_MSC_VER)
+      #if (_MSC_VER < 1600)
+      #define NEEDS_NULLPTR_DEFINED 1
+      #else
+      #define NEEDS_NULLPTR_DEFINED 0
+      #endif
+   #else
+   // Let everything else trigger based on whether we have nullptr_t
+   #if defined nullptr_t
+      #define NEEDS_NULLPTR_DEFINED 0
+      #else
+      #define NEEDS_NULLPTR_DEFINED 1
+      #endif
+   #endif
 #endif
 
-#endif
-
-// Might need this for gcc and older Microsoft compilers
-#if !defined nullptr
+#if NEEDS_NULLPTR_DEFINED
 #define nullptr NULL
 #endif
 
@@ -112,7 +121,7 @@ Version 3.0
 
 // Let's test some assumptions
 // We're assuming two's complement negative numbers
-C_ASSERT( -1 == 0xffffffff );
+C_ASSERT( -1 == (int)0xffffffff );
 
 /************* Compiler Options *****************************************************************************************************
 
@@ -1170,7 +1179,7 @@ template < typename T, typename U > class SafeCastHelper < T, U, CastCheckGTMax 
 public:
     static bool Cast( U u, T& t ) throw()
     {
-        if( u > IntTraits< T >::maxInt )
+        if( u > (U)IntTraits< T >::maxInt )
             return false;
 
         t = (T)u;
@@ -1180,7 +1189,7 @@ public:
     template < typename E >
     static void CastThrow( U u, T& t )
     {
-        if( u > IntTraits< T >::maxInt )
+        if( u > (U)IntTraits< T >::maxInt )
             E::SafeIntOnOverflow();
 
         t = (T)u;
@@ -1395,7 +1404,9 @@ public:
         //trap corner case
         if( CompileConst< IntTraits< U >::isSigned >::Value() )
         {
-            if( u == -1 )
+            // Some compilers don't notice that this only compiles when u is signed
+            // Add cast to make them happy
+            if( u == (U)-1 )
             {
                result = 0;
                return SafeIntNoError;
@@ -1415,7 +1426,7 @@ public:
         //trap corner case
         if( CompileConst< IntTraits< U >::isSigned >::Value() )
         {
-            if( u == -1 )
+            if( u == (U)-1 )
             {
                result = 0;
                return;
@@ -1437,7 +1448,7 @@ public:
         //trap corner case
         if( CompileConst< IntTraits< U >::isSigned >::Value() )
         {
-            if( u == -1 )
+            if( u == (U)-1 )
             {
                result = 0;
                return SafeIntNoError;
@@ -1457,7 +1468,7 @@ public:
       //trap corner case
       if( CompileConst< IntTraits< U >::isSigned >::Value() )
       {
-         if( u == -1 )
+         if( u == (U)-1 )
          {
             result = 0;
             return;
@@ -1479,7 +1490,7 @@ public:
         //trap corner case
         if( CompileConst< IntTraits< U >::isSigned >::Value() )
         {
-            if( u == -1 )
+            if( u == (U)-1 )
             {
                result = 0;
                return SafeIntNoError;
@@ -1498,7 +1509,7 @@ public:
 
       if( CompileConst< IntTraits< U >::isSigned >::Value() )
       {
-         if( u == -1 )
+         if( u == (U)-1 )
          {
             result = 0;
             return;
@@ -3351,7 +3362,7 @@ public:
         }
 
         // Must test for corner case
-        if( t == IntTraits< T >::minInt && u == -1 )
+        if( t == IntTraits< T >::minInt && u == (U)-1 )
             return SafeIntArithmeticOverflow;
 
         result = (T)( t/u );
@@ -3373,7 +3384,7 @@ public:
         }
 
         // Must test for corner case
-        if( t == IntTraits< T >::minInt && u == -1 )
+        if( t == IntTraits< T >::minInt && u == (U)-1 )
             E::SafeIntOnOverflow();
 
         result = (T)( t/u );
@@ -3927,11 +3938,11 @@ public:
     static bool Addition( const T& lhs, const U& rhs, T& result ) throw()
     {
         //lhs is signed __int64, rhs unsigned < 64-bit
-        __int64 tmp = lhs + (__int64)rhs;
+        unsigned __int64 tmp = (unsigned __int64)lhs + (unsigned __int64)rhs;
 
-        if( tmp >= lhs )
+        if( (__int64)tmp >= lhs )
         {
-            result = (T)tmp;
+            result = (T)(__int64)tmp;
             return true;
         }
 
@@ -3941,12 +3952,14 @@ public:
     template < typename E >
     static void AdditionThrow( const T& lhs, const U& rhs, T& result )
     {
-        //lhs is signed __int64, rhs unsigned < 64-bit
-        __int64 tmp = lhs + (__int64)rhs;
+        // lhs is signed __int64, rhs unsigned < 64-bit
+        // Some compilers get optimization-happy, let's thwart them
 
-        if( tmp >= lhs )
+        unsigned __int64 tmp = (unsigned __int64)lhs + (unsigned __int64)rhs;
+
+        if( (__int64)tmp >= lhs )
         {
-            result = (T)tmp;
+            result = (T)(__int64)tmp;
             return;
         }
 
@@ -3961,11 +3974,13 @@ public:
     {
         C_ASSERT( IntTraits< T >::isInt64 && IntTraits< U >::isUint64 );
         // rhs is unsigned __int64, lhs __int64
-        __int64 tmp = lhs + (__int64)rhs;
+        // cast everything to unsigned, perform addition, then 
+        // cast back for check - this is done to stop optimizers from removing the code
+        unsigned __int64 tmp = (unsigned __int64)lhs + rhs;
         
-        if( tmp >= lhs )
+        if( (__int64)tmp >= lhs )
         {
-           result = tmp;
+           result = (__int64)tmp;
            return true;
         }
 
@@ -3977,11 +3992,11 @@ public:
     {
         C_ASSERT( IntTraits< T >::isInt64 && IntTraits< U >::isUint64 );
         // rhs is unsigned __int64, lhs __int64
-        __int64 tmp = lhs + (__int64)rhs;
+        unsigned __int64 tmp = (unsigned __int64)lhs + rhs;
         
-        if( tmp >= lhs )
+        if( (__int64)tmp >= lhs )
         {
-           result = tmp;
+           result = (__int64)tmp;
            return;
         }
 
@@ -3995,14 +4010,14 @@ public:
     static bool Addition( const T& lhs, const U& rhs, T& result ) throw()
     {
         // rhs is unsigned __int64, lhs signed, 32-bit or less
-        
         if( (unsigned __int32)( rhs >> 32 ) == 0 )
         {
             // Now it just happens to work out that the standard behavior does what we want
             // Adding explicit casts to show exactly what's happening here
-            __int32 tmp = (__int32)( (unsigned __int32)rhs + (unsigned __int32)lhs );
+            // Note - this is tweaked to keep optimizers from tossing out the code.
+            unsigned __int32 tmp = (unsigned __int32)rhs + (unsigned __int32)lhs;
 
-            if( tmp >= lhs && SafeCastHelper< T, __int32, GetCastMethod< T, __int32 >::method >::Cast( tmp, result ) )
+            if( (__int32)tmp >= lhs && SafeCastHelper< T, __int32, GetCastMethod< T, __int32 >::method >::Cast( (__int32)tmp, result ) )
                 return true;
         }
 
@@ -4018,11 +4033,11 @@ public:
         {
             // Now it just happens to work out that the standard behavior does what we want
             // Adding explicit casts to show exactly what's happening here
-            __int32 tmp = (__int32)( (unsigned __int32)rhs + (unsigned __int32)lhs );
+            unsigned __int32 tmp = (unsigned __int32)rhs + (unsigned __int32)lhs;
 
-            if( tmp >= lhs )
+            if( (__int32)tmp >= lhs )
             {
-                SafeCastHelper< T, __int32, GetCastMethod< T, __int32 >::method >::template CastThrow< E >( tmp, result );
+                SafeCastHelper< T, __int32, GetCastMethod< T, __int32 >::method >::template CastThrow< E >( (__int32)tmp, result );
                 return;
             }
         }
@@ -4916,12 +4931,12 @@ public:
     static bool Subtract( const T& lhs, const U& rhs, T& result ) throw()
     {
         // lhs is a 64-bit int, rhs unsigned int32 or smaller
+        // perform test as unsigned to prevent unwanted optimizations
+        unsigned __int64 tmp = (unsigned __int64)lhs - (unsigned __int64)rhs;
 
-        __int64 tmp = lhs - (__int64)rhs;
-
-        if( tmp <= lhs )
+        if( (__int64)tmp <= lhs )
         {
-            result = (T)tmp;
+            result = (T)(__int64)tmp;
             return true;
         }
      
@@ -4932,10 +4947,10 @@ public:
     static void SubtractThrow( const T& lhs, const U& rhs, T& result )
     {
         // lhs is a 64-bit int, rhs unsigned int32 or smaller
+        // perform test as unsigned to prevent unwanted optimizations
+        unsigned __int64 tmp = (unsigned __int64)lhs - (unsigned __int64)rhs;
 
-        __int64 tmp = lhs - (__int64)rhs;
-
-        if( tmp <= lhs )
+        if( (__int64)tmp <= lhs )
         {
             result = (T)tmp;
             return;
@@ -4951,11 +4966,12 @@ public:
     // lhs is __int64, rhs is unsigned 32-bit or smaller
     static bool Subtract( const U& lhs, const T& rhs, T& result ) throw()
     {
-        __int64 tmp = lhs - (__int64)rhs;
+        // Do this as unsigned to prevent unwanted optimizations
+        unsigned __int64 tmp = (unsigned __int64)lhs - (unsigned __int64)rhs;
 
-        if( tmp <= IntTraits< T >::maxInt && tmp >= IntTraits< T >::minInt )
+        if( (__int64)tmp <= IntTraits< T >::maxInt && (__int64)tmp >= IntTraits< T >::minInt )
         {
-            result = (T)tmp;
+            result = (T)(__int64)tmp;
             return true;
         }
 
@@ -4965,11 +4981,12 @@ public:
     template < typename E >
     static void SubtractThrow( const U& lhs, const T& rhs, T& result )
     {
-        __int64 tmp = lhs - (__int64)rhs;
+        // Do this as unsigned to prevent unwanted optimizations
+        unsigned __int64 tmp = (unsigned __int64)lhs - (unsigned __int64)rhs;
 
-        if( tmp <= IntTraits< T >::maxInt && tmp >= IntTraits< T >::minInt )
+        if( (__int64)tmp <= IntTraits< T >::maxInt && (__int64)tmp >= IntTraits< T >::minInt )
         {
-            result = (T)tmp;
+            result = (T)(__int64)tmp;
             return;
         }
 
@@ -5077,11 +5094,12 @@ public:
     {
         C_ASSERT( IntTraits< T >::isInt64 && IntTraits< U >::isUint64 );
        // if we subtract, and it gets larger, there's a problem
-       __int64 tmp = lhs - (__int64)rhs;
+       // Perform test as unsigned to prevent unwanted optimizations
+       unsigned __int64 tmp = (unsigned __int64)lhs - rhs;
 
-       if( tmp <= lhs )
+       if( (__int64)tmp <= lhs )
        {
-          result = tmp;
+          result = (__int64)tmp;
           return true;
        }
         return false;
@@ -5092,11 +5110,12 @@ public:
     {
         C_ASSERT( IntTraits< T >::isInt64 && IntTraits< U >::isUint64 );
        // if we subtract, and it gets larger, there's a problem
-       __int64 tmp = lhs - (__int64)rhs;
+       // Perform test as unsigned to prevent unwanted optimizations
+       unsigned __int64 tmp = (unsigned __int64)lhs - rhs;
 
-       if( tmp <= lhs )
+       if( (__int64)tmp <= lhs )
        {
-          result = tmp;
+          result = (__int64)tmp;
           return;
        }
 
@@ -6408,7 +6427,7 @@ template < typename T, typename E > class ModulusSignedCaseHelper < T, E, true >
 public:
    static bool SignedCase( SafeInt< T, E > rhs, SafeInt< T, E >& result )
    {
-      if( (T)rhs == -1 )
+      if( (T)rhs == (T)-1 )
       {
          result = 0;
          return true;
@@ -6501,7 +6520,7 @@ public:
       else
          tmp = lhs/(U)( -(T)rhs );
 
-      if( tmp <= IntTraits< T >::maxInt )
+      if( tmp <= (U)IntTraits< T >::maxInt )
       {
          result = SafeInt< T, E >( -( (T)tmp ) );
          return true;
@@ -6739,12 +6758,12 @@ template < typename T, typename U, typename E >
 T*& operator +=( T*& lhs, SafeInt< U, E > rhs )
 {
     // Cast the pointer to a number so we can do arithmetic
-    SafeInt< uintptr_t, E > ptr_val = reinterpret_cast< uintptr_t >( lhs );
+    SafeInt< size_t, E > ptr_val = reinterpret_cast< size_t >( lhs );
     // Check first that rhs is valid for the type of ptrdiff_t
     // and that multiplying by sizeof( T ) doesn't overflow a ptrdiff_t
     // Next, we need to add 2 SafeInts of different types, so unbox the ptr_diff
     // Finally, cast the number back to a pointer of the correct type
-    lhs = reinterpret_cast< T* >( (uintptr_t)( ptr_val + (ptrdiff_t)( SafeInt< ptrdiff_t, E >( rhs ) * sizeof( T ) ) ) );
+    lhs = reinterpret_cast< T* >( (size_t)( ptr_val + (ptrdiff_t)( SafeInt< ptrdiff_t, E >( rhs ) * sizeof( T ) ) ) );
     return lhs;
 }
 
@@ -6752,9 +6771,9 @@ template < typename T, typename U, typename E >
 T*& operator -=( T*& lhs, SafeInt< U, E > rhs )
 {
     // Cast the pointer to a number so we can do arithmetic
-    SafeInt< size_t, E > ptr_val = reinterpret_cast< uintptr_t >( lhs );
+    SafeInt< size_t, E > ptr_val = reinterpret_cast< size_t >( lhs );
     // See above for comments
-    lhs = reinterpret_cast< T* >( (uintptr_t)( ptr_val - (ptrdiff_t)( SafeInt< ptrdiff_t, E >( rhs ) * sizeof( T ) ) ) );
+    lhs = reinterpret_cast< T* >( (size_t)( ptr_val - (ptrdiff_t)( SafeInt< ptrdiff_t, E >( rhs ) * sizeof( T ) ) ) );
     return lhs;
 }
 
