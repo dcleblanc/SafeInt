@@ -1,6 +1,6 @@
 /*-----------------------------------------------------------------------------------------------------------
 SafeInt.hpp
-Version 3.0.14p
+Version 3.0.15p
 
 This software is licensed under the Microsoft Public License (Ms-PL).
 For more information about Microsoft open source licenses, refer to 
@@ -56,11 +56,63 @@ Version 3.0
 #ifndef SAFEINT_HPP
 #define SAFEINT_HPP
 
+// Enable compiling with /Wall under VC 
+#if !defined __GNUC__
+#pragma warning( push )
+// Disable warnings coming from headers
+#pragma warning( disable:4987 4820 4987 4820 )
+#endif
+
 #include <assert.h>
+
+#if !defined __GNUC__ && defined _M_AMD64
+	#include <intrin.h>
+	#define SAFEINT_USE_INTRINSICS 1
+#else
+	#define SAFEINT_USE_INTRINSICS 0
+#endif
+
+#if !defined __GNUC__
+#pragma warning( pop )
+#endif
+
+// Various things needed for GCC
+#if defined __GNUC__
+
+#define NEEDS_INT_DEFINED
+
+#if !defined NULL
+#define NULL ((void*)0)
+#endif
+
+// Need this for ptrdiff_t
+#include <cstddef>
+#include <stdint.h>
+
+// These two may not be defined, either
+#if !defined uintptr_t
+#define uintptr_t size_t
+#endif
+
+#if !defined intptr_t
+#define intptr_t ptrdiff_t
+#endif
+
+#endif
+
+// Might need this for gcc and older Microsoft compilers
+#if !defined nullptr
+#define nullptr NULL
+#endif
+
 
 #ifndef C_ASSERT
 #define C_ASSERT(e) typedef char __C_ASSERT__[(e)?1:-1]
 #endif
+
+// Let's test some assumptions
+// We're assuming two's complement negative numbers
+C_ASSERT( -1 == 0xffffffff );
 
 /************* Compiler Options *****************************************************************************************************
 
@@ -423,24 +475,7 @@ SAFEINT_DISABLE_SHIFT_ASSERT       - Set this option if you don't want to assert
 * inline bool SafeAdd( T t, U u, T& result ) throw()
 * inline bool SafeSubtract( T t, U u, T& result ) throw()
 * 
-* * */
-
-#pragma warning(push)
-//this avoids warnings from the unary '-' operator being applied to unsigned numbers
-#pragma warning(disable:4146)
-// conditional expression is constant - these are used intentionally
-#pragma warning(disable:4127)
-//cast truncates constant value
-#pragma warning(disable:4310)
-
-#if !defined SAFEINT_WARN_64BIT_PORTABILITY
-// Internally to SafeInt, these should always be false positives.
-// If actually compiled with the 64-bit compiler, it would pull in a different template specialization.
-#pragma warning(disable:4242)
-#pragma warning(disable:4244)
-#pragma warning(disable:4267)
-#endif
-
+*/
 
 //use these if the compiler does not support _intXX
 #ifdef NEEDS_INT_DEFINED
@@ -448,6 +483,14 @@ SAFEINT_DISABLE_SHIFT_ASSERT       - Set this option if you don't want to assert
 #define __int16 short
 #define __int32 int
 #define __int64 long long
+#endif
+
+// GCC can't tell that the exception function won't return,
+// but Visual Studio can
+#if defined __GNUC__
+#define NotReachedReturn(x) return(x)
+#else
+#define NotReachedReturn(x)
 #endif
 
 /* catch these to handle errors
@@ -555,7 +598,7 @@ namespace SafeIntInternal
    {
    public:
 #if defined __GNUC__
-       static void SafeIntOnOverflow()
+       static __attribute__((noreturn)) void SafeIntOnOverflow()
 #else
        static __declspec(noreturn) void __stdcall SafeIntOnOverflow()
 #endif
@@ -565,7 +608,7 @@ namespace SafeIntInternal
        }
 
 #if defined __GNUC__
-       static void SafeIntOnDivZero()
+       static __attribute__((noreturn)) void SafeIntOnDivZero()
 #else
        static __declspec(noreturn) void __stdcall SafeIntOnDivZero()
 #endif
@@ -624,6 +667,14 @@ typedef SafeIntInternal::SafeIntExceptionHandler < SafeIntInternal::SafeIntWin32
 #endif
 
 /*
+* Turns out we can fool the compiler into not seeing compile-time constants with 
+* a simple template specialization
+*/
+template < int method > class CompileConst;
+template <> class CompileConst<true> { public: static bool Value(){ return true; } };
+template <> class CompileConst<false> { public: static bool Value(){ return false; } };
+
+/*
 * The following template magic is because we're now not allowed
 * to cast a float to an enum. This means that if we happen to assign
 * an enum to a SafeInt of some type, it won't compile, unless we prevent
@@ -655,13 +706,33 @@ template <> class NumericType<long double>      { public: enum{ isBool = false, 
 // Catch-all for anything not supported
 template < typename T > class NumericType       { public: enum{ isBool = false, isFloat = false, isInt = false }; };
 
+// Use this to avoid compile-time const truncation warnings
+template < int fSigned, int bits > class MinMax;
+
+template <> class MinMax< true,   8 > { public: const static __int8  min = (-0x7f - 1);
+                                                const static __int8  max = 0x7f; };
+template <> class MinMax< true,  16 > { public: const static __int16 min = ( -0x7fff - 1 );
+                                                const static __int16 max = 0x7fff; };
+template <> class MinMax< true,  32 > { public: const static __int32 min = ( -0x7fffffff -1 ); 
+                                                const static __int32 max = 0x7fffffff; };
+template <> class MinMax< true,  64 > { public: const static __int64 min = 0x8000000000000000;  
+                                                const static __int64 max = 0x7fffffffffffffff; };
+
+template <> class MinMax< false,  8 > { public: const static unsigned __int8  min = 0;
+                                                const static unsigned __int8  max = 0xff; };
+template <> class MinMax< false, 16 > { public: const static unsigned __int16 min = 0;
+                                                const static unsigned __int16 max = 0xffff; };
+template <> class MinMax< false, 32 > { public: const static unsigned __int32 min = 0;  
+                                                const static unsigned __int32 max = 0xffffffff; };
+template <> class MinMax< false, 64 > { public: const static unsigned __int64 min = 0;
+                                                const static unsigned __int64 max = 0xffffffffffffffff; };
+
 template < typename T > class IntTraits
 {
 public:
     C_ASSERT( NumericType<T>::isInt );
     enum
     {
-#pragma warning(suppress:4804) 
         isSigned  = ( (T)(-1) < 0 ),
         is64Bit   = ( sizeof(T) == 8 ),
         is32Bit   = ( sizeof(T) == 4 ),
@@ -678,15 +749,19 @@ public:
         isInt64   = ( sizeof(T) == 8 && isSigned ),
         isUint64  = ( sizeof(T) == 8 && !isSigned ),
         bitCount  = ( sizeof(T)*8 ),
-#pragma warning(suppress:4804)
         isBool    = ( (T)2 == (T)1 )
     };
 
     // On version 13.10 enums cannot define __int64 values
     // so we'll use const statics instead!
-    const static T maxInt = isSigned ? ((T)~((T)1 << (T)(bitCount-1))) : ((T)(~(T)0));
-    const static T minInt = isSigned ? ((T)((T)1 << (T)(bitCount-1)))  : ((T)0);
+    const static T maxInt = MinMax< isSigned, bitCount >::max;
+    const static T minInt = MinMax< isSigned, bitCount >::min;
 };
+
+template < typename T >
+const T IntTraits< T >::maxInt;
+template < typename T >
+const T IntTraits< T >::minInt;
 
 template < typename T, typename U > class SafeIntCompare
 {
@@ -836,15 +911,14 @@ public:
 	}
 };
 
+template < int method > class NegationAssertHelper;
 
-template < typename T > class NegationHelper <T, false> // unsigned
-{
-public:
-	template <typename E>
-	static T NegativeThrow( T t ) throw()
-	{
-		if( IntTraits<T>::isLT32Bit )
-		{
+template<>
+class NegationAssertHelper< true > 
+{ 
+   public: 
+      static void BehaviorWarning()
+      {
 			// This will normally upcast to int
 			// For example -(unsigned short)0xffff == (int)0xffff0001
 			// This class will retain the type, and will truncate, which may not be what
@@ -855,11 +929,42 @@ public:
 			// -(SafeInt<int>(ss))
 			// will then emit a signed int with the correct value and bitfield
 			assert( false );
-		}
+      }
+};
+
+template<>
+class NegationAssertHelper< false > 
+{ 
+   public: 
+      static void BehaviorWarning(){}
+};
+
+template < typename T > class NegationHelper <T, false> // unsigned
+{
+public:
+	template <typename E>
+	static T NegativeThrow( T t ) throw()
+	{
+      NegationAssertHelper< IntTraits<T>::isLT32Bit >::BehaviorWarning();
+
 #if defined SAFEINT_DISALLOW_UNSIGNED_NEGATION
 	    C_ASSERT( sizeof(T) == 0 );
 #endif
-		return -t;
+
+#if !defined __GNUC__
+#pragma warning(push)
+//this avoids warnings from the unary '-' operator being applied to unsigned numbers
+#pragma warning(disable:4146)
+#endif 
+      // Note - this could be quenched on gcc
+      // by doing something like:
+      // return (T)-((__int64)t);
+      // but it seems like you would want a warning when doing this.
+		return (T)-t;
+
+#if !defined __GNUC__
+#pragma warning(pop)
+#endif 
 	}
 
 	static bool Negative( T t, T& ret )
@@ -872,7 +977,8 @@ public:
 #if defined SAFEINT_DISALLOW_UNSIGNED_NEGATION
 	    C_ASSERT( sizeof(T) == 0 );
 #endif
-        ret = -t;
+      // Do it this way to avoid warning
+      ret = -t;
 		return true;
 	}
 };
@@ -1287,12 +1393,12 @@ public:
             return SafeIntDivideByZero;
 
         //trap corner case
-        if( IntTraits< U >::isSigned )
+        if( CompileConst< IntTraits< U >::isSigned >::Value() )
         {
-            if(u == -1)
+            if( u == -1 )
             {
-                result = 0;
-                return SafeIntNoError;
+               result = 0;
+               return SafeIntNoError;
             }
         }
 
@@ -1307,9 +1413,9 @@ public:
             E::SafeIntOnDivZero();
 
         //trap corner case
-        if( IntTraits< U >::isSigned )
+        if( CompileConst< IntTraits< U >::isSigned >::Value() )
         {
-            if(u == -1)
+            if( u == -1 )
             {
                result = 0;
                return;
@@ -1329,12 +1435,12 @@ public:
             return SafeIntDivideByZero;
 
         //trap corner case
-        if( IntTraits< U >::isSigned )
+        if( CompileConst< IntTraits< U >::isSigned >::Value() )
         {
-            if(u == -1)
+            if( u == -1 )
             {
-                result = 0;
-                return SafeIntNoError;
+               result = 0;
+               return SafeIntNoError;
             }
         }
 
@@ -1342,24 +1448,24 @@ public:
         return SafeIntNoError;
     }
 
-    template < typename E >
-    static void ModulusThrow( const T& t, const U& u, T& result )
-    {
-        if(u == 0)
-            E::SafeIntOnDivZero();
+   template < typename E >
+   static void ModulusThrow( const T& t, const U& u, T& result )
+   {
+      if(u == 0)
+         E::SafeIntOnDivZero();
 
-        //trap corner case
-        if( IntTraits< U >::isSigned )
-        {
-            if(u == -1)
-            {
-               result = 0;
-               return;
-            }
-        }
+      //trap corner case
+      if( CompileConst< IntTraits< U >::isSigned >::Value() )
+      {
+         if( u == -1 )
+         {
+            result = 0;
+            return;
+         }
+      }
 
-        result = (T)(t % u);
-    }
+      result = (T)(t % u);
+   }
 };
 
 template < typename T, typename U > class ModulusHelper< T, U, ComparisonMethod_CastInt64>
@@ -1370,25 +1476,37 @@ public:
         if(u == 0)
             return SafeIntDivideByZero;
 
-        if(IntTraits< U >::isSigned && u == -1)
-            result = 0;
-        else
-            result = (T)((__int64)t % (__int64)u);
+        //trap corner case
+        if( CompileConst< IntTraits< U >::isSigned >::Value() )
+        {
+            if( u == -1 )
+            {
+               result = 0;
+               return SafeIntNoError;
+            }
+        }
 
+        result = (T)((__int64)t % (__int64)u);
         return SafeIntNoError;
     }
 
-    template < typename E >
-    static void ModulusThrow( const T& t, const U& u, T& result )
-    {
-        if(u == 0)
-            E::SafeIntOnDivZero();
+   template < typename E >
+   static void ModulusThrow( const T& t, const U& u, T& result )
+   {
+      if(u == 0)
+         E::SafeIntOnDivZero();
 
-        if(IntTraits< U >::isSigned && u == -1)
+      if( CompileConst< IntTraits< U >::isSigned >::Value() )
+      {
+         if( u == -1 )
+         {
             result = 0;
-        else
-            result = (T)((__int64)t % (__int64)u);
-    }
+            return;
+         }
+      }
+
+      result = (T)((__int64)t % (__int64)u);
+   }
 };
 
 // T is unsigned __int64, U is any signed int
@@ -1552,7 +1670,7 @@ public:
     //accepts unsigned, both less than 32-bit
     static bool Multiply( const T& t, const U& u, T& ret ) throw()
     {
-        unsigned int tmp = t * u;
+        unsigned int tmp = (unsigned int)(t * u);
 
         if( tmp > IntTraits< T >::maxInt )
             return false;
@@ -1564,7 +1682,7 @@ public:
     template < typename E >
     static void MultiplyThrow( const T& t, const U& u, T& ret )
     {
-        unsigned int tmp = t * u;
+        unsigned int tmp = (unsigned int)( t * u );
 
         if( tmp > IntTraits< T >::maxInt )
             E::SafeIntOnOverflow();
@@ -1627,20 +1745,13 @@ public:
     }
 };
 
-#if !defined __GNUC__ && defined _M_AMD64
-	#include <intrin.h>
-	#define SAFEINT_USE_INTRINSICS 1
-#else
-	#define SAFEINT_USE_INTRINSICS 0
-#endif
-
 // T = left arg and return type
 // U = right arg
 template < typename T, typename U > class LargeIntRegMultiply;
 
 #if SAFEINT_USE_INTRINSICS
 // As usual, unsigned is easy
-bool IntrinsicMultiplyUint64( const unsigned __int64& a, const unsigned __int64& b, unsigned __int64* pRet )
+inline bool IntrinsicMultiplyUint64( const unsigned __int64& a, const unsigned __int64& b, unsigned __int64* pRet )
 {
 	unsigned __int64 ulHigh = 0;
 	*pRet = _umul128(a , b, &ulHigh);
@@ -1648,7 +1759,7 @@ bool IntrinsicMultiplyUint64( const unsigned __int64& a, const unsigned __int64&
 }
 
 // Signed, is not so easy
-bool IntrinsicMultiplyInt64( const signed __int64& a, const signed __int64& b, signed __int64* pRet )
+inline bool IntrinsicMultiplyInt64( const signed __int64& a, const signed __int64& b, signed __int64* pRet )
 {
 	__int64 llHigh = 0;
 	*pRet = _mul128(a , b, &llHigh);
@@ -2013,8 +2124,8 @@ public:
         // (aHigh * 2^32 + aLow) * (bHigh * 2^32 + bLow)
         // => (aHigh * bHigh * 2^64) + (aLow * bHigh * 2^32) + (aHigh * bLow * 2^32) + (aLow * bLow)
 
-        bHigh = (signed __int32)(b >> 32);
-        bLow  = (signed __int32)b;
+        bHigh = (unsigned __int32)(b >> 32);
+        bLow  = (unsigned __int32)b;
 
         *pRet = 0;
 
@@ -2457,7 +2568,7 @@ public:
                 // Result must be negative
                 if( tmp <= (unsigned __int32)IntTraits< signed __int32 >::minInt )
                 {
-                    *pRet = -tmp;
+                    *pRet = -((__int32)tmp);
                     return true;
                 }
             }
@@ -2641,7 +2752,7 @@ public:
     }
 
     template < typename E >
-    static void MultiplyThrow(const unsigned __int64& t, const unsigned __int64& u, unsigned __int64& ret)
+    static void MultiplyThrow(const unsigned __int64& t, const unsigned __int64& u, T& ret)
     {
         C_ASSERT( IntTraits<T>::isUint64 && IntTraits<U>::isUint64 );
         unsigned __int64 t1 = t;
@@ -2663,7 +2774,7 @@ public:
     }
 
     template < typename E >
-    static void MultiplyThrow( const T& t, const U& u, unsigned __int64& ret )
+    static void MultiplyThrow( const T& t, const U& u, T& ret )
     {
         C_ASSERT( IntTraits<T>::isUint64 );
         unsigned __int64 t1 = t;
@@ -2836,7 +2947,7 @@ public:
     }
 
     template < typename E >
-    static void MultiplyThrow( const __int64& t, U u, __int64& ret )
+    static void MultiplyThrow( const __int64& t, U u, T& ret )
     {
         C_ASSERT( IntTraits<T>::isInt64 );
         __int64          t1 = t;
@@ -2852,7 +2963,7 @@ public:
     static bool Multiply(T t, const U& u, T& ret) throw()
     {
         C_ASSERT( IntTraits<U>::isUint64 );
-        __int64          u1 = u;
+        unsigned __int64 u1 = u;
         __int32 tmp;
 
         if( LargeIntRegMultiply< __int32, unsigned __int64 >::RegMultiply( (__int32)t, u1, &tmp ) &&
@@ -2868,7 +2979,7 @@ public:
     static void MultiplyThrow(T t, const unsigned __int64& u, T& ret)
     {
         C_ASSERT( IntTraits<U>::isUint64 );
-        __int64          u1 = u;
+        unsigned __int64 u1 = u;
         __int32 tmp;
         
         LargeIntRegMultiply< __int32, unsigned __int64 >::template RegMultiplyThrow< E >( (__int32)t, u1, &tmp );
@@ -2890,7 +3001,7 @@ public:
     }
 
     template < typename E >
-    static void MultiplyThrow( const __int64& t, const unsigned __int64& u, __int64& ret )
+    static void MultiplyThrow( const __int64& t, const unsigned __int64& u, T& ret )
     {
         C_ASSERT( IntTraits<T>::isInt64 && IntTraits<U>::isUint64 );
         __int64          t1 = t;
@@ -2964,14 +3075,14 @@ template < typename T, typename U > class DivisionHelper< T, U, DivisionState_OK
 public:
     static SafeIntError Divide( const T& t, const U& u, T& result ) throw()
     {
-        if( t == 0 )
+       if( u == 0 )
+            return SafeIntDivideByZero;
+
+       if( t == 0 )
         {
            result = 0;
            return SafeIntNoError;
         }
-
-        if( u == 0 )
-            return SafeIntDivideByZero;
 
         result = (T)( t/u );
         return SafeIntNoError;
@@ -2980,14 +3091,14 @@ public:
     template < typename E >
     static void DivideThrow( const T& t, const U& u, T& result )
     {
+        if( u == 0 )
+            E::SafeIntOnDivZero();
+
         if( t == 0 )
         {
            result = 0;
            return;
         }
-
-        if( u == 0 )
-            E::SafeIntOnDivZero();
 
         result = (T)( t/u );
     }
@@ -2998,6 +3109,10 @@ template < typename T, typename U > class DivisionHelper< T, U, DivisionState_Un
 public:
     static SafeIntError Divide( const T& t, const U& u, T& result ) throw()
     {
+
+        if( u == 0 )
+           return SafeIntDivideByZero;
+
         if( t == 0 )
         {
            result = 0;
@@ -3009,9 +3124,6 @@ public:
             result = (T)( t/u );
             return SafeIntNoError;
         }
-
-        if( u == 0 )
-            return SafeIntDivideByZero;
 
         // it is always an error to try and divide an unsigned number by a negative signed number
         // unless u is bigger than t
@@ -3027,6 +3139,10 @@ public:
     template < typename E >
     static void DivideThrow( const T& t, const U& u, T& result )
     {
+
+        if( u == 0 )
+            E::SafeIntOnDivZero();
+
         if( t == 0 )
         {
            result = 0;
@@ -3038,9 +3154,6 @@ public:
             result = (T)( t/u );
             return;
         }
-
-        if( u == 0 )
-            E::SafeIntOnDivZero();
 
         // it is always an error to try and divide an unsigned number by a negative signed number
         // unless u is bigger than t
@@ -3059,14 +3172,14 @@ template < typename T, typename U > class DivisionHelper< T, U, DivisionState_Si
 public:
     static SafeIntError Divide( const T& t, const U& u, T& result ) throw()
     {
+        if( u == 0 )
+            return SafeIntDivideByZero;
+
         if( t == 0 )
         {
            result = 0;
            return SafeIntNoError;
         }
-
-        if( u == 0 )
-            return SafeIntDivideByZero;
 
         // Test for t > 0 
         // If t < 0, must explicitly upcast, or implicit upcast to ulong will cause errors
@@ -3083,15 +3196,15 @@ public:
     template < typename E >
     static void DivideThrow( const T& t, const U& u, T& result )
     {
+        if( u == 0 )
+        {
+            E::SafeIntOnDivZero();
+        }
+
         if( t == 0 )
         {
            result = 0;
            return;
-        }
-
-        if( u == 0 )
-        {
-            E::SafeIntOnDivZero();
         }
 
         // Test for t > 0 
@@ -3105,26 +3218,28 @@ public:
     }
 };
 
-template < typename T > class DivisionHelper< T, unsigned __int64, DivisionState_SignedUnsigned64 >
+template < typename T, typename U > class DivisionHelper< T, U, DivisionState_SignedUnsigned64 >
 {
 public:
     static SafeIntError Divide( const T& t, const unsigned __int64& u, T& result ) throw()
     {
-        if( t == 0 )
-        {
-           result = 0;
-           return SafeIntNoError;
-        }
+        C_ASSERT( IntTraits< U >::isUint64 );
 
         if( u == 0 )
         {
             return SafeIntDivideByZero;
         }
 
+        if( t == 0 )
+        {
+           result = 0;
+           return SafeIntNoError;
+        }
+
         if( u <= (unsigned __int64)IntTraits< T >::maxInt )
         {
             // Else u can safely be cast to T
-            if( sizeof( T ) < sizeof( __int64 ) )
+            if( CompileConst< sizeof( T ) < sizeof( __int64 )>::Value() )
                 result = (T)( (int)t/(int)u );
             else
                 result = (T)((__int64)t/(__int64)u);
@@ -3145,21 +3260,23 @@ public:
     template < typename E >
     static void DivideThrow( const T& t, const unsigned __int64& u, T& result )
     {
-        if( t == 0 )
-        {
-           result = 0;
-           return;
-        }
+        C_ASSERT( IntTraits< U >::isUint64 );
 
         if( u == 0 )
         {
             E::SafeIntOnDivZero();
         }
 
+        if( t == 0 )
+        {
+           result = 0;
+           return;
+        }
+
         if( u <= (unsigned __int64)IntTraits< T >::maxInt )
         {
             // Else u can safely be cast to T
-            if( sizeof( T ) < sizeof( __int64 ) )
+            if( CompileConst< sizeof( T ) < sizeof( __int64 ) >::Value() )
                 result = (T)( (int)t/(int)u );
             else
                 result = (T)((__int64)t/(__int64)u);
@@ -3184,15 +3301,15 @@ public:
     // In this case, standard operator casting is correct
     static SafeIntError Divide( const T& t, const U& u, T& result ) throw()
     {
+        if( u == 0 )
+        {
+            return SafeIntDivideByZero;
+        }
+
         if( t == 0 )
         {
            result = 0;
            return SafeIntNoError;
-        }
-
-        if( u == 0 )
-        {
-            return SafeIntDivideByZero;
         }
 
         result = (T)( t/u );
@@ -3202,15 +3319,15 @@ public:
     template < typename E >
     static void DivideThrow( const T& t, const U& u, T& result )
     {
+        if( u == 0 )
+        {
+            E::SafeIntOnDivZero();
+        }
+
         if( t == 0 )
         {
            result = 0;
            return;
-        }
-
-        if( u == 0 )
-        {
-            E::SafeIntOnDivZero();
         }
 
         result = (T)( t/u );
@@ -3222,15 +3339,15 @@ template < typename T, typename U > class DivisionHelper< T, U, DivisionState_Si
 public:
     static SafeIntError Divide( const T& t, const U& u, T& result ) throw()
     {
+        if( u == 0 )
+        {
+            return SafeIntDivideByZero;
+        }
+
         if( t == 0 )
         {
            result = 0;
            return SafeIntNoError;
-        }
-
-        if( u == 0 )
-        {
-            return SafeIntDivideByZero;
         }
 
         // Must test for corner case
@@ -3244,15 +3361,15 @@ public:
     template < typename E >
     static void DivideThrow( const T& t, const U& u, T& result )
     {
+        if(u == 0)
+        {
+            E::SafeIntOnDivZero();
+        }
+
         if( t == 0 )
         {
            result = 0;
            return;
-        }
-
-        if(u == 0)
-        {
-            E::SafeIntOnDivZero();
         }
 
         // Must test for corner case
@@ -3837,11 +3954,12 @@ public:
     }
 };
 
-template < > class AdditionHelper < __int64, unsigned __int64, AdditionState_ManualCheckInt64Uint64 >
+template < typename T, typename U > class AdditionHelper < T, U, AdditionState_ManualCheckInt64Uint64 >
 {
 public:
     static bool Addition( const __int64& lhs, const unsigned __int64& rhs, __int64& result ) throw()
     {
+        C_ASSERT( IntTraits< T >::isInt64 && IntTraits< U >::isUint64 );
         // rhs is unsigned __int64, lhs __int64
         __int64 tmp = lhs + (__int64)rhs;
         
@@ -3855,8 +3973,9 @@ public:
     }
 
     template < typename E >
-    static void AdditionThrow( const __int64& lhs, const unsigned __int64& rhs, __int64& result )
+    static void AdditionThrow( const __int64& lhs, const unsigned __int64& rhs, T& result )
     {
+        C_ASSERT( IntTraits< T >::isInt64 && IntTraits< U >::isUint64 );
         // rhs is unsigned __int64, lhs __int64
         __int64 tmp = lhs + (__int64)rhs;
         
@@ -4259,10 +4378,11 @@ public:
         }
         else
         {
+            T tmp = lhs;
             // we're now effectively adding
             result = lhs + AbsValueHelper< U, GetAbsMethod< U >::method >::Abs( rhs );
 
-            if(result >= lhs)
+            if(result >= tmp)
                 return true;
         }
 
@@ -4284,10 +4404,11 @@ public:
         }
         else
         {
+            T tmp = lhs;
             // we're now effectively adding
             result = lhs + AbsValueHelper< U, GetAbsMethod< U >::method >::Abs( rhs );
 
-            if(result >= lhs)
+            if(result >= tmp)
                 return;
         }
 
@@ -4610,7 +4731,7 @@ public:
         {
             // if both positive, overflow to negative not possible
             // which is why we'll explicitly check maxInt, and not call SafeCast
-            if( ( IntTraits< T >::isLT64Bit && tmp > IntTraits< T >::maxInt ) ||
+            if( ( CompileConst< IntTraits< T >::isLT64Bit >::Value() && tmp > IntTraits< T >::maxInt ) ||
                 ( rhs < 0 && tmp < lhs ) )
             {
                 E::SafeIntOnOverflow();
@@ -4619,7 +4740,7 @@ public:
         else
         {
             // lhs negative
-            if( ( IntTraits< T >::isLT64Bit && tmp < IntTraits< T >::minInt) ||
+            if( ( CompileConst< IntTraits< T >::isLT64Bit >::Value() && tmp < IntTraits< T >::minInt) ||
                 ( rhs >=0 && tmp > lhs ) )
             {
                 E::SafeIntOnOverflow();
@@ -4949,11 +5070,12 @@ public:
 
 };
 
-template < > class SubtractionHelper< __int64, unsigned __int64, SubtractionState_Int64Uint64 >
+template < typename T, typename U > class SubtractionHelper< T, U, SubtractionState_Int64Uint64 >
 {
 public:
     static bool Subtract( const __int64& lhs, const unsigned __int64& rhs, __int64& result ) throw()
     {
+        C_ASSERT( IntTraits< T >::isInt64 && IntTraits< U >::isUint64 );
        // if we subtract, and it gets larger, there's a problem
        __int64 tmp = lhs - (__int64)rhs;
 
@@ -4966,8 +5088,9 @@ public:
     }
 
     template < typename E >
-    static void SubtractThrow( const __int64& lhs, const unsigned __int64& rhs, __int64& result )
+    static void SubtractThrow( const __int64& lhs, const unsigned __int64& rhs, T& result )
     {
+        C_ASSERT( IntTraits< T >::isInt64 && IntTraits< U >::isUint64 );
        // if we subtract, and it gets larger, there's a problem
        __int64 tmp = lhs - (__int64)rhs;
 
@@ -4982,13 +5105,14 @@ public:
 
 };
 
-template < > class SubtractionHelper< __int64, unsigned __int64, SubtractionState_Int64Uint642 >
+template < typename U, typename T > class SubtractionHelper< U, T, SubtractionState_Int64Uint642 >
 {
 public:
 	 // If lhs is negative, immediate problem - return must be positive, and subtracting only makes it
 	 // get smaller. If rhs > lhs, then it would also go negative, which is the other case
-    static bool Subtract( const __int64& lhs, const unsigned __int64& rhs, unsigned __int64& result ) throw()
+    static bool Subtract( const __int64& lhs, const unsigned __int64& rhs, T& result ) throw()
     {
+        C_ASSERT( IntTraits< T >::isUint64 && IntTraits< U >::isInt64 );
 		 if( lhs >= 0 && (unsigned __int64)lhs >= rhs )
 		 {
 			 result = (unsigned __int64)lhs - rhs;
@@ -4999,8 +5123,9 @@ public:
     }
 
     template < typename E >
-    static void SubtractThrow( const __int64& lhs, const unsigned __int64& rhs, unsigned __int64& result )
+    static void SubtractThrow( const __int64& lhs, const unsigned __int64& rhs, T& result )
     {
+        C_ASSERT( IntTraits< T >::isUint64 && IntTraits< U >::isInt64 );
 		 if( lhs >= 0 && (unsigned __int64)lhs >= rhs )
 		 {
 			 result = (unsigned __int64)lhs - rhs;
@@ -5271,7 +5396,7 @@ public:
     SafeInt( bool b ) throw()
     {
         C_ASSERT( NumericType< T >::isInt );
-        m_int = b ? 1 : 0;
+        m_int = (T)( b ? 1 : 0 );
     }
 
     template < typename U > 
@@ -6050,16 +6175,16 @@ public:
     }
 
     // Miscellaneous helper functions
-    SafeInt< T, E > Min( SafeInt< T, E > test, SafeInt< T, E > floor = IntTraits< T >::minInt ) const throw()
+    SafeInt< T, E > Min( SafeInt< T, E > test, const T floor = IntTraits< T >::minInt ) const throw()
     {
         T tmp = test < m_int ? (T)test : m_int;
-        return tmp < floor ? (T)floor : tmp;
+        return tmp < floor ? floor : tmp;
     }
 
-    SafeInt< T, E > Max( SafeInt< T, E > test, SafeInt< T, E > upper = IntTraits< T >::maxInt ) const throw()
+    SafeInt< T, E > Max( SafeInt< T, E > test, const T upper = IntTraits< T >::maxInt ) const throw()
     {
         T tmp = test > m_int ? (T)test : m_int;
-        return tmp > upper ? (T)upper : tmp;
+        return tmp > upper ? upper : tmp;
     }
 
     void Swap( SafeInt< T, E >& with ) throw()
@@ -6109,7 +6234,7 @@ public:
 
         const T AlignValue = ( (T)1 << bits ) - 1;
 
-        m_int = ( m_int + AlignValue ) & ~AlignValue;
+        m_int = (T)( ( m_int + AlignValue ) & ~AlignValue );
 
         if( m_int <= 0 )
             E::SafeIntOnOverflow();
@@ -6139,7 +6264,7 @@ private:
         bool negative = false;
         
         // Bad input, or empty string
-        if( input == NULL || input[0] == 0 )
+        if( input == nullptr || input[0] == 0 )
             E::SafeIntOnOverflow();
 
         switch( *tmp )
@@ -6274,6 +6399,63 @@ bool operator !=( SafeInt< T, E > lhs, SafeInt< U, E > rhs ) throw()
     return !EqualityTest< T, U, ValidComparison< T, U >::method >::IsEquals( lhs, rhs );
 }
 
+template < typename T, typename U, typename E, int method > class ModulusSimpleCaseHelper;
+
+template < typename T, typename E, int method > class ModulusSignedCaseHelper;
+
+template < typename T, typename E > class ModulusSignedCaseHelper < T, E, true >
+{
+public:
+   static bool SignedCase( SafeInt< T, E > rhs, SafeInt< T, E >& result )
+   {
+      if( (T)rhs == -1 )
+      {
+         result = 0;
+         return true;
+      }
+      return false;
+   }
+};
+
+template < typename T, typename E > class ModulusSignedCaseHelper < T, E, false >
+{
+public:
+   static bool SignedCase( SafeInt< T, E > /*rhs*/, SafeInt< T, E >& /*result*/ )
+   {
+      return false;
+   }
+};
+
+template < typename T, typename U, typename E > 
+class ModulusSimpleCaseHelper < T, U, E, true >
+{
+public:
+   static bool ModulusSimpleCase( U lhs, SafeInt< T, E > rhs, SafeInt< T, E >& result )
+   {
+      if( rhs != 0 )
+      {
+         if( ModulusSignedCaseHelper< T, E, IntTraits< T >::isSigned >::SignedCase( rhs, result ) )
+            return true;
+
+         result = SafeInt< T, E >( (T)( lhs % (T)rhs ) );
+         return true;
+      }
+
+      E::SafeIntOnDivZero();
+      NotReachedReturn(false);
+   }
+};
+
+template< typename T, typename U, typename E >
+class ModulusSimpleCaseHelper < T, U, E, false >
+{
+public:
+   static bool ModulusSimpleCase( U /*lhs*/, SafeInt< T, E > /*rhs*/, SafeInt< T, E >& /*result*/ )
+   {
+      return false;
+   }
+};
+
 // Modulus
 template < typename T, typename U, typename E >
 SafeInt< T, E > operator %( U lhs, SafeInt< T, E > rhs )
@@ -6284,19 +6466,11 @@ SafeInt< T, E > operator %( U lhs, SafeInt< T, E > rhs )
 
     // Fast-track the simple case
     // same size and same sign
-    if( sizeof(T) == sizeof(U) &&
-        (bool)IntTraits< T >::isSigned == (bool)IntTraits< U >::isSigned )
-    {
-        if( rhs != 0 )
-        {
-            if( IntTraits< T >::isSigned && (T)rhs == -1 )
-                return 0;
+    SafeInt< T, E > result;
 
-            return SafeInt< T, E >( (T)( lhs % (T)rhs ) );
-        }
-
-        E::SafeIntOnDivZero();
-    }
+    if( ModulusSimpleCaseHelper< T, U, E, 
+       sizeof(T) == sizeof(U) && (bool)IntTraits< T >::isSigned == (bool)IntTraits< U >::isSigned >::ModulusSimpleCase( lhs, rhs, result ) )
+       return result;
 
     return SafeInt< T, E >( ( SafeInt< U, E >( lhs ) % (T)rhs ) );
 }
@@ -6310,69 +6484,144 @@ SafeInt< T, E > operator *( U lhs, SafeInt< T, E > rhs )
     return SafeInt< T, E >(ret);
 }
 
-// Division
-template < typename T, typename U, typename E > SafeInt< T, E > operator /( U lhs, SafeInt< T, E > rhs )
+template < typename T, typename U, typename E, int method > class DivisionNegativeCornerCaseHelper;
+
+template < typename T, typename U, typename E > class DivisionNegativeCornerCaseHelper< T, U, E, true >
 {
-    // Corner case - has to be handled seperately
-    if( (int)DivisionMethod< U, T >::method ==  (int)DivisionState_UnsignedSigned )
-    {
+public:
+   static bool NegativeCornerCase( U lhs, SafeInt< T, E > rhs, SafeInt<T, E>& result )
+   {
+      // Problem case - normal casting behavior changes meaning
+      // flip rhs to positive
+      // any operator casts now do the right thing
+      U tmp;
+
+      if( CompileConst< sizeof(T) == 4 >::Value() )
+         tmp = lhs/(U)(unsigned __int32)( -(T)rhs );
+      else
+         tmp = lhs/(U)( -(T)rhs );
+
+      if( tmp <= IntTraits< T >::maxInt )
+      {
+         result = SafeInt< T, E >( -( (T)tmp ) );
+         return true;
+      }
+
+      // Corner case
+      T maxT = IntTraits< T >::maxInt;
+      if( tmp == (U)maxT + 1 )
+      {
+         T minT = IntTraits< T >::minInt;
+         result = SafeInt< T, E >( minT );
+         return true;
+      }
+
+      E::SafeIntOnOverflow();
+      NotReachedReturn(false);
+   }
+};
+
+template < typename T, typename U, typename E > class DivisionNegativeCornerCaseHelper< T, U, E, false >
+{
+public:
+   static bool NegativeCornerCase( U /*lhs*/, SafeInt< T, E > /*rhs*/, SafeInt<T, E>& /*result*/ )
+   {
+      return false;
+   }
+};
+
+template < typename T, typename U, typename E, int method > class DivisionCornerCaseHelper;
+
+template < typename T, typename U, typename E > class DivisionCornerCaseHelper < T, U, E, true >
+{
+public:
+   static bool DivisionCornerCase1( U lhs, SafeInt< T, E > rhs, SafeInt<T, E>& result )
+   {
         if( (T)rhs > 0 )
-            return SafeInt< T, E >( lhs/(T)rhs );
+        {
+            result = SafeInt< T, E >( lhs/(T)rhs );
+            return true;
+        }
 
         // Now rhs is either negative, or zero
         if( (T)rhs != 0 )
         {
-            if( sizeof( U ) >= 4 && sizeof( T ) <= sizeof( U ) )
-            {
-                // Problem case - normal casting behavior changes meaning
-                // flip rhs to positive
-                // any operator casts now do the right thing
-                U tmp;
-                if( sizeof(T) == 4 )
-                    tmp = lhs/(U)(unsigned __int32)( -(T)rhs );
-                else
-                    tmp = lhs/(U)( -(T)rhs );
+           if( DivisionNegativeCornerCaseHelper< T, U, E, sizeof( U ) >= 4 && sizeof( T ) <= sizeof( U ) >::NegativeCornerCase( lhs, rhs, result ) )
+              return true;
 
-                if( tmp <= IntTraits< T >::maxInt )
-                    return SafeInt< T, E >( -( (T)tmp ) );
-
-                // Corner case
-#pragma warning(push)
-#pragma warning(disable:4307)
-                // Note - this warning happens because we're not using partial
-                // template specialization in this case. For any real cases where
-                // this block isn't optimized out, the warning won't be present.
-                T maxT = IntTraits< T >::maxInt;
-                if( tmp == (U)maxT + 1 )
-                {
-                    T minT = IntTraits< T >::minInt;
-                    return SafeInt< T, E >( minT );
-                }
-#pragma warning(pop)
-
-                E::SafeIntOnOverflow();
-            }
-
-            return SafeInt< T, E >(lhs/(T)rhs);
+            result = SafeInt< T, E >(lhs/(T)rhs);
+            return true;
         }
 
         E::SafeIntOnDivZero();
-    } // method == DivisionState_UnsignedSigned
+        NotReachedReturn(false);
+   }
+};
 
-    if( SafeIntCompare< T, U >::isBothSigned )
-    {
+template < typename T, typename U, typename E > class DivisionCornerCaseHelper < T, U, E, false >
+{
+public:
+   static bool DivisionCornerCase1( U /*lhs*/, SafeInt< T, E > /*rhs*/, SafeInt<T, E>& /*result*/ )
+   {
+      return false;
+   }
+};
+
+template < typename T, typename U, typename E, int method > class DivisionCornerCaseHelper2;
+
+template < typename T, typename U, typename E > class DivisionCornerCaseHelper2 < T, U, E, true >
+{
+public:
+   static bool DivisionCornerCase2( U lhs, SafeInt< T, E > rhs, SafeInt<T, E>& result )
+   {
         if( lhs == IntTraits< U >::minInt && (T)rhs == -1 )
         {
             // corner case of a corner case - lhs = min int, rhs = -1, 
             // but rhs is the return type, so in essence, we can return -lhs
             // if rhs is a larger type than lhs
-            if( sizeof( U ) < sizeof( T ) )
-                return SafeInt< T, E >( (T)( -(T)IntTraits< U >::minInt ) );
+            // If types are wrong, throws
 
-            // If rhs is smaller or the same size int, then -minInt won't work
-            E::SafeIntOnOverflow();
+#if !defined __GNUC__
+#pragma warning(push)
+//cast truncates constant value
+#pragma warning(disable:4310)
+#endif 
+
+           if( CompileConst<sizeof( U ) < sizeof( T )>::Value() )
+               result = SafeInt< T, E >( (T)( -(T)IntTraits< U >::minInt ) );
+            else
+               E::SafeIntOnOverflow();
+
+#if !defined __GNUC__
+#pragma warning(pop)
+#endif 
+
+            return true;
         }
-    }
+
+        return false;
+   }
+};
+
+template < typename T, typename U, typename E > class DivisionCornerCaseHelper2 < T, U, E, false >
+{
+public:
+   static bool DivisionCornerCase2( U /*lhs*/, SafeInt< T, E > /*rhs*/, SafeInt<T, E>& /*result*/ )
+   {
+      return false;
+   }
+};
+
+// Division
+template < typename T, typename U, typename E > SafeInt< T, E > operator /( U lhs, SafeInt< T, E > rhs )
+{
+    // Corner case - has to be handled seperately
+    SafeInt< T, E > result;
+    if( DivisionCornerCaseHelper< T, U, E, (int)DivisionMethod< U, T >::method == (int)DivisionState_UnsignedSigned >::DivisionCornerCase1( lhs, rhs, result ) )
+       return result;
+
+    if( DivisionCornerCaseHelper2< T, U, E, SafeIntCompare< T, U >::isBothSigned >::DivisionCornerCase2( lhs, rhs, result ) )
+       return result;
 
     // Otherwise normal logic works with addition of bounds check when casting from U->T
     U ret;
@@ -6620,7 +6869,5 @@ SafeInt< T, E > operator |( U lhs, SafeInt< T, E > rhs ) throw()
 {
     return SafeInt< T, E >( BinaryOrHelper< T, U, BinaryMethod< T, U >::method >::Or( (T)rhs, lhs ) );
 }
-
-#pragma warning(pop)
 
 #endif //SAFEINT_HPP
