@@ -1,0 +1,70 @@
+{
+  "WorkItem": {
+    "AffectedComponent": {
+      "Name": "",
+      "DisplayName": ""
+    },
+    "ClosedComment": "",
+    "ClosedDate": "2008-11-25T12:08:02.327-08:00",
+    "CommentCount": 0,
+    "Custom": null,
+    "Description": "I couldn't figure this one out - maybe something to do with template:: syntax.",
+    "LastUpdatedDate": "2013-05-16T01:03:31.657-07:00",
+    "PlannedForRelease": "",
+    "ReleaseVisibleToPublic": false,
+    "Priority": {
+      "Name": "Low",
+      "Severity": 50,
+      "Id": 1
+    },
+    "ProjectName": "SafeInt",
+    "ReportedDate": "2008-11-24T21:10:08.967-08:00",
+    "Status": {
+      "Name": "Closed",
+      "Id": 4
+    },
+    "ReasonClosed": {
+      "Name": "Unassigned"
+    },
+    "Summary": "Min and Max helpers fail to compile on gcc",
+    "Type": {
+      "Name": "Issue",
+      "Id": 3
+    },
+    "VoteCount": 1,
+    "Id": 6645
+  },
+  "FileAttachments": [],
+  "Comments": [
+    {
+      "Message": "I still don't think I've completely figured it out, but I did figure out how to make the warning stop. Problem is that the default argument of\r\n\r\nSafeInt<T, E> floor = SafeInt<T, E>(IntTraits<T>::minInt)\r\n\r\nis not happy, and if I change that to:\r\n\r\nSafeInt<T, E> floor = IntTraits<T>::minInt\r\n\r\ngcc is now OK with that. Weird. Maybe Neils can explain why.",
+      "PostedDate": "2008-11-25T12:07:50.64-08:00",
+      "Id": -2147483648
+    },
+    {
+      "Message": "",
+      "PostedDate": "2008-11-25T12:08:02.327-08:00",
+      "Id": -2147483648
+    },
+    {
+      "Message": "I'm sorry I don't really know why GCC complains when you do SafeInt<T, E>(IntTraits<T>::minInt). But I'm glad, you've found a workaround. BTW, you might also consider only just removing the template arguments, to get it accepted by GCC, if you like that better: SafeInt(IntTraits<T>::minInt).\r\n\r\nNote that GCC doesn't like the lines that follow either, when you actually call the function:\r\n        T tmp = test < m_int ? test : m_int;\r\n        return tmp < floor ? floor : tmp;\r\n\r\nIt says: \"error: operands to ?: have different types\".  The following should help, adding \"m_int\" two times:\r\n\r\n        T tmp = test < m_int ? test.m_int : m_int;\r\n        return tmp < floor ? floor.m_int : tmp;\r\n\r\nUnfortunately it leaves me with an \"undefined reference to `IntTraits<int>::minInt'\". Hopefully you're more lucky...\r\n",
+      "PostedDate": "2008-11-27T12:39:01.787-08:00",
+      "Id": -2147483648
+    },
+    {
+      "Message": "Your error sounds odd, like the default argument is getting stuck in without correctly making it the right argument type. At any rate, the easy thing to do is just to cast the SafeInt types back to themselves on the rhs of the ? operator.",
+      "PostedDate": "2008-11-29T13:42:11.63-08:00",
+      "Id": -2147483648
+    },
+    {
+      "Message": "",
+      "PostedDate": "2013-02-13T18:31:04.823-08:00",
+      "Id": -2147483648
+    },
+    {
+      "Message": "",
+      "PostedDate": "2013-05-16T01:03:31.657-07:00",
+      "Id": -2147483648
+    }
+  ]
+}

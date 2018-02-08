@@ -1,0 +1,18 @@
+[
+  {
+    "Id": "1465218",
+    "ThreadId": "651967",
+    "Html": "Consider this example code:<br />\n<pre><code>#include &lt;iostream&gt;\n#include &lt;limits&gt;\n#include &lt;SafeInt3.hpp&gt;\n\nint main()\n{\n    SafeInt&lt;unsigned int&gt; ui = std::numeric_limits&lt;unsigned int&gt;::max();\n    unsigned long long int ulli = 10;\n    unsigned long long int result = ui + ulli;\n    std::cout &lt;&lt; result &lt;&lt; std::endl;;\n    return 0;\n}\n</code></pre>\n\nSafeInt raises an exception during operator+. Is there a reason why? It seems to me there is no way this can be unsafe, and thus SafeInt should allow it. Using a native unsigned int instead of a SafeInt&lt;unsigned int&gt;, the compiler would implicitly cast ui to an unsigned long long, and perform a valid addition, yes?\r<br />\n<br />\nJust wondering what I am missing...\r<br />\n<br />\nthanks<br />\n",
+    "PostedDate": "2016-03-01T22:48:03.1-08:00",
+    "UserRole": null,
+    "MarkedAsAnswerDate": null
+  },
+  {
+    "Id": "1467289",
+    "ThreadId": "651967",
+    "Html": "SafeInt has an operator + overload. The following overload is called in the case above. As you can see the return type of the operation is SafeInt&lt;T, E&gt; where T is same type as the input SafeInt. So in your case it is SafeInt&lt;unsiged int&gt; which cannot fit the result.<br />\n<pre><code>template &lt; typename T, typename U, typename E &gt;                                 \nSafeInt&lt; T, E &gt; operator +( U lhs, SafeInt&lt; T, E &gt; rhs ) SAFEINT_CPP_THROW      \n{                                                                               \n    T ret( 0 );                                                                 \n    AdditionHelper&lt; T, U, AdditionMethod&lt; T, U &gt;::method &gt;::template AdditionThrow&lt; E &gt;( (T)rhs, lhs, ret );\n    return SafeInt&lt; T, E &gt;( ret );                                              \n}  </code></pre>\n\n",
+    "PostedDate": "2016-03-18T08:52:43.627-07:00",
+    "UserRole": null,
+    "MarkedAsAnswerDate": null
+  }
+]
