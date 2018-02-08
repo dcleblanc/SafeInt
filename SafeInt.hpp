@@ -1,6 +1,6 @@
 /*-----------------------------------------------------------------------------------------------------------
 SafeInt.hpp
-Version 3.0.17p
+Version 3.0.18p
 
 This software is licensed under the Microsoft Public License (Ms-PL).
 For more information about Microsoft open source licenses, refer to
@@ -47,39 +47,56 @@ Copyright (c) Microsoft Corporation.  All rights reserved.
 This header implements an integer handling class designed to catch
 unsafe integer operations
 
-This header compiles properly at warning level 4.
+This header compiles properly at Wall on Visual Studio, -Wall on gcc, and -Weverything on clang.
 
 Please read the leading comments before using the class.
-
-Version 3.0
 ---------------------------------------------------------------*/
 #ifndef SAFEINT_HPP
 #define SAFEINT_HPP
 
+// It is a bit tricky to sort out what compiler we are actually using,
+// do this once here, and avoid cluttering the code
+#define VISUAL_STUDIO_COMPILER 0
+#define CLANG_COMPILER 1
+#define GCC_COMPILER 2
+#define UNKNOWN_COMPILER -1
+
+// Clang will sometimes pretend to be Visual Studio
+// and does pretend to be gcc. Check it first, as nothing else pretends to be clang
+#if defined __clang__
+#define SAFEINT_COMPILER CLANG_COMPILER
+#elif defined __GNUC__
+#define SAFEINT_COMPILER GCC_COMPILER
+#elif defined _MSC_VER
+#define SAFEINT_COMPILER VISUAL_STUDIO_COMPILER
+#else
+#define SAFEINT_COMPILER UNKNOWN_COMPILER
+#endif
+
 // Enable compiling with /Wall under VC
-#if !defined __GNUC__
+#if SAFEINT_COMPILER == VISUAL_STUDIO_COMPILER
 #pragma warning( push )
 // Disable warnings coming from headers
 #pragma warning( disable:4987 4820 4987 4820 )
+
 #endif
 
-#include <assert.h>
 // Need this for ptrdiff_t on some compilers
 #include <cstddef>
 
-#if !defined __GNUC__ && defined _M_AMD64
+#if SAFEINT_COMPILER == VISUAL_STUDIO_COMPILER && defined _M_AMD64
     #include <intrin.h>
     #define SAFEINT_USE_INTRINSICS 1
 #else
     #define SAFEINT_USE_INTRINSICS 0
 #endif
 
-#if !defined __GNUC__
+#if SAFEINT_COMPILER == VISUAL_STUDIO_COMPILER
 #pragma warning( pop )
 #endif
 
 // Various things needed for GCC
-#if defined __GNUC__
+#if SAFEINT_COMPILER == GCC_COMPILER || SAFEINT_COMPILER == CLANG_COMPILER
 
 #define NEEDS_INT_DEFINED
 
@@ -87,14 +104,32 @@ Version 3.0
 #define NULL 0
 #endif
 
+// GCC warning suppression
+#if SAFEINT_COMPILER == GCC_COMPILER
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-local-typedefs"
+#endif
+
 #include <stdint.h>
+
+// clang only
+#if SAFEINT_COMPILER == CLANG_COMPILER
+
+#if __has_feature(cxx_nullptr)
+   #define NEEDS_NULLPTR_DEFINED 0
+#endif
+
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wc++11-long-long"
+#pragma clang diagnostic ignored "-Wold-style-cast"
+#endif
 
 #endif
 
 // If the user made a choice, respect it #if !defined
 #if !defined NEEDS_NULLPTR_DEFINED
     // Visual Studio 2010 and higher support this
-    #if defined(_MSC_VER)
+    #if SAFEINT_COMPILER == VISUAL_STUDIO_COMPILER
         #if (_MSC_VER < 1600)
         #define NEEDS_NULLPTR_DEFINED 1
         #else
@@ -114,14 +149,13 @@ Version 3.0
 #define nullptr NULL
 #endif
 
-
 #ifndef C_ASSERT
 #define C_ASSERT(e) typedef char __C_ASSERT__[(e)?1:-1]
 #endif
 
 // Let's test some assumptions
 // We're assuming two's complement negative numbers
-C_ASSERT( -1 == (int)0xffffffff );
+C_ASSERT( -1 == static_cast<int>(0xffffffff) );
 
 /************* Compiler Options *****************************************************************************************************
 
@@ -134,7 +168,9 @@ NEEDS_INT_DEFINED                  - if your compiler does not support __int8, _
 SAFEINT_ASSERT_ON_EXCEPTION        - it is often easier to stop on an assert and figure out a problem than to try and figure out
                                      how you landed in the catch block.
 SafeIntDefaultExceptionHandler     - if you'd like to replace the exception handlers SafeInt provides, define your replacement and
-                                     define this.
+                                     define this. Note - two built in (Windows-specific) options exist:
+                                     - SAFEINT_FAILFAST - bypasses all exception handlers, exits the app with an exception
+                                     - SAFEINT_RAISE_EXCEPTION - throws Win32 exceptions, which can be caught
 SAFEINT_DISALLOW_UNSIGNED_NEGATION - Invoking the unary negation operator creates warnings, but if you'd like it to completely fail
                                      to compile, define this.
 ANSI_CONVERSIONS                   - This changes the class to use default comparison behavior, which may be unsafe. Enabling this
@@ -451,6 +487,11 @@ SAFEINT_DISABLE_SHIFT_ASSERT       - Set this option if you don't want to assert
 *                 values. Also, let's use some intrinsics for x64 Microsoft compiler to
 *                 reduce code size, and hopefully improve efficiency.
 *
+*  June 21, 2014  Better support for clang, higher warning levels supported for all 3 primary supported
+                  compilers (Visual Studio, clang, gcc).
+                  Also started to converge the code base such that the public CodePlex version will
+                  be a drop-in replacement for the Visual Studio version.
+
 *  Note about code style - throughout this class, casts will be written using C-style (T),
 *  not C++ style static_cast< T >. This is because the class is nearly always dealing with integer
 *  types, and in this case static_cast and a C cast are equivalent. Given the large number of casts,
@@ -494,12 +535,12 @@ SAFEINT_DISABLE_SHIFT_ASSERT       - Set this option if you don't want to assert
 #define __int64 long long
 #endif
 
-// GCC can't tell that the exception function won't return,
-// but Visual Studio can
-#if defined __GNUC__
-#define NotReachedReturn(x) return(x)
-#else
-#define NotReachedReturn(x)
+#if defined VISUAL_STUDIO_SAFEINT_COMPAT
+namespace msl
+{
+
+namespace utilities
+{
 #endif
 
 // catch these to handle errors
@@ -512,6 +553,12 @@ enum SafeIntError
     SafeIntArithmeticOverflow,
     SafeIntDivideByZero
 };
+
+#if defined VISUAL_STUDIO_SAFEINT_COMPAT
+} // utilities
+} // msl
+#endif
+
 
 /*
 * Error handler classes
@@ -580,87 +627,151 @@ enum SafeIntError
 *    Overall, this is probably the best approach.
 * */
 
-class SafeIntException
+// On the Microsoft compiler, violating a throw() annotation is a silent error.
+// Other compilers might turn these into exceptions, and some users may want to not have throw() enabled.
+// In addition, some error handlers may not throw C++ exceptions, which makes everything no throw.
+#if defined SAFEINT_REMOVE_NOTHROW
+#define SAFEINT_NOTHROW
+#else
+#define SAFEINT_NOTHROW throw()
+#endif
+
+#if defined VISUAL_STUDIO_SAFEINT_COMPAT
+namespace msl
+{
+
+namespace utilities
+{
+#endif
+
+// If you would like to use your own custom assert
+// Define SAFEINT_ASSERT
+#if !defined SAFEINT_ASSERT
+#include <assert.h>
+#define SAFEINT_ASSERT(x) assert(x)
+#endif
+
+#if defined SAFEINT_ASSERT_ON_EXCEPTION
+	inline void SafeIntExceptionAssert() SAFEINT_NOTHROW { SAFEINT_ASSERT(false); }
+#else
+	inline void SafeIntExceptionAssert() SAFEINT_NOTHROW {}
+#endif
+
+#if SAFEINT_COMPILER == GCC_COMPILER || SAFEINT_COMPILER == CLANG_COMPILER
+    #define SAFEINT_NORETURN __attribute__((noreturn))
+    #define SAFEINT_STDCALL
+    #define SAFEINT_VISIBLE __attribute__ ((__visibility__("default")))
+    #define SAFEINT_WEAK __attribute__ ((weak))
+#else
+    #define SAFEINT_NORETURN __declspec(noreturn)
+    #define SAFEINT_STDCALL __stdcall
+    #define SAFEINT_VISIBLE
+    #define SAFEINT_WEAK
+#endif
+
+class SAFEINT_VISIBLE SAFEINT_WEAK SafeIntException
 {
 public:
-    SafeIntException() { m_code = SafeIntNoError; }
-    SafeIntException( SafeIntError code )
+    SafeIntException() SAFEINT_NOTHROW { m_code = SafeIntNoError; }
+    SafeIntException( SafeIntError code ) SAFEINT_NOTHROW
     {
         m_code = code;
     }
     SafeIntError m_code;
 };
 
-#if defined SAFEINT_ASSERT_ON_EXCEPTION
-inline void SafeIntExceptionAssert(){ assert(false); }
-#else
-inline void SafeIntExceptionAssert(){}
-#endif
-
 namespace SafeIntInternal
 {
+    // Visual Studio version of SafeInt provides for two possible error
+    // handlers:
+    // SafeIntErrorPolicy_SafeIntException - C++ exception, default if not otherwise defined
+    // SafeIntErrorPolicy_InvalidParameter - Calls fail fast (Windows-specific), bypasses any exception handlers, 
+    //                                       exits the app with a crash
     template < typename E > class SafeIntExceptionHandler;
 
     template <> class SafeIntExceptionHandler < SafeIntException >
     {
     public:
-#if defined __GNUC__
-        static __attribute__((noreturn)) void SafeIntOnOverflow()
-#else
-        static __declspec(noreturn) void __stdcall SafeIntOnOverflow()
-#endif
+
+        static SAFEINT_NORETURN void SAFEINT_STDCALL SafeIntOnOverflow()
         {
             SafeIntExceptionAssert();
             throw SafeIntException( SafeIntArithmeticOverflow );
         }
 
-#if defined __GNUC__
-        static __attribute__((noreturn)) void SafeIntOnDivZero()
-#else
-        static __declspec(noreturn) void __stdcall SafeIntOnDivZero()
-#endif
+        static SAFEINT_NORETURN void SAFEINT_STDCALL SafeIntOnDivZero()
         {
             SafeIntExceptionAssert();
             throw SafeIntException( SafeIntDivideByZero );
         }
     };
 
-#if defined _WINDOWS_
-    class SafeIntWin32Exception
-    {
-    public:
-        SafeIntWin32Exception( DWORD dwExceptionCode, DWORD dwExceptionFlags = EXCEPTION_NONCONTINUABLE )
-        {
-            SafeIntExceptionAssert();
-            RaiseException( dwExceptionCode, dwExceptionFlags, 0, 0 );
-        }
-    };
-
-    template <> class SafeIntExceptionHandler < SafeIntWin32Exception >
-    {
-    public:
-        static __declspec(noreturn) void __stdcall SafeIntOnOverflow()
-        {
-            SafeIntExceptionAssert();
-            SafeIntWin32Exception( EXCEPTION_INT_OVERFLOW );
-        }
-
-        static __declspec(noreturn) void __stdcall SafeIntOnDivZero()
-        {
-            SafeIntExceptionAssert();
-            SafeIntWin32Exception( EXCEPTION_INT_DIVIDE_BY_ZERO );
-        }
-    };
+#if !defined _CRT_SECURE_INVALID_PARAMETER
+	// Calling fail fast is somewhat more robust than calling abort, 
+	// but abort is the closest we can manage without Visual Studio support
+	// Need the header for abort()
+	#include <stdlib.h>
+	#define _CRT_SECURE_INVALID_PARAMETER(msg) abort()
 #endif
+
+   class SafeInt_InvalidParameter
+   {
+   public:
+       static SAFEINT_NORETURN void SafeIntOnOverflow() SAFEINT_NOTHROW
+       {
+           SafeIntExceptionAssert();
+           _CRT_SECURE_INVALID_PARAMETER("SafeInt Arithmetic Overflow");
+       }
+
+       static SAFEINT_NORETURN void SafeIntOnDivZero() SAFEINT_NOTHROW
+       {
+           SafeIntExceptionAssert();
+           _CRT_SECURE_INVALID_PARAMETER("SafeInt Divide By Zero");
+       }
+   };
+
+#if defined _WINDOWS_ 
+
+    class SafeIntWin32ExceptionHandler 
+    {
+    public:
+        static SAFEINT_NORETURN void SAFEINT_STDCALL SafeIntOnOverflow() SAFEINT_NOTHROW
+        {
+            SafeIntExceptionAssert();
+			RaiseException( static_cast<DWORD>(EXCEPTION_INT_OVERFLOW), EXCEPTION_NONCONTINUABLE, 0, 0);
+        }
+
+        static SAFEINT_NORETURN void SAFEINT_STDCALL SafeIntOnDivZero() SAFEINT_NOTHROW
+        {
+            SafeIntExceptionAssert();
+			RaiseException( static_cast<DWORD>(EXCEPTION_INT_DIVIDE_BY_ZERO), EXCEPTION_NONCONTINUABLE, 0, 0);
+        }
+    };
+
+#endif
+
 } // namespace SafeIntInternal
 
+// both of these have cross-platform support
 typedef SafeIntInternal::SafeIntExceptionHandler < SafeIntException > CPlusPlusExceptionHandler;
-#if defined _WINDOWS_
-typedef SafeIntInternal::SafeIntExceptionHandler < SafeIntInternal::SafeIntWin32Exception > Win32ExceptionHandler;
+typedef SafeIntInternal::SafeInt_InvalidParameter InvalidParameterExceptionHandler;
+
+// This exception handler is no longer recommended, but is left here in order not to break existing users
+#if defined _WINDOWS_ 
+typedef SafeIntInternal::SafeIntWin32ExceptionHandler Win32ExceptionHandler;
+#endif
+
+// For Visual Studio compatibility
+#if defined VISUAL_STUDIO_SAFEINT_COMPAT 
+    typedef CPlusPlusExceptionHandler  SafeIntErrorPolicy_SafeIntException;
+    typedef InvalidParameterExceptionHandler SafeIntErrorPolicy_InvalidParameter;
 #endif
 
 // If the user hasn't defined a default exception handler,
 // define one now, depending on whether they would like Win32 or C++ exceptions
+
+// This library will use conditional noexcept soon, but not in this release
+// Some users might mix exception handlers, which is not advised, but is supported
 #if !defined SafeIntDefaultExceptionHandler
     #if defined SAFEINT_RAISE_EXCEPTION
         #if !defined _WINDOWS_
@@ -668,16 +779,34 @@ typedef SafeIntInternal::SafeIntExceptionHandler < SafeIntInternal::SafeIntWin32
         #endif
 
         #define SafeIntDefaultExceptionHandler Win32ExceptionHandler
+    #elif defined SAFEINT_FAILFAST
+        #define SafeIntDefaultExceptionHandler InvalidParameterExceptionHandler
     #else
         #define SafeIntDefaultExceptionHandler CPlusPlusExceptionHandler
+		#if !defined SAFEINT_EXCEPTION_HANDLER_CPP
+		#define SAFEINT_EXCEPTION_HANDLER_CPP 1
+		#endif
     #endif
+#endif
+
+#if !defined SAFEINT_EXCEPTION_HANDLER_CPP
+#define SAFEINT_EXCEPTION_HANDLER_CPP 0
+#endif
+
+// If an error handler is chosen other than C++ exceptions, such as Win32 exceptions, fail fast, 
+// or abort, then all methods become no throw. Some teams track throw() annotations closely,
+// and the following option provides for this.
+#if SAFEINT_EXCEPTION_HANDLER_CPP
+#define SAFEINT_CPP_THROW
+#else
+#define SAFEINT_CPP_THROW SAFEINT_NOTHROW
 #endif
 
 // Turns out we can fool the compiler into not seeing compile-time constants with
 // a simple template specialization
 template < int method > class CompileConst;
-template <> class CompileConst<true> { public: static bool Value(){ return true; } };
-template <> class CompileConst<false> { public: static bool Value(){ return false; } };
+template <> class CompileConst<true> { public: static bool Value() SAFEINT_NOTHROW { return true; } };
+template <> class CompileConst<false> { public: static bool Value() SAFEINT_NOTHROW { return false; } };
 
 // The following template magic is because we're now not allowed
 // to cast a float to an enum. This means that if we happen to assign
@@ -685,7 +814,28 @@ template <> class CompileConst<false> { public: static bool Value(){ return fals
 //              isFloat = ( (T)( (float)1.1 ) > (T)1 )
 // from compiling in the case of an enum, which is the point of the specialization
 // that follows.
+
+// If we have support for std<typetraits>, then we can do this easily, and detect enums as well
 template < typename T > class NumericType;
+
+#if defined _LIBCPP_TYPE_TRAITS || defined _TYPE_TRAITS_
+// Continue to special case bool
+template <> class NumericType<bool>             { public: enum{ isBool = true,  isFloat = false, isInt = false }; };
+template < typename T > class NumericType
+{
+    public: 
+        enum
+        { 
+            isBool = false, // We specialized out a bool  
+            isFloat = std::is_floating_point<T>::value,
+            // If it is an enum, then consider it an int type
+            // This does allow someone to make a SafeInt from an enum type, which is not recommended,
+            // but it also allows someone to add an enum value to a SafeInt, which is handy.
+            isInt = std::is_integral<T>::value || std::is_enum<T>::value
+        };
+};
+
+#else
 
 template <> class NumericType<bool>             { public: enum{ isBool = true,  isFloat = false, isInt = false }; };
 template <> class NumericType<char>             { public: enum{ isBool = false, isFloat = false, isInt = true }; };
@@ -693,7 +843,7 @@ template <> class NumericType<unsigned char>    { public: enum{ isBool = false, 
 template <> class NumericType<signed char>      { public: enum{ isBool = false, isFloat = false, isInt = true }; };
 template <> class NumericType<short>            { public: enum{ isBool = false, isFloat = false, isInt = true }; };
 template <> class NumericType<unsigned short>   { public: enum{ isBool = false, isFloat = false, isInt = true }; };
-#if defined SAFEINT_USE_WCHAR_T || _NATIVE_WCHAR_T_DEFINED
+#if defined SAFEINT_USE_WCHAR_T || defined _NATIVE_WCHAR_T_DEFINED
 template <> class NumericType<wchar_t>          { public: enum{ isBool = false, isFloat = false, isInt = true }; };
 #endif
 template <> class NumericType<int>              { public: enum{ isBool = false, isFloat = false, isInt = true }; };
@@ -706,27 +856,43 @@ template <> class NumericType<float>            { public: enum{ isBool = false, 
 template <> class NumericType<double>           { public: enum{ isBool = false, isFloat = true,  isInt = false }; };
 template <> class NumericType<long double>      { public: enum{ isBool = false, isFloat = true,  isInt = false }; };
 // Catch-all for anything not supported
-template < typename T > class NumericType       { public: enum{ isBool = false, isFloat = false, isInt = false }; };
+template < typename T > class NumericType       
+{ 
+public: 
+    // We have some unknown type, which could be an enum. For parity with the code that uses <type_traits>,
+    // We can try a static_cast<int> - it if compiles, then it might be an enum, and should work.
+    // If it is something else that just happens to have a constructor that takes an int, and a casting operator,
+    // then it is possible something will go wrong, and for best results, cast it directly to an int before letting it
+    // interact with a SafeInt
+
+    enum
+    { 
+        isBool = false, 
+        isFloat = false, 
+        isInt = static_cast<int>( static_cast<T>(0) ) == 0
+    }; 
+};
+#endif // type traits
 
 // Use this to avoid compile-time const truncation warnings
-template < int fSigned, int bits > class MinMax;
+template < int fSigned, int bits > class SafeIntMinMax;
 
-template <> class MinMax< true,   8 > { public: const static __int8  min = (-0x7f - 1);
-                                                const static __int8  max = 0x7f; };
-template <> class MinMax< true,  16 > { public: const static __int16 min = ( -0x7fff - 1 );
+template <> class SafeIntMinMax< true,   8 > { public: const static signed __int8  min = (-0x7f - 1);
+                                                const static signed __int8  max = 0x7f; };
+template <> class SafeIntMinMax< true,  16 > { public: const static __int16 min = ( -0x7fff - 1 );
                                                 const static __int16 max = 0x7fff; };
-template <> class MinMax< true,  32 > { public: const static __int32 min = ( -0x7fffffff -1 );
+template <> class SafeIntMinMax< true,  32 > { public: const static __int32 min = ( -0x7fffffff -1 );
                                                 const static __int32 max = 0x7fffffff; };
-template <> class MinMax< true,  64 > { public: const static __int64 min = 0x8000000000000000LL;
+template <> class SafeIntMinMax< true,  64 > { public: const static __int64 min = static_cast<__int64>(0x8000000000000000LL);
                                                 const static __int64 max = 0x7fffffffffffffffLL; };
 
-template <> class MinMax< false,  8 > { public: const static unsigned __int8  min = 0;
+template <> class SafeIntMinMax< false,  8 > { public: const static unsigned __int8  min = 0;
                                                 const static unsigned __int8  max = 0xff; };
-template <> class MinMax< false, 16 > { public: const static unsigned __int16 min = 0;
+template <> class SafeIntMinMax< false, 16 > { public: const static unsigned __int16 min = 0;
                                                 const static unsigned __int16 max = 0xffff; };
-template <> class MinMax< false, 32 > { public: const static unsigned __int32 min = 0;
+template <> class SafeIntMinMax< false, 32 > { public: const static unsigned __int32 min = 0;
                                                 const static unsigned __int32 max = 0xffffffff; };
-template <> class MinMax< false, 64 > { public: const static unsigned __int64 min = 0;
+template <> class SafeIntMinMax< false, 64 > { public: const static unsigned __int64 min = 0;
                                                 const static unsigned __int64 max = 0xffffffffffffffffULL; };
 
 template < typename T > class IntTraits
@@ -756,8 +922,9 @@ public:
 
     // On version 13.10 enums cannot define __int64 values
     // so we'll use const statics instead!
-    const static T maxInt = MinMax< isSigned, bitCount >::max;
-    const static T minInt = MinMax< isSigned, bitCount >::min;
+    // These must be cast to deal with the possibility of a SafeInt being given an enum as an argument
+    const static T maxInt = static_cast<T>(SafeIntMinMax< isSigned, bitCount >::max);
+    const static T minInt = static_cast<T>(SafeIntMinMax< isSigned, bitCount >::min);
 };
 
 template < typename T >
@@ -805,7 +972,7 @@ public:
         IntZone_UintLT64_Int64    = !IntTraits< T >::isSigned && IntTraits< T >::isLT64Bit && IntTraits< U >::isInt64,
         IntZone_Uint64_Int64      = IntTraits< T >::isUint64 && IntTraits< U >::isInt64,
         //signed-signed
-        IntZone_IntLT32_IntLT32   = SafeIntCompare< T,U >::isBothSigned && ::SafeIntCompare< T, U >::isBothLT32Bit,
+        IntZone_IntLT32_IntLT32   = SafeIntCompare< T,U >::isBothSigned && SafeIntCompare< T, U >::isBothLT32Bit,
         IntZone_Int32_IntLT64     = SafeIntCompare< T,U >::isBothSigned && IntTraits< T >::is32Bit && IntTraits< U >::isLT64Bit,
         IntZone_IntLT32_Int32     = SafeIntCompare< T,U >::isBothSigned && IntTraits< T >::isLT32Bit && IntTraits< U >::is32Bit,
         IntZone_Int64_Int64       = SafeIntCompare< T,U >::isBothSigned && IntTraits< T >::isInt64 && IntTraits< U >::isInt64,
@@ -858,9 +1025,9 @@ template < typename T, int > class AbsValueHelper;
 template < typename T > class AbsValueHelper < T, AbsMethodInt>
 {
 public:
-    static unsigned __int32 Abs( T t ) throw()
+    static unsigned __int32 Abs( T t ) SAFEINT_NOTHROW
     {
-        assert( t < 0 );
+        SAFEINT_ASSERT( t < 0 );
         return ~(unsigned __int32)t + 1;
     }
 };
@@ -868,9 +1035,9 @@ public:
 template < typename T > class AbsValueHelper < T, AbsMethodInt64 >
 {
 public:
-    static unsigned __int64 Abs( T t ) throw()
+    static unsigned __int64 Abs( T t ) SAFEINT_NOTHROW
     {
-        assert( t < 0 );
+        SAFEINT_ASSERT( t < 0 );
         return ~(unsigned __int64)t + 1;
     }
 };
@@ -878,21 +1045,32 @@ public:
 template < typename T > class AbsValueHelper < T, AbsMethodNoop >
 {
 public:
-    static T Abs( T t ) throw()
+    static T Abs( T t ) SAFEINT_NOTHROW
     {
         // Why are you calling Abs on an unsigned number ???
-        assert( false );
+        SAFEINT_ASSERT( false );
         return t;
     }
 };
 
 template < typename T, bool > class NegationHelper;
+// Previous versions had an assert that the type being negated was 32-bit or higher
+// In retrospect, this seems like something to just document
+// Negation will normally upcast to int
+// For example -(unsigned short)0xffff == (int)0xffff0001
+// This class will retain the type, and will truncate, which may not be what
+// you wanted
+// If you want normal operator casting behavior, do this:
+// SafeInt<unsigned short> ss = 0xffff;
+// then:
+// -(SafeInt<int>(ss))
+// will then emit a signed int with the correct value and bitfield
 
 template < typename T > class NegationHelper <T, true> // Signed
 {
 public:
     template <typename E>
-    static T NegativeThrow( T t )
+    static T NegativeThrow( T t ) SAFEINT_CPP_THROW
     {
         // corner case
         if( t != IntTraits< T >::minInt )
@@ -903,7 +1081,7 @@ public:
         E::SafeIntOnOverflow();
     }
 
-    static bool Negative( T t, T& ret ) throw()
+    static bool Negative( T t, T& ret ) SAFEINT_NOTHROW
     {
         // corner case
         if( t != IntTraits< T >::minInt )
@@ -924,12 +1102,12 @@ template <>
 class SignedNegation <signed __int32>
 {
 public:
-    static signed __int32 Value(unsigned __int64 in)
+    static signed __int32 Value(unsigned __int64 in) SAFEINT_NOTHROW
     {
         return (signed __int32)(~(unsigned __int32)in + 1);
     }
 
-    static signed __int32 Value(unsigned __int32 in)
+    static signed __int32 Value(unsigned __int32 in) SAFEINT_NOTHROW
     {
         return (signed __int32)(~in + 1);
     }
@@ -939,53 +1117,23 @@ template <>
 class SignedNegation <signed __int64>
 {
 public:
-    static signed __int64 Value(unsigned __int64 in)
+    static signed __int64 Value(unsigned __int64 in) SAFEINT_NOTHROW
     {
         return (signed __int64)(~in + 1);
     }
-};
-
-template < int method > class NegationAssertHelper;
-
-template<>
-class NegationAssertHelper< true >
-{
-    public:
-        static void BehaviorWarning()
-        {
-            // This will normally upcast to int
-            // For example -(unsigned short)0xffff == (int)0xffff0001
-            // This class will retain the type, and will truncate, which may not be what
-            // you wanted
-            // If you want normal operator casting behavior, do this:
-            // SafeInt<unsigned short> ss = 0xffff;
-            // then:
-            // -(SafeInt<int>(ss))
-            // will then emit a signed int with the correct value and bitfield
-            assert( false );
-        }
-};
-
-template<>
-class NegationAssertHelper< false >
-{
-    public:
-        static void BehaviorWarning(){}
 };
 
 template < typename T > class NegationHelper <T, false> // unsigned
 {
 public:
     template <typename E>
-    static T NegativeThrow( T t ) throw()
+    static T NegativeThrow( T t ) SAFEINT_CPP_THROW
     {
-        NegationAssertHelper< IntTraits<T>::isLT32Bit >::BehaviorWarning();
-
 #if defined SAFEINT_DISALLOW_UNSIGNED_NEGATION
         C_ASSERT( sizeof(T) == 0 );
 #endif
 
-#if !defined __GNUC__
+#if SAFEINT_COMPILER == VISUAL_STUDIO_COMPILER
 #pragma warning(push)
 //this avoids warnings from the unary '-' operator being applied to unsigned numbers
 #pragma warning(disable:4146)
@@ -996,17 +1144,17 @@ public:
         // but it seems like you would want a warning when doing this.
         return (T)-t;
 
-#if !defined __GNUC__
+#if SAFEINT_COMPILER == VISUAL_STUDIO_COMPILER
 #pragma warning(pop)
 #endif
     }
 
-    static bool Negative( T t, T& ret )
+    static bool Negative( T t, T& ret ) SAFEINT_NOTHROW
     {
         if( IntTraits<T>::isLT32Bit )
         {
             // See above
-            assert( false );
+            SAFEINT_ASSERT( false );
         }
 #if defined SAFEINT_DISALLOW_UNSIGNED_NEGATION
         C_ASSERT( sizeof(T) == 0 );
@@ -1023,8 +1171,8 @@ enum CastMethod
     CastOK = 0,
     CastCheckLTZero,
     CastCheckGTMax,
-    CastCheckMinMaxUnsigned,
-    CastCheckMinMaxSigned,
+    CastCheckSafeIntMinMaxUnsigned,
+    CastCheckSafeIntMinMaxSigned,
     CastToFloat,
     CastFromFloat,
     CastToBool,
@@ -1056,8 +1204,8 @@ public:
                      IntTraits< FromType >::isSigned &&
                      sizeof( ToType ) >= sizeof( FromType ) )          ? CastCheckLTZero :
 
-                 ( !IntTraits< ToType >::isSigned )                    ? CastCheckMinMaxUnsigned
-                                                                       : CastCheckMinMaxSigned
+                 ( !IntTraits< ToType >::isSigned )                    ? CastCheckSafeIntMinMaxUnsigned
+                                                                       : CastCheckSafeIntMinMaxSigned
     };
 };
 
@@ -1102,14 +1250,14 @@ template < typename T, typename U, int > class SafeCastHelper;
 template < typename T, typename U > class SafeCastHelper < T, U, CastOK >
 {
 public:
-    static bool Cast( U u, T& t ) throw()
+    static bool Cast( U u, T& t ) SAFEINT_NOTHROW
     {
         t = (T)u;
         return true;
     }
 
     template < typename E >
-    static void CastThrow( U u, T& t )
+    static void CastThrow( U u, T& t ) SAFEINT_CPP_THROW
     {
         t = (T)u;
     }
@@ -1120,7 +1268,7 @@ public:
 template < typename T, typename U > class SafeCastHelper < T, U, CastFromFloat >
 {
 public:
-    static bool Cast( U u, T& t ) throw()
+    static bool Cast( U u, T& t ) SAFEINT_NOTHROW
     {
         if( u <= (U)IntTraits< T >::maxInt &&
             u >= (U)IntTraits< T >::minInt )
@@ -1132,7 +1280,7 @@ public:
     }
 
     template < typename E >
-    static void CastThrow( U u, T& t )
+    static void CastThrow( U u, T& t ) SAFEINT_CPP_THROW
     {
         if( u <= (U)IntTraits< T >::maxInt &&
             u >= (U)IntTraits< T >::minInt )
@@ -1148,14 +1296,14 @@ public:
 template < typename T > class SafeCastHelper < T, bool, CastFromBool >
 {
 public:
-    static bool Cast( bool b, T& t ) throw()
+    static bool Cast( bool b, T& t ) SAFEINT_NOTHROW
     {
         t = (T)( b ? 1 : 0 );
         return true;
     }
 
     template < typename E >
-    static void CastThrow( bool b, T& t )
+    static void CastThrow( bool b, T& t ) SAFEINT_CPP_THROW
     {
         t = (T)( b ? 1 : 0 );
     }
@@ -1164,14 +1312,14 @@ public:
 template < typename T > class SafeCastHelper < bool, T, CastToBool >
 {
 public:
-    static bool Cast( T t, bool& b ) throw()
+    static bool Cast( T t, bool& b ) SAFEINT_NOTHROW
     {
         b = !!t;
         return true;
     }
 
     template < typename E >
-    static void CastThrow( bool b, T& t )
+    static void CastThrow( bool b, T& t ) SAFEINT_CPP_THROW
     {
         b = !!t;
     }
@@ -1180,7 +1328,7 @@ public:
 template < typename T, typename U > class SafeCastHelper < T, U, CastCheckLTZero >
 {
 public:
-    static bool Cast( U u, T& t ) throw()
+    static bool Cast( U u, T& t ) SAFEINT_NOTHROW
     {
         if( u < 0 )
             return false;
@@ -1190,7 +1338,7 @@ public:
     }
 
     template < typename E >
-    static void CastThrow( U u, T& t )
+    static void CastThrow( U u, T& t ) SAFEINT_CPP_THROW
     {
         if( u < 0 )
             E::SafeIntOnOverflow();
@@ -1202,7 +1350,7 @@ public:
 template < typename T, typename U > class SafeCastHelper < T, U, CastCheckGTMax >
 {
 public:
-    static bool Cast( U u, T& t ) throw()
+    static bool Cast( U u, T& t ) SAFEINT_NOTHROW
     {
         if( u > (U)IntTraits< T >::maxInt )
             return false;
@@ -1212,7 +1360,7 @@ public:
     }
 
     template < typename E >
-    static void CastThrow( U u, T& t )
+    static void CastThrow( U u, T& t ) SAFEINT_CPP_THROW
     {
         if( u > (U)IntTraits< T >::maxInt )
             E::SafeIntOnOverflow();
@@ -1221,10 +1369,10 @@ public:
     }
 };
 
-template < typename T, typename U > class SafeCastHelper < T, U, CastCheckMinMaxUnsigned >
+template < typename T, typename U > class SafeCastHelper < T, U, CastCheckSafeIntMinMaxUnsigned >
 {
 public:
-    static bool Cast( U u, T& t ) throw()
+    static bool Cast( U u, T& t ) SAFEINT_NOTHROW
     {
         // U is signed - T could be either signed or unsigned
         if( u > IntTraits< T >::maxInt || u < 0 )
@@ -1235,7 +1383,7 @@ public:
     }
 
     template < typename E >
-    static void CastThrow( U u, T& t )
+    static void CastThrow( U u, T& t ) SAFEINT_CPP_THROW
     {
         // U is signed - T could be either signed or unsigned
         if( u > IntTraits< T >::maxInt || u < 0 )
@@ -1245,10 +1393,10 @@ public:
     }
 };
 
-template < typename T, typename U > class SafeCastHelper < T, U, CastCheckMinMaxSigned >
+template < typename T, typename U > class SafeCastHelper < T, U, CastCheckSafeIntMinMaxSigned >
 {
 public:
-    static bool Cast( U u, T& t ) throw()
+    static bool Cast( U u, T& t ) SAFEINT_NOTHROW
     {
         // T, U are signed
         if( u > IntTraits< T >::maxInt || u < IntTraits< T >::minInt )
@@ -1259,7 +1407,7 @@ public:
     }
 
     template < typename E >
-    static void CastThrow( U u, T& t )
+    static void CastThrow( U u, T& t ) SAFEINT_CPP_THROW
     {
         //T, U are signed
         if( u > IntTraits< T >::maxInt || u < IntTraits< T >::minInt )
@@ -1323,25 +1471,25 @@ template <typename T, typename U, int state> class EqualityTest;
 template < typename T, typename U > class EqualityTest< T, U, ComparisonMethod_Ok >
 {
 public:
-    static bool IsEquals( const T t, const U u ) throw() { return ( t == u ); }
+    static bool IsEquals( const T t, const U u ) SAFEINT_NOTHROW { return ( t == u ); }
 };
 
 template < typename T, typename U > class EqualityTest< T, U, ComparisonMethod_CastInt >
 {
 public:
-    static bool IsEquals( const T t, const U u ) throw() { return ( (int)t == (int)u ); }
+    static bool IsEquals( const T t, const U u ) SAFEINT_NOTHROW { return ( (int)t == (int)u ); }
 };
 
 template < typename T, typename U > class EqualityTest< T, U, ComparisonMethod_CastInt64 >
 {
 public:
-    static bool IsEquals( const T t, const U u ) throw() { return ( (__int64)t == (__int64)u ); }
+    static bool IsEquals( const T t, const U u ) SAFEINT_NOTHROW { return ( (__int64)t == (__int64)u ); }
 };
 
 template < typename T, typename U > class EqualityTest< T, U, ComparisonMethod_UnsignedT >
 {
 public:
-    static bool IsEquals( const T t, const U u ) throw()
+    static bool IsEquals( const T t, const U u ) SAFEINT_NOTHROW
     {
         //one operand is 32 or 64-bit unsigned, and the other is signed and the same size or smaller
         if( u < 0 )
@@ -1355,7 +1503,7 @@ public:
 template < typename T, typename U > class EqualityTest< T, U, ComparisonMethod_UnsignedU>
 {
 public:
-    static bool IsEquals( const T t, const U u ) throw()
+    static bool IsEquals( const T t, const U u ) SAFEINT_NOTHROW
     {
         //one operand is 32 or 64-bit unsigned, and the other is signed and the same size or smaller
         if( t < 0 )
@@ -1371,25 +1519,25 @@ template <typename T, typename U, int state> class GreaterThanTest;
 template < typename T, typename U > class GreaterThanTest< T, U, ComparisonMethod_Ok >
 {
 public:
-    static bool GreaterThan( const T t, const U u ) throw() { return ( t > u ); }
+    static bool GreaterThan( const T t, const U u ) SAFEINT_NOTHROW { return ( t > u ); }
 };
 
 template < typename T, typename U > class GreaterThanTest< T, U, ComparisonMethod_CastInt >
 {
 public:
-    static bool GreaterThan( const T t, const U u ) throw() { return ( (int)t > (int)u ); }
+    static bool GreaterThan( const T t, const U u ) SAFEINT_NOTHROW { return ( (int)t > (int)u ); }
 };
 
 template < typename T, typename U > class GreaterThanTest< T, U, ComparisonMethod_CastInt64 >
 {
 public:
-    static bool GreaterThan( const T t, const U u ) throw() { return ( (__int64)t > (__int64)u ); }
+    static bool GreaterThan( const T t, const U u ) SAFEINT_NOTHROW { return ( (__int64)t > (__int64)u ); }
 };
 
 template < typename T, typename U > class GreaterThanTest< T, U, ComparisonMethod_UnsignedT >
 {
 public:
-    static bool GreaterThan( const T t, const U u ) throw()
+    static bool GreaterThan( const T t, const U u ) SAFEINT_NOTHROW
     {
         // one operand is 32 or 64-bit unsigned, and the other is signed and the same size or smaller
         if( u < 0 )
@@ -1403,7 +1551,7 @@ public:
 template < typename T, typename U > class GreaterThanTest< T, U, ComparisonMethod_UnsignedU >
 {
 public:
-    static bool GreaterThan( const T t, const U u ) throw()
+    static bool GreaterThan( const T t, const U u ) SAFEINT_NOTHROW
     {
         // one operand is 32 or 64-bit unsigned, and the other is signed and the same size or smaller
         if( t < 0 )
@@ -1421,7 +1569,7 @@ template <typename T, typename U, int method > class ModulusHelper;
 template <typename T, typename U> class ModulusHelper <T, U, ComparisonMethod_Ok>
 {
 public:
-    static SafeIntError Modulus( const T& t, const U& u, T& result ) throw()
+    static SafeIntError Modulus( const T& t, const U& u, T& result ) SAFEINT_NOTHROW
     {
         if(u == 0)
             return SafeIntDivideByZero;
@@ -1443,7 +1591,7 @@ public:
     }
 
     template < typename E >
-    static void ModulusThrow( const T& t, const U& u, T& result )
+    static void ModulusThrow( const T& t, const U& u, T& result ) SAFEINT_CPP_THROW
     {
         if(u == 0)
             E::SafeIntOnDivZero();
@@ -1465,7 +1613,7 @@ public:
 template <typename T, typename U> class ModulusHelper <T, U, ComparisonMethod_CastInt>
 {
 public:
-    static SafeIntError Modulus( const T& t, const U& u, T& result ) throw()
+    static SafeIntError Modulus( const T& t, const U& u, T& result ) SAFEINT_NOTHROW
     {
         if(u == 0)
             return SafeIntDivideByZero;
@@ -1485,7 +1633,7 @@ public:
     }
 
     template < typename E >
-    static void ModulusThrow( const T& t, const U& u, T& result )
+    static void ModulusThrow( const T& t, const U& u, T& result ) SAFEINT_CPP_THROW
     {
         if(u == 0)
             E::SafeIntOnDivZero();
@@ -1507,7 +1655,7 @@ public:
 template < typename T, typename U > class ModulusHelper< T, U, ComparisonMethod_CastInt64>
 {
 public:
-    static SafeIntError Modulus( const T& t, const U& u, T& result ) throw()
+    static SafeIntError Modulus( const T& t, const U& u, T& result ) SAFEINT_NOTHROW
     {
         if(u == 0)
             return SafeIntDivideByZero;
@@ -1527,7 +1675,7 @@ public:
     }
 
     template < typename E >
-    static void ModulusThrow( const T& t, const U& u, T& result )
+    static void ModulusThrow( const T& t, const U& u, T& result ) SAFEINT_CPP_THROW
     {
         if(u == 0)
             E::SafeIntOnDivZero();
@@ -1549,7 +1697,7 @@ public:
 template < typename T, typename U > class ModulusHelper< T, U, ComparisonMethod_UnsignedT>
 {
 public:
-    static SafeIntError Modulus( const T& t, const U& u, T& result ) throw()
+    static SafeIntError Modulus( const T& t, const U& u, T& result ) SAFEINT_NOTHROW
     {
         if(u == 0)
             return SafeIntDivideByZero;
@@ -1565,7 +1713,7 @@ public:
     }
 
     template < typename E >
-    static void ModulusThrow( const T& t, const U& u, T& result )
+    static void ModulusThrow( const T& t, const U& u, T& result ) SAFEINT_CPP_THROW
     {
         if(u == 0)
             E::SafeIntOnDivZero();
@@ -1582,7 +1730,7 @@ public:
 template < typename T, typename U > class ModulusHelper< T, U, ComparisonMethod_UnsignedU>
 {
 public:
-    static SafeIntError Modulus( const T& t, const U& u, T& result ) throw()
+    static SafeIntError Modulus( const T& t, const U& u, T& result ) SAFEINT_NOTHROW
     {
         if(u == 0)
             return SafeIntDivideByZero;
@@ -1597,7 +1745,7 @@ public:
     }
 
     template < typename E >
-    static void ModulusThrow( const T& t, const U& u, T& result )
+    static void ModulusThrow( const T& t, const U& u, T& result ) SAFEINT_CPP_THROW
     {
         if(u == 0)
             E::SafeIntOnDivZero();
@@ -1677,7 +1825,7 @@ template < typename T, typename U > class MultiplicationHelper< T, U, Multiplica
 {
 public:
     //accepts signed, both less than 32-bit
-    static bool Multiply( const T& t, const U& u, T& ret ) throw()
+    static bool Multiply( const T& t, const U& u, T& ret ) SAFEINT_NOTHROW
     {
         int tmp = t * u;
 
@@ -1689,7 +1837,7 @@ public:
     }
 
     template < typename E >
-    static void MultiplyThrow( const T& t, const U& u, T& ret )
+    static void MultiplyThrow( const T& t, const U& u, T& ret ) SAFEINT_CPP_THROW
     {
         int tmp = t * u;
 
@@ -1704,7 +1852,7 @@ template < typename T, typename U > class MultiplicationHelper< T, U, Multiplica
 {
 public:
     //accepts unsigned, both less than 32-bit
-    static bool Multiply( const T& t, const U& u, T& ret ) throw()
+    static bool Multiply( const T& t, const U& u, T& ret ) SAFEINT_NOTHROW
     {
         unsigned int tmp = (unsigned int)(t * u);
 
@@ -1716,7 +1864,7 @@ public:
     }
 
     template < typename E >
-    static void MultiplyThrow( const T& t, const U& u, T& ret )
+    static void MultiplyThrow( const T& t, const U& u, T& ret ) SAFEINT_CPP_THROW
     {
         unsigned int tmp = (unsigned int)( t * u );
 
@@ -1731,7 +1879,7 @@ template < typename T, typename U > class MultiplicationHelper< T, U, Multiplica
 {
 public:
     //mixed signed or both signed where at least one argument is 32-bit, and both a 32-bit or less
-    static bool Multiply( const T& t, const U& u, T& ret ) throw()
+    static bool Multiply( const T& t, const U& u, T& ret ) SAFEINT_NOTHROW
     {
         __int64 tmp = (__int64)t * (__int64)u;
 
@@ -1743,7 +1891,7 @@ public:
     }
 
     template < typename E >
-    static void MultiplyThrow( const T& t, const U& u, T& ret )
+    static void MultiplyThrow( const T& t, const U& u, T& ret ) SAFEINT_CPP_THROW
     {
         __int64 tmp = (__int64)t * (__int64)u;
 
@@ -1758,7 +1906,7 @@ template < typename T, typename U > class MultiplicationHelper< T, U, Multiplica
 {
 public:
     //both unsigned where at least one argument is 32-bit, and both are 32-bit or less
-    static bool Multiply( const T& t, const U& u, T& ret ) throw()
+    static bool Multiply( const T& t, const U& u, T& ret ) SAFEINT_NOTHROW
     {
         unsigned __int64 tmp = (unsigned __int64)t * (unsigned __int64)u;
 
@@ -1770,7 +1918,7 @@ public:
     }
 
     template < typename E >
-    static void MultiplyThrow( const T& t, const U& u, T& ret )
+    static void MultiplyThrow( const T& t, const U& u, T& ret ) SAFEINT_CPP_THROW
     {
         unsigned __int64 tmp = (unsigned __int64)t * (unsigned __int64)u;
 
@@ -1787,7 +1935,7 @@ template < typename T, typename U > class LargeIntRegMultiply;
 
 #if SAFEINT_USE_INTRINSICS
 // As usual, unsigned is easy
-inline bool IntrinsicMultiplyUint64( const unsigned __int64& a, const unsigned __int64& b, unsigned __int64* pRet )
+inline bool IntrinsicMultiplyUint64( const unsigned __int64& a, const unsigned __int64& b, unsigned __int64* pRet ) SAFEINT_NOTHROW
 {
     unsigned __int64 ulHigh = 0;
     *pRet = _umul128(a , b, &ulHigh);
@@ -1795,7 +1943,7 @@ inline bool IntrinsicMultiplyUint64( const unsigned __int64& a, const unsigned _
 }
 
 // Signed, is not so easy
-inline bool IntrinsicMultiplyInt64( const signed __int64& a, const signed __int64& b, signed __int64* pRet )
+inline bool IntrinsicMultiplyInt64( const signed __int64& a, const signed __int64& b, signed __int64* pRet ) SAFEINT_NOTHROW
 {
     __int64 llHigh = 0;
     *pRet = _mul128(a , b, &llHigh);
@@ -1829,7 +1977,7 @@ inline bool IntrinsicMultiplyInt64( const signed __int64& a, const signed __int6
 template<> class LargeIntRegMultiply< unsigned __int64, unsigned __int64 >
 {
 public:
-    static bool RegMultiply( const unsigned __int64& a, const unsigned __int64& b, unsigned __int64* pRet ) throw()
+    static bool RegMultiply( const unsigned __int64& a, const unsigned __int64& b, unsigned __int64* pRet ) SAFEINT_NOTHROW
     {
 #if SAFEINT_USE_INTRINSICS
         return IntrinsicMultiplyUint64( a, b, pRet );
@@ -1890,7 +2038,7 @@ public:
     }
 
     template < typename E >
-    static void RegMultiplyThrow( const unsigned __int64& a, const unsigned __int64& b, unsigned __int64* pRet )
+    static void RegMultiplyThrow( const unsigned __int64& a, const unsigned __int64& b, unsigned __int64* pRet ) SAFEINT_CPP_THROW
     {
 #if SAFEINT_USE_INTRINSICS
         if( !IntrinsicMultiplyUint64( a, b, pRet ) )
@@ -1954,7 +2102,7 @@ public:
 template<> class LargeIntRegMultiply< unsigned __int64, unsigned __int32 >
 {
 public:
-    static bool RegMultiply( const unsigned __int64& a, unsigned __int32 b, unsigned __int64* pRet ) throw()
+    static bool RegMultiply( const unsigned __int64& a, unsigned __int32 b, unsigned __int64* pRet ) SAFEINT_NOTHROW
     {
 #if SAFEINT_USE_INTRINSICS
         return IntrinsicMultiplyUint64( a, (unsigned __int64)b, pRet );
@@ -1995,7 +2143,7 @@ public:
     }
 
     template < typename E >
-    static void RegMultiplyThrow( const unsigned __int64& a, unsigned __int32 b, unsigned __int64* pRet )
+    static void RegMultiplyThrow( const unsigned __int64& a, unsigned __int32 b, unsigned __int64* pRet ) SAFEINT_CPP_THROW
     {
 #if SAFEINT_USE_INTRINSICS
         if( !IntrinsicMultiplyUint64( a, (unsigned __int64)b, pRet ) )
@@ -2041,7 +2189,7 @@ template<> class LargeIntRegMultiply< unsigned __int64, signed __int32 >
 {
 public:
     // Intrinsic not needed
-    static bool RegMultiply( const unsigned __int64& a, signed __int32 b, unsigned __int64* pRet ) throw()
+    static bool RegMultiply( const unsigned __int64& a, signed __int32 b, unsigned __int64* pRet ) SAFEINT_NOTHROW
     {
         if( b < 0 && a != 0 )
             return false;
@@ -2054,7 +2202,7 @@ public:
     }
 
     template < typename E >
-    static void RegMultiplyThrow( const unsigned __int64& a, signed __int32 b, unsigned __int64* pRet )
+    static void RegMultiplyThrow( const unsigned __int64& a, signed __int32 b, unsigned __int64* pRet ) SAFEINT_CPP_THROW
     {
         if( b < 0 && a != 0 )
             E::SafeIntOnOverflow();
@@ -2071,7 +2219,7 @@ public:
 template<> class LargeIntRegMultiply< unsigned __int64, signed __int64 >
 {
 public:
-    static bool RegMultiply( const unsigned __int64& a, signed __int64 b, unsigned __int64* pRet ) throw()
+    static bool RegMultiply( const unsigned __int64& a, signed __int64 b, unsigned __int64* pRet ) SAFEINT_NOTHROW
     {
         if( b < 0 && a != 0 )
             return false;
@@ -2084,7 +2232,7 @@ public:
     }
 
     template < typename E >
-    static void RegMultiplyThrow( const unsigned __int64& a, signed __int64 b, unsigned __int64* pRet )
+    static void RegMultiplyThrow( const unsigned __int64& a, signed __int64 b, unsigned __int64* pRet ) SAFEINT_CPP_THROW
     {
         if( b < 0 && a != 0 )
             E::SafeIntOnOverflow();
@@ -2102,7 +2250,7 @@ template<> class LargeIntRegMultiply< signed __int32, unsigned __int64 >
 {
 public:
     // Devolves into ordinary 64-bit calculation
-    static bool RegMultiply( signed __int32 a, const unsigned __int64& b, signed __int32* pRet ) throw()
+    static bool RegMultiply( signed __int32 a, const unsigned __int64& b, signed __int32* pRet ) SAFEINT_NOTHROW
     {
         unsigned __int32 bHigh, bLow;
         bool fIsNegative = false;
@@ -2152,7 +2300,7 @@ public:
     }
 
     template < typename E >
-    static void RegMultiplyThrow( signed __int32 a, const unsigned __int64& b, signed __int32* pRet )
+    static void RegMultiplyThrow( signed __int32 a, const unsigned __int64& b, signed __int32* pRet ) SAFEINT_CPP_THROW
     {
         unsigned __int32 bHigh, bLow;
         bool fIsNegative = false;
@@ -2202,7 +2350,7 @@ template<> class LargeIntRegMultiply< unsigned __int32, unsigned __int64 >
 {
 public:
     // Becomes ordinary 64-bit multiplication, intrinsic not needed
-    static bool RegMultiply( unsigned __int32 a, const unsigned __int64& b, unsigned __int32* pRet ) throw()
+    static bool RegMultiply( unsigned __int32 a, const unsigned __int64& b, unsigned __int32* pRet ) SAFEINT_NOTHROW
     {
         // Consider that a*b can be broken up into:
         // (bHigh * 2^32 + bLow) * a
@@ -2223,7 +2371,7 @@ public:
     }
 
     template < typename E >
-    static void RegMultiplyThrow( unsigned __int32 a, const unsigned __int64& b, unsigned __int32* pRet )
+    static void RegMultiplyThrow( unsigned __int32 a, const unsigned __int64& b, unsigned __int32* pRet ) SAFEINT_CPP_THROW
     {
         if( (unsigned __int32)(b >> 32) != 0 && a != 0 )
             E::SafeIntOnOverflow();
@@ -2240,7 +2388,7 @@ public:
 template<> class LargeIntRegMultiply< unsigned __int32, signed __int64 >
 {
 public:
-    static bool RegMultiply( unsigned __int32 a, const signed __int64& b, unsigned __int32* pRet ) throw()
+    static bool RegMultiply( unsigned __int32 a, const signed __int64& b, unsigned __int32* pRet ) SAFEINT_NOTHROW
     {
         if( b < 0 && a != 0 )
             return false;
@@ -2248,7 +2396,7 @@ public:
     }
 
     template < typename E >
-    static void RegMultiplyThrow( unsigned __int32 a, const signed __int64& b, unsigned __int32* pRet )
+    static void RegMultiplyThrow( unsigned __int32 a, const signed __int64& b, unsigned __int32* pRet ) SAFEINT_CPP_THROW
     {
         if( b < 0 && a != 0 )
             E::SafeIntOnOverflow();
@@ -2260,7 +2408,7 @@ public:
 template<> class LargeIntRegMultiply< signed __int64, signed __int64 >
 {
 public:
-    static bool RegMultiply( const signed __int64& a, const signed __int64& b, signed __int64* pRet ) throw()
+    static bool RegMultiply( const signed __int64& a, const signed __int64& b, signed __int64* pRet ) SAFEINT_NOTHROW
     {
 #if SAFEINT_USE_INTRINSICS
         return IntrinsicMultiplyInt64( a, b, pRet );
@@ -2312,7 +2460,7 @@ public:
     }
 
     template < typename E >
-    static void RegMultiplyThrow( const signed __int64& a, const signed __int64& b, signed __int64* pRet )
+    static void RegMultiplyThrow( const signed __int64& a, const signed __int64& b, signed __int64* pRet ) SAFEINT_CPP_THROW
     {
 #if SAFEINT_USE_INTRINSICS
         if( !IntrinsicMultiplyInt64( a, b, pRet ) )
@@ -2367,7 +2515,7 @@ public:
 template<> class LargeIntRegMultiply< signed __int64, unsigned __int32 >
 {
 public:
-    static bool RegMultiply( const signed __int64& a, unsigned __int32 b, signed __int64* pRet ) throw()
+    static bool RegMultiply( const signed __int64& a, unsigned __int32 b, signed __int64* pRet ) SAFEINT_NOTHROW
     {
 #if SAFEINT_USE_INTRINSICS
         return IntrinsicMultiplyInt64( a, (signed __int64)b, pRet );
@@ -2410,7 +2558,7 @@ public:
     }
 
     template < typename E >
-    static void RegMultiplyThrow( const signed __int64& a, unsigned __int32 b, signed __int64* pRet )
+    static void RegMultiplyThrow( const signed __int64& a, unsigned __int32 b, signed __int64* pRet ) SAFEINT_CPP_THROW
     {
 #if SAFEINT_USE_INTRINSICS
         if( !IntrinsicMultiplyInt64( a, (signed __int64)b, pRet ) )
@@ -2456,7 +2604,7 @@ public:
 template<> class LargeIntRegMultiply< signed __int64, signed __int32 >
 {
 public:
-    static bool RegMultiply( const signed __int64& a, signed __int32 b, signed __int64* pRet ) throw()
+    static bool RegMultiply( const signed __int64& a, signed __int32 b, signed __int64* pRet ) SAFEINT_NOTHROW
     {
 #if SAFEINT_USE_INTRINSICS
         return IntrinsicMultiplyInt64( a, (signed __int64)b, pRet );
@@ -2508,7 +2656,7 @@ public:
     }
 
     template < typename E >
-    static void RegMultiplyThrow( signed __int64 a, signed __int32 b, signed __int64* pRet )
+    static void RegMultiplyThrow( signed __int64 a, signed __int32 b, signed __int64* pRet ) SAFEINT_CPP_THROW
     {
 #if SAFEINT_USE_INTRINSICS
         if( !IntrinsicMultiplyInt64( a, (signed __int64)b, pRet ) )
@@ -2561,7 +2709,7 @@ public:
 template<> class LargeIntRegMultiply< signed __int32, signed __int64 >
 {
 public:
-    static bool RegMultiply( signed __int32 a, const signed __int64& b, signed __int32* pRet ) throw()
+    static bool RegMultiply( signed __int32 a, const signed __int64& b, signed __int32* pRet ) SAFEINT_NOTHROW
     {
 #if SAFEINT_USE_INTRINSICS
         __int64 tmp;
@@ -2625,7 +2773,7 @@ public:
     }
 
     template < typename E >
-    static void RegMultiplyThrow( signed __int32 a, const signed __int64& b, signed __int32* pRet )
+    static void RegMultiplyThrow( signed __int32 a, const signed __int64& b, signed __int32* pRet ) SAFEINT_CPP_THROW
     {
 #if SAFEINT_USE_INTRINSICS
         __int64 tmp;
@@ -2692,7 +2840,7 @@ template<> class LargeIntRegMultiply< signed __int64, unsigned __int64 >
 {
 public:
     // Leave this one as-is - will call unsigned intrinsic internally
-    static bool RegMultiply( const signed __int64& a, const unsigned __int64& b, signed __int64* pRet ) throw()
+    static bool RegMultiply( const signed __int64& a, const unsigned __int64& b, signed __int64* pRet ) SAFEINT_NOTHROW
     {
         bool aNegative = false;
 
@@ -2732,7 +2880,7 @@ public:
     }
 
     template < typename E >
-    static void RegMultiplyThrow( const signed __int64& a, const unsigned __int64& b, signed __int64* pRet )
+    static void RegMultiplyThrow( const signed __int64& a, const unsigned __int64& b, signed __int64* pRet ) SAFEINT_CPP_THROW
     {
         bool aNegative = false;
         unsigned __int64 tmp;
@@ -2780,7 +2928,7 @@ template < typename T, typename U > class MultiplicationHelper< T, U, Multiplica
 {
 public:
     // T, U are unsigned __int64
-    static bool Multiply( const T& t, const U& u, T& ret ) throw()
+    static bool Multiply( const T& t, const U& u, T& ret ) SAFEINT_NOTHROW
     {
         C_ASSERT( IntTraits<T>::isUint64 && IntTraits<U>::isUint64 );
         unsigned __int64 t1 = t;
@@ -2789,7 +2937,7 @@ public:
     }
 
     template < typename E >
-    static void MultiplyThrow(const unsigned __int64& t, const unsigned __int64& u, T& ret)
+    static void MultiplyThrow(const unsigned __int64& t, const unsigned __int64& u, T& ret) SAFEINT_CPP_THROW
     {
         C_ASSERT( IntTraits<T>::isUint64 && IntTraits<U>::isUint64 );
         unsigned __int64 t1 = t;
@@ -2803,7 +2951,7 @@ template < typename T, typename U > class MultiplicationHelper< T, U, Multiplica
 public:
     // T is unsigned __int64
     // U is any unsigned int 32-bit or less
-    static bool Multiply( const T& t, const U& u, T& ret ) throw()
+    static bool Multiply( const T& t, const U& u, T& ret ) SAFEINT_NOTHROW
     {
         C_ASSERT( IntTraits<T>::isUint64 );
         unsigned __int64 t1 = t;
@@ -2811,7 +2959,7 @@ public:
     }
 
     template < typename E >
-    static void MultiplyThrow( const T& t, const U& u, T& ret )
+    static void MultiplyThrow( const T& t, const U& u, T& ret ) SAFEINT_CPP_THROW
     {
         C_ASSERT( IntTraits<T>::isUint64 );
         unsigned __int64 t1 = t;
@@ -2825,7 +2973,7 @@ template < typename T, typename U > class MultiplicationHelper< T, U, Multiplica
 public:
     // T is any unsigned int up to 32-bit
     // U is unsigned __int64
-    static bool Multiply(const T& t, const U& u, T& ret) throw()
+    static bool Multiply(const T& t, const U& u, T& ret) SAFEINT_NOTHROW
     {
         C_ASSERT( IntTraits<U>::isUint64 );
         unsigned __int64 u1 = u;
@@ -2841,7 +2989,7 @@ public:
     }
 
     template < typename E >
-    static void MultiplyThrow(const T& t, const U& u, T& ret)
+    static void MultiplyThrow(const T& t, const U& u, T& ret) SAFEINT_CPP_THROW
     {
         C_ASSERT( IntTraits<U>::isUint64 );
         unsigned __int64 u1 = u;
@@ -2857,7 +3005,7 @@ template < typename T, typename U > class MultiplicationHelper< T, U, Multiplica
 public:
     // T is unsigned __int64
     // U is any signed int, up to 64-bit
-    static bool Multiply(const T& t, const U& u, T& ret) throw()
+    static bool Multiply(const T& t, const U& u, T& ret) SAFEINT_NOTHROW
     {
         C_ASSERT( IntTraits<T>::isUint64 );
         unsigned __int64 t1 = t;
@@ -2865,7 +3013,7 @@ public:
     }
 
     template < typename E >
-    static void MultiplyThrow(const T& t, const U& u, T& ret)
+    static void MultiplyThrow(const T& t, const U& u, T& ret) SAFEINT_CPP_THROW
     {
         C_ASSERT( IntTraits<T>::isUint64 );
         unsigned __int64 t1 = t;
@@ -2878,7 +3026,7 @@ template < typename T, typename U > class MultiplicationHelper< T, U, Multiplica
 public:
     // T is unsigned __int64
     // U is __int64
-    static bool Multiply(const T& t, const U& u, T& ret) throw()
+    static bool Multiply(const T& t, const U& u, T& ret) SAFEINT_NOTHROW
     {
         C_ASSERT( IntTraits<T>::isUint64 && IntTraits<U>::isInt64 );
         unsigned __int64 t1 = t;
@@ -2887,7 +3035,7 @@ public:
     }
 
     template < typename E >
-    static void MultiplyThrow(const T& t, const U& u, T& ret)
+    static void MultiplyThrow(const T& t, const U& u, T& ret) SAFEINT_CPP_THROW
     {
         C_ASSERT( IntTraits<T>::isUint64 && IntTraits<U>::isInt64 );
         unsigned __int64 t1 = t;
@@ -2901,7 +3049,7 @@ template < typename T, typename U > class MultiplicationHelper< T, U, Multiplica
 public:
     // T is unsigned up to 32-bit
     // U is __int64
-    static bool Multiply(const T& t, const U& u, T& ret) throw()
+    static bool Multiply(const T& t, const U& u, T& ret) SAFEINT_NOTHROW
     {
         C_ASSERT( IntTraits<U>::isInt64 );
         __int64          u1 = u;
@@ -2917,7 +3065,7 @@ public:
     }
 
     template < typename E >
-    static void MultiplyThrow(const T& t, const U& u, T& ret)
+    static void MultiplyThrow(const T& t, const U& u, T& ret) SAFEINT_CPP_THROW
     {
         C_ASSERT( IntTraits<U>::isInt64 );
         __int64          u1 = u;
@@ -2933,7 +3081,7 @@ template < typename T, typename U > class MultiplicationHelper< T, U, Multiplica
 public:
     // T is __int64
     // U is unsigned up to 32-bit
-    static bool Multiply( const T& t, const U& u, T& ret ) throw()
+    static bool Multiply( const T& t, const U& u, T& ret ) SAFEINT_NOTHROW
     {
         C_ASSERT( IntTraits<T>::isInt64 );
         __int64          t1 = t;
@@ -2941,7 +3089,7 @@ public:
     }
 
     template < typename E >
-    static void MultiplyThrow( const T& t, const U& u, T& ret )
+    static void MultiplyThrow( const T& t, const U& u, T& ret ) SAFEINT_CPP_THROW
     {
         C_ASSERT( IntTraits<T>::isInt64 );
         __int64          t1 = t;
@@ -2953,7 +3101,7 @@ template < typename T, typename U > class MultiplicationHelper< T, U, Multiplica
 {
 public:
     // T, U are __int64
-    static bool Multiply( const T& t, const U& u, T& ret ) throw()
+    static bool Multiply( const T& t, const U& u, T& ret ) SAFEINT_NOTHROW
     {
         C_ASSERT( IntTraits<T>::isInt64 && IntTraits<U>::isInt64 );
         __int64          t1 = t;
@@ -2962,7 +3110,7 @@ public:
     }
 
     template < typename E >
-    static void MultiplyThrow( const T& t, const U& u, T& ret )
+    static void MultiplyThrow( const T& t, const U& u, T& ret ) SAFEINT_CPP_THROW
     {
         C_ASSERT( IntTraits<T>::isInt64 && IntTraits<U>::isInt64 );
         __int64          t1 = t;
@@ -2976,7 +3124,7 @@ template < typename T, typename U > class MultiplicationHelper< T, U, Multiplica
 public:
     // T is __int64
     // U is signed up to 32-bit
-    static bool Multiply( const T& t, U u, T& ret ) throw()
+    static bool Multiply( const T& t, U u, T& ret ) SAFEINT_NOTHROW
     {
         C_ASSERT( IntTraits<T>::isInt64 );
         __int64          t1 = t;
@@ -2984,7 +3132,7 @@ public:
     }
 
     template < typename E >
-    static void MultiplyThrow( const __int64& t, U u, T& ret )
+    static void MultiplyThrow( const __int64& t, U u, T& ret ) SAFEINT_CPP_THROW
     {
         C_ASSERT( IntTraits<T>::isInt64 );
         __int64          t1 = t;
@@ -2997,7 +3145,7 @@ template < typename T, typename U > class MultiplicationHelper< T, U, Multiplica
 public:
     // T is signed up to 32-bit
     // U is unsigned __int64
-    static bool Multiply(T t, const U& u, T& ret) throw()
+    static bool Multiply(T t, const U& u, T& ret) SAFEINT_NOTHROW
     {
         C_ASSERT( IntTraits<U>::isUint64 );
         unsigned __int64 u1 = u;
@@ -3013,7 +3161,7 @@ public:
     }
 
     template < typename E >
-    static void MultiplyThrow(T t, const unsigned __int64& u, T& ret)
+    static void MultiplyThrow(T t, const unsigned __int64& u, T& ret) SAFEINT_CPP_THROW
     {
         C_ASSERT( IntTraits<U>::isUint64 );
         unsigned __int64 u1 = u;
@@ -3029,7 +3177,7 @@ template < typename T, typename U > class MultiplicationHelper< T, U, Multiplica
 public:
     // T is __int64
     // U is unsigned __int64
-    static bool Multiply( const T& t, const U& u, T& ret ) throw()
+    static bool Multiply( const T& t, const U& u, T& ret ) SAFEINT_NOTHROW
     {
         C_ASSERT( IntTraits<T>::isInt64 && IntTraits<U>::isUint64 );
         __int64          t1 = t;
@@ -3038,7 +3186,7 @@ public:
     }
 
     template < typename E >
-    static void MultiplyThrow( const __int64& t, const unsigned __int64& u, T& ret )
+    static void MultiplyThrow( const __int64& t, const unsigned __int64& u, T& ret ) SAFEINT_CPP_THROW
     {
         C_ASSERT( IntTraits<T>::isInt64 && IntTraits<U>::isUint64 );
         __int64          t1 = t;
@@ -3052,7 +3200,7 @@ template < typename T, typename U > class MultiplicationHelper< T, U, Multiplica
 public:
     // T is signed, up to 32-bit
     // U is __int64
-    static bool Multiply( T t, const U& u, T& ret ) throw()
+    static bool Multiply( T t, const U& u, T& ret ) SAFEINT_NOTHROW
     {
         C_ASSERT( IntTraits<U>::isInt64 );
         __int64 u1 = u;
@@ -3068,7 +3216,7 @@ public:
     }
 
     template < typename E >
-    static void MultiplyThrow(T t, const U& u, T& ret)
+    static void MultiplyThrow(T t, const U& u, T& ret) SAFEINT_CPP_THROW
     {
         C_ASSERT( IntTraits<U>::isInt64 );
         __int64 u1 = u;
@@ -3110,7 +3258,7 @@ template < typename T, typename U, int state > class DivisionHelper;
 template < typename T, typename U > class DivisionHelper< T, U, DivisionState_OK >
 {
 public:
-    static SafeIntError Divide( const T& t, const U& u, T& result ) throw()
+    static SafeIntError Divide( const T& t, const U& u, T& result ) SAFEINT_NOTHROW
     {
         if( u == 0 )
             return SafeIntDivideByZero;
@@ -3126,7 +3274,7 @@ public:
     }
 
     template < typename E >
-    static void DivideThrow( const T& t, const U& u, T& result )
+    static void DivideThrow( const T& t, const U& u, T& result ) SAFEINT_CPP_THROW
     {
         if( u == 0 )
             E::SafeIntOnDivZero();
@@ -3144,7 +3292,7 @@ public:
 template < typename T, typename U > class DivisionHelper< T, U, DivisionState_UnsignedSigned>
 {
 public:
-    static SafeIntError Divide( const T& t, const U& u, T& result ) throw()
+    static SafeIntError Divide( const T& t, const U& u, T& result ) SAFEINT_NOTHROW
     {
 
         if( u == 0 )
@@ -3174,7 +3322,7 @@ public:
     }
 
     template < typename E >
-    static void DivideThrow( const T& t, const U& u, T& result )
+    static void DivideThrow( const T& t, const U& u, T& result ) SAFEINT_CPP_THROW
     {
 
         if( u == 0 )
@@ -3207,7 +3355,7 @@ public:
 template < typename T, typename U > class DivisionHelper< T, U, DivisionState_SignedUnsigned32 >
 {
 public:
-    static SafeIntError Divide( const T& t, const U& u, T& result ) throw()
+    static SafeIntError Divide( const T& t, const U& u, T& result ) SAFEINT_NOTHROW
     {
         if( u == 0 )
             return SafeIntDivideByZero;
@@ -3231,7 +3379,7 @@ public:
     }
 
     template < typename E >
-    static void DivideThrow( const T& t, const U& u, T& result )
+    static void DivideThrow( const T& t, const U& u, T& result ) SAFEINT_CPP_THROW
     {
         if( u == 0 )
         {
@@ -3258,7 +3406,7 @@ public:
 template < typename T, typename U > class DivisionHelper< T, U, DivisionState_SignedUnsigned64 >
 {
 public:
-    static SafeIntError Divide( const T& t, const unsigned __int64& u, T& result ) throw()
+    static SafeIntError Divide( const T& t, const unsigned __int64& u, T& result ) SAFEINT_NOTHROW
     {
         C_ASSERT( IntTraits< U >::isUint64 );
 
@@ -3295,7 +3443,7 @@ public:
     }
 
     template < typename E >
-    static void DivideThrow( const T& t, const unsigned __int64& u, T& result )
+    static void DivideThrow( const T& t, const unsigned __int64& u, T& result ) SAFEINT_CPP_THROW
     {
         C_ASSERT( IntTraits< U >::isUint64 );
 
@@ -3336,7 +3484,7 @@ template < typename T, typename U > class DivisionHelper< T, U, DivisionState_Si
 public:
     // T is any signed, U is unsigned and smaller than 32-bit
     // In this case, standard operator casting is correct
-    static SafeIntError Divide( const T& t, const U& u, T& result ) throw()
+    static SafeIntError Divide( const T& t, const U& u, T& result ) SAFEINT_NOTHROW
     {
         if( u == 0 )
         {
@@ -3354,7 +3502,7 @@ public:
     }
 
     template < typename E >
-    static void DivideThrow( const T& t, const U& u, T& result )
+    static void DivideThrow( const T& t, const U& u, T& result ) SAFEINT_CPP_THROW
     {
         if( u == 0 )
         {
@@ -3374,7 +3522,7 @@ public:
 template < typename T, typename U > class DivisionHelper< T, U, DivisionState_SignedSigned>
 {
 public:
-    static SafeIntError Divide( const T& t, const U& u, T& result ) throw()
+    static SafeIntError Divide( const T& t, const U& u, T& result ) SAFEINT_NOTHROW
     {
         if( u == 0 )
         {
@@ -3396,7 +3544,7 @@ public:
     }
 
     template < typename E >
-    static void DivideThrow( const T& t, const U& u, T& result )
+    static void DivideThrow( const T& t, const U& u, T& result ) SAFEINT_CPP_THROW
     {
         if(u == 0)
         {
@@ -3424,13 +3572,13 @@ enum AdditionState
     AdditionState_CastUintCheckOverflowMax,
     AdditionState_CastUint64CheckOverflow,
     AdditionState_CastUint64CheckOverflowMax,
-    AdditionState_CastIntCheckMinMax,
-    AdditionState_CastInt64CheckMinMax,
+    AdditionState_CastIntCheckSafeIntMinMax,
+    AdditionState_CastInt64CheckSafeIntMinMax,
     AdditionState_CastInt64CheckMax,
-    AdditionState_CastUint64CheckMinMax,
-    AdditionState_CastUint64CheckMinMax2,
+    AdditionState_CastUint64CheckSafeIntMinMax,
+    AdditionState_CastUint64CheckSafeIntMinMax2,
     AdditionState_CastInt64CheckOverflow,
-    AdditionState_CastInt64CheckOverflowMinMax,
+    AdditionState_CastInt64CheckOverflowSafeIntMinMax,
     AdditionState_CastInt64CheckOverflowMax,
     AdditionState_ManualCheckInt64Uint64,
     AdditionState_ManualCheck,
@@ -3450,19 +3598,19 @@ public:
                  (IntRegion< T,U >::IntZone_Uint64_Uint)       ? AdditionState_CastUint64CheckOverflow :
                  (IntRegion< T,U >::IntZone_UintLT64_Uint64)   ? AdditionState_CastUint64CheckOverflowMax :
                  //unsigned-signed
-                 (IntRegion< T,U >::IntZone_UintLT32_IntLT32)  ? AdditionState_CastIntCheckMinMax :
+                 (IntRegion< T,U >::IntZone_UintLT32_IntLT32)  ? AdditionState_CastIntCheckSafeIntMinMax :
                  (IntRegion< T,U >::IntZone_Uint32_IntLT64 ||
-                  IntRegion< T,U >::IntZone_UintLT32_Int32)    ? AdditionState_CastInt64CheckMinMax :
+                  IntRegion< T,U >::IntZone_UintLT32_Int32)    ? AdditionState_CastInt64CheckSafeIntMinMax :
                  (IntRegion< T,U >::IntZone_Uint64_Int ||
-                  IntRegion< T,U >::IntZone_Uint64_Int64)      ? AdditionState_CastUint64CheckMinMax :
-                 (IntRegion< T,U >::IntZone_UintLT64_Int64)    ? AdditionState_CastUint64CheckMinMax2 :
+                  IntRegion< T,U >::IntZone_Uint64_Int64)      ? AdditionState_CastUint64CheckSafeIntMinMax :
+                 (IntRegion< T,U >::IntZone_UintLT64_Int64)    ? AdditionState_CastUint64CheckSafeIntMinMax2 :
                  //signed-signed
-                 (IntRegion< T,U >::IntZone_IntLT32_IntLT32)   ? AdditionState_CastIntCheckMinMax :
+                 (IntRegion< T,U >::IntZone_IntLT32_IntLT32)   ? AdditionState_CastIntCheckSafeIntMinMax :
                  (IntRegion< T,U >::IntZone_Int32_IntLT64 ||
-                  IntRegion< T,U >::IntZone_IntLT32_Int32)     ? AdditionState_CastInt64CheckMinMax :
+                  IntRegion< T,U >::IntZone_IntLT32_Int32)     ? AdditionState_CastInt64CheckSafeIntMinMax :
                  (IntRegion< T,U >::IntZone_Int64_Int ||
                   IntRegion< T,U >::IntZone_Int64_Int64)       ? AdditionState_CastInt64CheckOverflow :
-                 (IntRegion< T,U >::IntZone_IntLT64_Int64)     ? AdditionState_CastInt64CheckOverflowMinMax :
+                 (IntRegion< T,U >::IntZone_IntLT64_Int64)     ? AdditionState_CastInt64CheckOverflowSafeIntMinMax :
                  //signed-unsigned
                  (IntRegion< T,U >::IntZone_IntLT32_UintLT32)  ? AdditionState_CastIntCheckMax :
                  (IntRegion< T,U >::IntZone_Int32_UintLT32 ||
@@ -3479,7 +3627,7 @@ template < typename T, typename U, int method > class AdditionHelper;
 template < typename T, typename U > class AdditionHelper < T, U, AdditionState_CastIntCheckMax >
 {
 public:
-    static bool Addition( const T& lhs, const U& rhs, T& result ) throw()
+    static bool Addition( const T& lhs, const U& rhs, T& result ) SAFEINT_NOTHROW
     {
         //16-bit or less unsigned addition
         __int32 tmp = lhs + rhs;
@@ -3494,7 +3642,7 @@ public:
     }
 
     template < typename E >
-    static void AdditionThrow( const T& lhs, const U& rhs, T& result )
+    static void AdditionThrow( const T& lhs, const U& rhs, T& result ) SAFEINT_CPP_THROW
     {
         //16-bit or less unsigned addition
         __int32 tmp = lhs + rhs;
@@ -3512,7 +3660,7 @@ public:
 template < typename T, typename U > class AdditionHelper < T, U, AdditionState_CastUintCheckOverflow >
 {
 public:
-    static bool Addition( const T& lhs, const U& rhs, T& result ) throw()
+    static bool Addition( const T& lhs, const U& rhs, T& result ) SAFEINT_NOTHROW
     {
         // 32-bit or less - both are unsigned
         unsigned __int32 tmp = (unsigned __int32)lhs + (unsigned __int32)rhs;
@@ -3527,7 +3675,7 @@ public:
     }
 
     template < typename E >
-    static void AdditionThrow( const T& lhs, const U& rhs, T& result )
+    static void AdditionThrow( const T& lhs, const U& rhs, T& result ) SAFEINT_CPP_THROW
     {
         // 32-bit or less - both are unsigned
         unsigned __int32 tmp = (unsigned __int32)lhs + (unsigned __int32)rhs;
@@ -3545,7 +3693,7 @@ public:
 template < typename T, typename U > class AdditionHelper < T, U, AdditionState_CastUintCheckOverflowMax>
 {
 public:
-    static bool Addition( const T& lhs, const U& rhs, T& result ) throw()
+    static bool Addition( const T& lhs, const U& rhs, T& result ) SAFEINT_NOTHROW
     {
         // 32-bit or less - both are unsigned
         unsigned __int32 tmp = (unsigned __int32)lhs + (unsigned __int32)rhs;
@@ -3560,7 +3708,7 @@ public:
     }
 
     template < typename E >
-    static void AdditionThrow( const T& lhs, const U& rhs, T& result )
+    static void AdditionThrow( const T& lhs, const U& rhs, T& result ) SAFEINT_CPP_THROW
     {
         //32-bit or less - both are unsigned
         unsigned __int32 tmp = (unsigned __int32)lhs + (unsigned __int32)rhs;
@@ -3578,7 +3726,7 @@ public:
 template < typename T, typename U > class AdditionHelper < T, U, AdditionState_CastUint64CheckOverflow>
 {
 public:
-    static bool Addition( const T& lhs, const U& rhs, T& result ) throw()
+    static bool Addition( const T& lhs, const U& rhs, T& result ) SAFEINT_NOTHROW
     {
         // lhs unsigned __int64, rhs unsigned
         unsigned __int64 tmp = (unsigned __int64)lhs + (unsigned __int64)rhs;
@@ -3594,7 +3742,7 @@ public:
     }
 
     template < typename E >
-    static void AdditionThrow( const T& lhs, const U& rhs, T& result )
+    static void AdditionThrow( const T& lhs, const U& rhs, T& result ) SAFEINT_CPP_THROW
     {
         // lhs unsigned __int64, rhs unsigned
         unsigned __int64 tmp = (unsigned __int64)lhs + (unsigned __int64)rhs;
@@ -3613,7 +3761,7 @@ public:
 template < typename T, typename U > class AdditionHelper < T, U, AdditionState_CastUint64CheckOverflowMax >
 {
 public:
-    static bool Addition( const T& lhs, const U& rhs, T& result ) throw()
+    static bool Addition( const T& lhs, const U& rhs, T& result ) SAFEINT_NOTHROW
     {
         //lhs unsigned __int64, rhs unsigned
         unsigned __int64 tmp = (unsigned __int64)lhs + (unsigned __int64)rhs;
@@ -3629,7 +3777,7 @@ public:
     }
 
     template < typename E >
-    static void AdditionThrow( const T& lhs, const U& rhs, T& result )
+    static void AdditionThrow( const T& lhs, const U& rhs, T& result ) SAFEINT_CPP_THROW
     {
         //lhs unsigned __int64, rhs unsigned
         unsigned __int64 tmp = (unsigned __int64)lhs + (unsigned __int64)rhs;
@@ -3645,10 +3793,10 @@ public:
     }
 };
 
-template < typename T, typename U > class AdditionHelper < T, U, AdditionState_CastIntCheckMinMax >
+template < typename T, typename U > class AdditionHelper < T, U, AdditionState_CastIntCheckSafeIntMinMax >
 {
 public:
-    static bool Addition( const T& lhs, const U& rhs, T& result ) throw()
+    static bool Addition( const T& lhs, const U& rhs, T& result ) SAFEINT_NOTHROW
     {
         // 16-bit or less - one or both are signed
         __int32 tmp = lhs + rhs;
@@ -3663,7 +3811,7 @@ public:
     }
 
     template < typename E >
-    static void AdditionThrow( const T& lhs, const U& rhs, T& result )
+    static void AdditionThrow( const T& lhs, const U& rhs, T& result ) SAFEINT_CPP_THROW
     {
         // 16-bit or less - one or both are signed
         __int32 tmp = lhs + rhs;
@@ -3678,10 +3826,10 @@ public:
     }
 };
 
-template < typename T, typename U > class AdditionHelper < T, U, AdditionState_CastInt64CheckMinMax >
+template < typename T, typename U > class AdditionHelper < T, U, AdditionState_CastInt64CheckSafeIntMinMax >
 {
 public:
-    static bool Addition( const T& lhs, const U& rhs, T& result ) throw()
+    static bool Addition( const T& lhs, const U& rhs, T& result ) SAFEINT_NOTHROW
     {
         // 32-bit or less - one or both are signed
         __int64 tmp = (__int64)lhs + (__int64)rhs;
@@ -3696,7 +3844,7 @@ public:
     }
 
     template < typename E >
-    static void AdditionThrow( const T& lhs, const U& rhs, T& result )
+    static void AdditionThrow( const T& lhs, const U& rhs, T& result ) SAFEINT_CPP_THROW
     {
         // 32-bit or less - one or both are signed
         __int64 tmp = (__int64)lhs + (__int64)rhs;
@@ -3714,7 +3862,7 @@ public:
 template < typename T, typename U > class AdditionHelper < T, U, AdditionState_CastInt64CheckMax >
 {
 public:
-    static bool Addition( const T& lhs, const U& rhs, T& result ) throw()
+    static bool Addition( const T& lhs, const U& rhs, T& result ) SAFEINT_NOTHROW
     {
         // 32-bit or less - lhs signed, rhs unsigned
         __int64 tmp = (__int64)lhs + (__int64)rhs;
@@ -3729,7 +3877,7 @@ public:
     }
 
     template < typename E >
-    static void AdditionThrow( const T& lhs, const U& rhs, T& result )
+    static void AdditionThrow( const T& lhs, const U& rhs, T& result ) SAFEINT_CPP_THROW
     {
         // 32-bit or less - lhs signed, rhs unsigned
         __int64 tmp = (__int64)lhs + (__int64)rhs;
@@ -3744,10 +3892,10 @@ public:
     }
 };
 
-template < typename T, typename U > class AdditionHelper < T, U, AdditionState_CastUint64CheckMinMax >
+template < typename T, typename U > class AdditionHelper < T, U, AdditionState_CastUint64CheckSafeIntMinMax >
 {
 public:
-    static bool Addition( const T& lhs, const U& rhs, T& result ) throw()
+    static bool Addition( const T& lhs, const U& rhs, T& result ) SAFEINT_NOTHROW
     {
         // lhs is unsigned __int64, rhs signed
         unsigned __int64 tmp;
@@ -3780,7 +3928,7 @@ public:
     }
 
     template < typename E >
-    static void AdditionThrow( const T& lhs, const U& rhs, T& result )
+    static void AdditionThrow( const T& lhs, const U& rhs, T& result ) SAFEINT_CPP_THROW
     {
         // lhs is unsigned __int64, rhs signed
         unsigned __int64 tmp;
@@ -3813,10 +3961,10 @@ public:
     }
 };
 
-template < typename T, typename U > class AdditionHelper < T, U, AdditionState_CastUint64CheckMinMax2>
+template < typename T, typename U > class AdditionHelper < T, U, AdditionState_CastUint64CheckSafeIntMinMax2>
 {
 public:
-    static bool Addition( const T& lhs, const U& rhs, T& result ) throw()
+    static bool Addition( const T& lhs, const U& rhs, T& result ) SAFEINT_NOTHROW
     {
         // lhs is unsigned and < 64-bit, rhs signed __int64
         if( rhs < 0 )
@@ -3844,7 +3992,7 @@ public:
     }
 
     template < typename E >
-    static void AdditionThrow( const T& lhs, const U& rhs, T& result )
+    static void AdditionThrow( const T& lhs, const U& rhs, T& result ) SAFEINT_CPP_THROW
     {
         // lhs is unsigned and < 64-bit, rhs signed __int64
         if( rhs < 0 )
@@ -3875,7 +4023,7 @@ public:
 template < typename T, typename U > class AdditionHelper < T, U, AdditionState_CastInt64CheckOverflow>
 {
 public:
-    static bool Addition( const T& lhs, const U& rhs, T& result ) throw()
+    static bool Addition( const T& lhs, const U& rhs, T& result ) SAFEINT_NOTHROW
     {
         // lhs is signed __int64, rhs signed
         __int64 tmp = (__int64)((unsigned __int64)lhs + (unsigned __int64)rhs);
@@ -3898,7 +4046,7 @@ public:
     }
 
     template < typename E >
-    static void AdditionThrow( const T& lhs, const U& rhs, T& result )
+    static void AdditionThrow( const T& lhs, const U& rhs, T& result ) SAFEINT_CPP_THROW
     {
         // lhs is signed __int64, rhs signed
         __int64 tmp = (__int64)((unsigned __int64)lhs + (unsigned __int64)rhs);
@@ -3920,10 +4068,10 @@ public:
     }
 };
 
-template < typename T, typename U > class AdditionHelper < T, U, AdditionState_CastInt64CheckOverflowMinMax>
+template < typename T, typename U > class AdditionHelper < T, U, AdditionState_CastInt64CheckOverflowSafeIntMinMax>
 {
 public:
-    static bool Addition( const T& lhs, const U& rhs, T& result ) throw()
+    static bool Addition( const T& lhs, const U& rhs, T& result ) SAFEINT_NOTHROW
     {
         //rhs is signed __int64, lhs signed
         __int64 tmp;
@@ -3940,7 +4088,7 @@ public:
     }
 
     template < typename E >
-    static void AdditionThrow( const T& lhs, const U& rhs, T& result )
+    static void AdditionThrow( const T& lhs, const U& rhs, T& result ) SAFEINT_CPP_THROW
     {
         //rhs is signed __int64, lhs signed
         __int64 tmp;
@@ -3961,7 +4109,7 @@ public:
 template < typename T, typename U > class AdditionHelper < T, U, AdditionState_CastInt64CheckOverflowMax>
 {
 public:
-    static bool Addition( const T& lhs, const U& rhs, T& result ) throw()
+    static bool Addition( const T& lhs, const U& rhs, T& result ) SAFEINT_NOTHROW
     {
         //lhs is signed __int64, rhs unsigned < 64-bit
         unsigned __int64 tmp = (unsigned __int64)lhs + (unsigned __int64)rhs;
@@ -3976,7 +4124,7 @@ public:
     }
 
     template < typename E >
-    static void AdditionThrow( const T& lhs, const U& rhs, T& result )
+    static void AdditionThrow( const T& lhs, const U& rhs, T& result ) SAFEINT_CPP_THROW
     {
         // lhs is signed __int64, rhs unsigned < 64-bit
         // Some compilers get optimization-happy, let's thwart them
@@ -3996,7 +4144,7 @@ public:
 template < typename T, typename U > class AdditionHelper < T, U, AdditionState_ManualCheckInt64Uint64 >
 {
 public:
-    static bool Addition( const __int64& lhs, const unsigned __int64& rhs, __int64& result ) throw()
+    static bool Addition( const __int64& lhs, const unsigned __int64& rhs, __int64& result ) SAFEINT_NOTHROW
     {
         C_ASSERT( IntTraits< T >::isInt64 && IntTraits< U >::isUint64 );
         // rhs is unsigned __int64, lhs __int64
@@ -4014,7 +4162,7 @@ public:
     }
 
     template < typename E >
-    static void AdditionThrow( const __int64& lhs, const unsigned __int64& rhs, T& result )
+    static void AdditionThrow( const __int64& lhs, const unsigned __int64& rhs, T& result ) SAFEINT_CPP_THROW
     {
         C_ASSERT( IntTraits< T >::isInt64 && IntTraits< U >::isUint64 );
         // rhs is unsigned __int64, lhs __int64
@@ -4033,7 +4181,7 @@ public:
 template < typename T, typename U > class AdditionHelper < T, U, AdditionState_ManualCheck>
 {
 public:
-    static bool Addition( const T& lhs, const U& rhs, T& result ) throw()
+    static bool Addition( const T& lhs, const U& rhs, T& result ) SAFEINT_NOTHROW
     {
         // rhs is unsigned __int64, lhs signed, 32-bit or less
         if( (unsigned __int32)( rhs >> 32 ) == 0 )
@@ -4051,7 +4199,7 @@ public:
     }
 
     template < typename E >
-    static void AdditionThrow( const T& lhs, const U& rhs, T& result )
+    static void AdditionThrow( const T& lhs, const U& rhs, T& result ) SAFEINT_CPP_THROW
     {
         // rhs is unsigned __int64, lhs signed, 32-bit or less
 
@@ -4074,9 +4222,9 @@ public:
 enum SubtractionState
 {
     SubtractionState_BothUnsigned,
-    SubtractionState_CastIntCheckMinMax,
+    SubtractionState_CastIntCheckSafeIntMinMax,
     SubtractionState_CastIntCheckMin,
-    SubtractionState_CastInt64CheckMinMax,
+    SubtractionState_CastInt64CheckSafeIntMinMax,
     SubtractionState_CastInt64CheckMin,
     SubtractionState_Uint64Int,
     SubtractionState_UintInt64,
@@ -4087,8 +4235,8 @@ enum SubtractionState
     SubtractionState_Int64Uint64,
     // states for SubtractionMethod2
     SubtractionState_BothUnsigned2,
-    SubtractionState_CastIntCheckMinMax2,
-    SubtractionState_CastInt64CheckMinMax2,
+    SubtractionState_CastIntCheckSafeIntMinMax2,
+    SubtractionState_CastInt64CheckSafeIntMinMax2,
     SubtractionState_Uint64Int2,
     SubtractionState_UintInt642,
     SubtractionState_Int64Int2,
@@ -4111,16 +4259,16 @@ public:
                  (IntRegion< T,U >::IntZone_Uint64_Uint)       ||
                  (IntRegion< T,U >::IntZone_UintLT64_Uint64))      ? SubtractionState_BothUnsigned :
                  // unsigned-signed
-                 (IntRegion< T,U >::IntZone_UintLT32_IntLT32)      ? SubtractionState_CastIntCheckMinMax :
+                 (IntRegion< T,U >::IntZone_UintLT32_IntLT32)      ? SubtractionState_CastIntCheckSafeIntMinMax :
                  (IntRegion< T,U >::IntZone_Uint32_IntLT64 ||
-                  IntRegion< T,U >::IntZone_UintLT32_Int32)        ? SubtractionState_CastInt64CheckMinMax :
+                  IntRegion< T,U >::IntZone_UintLT32_Int32)        ? SubtractionState_CastInt64CheckSafeIntMinMax :
                  (IntRegion< T,U >::IntZone_Uint64_Int ||
                   IntRegion< T,U >::IntZone_Uint64_Int64)          ? SubtractionState_Uint64Int :
                  (IntRegion< T,U >::IntZone_UintLT64_Int64)        ? SubtractionState_UintInt64 :
                  // signed-signed
-                 (IntRegion< T,U >::IntZone_IntLT32_IntLT32)       ? SubtractionState_CastIntCheckMinMax :
+                 (IntRegion< T,U >::IntZone_IntLT32_IntLT32)       ? SubtractionState_CastIntCheckSafeIntMinMax :
                  (IntRegion< T,U >::IntZone_Int32_IntLT64 ||
-                  IntRegion< T,U >::IntZone_IntLT32_Int32)         ? SubtractionState_CastInt64CheckMinMax :
+                  IntRegion< T,U >::IntZone_IntLT32_Int32)         ? SubtractionState_CastInt64CheckSafeIntMinMax :
                  (IntRegion< T,U >::IntZone_Int64_Int ||
                   IntRegion< T,U >::IntZone_Int64_Int64)           ? SubtractionState_Int64Int :
                  (IntRegion< T,U >::IntZone_IntLT64_Int64)         ? SubtractionState_IntInt64 :
@@ -4148,23 +4296,23 @@ public:
                  (IntRegion< T,U >::IntZone_Uint64_Uint)       ||
                  (IntRegion< T,U >::IntZone_UintLT64_Uint64))     ? SubtractionState_BothUnsigned2 :
                  // unsigned-signed
-                 (IntRegion< T,U >::IntZone_UintLT32_IntLT32)     ? SubtractionState_CastIntCheckMinMax2 :
+                 (IntRegion< T,U >::IntZone_UintLT32_IntLT32)     ? SubtractionState_CastIntCheckSafeIntMinMax2 :
                  (IntRegion< T,U >::IntZone_Uint32_IntLT64 ||
-                  IntRegion< T,U >::IntZone_UintLT32_Int32)       ? SubtractionState_CastInt64CheckMinMax2 :
+                  IntRegion< T,U >::IntZone_UintLT32_Int32)       ? SubtractionState_CastInt64CheckSafeIntMinMax2 :
                  (IntRegion< T,U >::IntZone_Uint64_Int ||
                   IntRegion< T,U >::IntZone_Uint64_Int64)         ? SubtractionState_Uint64Int2 :
                  (IntRegion< T,U >::IntZone_UintLT64_Int64)       ? SubtractionState_UintInt642 :
                  // signed-signed
-                 (IntRegion< T,U >::IntZone_IntLT32_IntLT32)      ? SubtractionState_CastIntCheckMinMax2 :
+                 (IntRegion< T,U >::IntZone_IntLT32_IntLT32)      ? SubtractionState_CastIntCheckSafeIntMinMax2 :
                  (IntRegion< T,U >::IntZone_Int32_IntLT64 ||
-                  IntRegion< T,U >::IntZone_IntLT32_Int32)        ? SubtractionState_CastInt64CheckMinMax2 :
+                  IntRegion< T,U >::IntZone_IntLT32_Int32)        ? SubtractionState_CastInt64CheckSafeIntMinMax2 :
                  (IntRegion< T,U >::IntZone_Int64_Int ||
                   IntRegion< T,U >::IntZone_Int64_Int64)          ? SubtractionState_Int64Int2 :
                  (IntRegion< T,U >::IntZone_IntLT64_Int64)        ? SubtractionState_IntInt642 :
                  // signed-unsigned
-                 (IntRegion< T,U >::IntZone_IntLT32_UintLT32)     ? SubtractionState_CastIntCheckMinMax2 :
+                 (IntRegion< T,U >::IntZone_IntLT32_UintLT32)     ? SubtractionState_CastIntCheckSafeIntMinMax2 :
                  (IntRegion< T,U >::IntZone_Int32_UintLT32 ||
-                  IntRegion< T,U >::IntZone_IntLT64_Uint32)       ? SubtractionState_CastInt64CheckMinMax2 :
+                  IntRegion< T,U >::IntZone_IntLT64_Uint32)       ? SubtractionState_CastInt64CheckSafeIntMinMax2 :
                  (IntRegion< T,U >::IntZone_Int64_UintLT64)       ? SubtractionState_Int64Uint2 :
                  (IntRegion< T,U >::IntZone_Int_Uint64)           ? SubtractionState_IntUint642 :
                  (IntRegion< T,U >::IntZone_Int64_Uint64)         ? SubtractionState_Int64Uint642 :
@@ -4177,7 +4325,7 @@ template < typename T, typename U, int method > class SubtractionHelper;
 template < typename T, typename U > class SubtractionHelper< T, U, SubtractionState_BothUnsigned >
 {
 public:
-    static bool Subtract( const T& lhs, const U& rhs, T& result ) throw()
+    static bool Subtract( const T& lhs, const U& rhs, T& result ) SAFEINT_NOTHROW
     {
         // both are unsigned - easy case
         if( rhs <= lhs )
@@ -4190,7 +4338,7 @@ public:
     }
 
     template < typename E >
-    static void SubtractThrow( const T& lhs, const U& rhs, T& result )
+    static void SubtractThrow( const T& lhs, const U& rhs, T& result ) SAFEINT_CPP_THROW
     {
         // both are unsigned - easy case
         if( rhs <= lhs )
@@ -4206,7 +4354,7 @@ public:
 template < typename T, typename U > class SubtractionHelper< T, U, SubtractionState_BothUnsigned2 >
 {
 public:
-    static bool Subtract( const T& lhs, const U& rhs, U& result ) throw()
+    static bool Subtract( const T& lhs, const U& rhs, U& result ) SAFEINT_NOTHROW
     {
         // both are unsigned - easy case
         // Except we do have to check for overflow - lhs could be larger than result can hold
@@ -4220,7 +4368,7 @@ public:
     }
 
     template < typename E >
-    static void SubtractThrow( const T& lhs, const U& rhs, U& result )
+    static void SubtractThrow( const T& lhs, const U& rhs, U& result ) SAFEINT_CPP_THROW
     {
         // both are unsigned - easy case
         if( rhs <= lhs )
@@ -4234,10 +4382,10 @@ public:
     }
 };
 
-template < typename T, typename U > class SubtractionHelper< T, U, SubtractionState_CastIntCheckMinMax >
+template < typename T, typename U > class SubtractionHelper< T, U, SubtractionState_CastIntCheckSafeIntMinMax >
 {
 public:
-    static bool Subtract( const T& lhs, const U& rhs, T& result ) throw()
+    static bool Subtract( const T& lhs, const U& rhs, T& result ) SAFEINT_NOTHROW
     {
         // both values are 16-bit or less
         // rhs is signed, so could end up increasing or decreasing
@@ -4253,7 +4401,7 @@ public:
     }
 
     template < typename E >
-    static void SubtractThrow( const T& lhs, const U& rhs, T& result )
+    static void SubtractThrow( const T& lhs, const U& rhs, T& result ) SAFEINT_CPP_THROW
     {
         // both values are 16-bit or less
         // rhs is signed, so could end up increasing or decreasing
@@ -4263,10 +4411,10 @@ public:
     }
 };
 
-template <typename U, typename T> class SubtractionHelper< U, T, SubtractionState_CastIntCheckMinMax2 >
+template <typename U, typename T> class SubtractionHelper< U, T, SubtractionState_CastIntCheckSafeIntMinMax2 >
 {
 public:
-    static bool Subtract( const U& lhs, const T& rhs, T& result ) throw()
+    static bool Subtract( const U& lhs, const T& rhs, T& result ) SAFEINT_NOTHROW
     {
         // both values are 16-bit or less
         // rhs is signed, so could end up increasing or decreasing
@@ -4276,7 +4424,7 @@ public:
     }
 
     template < typename E >
-    static void SubtractThrow( const U& lhs, const T& rhs, T& result )
+    static void SubtractThrow( const U& lhs, const T& rhs, T& result ) SAFEINT_CPP_THROW
     {
         // both values are 16-bit or less
         // rhs is signed, so could end up increasing or decreasing
@@ -4289,7 +4437,7 @@ public:
 template < typename T, typename U > class SubtractionHelper< T, U, SubtractionState_CastIntCheckMin >
 {
 public:
-    static bool Subtract( const T& lhs, const U& rhs, T& result ) throw()
+    static bool Subtract( const T& lhs, const U& rhs, T& result ) SAFEINT_NOTHROW
     {
         // both values are 16-bit or less
         // rhs is unsigned - check only minimum
@@ -4305,7 +4453,7 @@ public:
     }
 
     template < typename E >
-    static void SubtractThrow( const T& lhs, const U& rhs, T& result )
+    static void SubtractThrow( const T& lhs, const U& rhs, T& result ) SAFEINT_CPP_THROW
     {
         // both values are 16-bit or less
         // rhs is unsigned - check only minimum
@@ -4321,10 +4469,10 @@ public:
     }
 };
 
-template < typename T, typename U > class SubtractionHelper< T, U, SubtractionState_CastInt64CheckMinMax >
+template < typename T, typename U > class SubtractionHelper< T, U, SubtractionState_CastInt64CheckSafeIntMinMax >
 {
 public:
-    static bool Subtract( const T& lhs, const U& rhs, T& result ) throw()
+    static bool Subtract( const T& lhs, const U& rhs, T& result ) SAFEINT_NOTHROW
     {
         // both values are 32-bit or less
         // rhs is signed, so could end up increasing or decreasing
@@ -4334,7 +4482,7 @@ public:
     }
 
     template < typename E >
-    static void SubtractThrow( const T& lhs, const U& rhs, T& result )
+    static void SubtractThrow( const T& lhs, const U& rhs, T& result ) SAFEINT_CPP_THROW
     {
         // both values are 32-bit or less
         // rhs is signed, so could end up increasing or decreasing
@@ -4344,10 +4492,10 @@ public:
     }
 };
 
-template <typename U, typename T> class SubtractionHelper< U, T, SubtractionState_CastInt64CheckMinMax2 >
+template <typename U, typename T> class SubtractionHelper< U, T, SubtractionState_CastInt64CheckSafeIntMinMax2 >
 {
 public:
-    static bool Subtract( const U& lhs, const T& rhs, T& result ) throw()
+    static bool Subtract( const U& lhs, const T& rhs, T& result ) SAFEINT_NOTHROW
     {
         // both values are 32-bit or less
         // rhs is signed, so could end up increasing or decreasing
@@ -4357,7 +4505,7 @@ public:
     }
 
     template < typename E >
-    static void SubtractThrow( const U& lhs, const T& rhs, T& result )
+    static void SubtractThrow( const U& lhs, const T& rhs, T& result ) SAFEINT_CPP_THROW
     {
         // both values are 32-bit or less
         // rhs is signed, so could end up increasing or decreasing
@@ -4370,7 +4518,7 @@ public:
 template < typename T, typename U > class SubtractionHelper< T, U, SubtractionState_CastInt64CheckMin >
 {
 public:
-    static bool Subtract( const T& lhs, const U& rhs, T& result ) throw()
+    static bool Subtract( const T& lhs, const U& rhs, T& result ) SAFEINT_NOTHROW
     {
         // both values are 32-bit or less
         // rhs is unsigned - check only minimum
@@ -4386,7 +4534,7 @@ public:
     }
 
     template < typename E >
-    static void SubtractThrow( const T& lhs, const U& rhs, T& result )
+    static void SubtractThrow( const T& lhs, const U& rhs, T& result ) SAFEINT_CPP_THROW
     {
         // both values are 32-bit or less
         // rhs is unsigned - check only minimum
@@ -4405,7 +4553,7 @@ public:
 template < typename T, typename U > class SubtractionHelper< T, U, SubtractionState_Uint64Int >
 {
 public:
-    static bool Subtract( const T& lhs, const U& rhs, T& result ) throw()
+    static bool Subtract( const T& lhs, const U& rhs, T& result ) SAFEINT_NOTHROW
     {
         // lhs is an unsigned __int64, rhs signed
         // must first see if rhs is positive or negative
@@ -4431,7 +4579,7 @@ public:
     }
 
     template < typename E >
-    static void SubtractThrow( const T& lhs, const U& rhs, T& result )
+    static void SubtractThrow( const T& lhs, const U& rhs, T& result ) SAFEINT_CPP_THROW
     {
         // lhs is an unsigned __int64, rhs signed
         // must first see if rhs is positive or negative
@@ -4460,7 +4608,7 @@ public:
 template < typename U, typename T > class SubtractionHelper< U, T, SubtractionState_Uint64Int2 >
 {
 public:
-    static bool Subtract( const U& lhs, const T& rhs, T& result ) throw()
+    static bool Subtract( const U& lhs, const T& rhs, T& result ) SAFEINT_NOTHROW
     {
         // U is unsigned __int64, T is signed
         if( rhs < 0 )
@@ -4501,7 +4649,7 @@ public:
     }
 
     template < typename E >
-    static void SubtractThrow( const U& lhs, const T& rhs, T& result )
+    static void SubtractThrow( const U& lhs, const T& rhs, T& result ) SAFEINT_CPP_THROW
     {
         // U is unsigned __int64, T is signed
         if( rhs < 0 )
@@ -4545,7 +4693,7 @@ public:
 template < typename T, typename U > class SubtractionHelper< T, U, SubtractionState_UintInt64 >
 {
 public:
-    static bool Subtract( const T& lhs, const U& rhs, T& result ) throw()
+    static bool Subtract( const T& lhs, const U& rhs, T& result ) SAFEINT_NOTHROW
     {
         // lhs is an unsigned int32 or smaller, rhs signed __int64
         // must first see if rhs is positive or negative
@@ -4576,7 +4724,7 @@ public:
     }
 
     template < typename E >
-    static void SubtractThrow( const T& lhs, const U& rhs, T& result )
+    static void SubtractThrow( const T& lhs, const U& rhs, T& result ) SAFEINT_CPP_THROW
     {
         // lhs is an unsigned int32 or smaller, rhs signed __int64
         // must first see if rhs is positive or negative
@@ -4610,7 +4758,7 @@ public:
 template <typename U, typename T> class SubtractionHelper< U, T, SubtractionState_UintInt642 >
 {
 public:
-    static bool Subtract( const U& lhs, const T& rhs, T& result ) throw()
+    static bool Subtract( const U& lhs, const T& rhs, T& result ) SAFEINT_NOTHROW
     {
         // U unsigned 32-bit or less, T __int64
         if( rhs >= 0 )
@@ -4636,7 +4784,7 @@ public:
     }
 
     template < typename E >
-    static void SubtractThrow( const U& lhs, const T& rhs, T& result )
+    static void SubtractThrow( const U& lhs, const T& rhs, T& result ) SAFEINT_CPP_THROW
     {
         // U unsigned 32-bit or less, T __int64
         if( rhs >= 0 )
@@ -4665,7 +4813,7 @@ public:
 template < typename T, typename U > class SubtractionHelper< T, U, SubtractionState_Int64Int >
 {
 public:
-    static bool Subtract( const T& lhs, const U& rhs, T& result ) throw()
+    static bool Subtract( const T& lhs, const U& rhs, T& result ) SAFEINT_NOTHROW
     {
         // lhs is an __int64, rhs signed (up to 64-bit)
         // we have essentially 4 cases:
@@ -4691,7 +4839,7 @@ public:
     }
 
     template < typename E >
-    static void SubtractThrow( const T& lhs, const U& rhs, T& result )
+    static void SubtractThrow( const T& lhs, const U& rhs, T& result ) SAFEINT_CPP_THROW
     {
         // lhs is an __int64, rhs signed (up to 64-bit)
         // we have essentially 4 cases:
@@ -4719,7 +4867,7 @@ public:
 template < typename U, typename T > class SubtractionHelper< U, T, SubtractionState_Int64Int2 >
 {
 public:
-    static bool Subtract( const U& lhs, const T& rhs, T& result ) throw()
+    static bool Subtract( const U& lhs, const T& rhs, T& result ) SAFEINT_NOTHROW
     {
         // lhs __int64, rhs any signed int (including __int64)
         __int64 tmp = lhs - rhs;
@@ -4756,7 +4904,7 @@ public:
     }
 
     template < typename E >
-    static void SubtractThrow( const U& lhs, const T& rhs, T& result )
+    static void SubtractThrow( const U& lhs, const T& rhs, T& result ) SAFEINT_CPP_THROW
     {
         // lhs __int64, rhs any signed int (including __int64)
         __int64 tmp = lhs - rhs;
@@ -4795,7 +4943,7 @@ public:
 template < typename T, typename U > class SubtractionHelper< T, U, SubtractionState_IntInt64 >
 {
 public:
-    static bool Subtract( const T& lhs, const U& rhs, T& result ) throw()
+    static bool Subtract( const T& lhs, const U& rhs, T& result ) SAFEINT_NOTHROW
     {
         // lhs is a 32-bit int or less, rhs __int64
         // we have essentially 4 cases:
@@ -4855,7 +5003,7 @@ public:
     }
 
     template < typename E >
-    static void SubtractThrow( const T& lhs, const U& rhs, T& result )
+    static void SubtractThrow( const T& lhs, const U& rhs, T& result ) SAFEINT_CPP_THROW
     {
         // lhs is a 32-bit int or less, rhs __int64
         // we have essentially 4 cases:
@@ -4918,7 +5066,7 @@ public:
 template < typename U, typename T > class SubtractionHelper< U, T, SubtractionState_IntInt642 >
 {
 public:
-    static bool Subtract( const U& lhs, const T& rhs, T& result ) throw()
+    static bool Subtract( const U& lhs, const T& rhs, T& result ) SAFEINT_NOTHROW
     {
         // lhs is any signed int32 or smaller, rhs is int64
         __int64 tmp = (__int64)lhs - rhs;
@@ -4935,7 +5083,7 @@ public:
     }
 
     template < typename E >
-    static void SubtractThrow( const U& lhs, const T& rhs, T& result )
+    static void SubtractThrow( const U& lhs, const T& rhs, T& result ) SAFEINT_CPP_THROW
     {
         // lhs is any signed int32 or smaller, rhs is int64
         __int64 tmp = (__int64)lhs - rhs;
@@ -4954,7 +5102,7 @@ public:
 template < typename T, typename U > class SubtractionHelper< T, U, SubtractionState_Int64Uint >
 {
 public:
-    static bool Subtract( const T& lhs, const U& rhs, T& result ) throw()
+    static bool Subtract( const T& lhs, const U& rhs, T& result ) SAFEINT_NOTHROW
     {
         // lhs is a 64-bit int, rhs unsigned int32 or smaller
         // perform test as unsigned to prevent unwanted optimizations
@@ -4970,7 +5118,7 @@ public:
     }
 
     template < typename E >
-    static void SubtractThrow( const T& lhs, const U& rhs, T& result )
+    static void SubtractThrow( const T& lhs, const U& rhs, T& result ) SAFEINT_CPP_THROW
     {
         // lhs is a 64-bit int, rhs unsigned int32 or smaller
         // perform test as unsigned to prevent unwanted optimizations
@@ -4990,7 +5138,7 @@ template < typename U, typename T > class SubtractionHelper< U, T, SubtractionSt
 {
 public:
     // lhs is __int64, rhs is unsigned 32-bit or smaller
-    static bool Subtract( const U& lhs, const T& rhs, T& result ) throw()
+    static bool Subtract( const U& lhs, const T& rhs, T& result ) SAFEINT_NOTHROW
     {
         // Do this as unsigned to prevent unwanted optimizations
         unsigned __int64 tmp = (unsigned __int64)lhs - (unsigned __int64)rhs;
@@ -5005,7 +5153,7 @@ public:
     }
 
     template < typename E >
-    static void SubtractThrow( const U& lhs, const T& rhs, T& result )
+    static void SubtractThrow( const U& lhs, const T& rhs, T& result ) SAFEINT_CPP_THROW
     {
         // Do this as unsigned to prevent unwanted optimizations
         unsigned __int64 tmp = (unsigned __int64)lhs - (unsigned __int64)rhs;
@@ -5023,7 +5171,7 @@ public:
 template < typename T, typename U > class SubtractionHelper< T, U, SubtractionState_IntUint64 >
 {
 public:
-    static bool Subtract( const T& lhs, const U& rhs, T& result ) throw()
+    static bool Subtract( const T& lhs, const U& rhs, T& result ) SAFEINT_NOTHROW
     {
         // lhs is any signed int, rhs unsigned int64
         // check against available range
@@ -5053,7 +5201,7 @@ public:
     }
 
     template < typename E >
-    static void SubtractThrow( const T& lhs, const U& rhs, T& result )
+    static void SubtractThrow( const T& lhs, const U& rhs, T& result ) SAFEINT_CPP_THROW
     {
         // lhs is any signed int, rhs unsigned int64
         // check against available range
@@ -5086,7 +5234,7 @@ public:
 template < typename U, typename T > class SubtractionHelper< U, T, SubtractionState_IntUint642 >
 {
 public:
-    static bool Subtract( const U& lhs, const T& rhs, T& result ) throw()
+    static bool Subtract( const U& lhs, const T& rhs, T& result ) SAFEINT_NOTHROW
     {
         // We run into upcasting problems on comparison - needs 2 checks
         if( lhs >= 0 && (T)lhs >= rhs )
@@ -5099,7 +5247,7 @@ public:
     }
 
     template < typename E >
-    static void SubtractThrow( const U& lhs, const T& rhs, T& result )
+    static void SubtractThrow( const U& lhs, const T& rhs, T& result ) SAFEINT_CPP_THROW
     {
         // We run into upcasting problems on comparison - needs 2 checks
         if( lhs >= 0 && (T)lhs >= rhs )
@@ -5116,7 +5264,7 @@ public:
 template < typename T, typename U > class SubtractionHelper< T, U, SubtractionState_Int64Uint64 >
 {
 public:
-    static bool Subtract( const __int64& lhs, const unsigned __int64& rhs, __int64& result ) throw()
+    static bool Subtract( const __int64& lhs, const unsigned __int64& rhs, __int64& result ) SAFEINT_NOTHROW
     {
         C_ASSERT( IntTraits< T >::isInt64 && IntTraits< U >::isUint64 );
         // if we subtract, and it gets larger, there's a problem
@@ -5132,7 +5280,7 @@ public:
     }
 
     template < typename E >
-    static void SubtractThrow( const __int64& lhs, const unsigned __int64& rhs, T& result )
+    static void SubtractThrow( const __int64& lhs, const unsigned __int64& rhs, T& result ) SAFEINT_CPP_THROW
     {
         C_ASSERT( IntTraits< T >::isInt64 && IntTraits< U >::isUint64 );
         // if we subtract, and it gets larger, there's a problem
@@ -5155,7 +5303,7 @@ template < typename U, typename T > class SubtractionHelper< U, T, SubtractionSt
 public:
     // If lhs is negative, immediate problem - return must be positive, and subtracting only makes it
     // get smaller. If rhs > lhs, then it would also go negative, which is the other case
-    static bool Subtract( const __int64& lhs, const unsigned __int64& rhs, T& result ) throw()
+    static bool Subtract( const __int64& lhs, const unsigned __int64& rhs, T& result ) SAFEINT_NOTHROW
     {
         C_ASSERT( IntTraits< T >::isUint64 && IntTraits< U >::isInt64 );
         if( lhs >= 0 && (unsigned __int64)lhs >= rhs )
@@ -5168,7 +5316,7 @@ public:
     }
 
     template < typename E >
-    static void SubtractThrow( const __int64& lhs, const unsigned __int64& rhs, T& result )
+    static void SubtractThrow( const __int64& lhs, const unsigned __int64& rhs, T& result ) SAFEINT_CPP_THROW
     {
         C_ASSERT( IntTraits< T >::isUint64 && IntTraits< U >::isInt64 );
         if( lhs >= 0 && (unsigned __int64)lhs >= rhs )
@@ -5211,7 +5359,7 @@ public:
 #ifdef SAFEINT_DISABLE_BINARY_ASSERT
 #define BinaryAssert(x)
 #else
-#define BinaryAssert(x) assert(x)
+#define BinaryAssert(x) SAFEINT_ASSERT(x)
 #endif
 
 template < typename T, typename U, int method > class BinaryAndHelper;
@@ -5219,13 +5367,13 @@ template < typename T, typename U, int method > class BinaryAndHelper;
 template < typename T, typename U > class BinaryAndHelper< T, U, BinaryState_OK >
 {
 public:
-    static T And( T lhs, U rhs ){ return (T)( lhs & rhs ); }
+    static T And( T lhs, U rhs ) SAFEINT_NOTHROW { return (T)( lhs & rhs ); }
 };
 
 template < typename T, typename U > class BinaryAndHelper< T, U, BinaryState_Int8 >
 {
 public:
-    static T And( T lhs, U rhs )
+    static T And( T lhs, U rhs ) SAFEINT_NOTHROW
     {
         // cast forces sign extension to be zeros
         BinaryAssert( ( lhs & rhs ) == ( lhs & (unsigned __int8)rhs ) );
@@ -5236,7 +5384,7 @@ public:
 template < typename T, typename U > class BinaryAndHelper< T, U, BinaryState_Int16 >
 {
 public:
-    static T And( T lhs, U rhs )
+    static T And( T lhs, U rhs ) SAFEINT_NOTHROW
     {
         //cast forces sign extension to be zeros
         BinaryAssert( ( lhs & rhs ) == ( lhs & (unsigned __int16)rhs ) );
@@ -5247,7 +5395,7 @@ public:
 template < typename T, typename U > class BinaryAndHelper< T, U, BinaryState_Int32 >
 {
 public:
-    static T And( T lhs, U rhs )
+    static T And( T lhs, U rhs ) SAFEINT_NOTHROW
     {
         //cast forces sign extension to be zeros
         BinaryAssert( ( lhs & rhs ) == ( lhs & (unsigned __int32)rhs ) );
@@ -5260,13 +5408,13 @@ template < typename T, typename U, int method > class BinaryOrHelper;
 template < typename T, typename U > class BinaryOrHelper< T, U, BinaryState_OK >
 {
 public:
-    static T Or( T lhs, U rhs ){ return (T)( lhs | rhs ); }
+    static T Or( T lhs, U rhs ) SAFEINT_NOTHROW { return (T)( lhs | rhs ); }
 };
 
 template < typename T, typename U > class BinaryOrHelper< T, U, BinaryState_Int8 >
 {
 public:
-    static T Or( T lhs, U rhs )
+    static T Or( T lhs, U rhs ) SAFEINT_NOTHROW
     {
         //cast forces sign extension to be zeros
         BinaryAssert( ( lhs | rhs ) == ( lhs | (unsigned __int8)rhs ) );
@@ -5277,7 +5425,7 @@ public:
 template < typename T, typename U > class BinaryOrHelper< T, U, BinaryState_Int16 >
 {
 public:
-    static T Or( T lhs, U rhs )
+    static T Or( T lhs, U rhs ) SAFEINT_NOTHROW
     {
         //cast forces sign extension to be zeros
         BinaryAssert( ( lhs | rhs ) == ( lhs | (unsigned __int16)rhs ) );
@@ -5288,7 +5436,7 @@ public:
 template < typename T, typename U > class BinaryOrHelper< T, U, BinaryState_Int32 >
 {
 public:
-    static T Or( T lhs, U rhs )
+    static T Or( T lhs, U rhs ) SAFEINT_NOTHROW
     {
         //cast forces sign extension to be zeros
         BinaryAssert( ( lhs | rhs ) == ( lhs | (unsigned __int32)rhs ) );
@@ -5301,13 +5449,13 @@ template <typename T, typename U, int method > class BinaryXorHelper;
 template < typename T, typename U > class BinaryXorHelper< T, U, BinaryState_OK >
 {
 public:
-    static T Xor( T lhs, U rhs ){ return (T)( lhs ^ rhs ); }
+    static T Xor( T lhs, U rhs ) SAFEINT_NOTHROW { return (T)( lhs ^ rhs ); }
 };
 
 template < typename T, typename U > class BinaryXorHelper< T, U, BinaryState_Int8 >
 {
 public:
-    static T Xor( T lhs, U rhs )
+    static T Xor( T lhs, U rhs ) SAFEINT_NOTHROW
     {
         // cast forces sign extension to be zeros
         BinaryAssert( ( lhs ^ rhs ) == ( lhs ^ (unsigned __int8)rhs ) );
@@ -5318,7 +5466,7 @@ public:
 template < typename T, typename U > class BinaryXorHelper< T, U, BinaryState_Int16 >
 {
 public:
-    static T Xor( T lhs, U rhs )
+    static T Xor( T lhs, U rhs ) SAFEINT_NOTHROW
     {
         // cast forces sign extension to be zeros
         BinaryAssert( ( lhs ^ rhs ) == ( lhs ^ (unsigned __int16)rhs ) );
@@ -5329,7 +5477,7 @@ public:
 template < typename T, typename U > class BinaryXorHelper< T, U, BinaryState_Int32 >
 {
 public:
-    static T Xor( T lhs, U rhs )
+    static T Xor( T lhs, U rhs ) SAFEINT_NOTHROW
     {
         // cast forces sign extension to be zeros
         BinaryAssert( ( lhs ^ rhs ) == ( lhs ^ (unsigned __int32)rhs ) );
@@ -5343,73 +5491,73 @@ public:
 // non-class helper function so that you can check for a cast's validity
 // and handle errors how you like
 template < typename T, typename U >
-inline bool SafeCast( const T From, U& To )
+inline bool SafeCast( const T From, U& To ) SAFEINT_NOTHROW
 {
     return SafeCastHelper< U, T, GetCastMethod< U, T >::method >::Cast( From, To );
 }
 
 template < typename T, typename U >
-inline bool SafeEquals( const T t, const U u ) throw()
+inline bool SafeEquals( const T t, const U u ) SAFEINT_NOTHROW
 {
     return EqualityTest< T, U, ValidComparison< T, U >::method >::IsEquals( t, u );
 }
 
 template < typename T, typename U >
-inline bool SafeNotEquals( const T t, const U u ) throw()
+inline bool SafeNotEquals( const T t, const U u ) SAFEINT_NOTHROW
 {
     return !EqualityTest< T, U, ValidComparison< T, U >::method >::IsEquals( t, u );
 }
 
 template < typename T, typename U >
-inline bool SafeGreaterThan( const T t, const U u ) throw()
+inline bool SafeGreaterThan( const T t, const U u ) SAFEINT_NOTHROW
 {
     return GreaterThanTest< T, U, ValidComparison< T, U >::method >::GreaterThan( t, u );
 }
 
 template < typename T, typename U >
-inline bool SafeGreaterThanEquals( const T t, const U u ) throw()
+inline bool SafeGreaterThanEquals( const T t, const U u ) SAFEINT_NOTHROW
 {
     return !GreaterThanTest< U, T, ValidComparison< U, T >::method >::GreaterThan( u, t );
 }
 
 template < typename T, typename U >
-inline bool SafeLessThan( const T t, const U u ) throw()
+inline bool SafeLessThan( const T t, const U u ) SAFEINT_NOTHROW
 {
     return GreaterThanTest< U, T, ValidComparison< U, T >::method >::GreaterThan( u, t );
 }
 
 template < typename T, typename U >
-inline bool SafeLessThanEquals( const T t, const U u ) throw()
+inline bool SafeLessThanEquals( const T t, const U u ) SAFEINT_NOTHROW
 {
     return !GreaterThanTest< T, U, ValidComparison< T, U >::method >::GreaterThan( t, u );
 }
 
 template < typename T, typename U >
-inline bool SafeModulus( const T& t, const U& u, T& result ) throw()
+inline bool SafeModulus( const T& t, const U& u, T& result ) SAFEINT_NOTHROW
 {
     return ( ModulusHelper< T, U, ValidComparison< T, U >::method >::Modulus( t, u, result ) == SafeIntNoError );
 }
 
 template < typename T, typename U >
-inline bool SafeMultiply( T t, U u, T& result ) throw()
+inline bool SafeMultiply( T t, U u, T& result ) SAFEINT_NOTHROW
 {
     return MultiplicationHelper< T, U, MultiplicationMethod< T, U >::method >::Multiply( t, u, result );
 }
 
 template < typename T, typename U >
-inline bool SafeDivide( T t, U u, T& result ) throw()
+inline bool SafeDivide( T t, U u, T& result ) SAFEINT_NOTHROW
 {
     return ( DivisionHelper< T, U, DivisionMethod< T, U >::method >::Divide( t, u, result ) == SafeIntNoError );
 }
 
 template < typename T, typename U >
-inline bool SafeAdd( T t, U u, T& result ) throw()
+inline bool SafeAdd( T t, U u, T& result ) SAFEINT_NOTHROW
 {
     return AdditionHelper< T, U, AdditionMethod< T, U >::method >::Addition( t, u, result );
 }
 
 template < typename T, typename U >
-inline bool SafeSubtract( T t, U u, T& result ) throw()
+inline bool SafeSubtract( T t, U u, T& result ) SAFEINT_NOTHROW
 {
     return SubtractionHelper< T, U, SubtractionMethod< T, U >::method >::Subtract( t, u, result );
 }
@@ -5421,7 +5569,7 @@ inline bool SafeSubtract( T t, U u, T& result ) throw()
 template < typename T, typename E = SafeIntDefaultExceptionHandler > class SafeInt
 {
 public:
-    SafeInt() throw()
+    SafeInt() SAFEINT_NOTHROW
     {
         C_ASSERT( NumericType< T >::isInt );
         m_int = 0;
@@ -5430,7 +5578,7 @@ public:
     // Having a constructor for every type of int
     // avoids having the compiler evade our checks when doing implicit casts -
     // e.g., SafeInt<char> s = 0x7fffffff;
-    SafeInt( const T& i ) throw()
+    SafeInt( const T& i ) SAFEINT_NOTHROW
     {
         C_ASSERT( NumericType< T >::isInt );
         //always safe
@@ -5438,21 +5586,21 @@ public:
     }
 
     // provide explicit boolean converter
-    SafeInt( bool b ) throw()
+    SafeInt( bool b ) SAFEINT_NOTHROW
     {
         C_ASSERT( NumericType< T >::isInt );
         m_int = (T)( b ? 1 : 0 );
     }
 
     template < typename U >
-    SafeInt(const SafeInt< U, E >& u)
+    SafeInt(const SafeInt< U, E >& u) SAFEINT_CPP_THROW
     {
         C_ASSERT( NumericType< T >::isInt );
         *this = SafeInt< T, E >( (U)u );
     }
 
     template < typename U >
-    SafeInt( const U& i )
+    SafeInt( const U& i ) SAFEINT_CPP_THROW
     {
         C_ASSERT( NumericType< T >::isInt );
         // SafeCast will throw exceptions if i won't fit in type T
@@ -5470,7 +5618,7 @@ public:
     // constructors exist for all int types and will ensure safety
 
     template < typename U >
-    SafeInt< T, E >& operator =( const U& rhs )
+    SafeInt< T, E >& operator =( const U& rhs ) SAFEINT_CPP_THROW
     {
         // use constructor to test size
         // constructor is optimized to do minimal checking based
@@ -5480,20 +5628,20 @@ public:
         return *this;
     }
 
-    SafeInt< T, E >& operator =( const T& rhs ) throw()
+    SafeInt< T, E >& operator =( const T& rhs ) SAFEINT_NOTHROW
     {
         m_int = rhs;
         return *this;
     }
 
     template < typename U >
-    SafeInt< T, E >& operator =( const SafeInt< U, E >& rhs )
+    SafeInt< T, E >& operator =( const SafeInt< U, E >& rhs ) SAFEINT_CPP_THROW
     {
         SafeCastHelper< T, U, GetCastMethod< T, U >::method >::template CastThrow< E >( rhs.Ref(), m_int );
         return *this;
     }
 
-    SafeInt< T, E >& operator =( const SafeInt< T, E >& rhs ) throw()
+    SafeInt< T, E >& operator =( const SafeInt< T, E >& rhs ) SAFEINT_NOTHROW
     {
         m_int = rhs.m_int;
         return *this;
@@ -5501,54 +5649,54 @@ public:
 
     // Casting operators
 
-    operator bool() const throw()
+    operator bool() const SAFEINT_NOTHROW
     {
         return !!m_int;
     }
 
-    operator char() const
+    operator char() const SAFEINT_CPP_THROW
     {
         char val;
         SafeCastHelper< char, T, GetCastMethod< char, T >::method >::template CastThrow< E >( m_int, val );
         return val;
     }
 
-    operator signed char() const
+    operator signed char() const SAFEINT_CPP_THROW
     {
         signed char val;
         SafeCastHelper< signed char, T, GetCastMethod< signed char, T >::method >::template CastThrow< E >( m_int, val );
         return val;
     }
 
-    operator unsigned char() const
+    operator unsigned char() const SAFEINT_CPP_THROW
     {
         unsigned char val;
         SafeCastHelper< unsigned char, T, GetCastMethod< unsigned char, T >::method >::template CastThrow< E >( m_int, val );
         return val;
     }
 
-    operator __int16() const
+    operator __int16() const SAFEINT_CPP_THROW
     {
         __int16 val;
         SafeCastHelper< __int16, T, GetCastMethod< __int16, T >::method >::template CastThrow< E >( m_int, val );
         return val;
     }
 
-    operator unsigned __int16() const
+    operator unsigned __int16() const SAFEINT_CPP_THROW
     {
         unsigned __int16 val;
         SafeCastHelper< unsigned __int16, T, GetCastMethod< unsigned __int16, T >::method >::template CastThrow< E >( m_int, val );
         return val;
     }
 
-    operator __int32() const
+    operator __int32() const SAFEINT_CPP_THROW
     {
         __int32 val;
         SafeCastHelper< __int32, T, GetCastMethod< __int32, T >::method >::template CastThrow< E >( m_int, val );
         return val;
     }
 
-    operator unsigned __int32() const
+    operator unsigned __int32() const SAFEINT_CPP_THROW
     {
         unsigned __int32 val;
         SafeCastHelper< unsigned __int32, T, GetCastMethod< unsigned __int32, T >::method >::template CastThrow< E >( m_int, val );
@@ -5557,39 +5705,48 @@ public:
 
     // The compiler knows that int == __int32
     // but not that long == __int32
-    operator long() const
+    operator long() const SAFEINT_CPP_THROW
     {
         long val;
         SafeCastHelper< long, T, GetCastMethod< long, T >::method >::template CastThrow< E >( m_int, val );
         return  val;
     }
 
-    operator unsigned long() const
+    operator unsigned long() const SAFEINT_CPP_THROW
     {
         unsigned long val;
         SafeCastHelper< unsigned long, T, GetCastMethod< unsigned long, T >::method >::template CastThrow< E >( m_int, val );
         return val;
     }
 
-    operator __int64() const
+    operator __int64() const SAFEINT_CPP_THROW
     {
         __int64 val;
         SafeCastHelper< __int64, T, GetCastMethod< __int64, T >::method >::template CastThrow< E >( m_int, val );
         return val;
     }
 
-    operator unsigned __int64() const
+    operator unsigned __int64() const SAFEINT_CPP_THROW
     {
         unsigned __int64 val;
         SafeCastHelper< unsigned __int64, T, GetCastMethod< unsigned __int64, T >::method >::template CastThrow< E >( m_int, val );
         return val;
     }
 
+#if defined SAFEINT_USE_WCHAR_T || defined _NATIVE_WCHAR_T_DEFINED
+    operator wchar_t() const SAFEINT_CPP_THROW
+    {
+        wchar_t val;
+        SafeCastHelper< wchar_t, T, GetCastMethod< wchar_t, T >::method >::template CastThrow< E >( m_int, val );
+        return val;
+    }
+#endif
+
 #ifdef SIZE_T_CAST_NEEDED
     // We also need an explicit cast to size_t, or the compiler will complain
     // Apparently, only SOME compilers complain, and cl 14.00.50727.42 isn't one of them
     // Leave here in case we decide to backport this to an earlier compiler
-    operator size_t() const
+    operator size_t() const SAFEINT_CPP_THROW
     {
         size_t val;
         SafeCastHelper< size_t, T, GetCastMethod< size_t, T >::method >::template CastThrow< E >( m_int, val );
@@ -5598,20 +5755,20 @@ public:
 #endif
 
     // Also provide a cast operator for floating point types
-    operator float() const
+    operator float() const SAFEINT_CPP_THROW
     {
         float val;
         SafeCastHelper< float, T, GetCastMethod< float, T >::method >::template CastThrow< E >( m_int, val );
         return val;
     }
 
-    operator double() const
+    operator double() const SAFEINT_CPP_THROW
     {
         double val;
         SafeCastHelper< double, T, GetCastMethod< double, T >::method >::template CastThrow< E >( m_int, val );
         return val;
     }
-    operator long double() const
+    operator long double() const SAFEINT_CPP_THROW
     {
         long double val;
         SafeCastHelper< long double, T, GetCastMethod< long double, T >::method >::template CastThrow< E >( m_int, val );
@@ -5622,29 +5779,29 @@ public:
     // this could be dangerous, but allows you to correctly pass
     // instances of this class to APIs that take a pointer to an integer
     // also see overloaded address-of operator below
-    T* Ptr() throw() { return &m_int; }
-    const T* Ptr() const throw() { return &m_int; }
-    const T& Ref() const throw() { return m_int; }
+    T* Ptr() SAFEINT_NOTHROW { return &m_int; }
+    const T* Ptr() const SAFEINT_NOTHROW { return &m_int; }
+    const T& Ref() const SAFEINT_NOTHROW { return m_int; }
 
     // Or if SafeInt< T, E >::Ptr() is inconvenient, use the overload
     // operator &
     // This allows you to do unsafe things!
     // It is meant to allow you to more easily
     // pass a SafeInt into things like ReadFile
-    T* operator &() throw() { return &m_int; }
-    const T* operator &() const throw() { return &m_int; }
+    T* operator &() SAFEINT_NOTHROW { return &m_int; }
+    const T* operator &() const SAFEINT_NOTHROW { return &m_int; }
 
     // Unary operators
-    bool operator !() const throw() { return (!m_int) ? true : false; }
+    bool operator !() const SAFEINT_NOTHROW { return (!m_int) ? true : false; }
 
     // operator + (unary)
     // note - normally, the '+' and '-' operators will upcast to a signed int
     // for T < 32 bits. This class changes behavior to preserve type
-    const SafeInt< T, E >& operator +() const throw() { return *this; };
+    const SafeInt< T, E >& operator +() const SAFEINT_NOTHROW { return *this; }
 
     //unary  -
 
-    SafeInt< T, E > operator -() const
+    SafeInt< T, E > operator -() const SAFEINT_CPP_THROW
     {
         // Note - unsigned still performs the bitwise manipulation
         // will warn at level 2 or higher if the value is 32-bit or larger
@@ -5652,7 +5809,7 @@ public:
     }
 
     // prefix increment operator
-    SafeInt< T, E >& operator ++()
+    SafeInt< T, E >& operator ++() SAFEINT_CPP_THROW
     {
         if( m_int != IntTraits< T >::maxInt )
         {
@@ -5663,7 +5820,7 @@ public:
     }
 
     // prefix decrement operator
-    SafeInt< T, E >& operator --()
+    SafeInt< T, E >& operator --() SAFEINT_CPP_THROW
     {
         if( m_int != IntTraits< T >::minInt )
         {
@@ -5677,7 +5834,7 @@ public:
     // characteristics
 
     // postfix increment operator
-    SafeInt< T, E > operator ++( int ) // dummy arg to comply with spec
+    SafeInt< T, E > operator ++( int )  SAFEINT_CPP_THROW // dummy arg to comply with spec
     {
         if( m_int != IntTraits< T >::maxInt )
         {
@@ -5690,7 +5847,7 @@ public:
     }
 
     // postfix decrement operator
-    SafeInt< T, E > operator --( int ) // dummy arg to comply with spec
+    SafeInt< T, E > operator --( int ) SAFEINT_CPP_THROW // dummy arg to comply with spec
     {
         if( m_int != IntTraits< T >::minInt )
         {
@@ -5704,7 +5861,7 @@ public:
     // One's complement
     // Note - this operator will normally change size to an int
     // cast in return improves perf and maintains type
-    SafeInt< T, E > operator ~() const throw() { return SafeInt< T, E >( (T)~m_int ); }
+    SafeInt< T, E > operator ~() const SAFEINT_NOTHROW { return SafeInt< T, E >( (T)~m_int ); }
 
     // Binary operators
     //
@@ -5749,14 +5906,14 @@ public:
     // as well. It does, however, suffer from the same promotion
     // problems as comparisons, division and other operations
     template < typename U >
-    SafeInt< T, E > operator %( U rhs ) const
+    SafeInt< T, E > operator %( U rhs ) const SAFEINT_CPP_THROW
     {
         T result;
         ModulusHelper< T, U, ValidComparison< T, U >::method >::template ModulusThrow< E >( m_int, rhs, result );
         return SafeInt< T, E >( result );
     }
 
-    SafeInt< T, E > operator %( SafeInt< T, E > rhs ) const
+    SafeInt< T, E > operator %( SafeInt< T, E > rhs ) const SAFEINT_CPP_THROW
     {
         T result;
         ModulusHelper< T, T, ValidComparison< T, T >::method >::template ModulusThrow< E >( m_int, rhs, result );
@@ -5765,14 +5922,14 @@ public:
 
     // Modulus assignment
     template < typename U >
-    SafeInt< T, E >& operator %=( U rhs )
+    SafeInt< T, E >& operator %=( U rhs ) SAFEINT_CPP_THROW
     {
         ModulusHelper< T, U, ValidComparison< T, U >::method >::template ModulusThrow< E >( m_int, rhs, m_int );
         return *this;
     }
 
     template < typename U >
-    SafeInt< T, E >& operator %=( SafeInt< U, E > rhs )
+    SafeInt< T, E >& operator %=( SafeInt< U, E > rhs ) SAFEINT_CPP_THROW
     {
         ModulusHelper< T, U, ValidComparison< T, U >::method >::template ModulusThrow< E >( m_int, (U)rhs, m_int );
         return *this;
@@ -5780,14 +5937,14 @@ public:
 
     // Multiplication
     template < typename U >
-    SafeInt< T, E > operator *( U rhs ) const
+    SafeInt< T, E > operator *( U rhs ) const SAFEINT_CPP_THROW
     {
         T ret( 0 );
         MultiplicationHelper< T, U, MultiplicationMethod< T, U >::method >::template MultiplyThrow< E >( m_int, rhs, ret );
         return SafeInt< T, E >( ret );
     }
 
-    SafeInt< T, E > operator *( SafeInt< T, E > rhs ) const
+    SafeInt< T, E > operator *( SafeInt< T, E > rhs ) const SAFEINT_CPP_THROW
     {
         T ret( 0 );
         MultiplicationHelper< T, T, MultiplicationMethod< T, T >::method >::template MultiplyThrow< E >( m_int, (T)rhs, ret );
@@ -5795,21 +5952,21 @@ public:
     }
 
     // Multiplication assignment
-    SafeInt< T, E >& operator *=( SafeInt< T, E > rhs )
+    SafeInt< T, E >& operator *=( SafeInt< T, E > rhs ) SAFEINT_CPP_THROW
     {
         MultiplicationHelper< T, T, MultiplicationMethod< T, T >::method >::template MultiplyThrow< E >( m_int, (T)rhs, m_int );
         return *this;
     }
 
     template < typename U >
-    SafeInt< T, E >& operator *=( U rhs )
+    SafeInt< T, E >& operator *=( U rhs ) SAFEINT_CPP_THROW
     {
         MultiplicationHelper< T, U, MultiplicationMethod< T, U >::method >::template MultiplyThrow< E >( m_int, rhs, m_int );
         return *this;
     }
 
     template < typename U >
-    SafeInt< T, E >& operator *=( SafeInt< U, E > rhs )
+    SafeInt< T, E >& operator *=( SafeInt< U, E > rhs ) SAFEINT_CPP_THROW
     {
         MultiplicationHelper< T, U, MultiplicationMethod< T, U >::method >::template MultiplyThrow< E >( m_int, rhs.Ref(), m_int );
         return *this;
@@ -5817,14 +5974,14 @@ public:
 
     // Division
     template < typename U >
-    SafeInt< T, E > operator /( U rhs ) const
+    SafeInt< T, E > operator /( U rhs ) const SAFEINT_CPP_THROW
     {
         T ret( 0 );
         DivisionHelper< T, U, DivisionMethod< T, U >::method >::template DivideThrow< E >( m_int, rhs, ret );
         return SafeInt< T, E >( ret );
     }
 
-    SafeInt< T, E > operator /( SafeInt< T, E > rhs ) const
+    SafeInt< T, E > operator /( SafeInt< T, E > rhs ) const SAFEINT_CPP_THROW
     {
         T ret( 0 );
         DivisionHelper< T, T, DivisionMethod< T, T >::method >::template DivideThrow< E >( m_int, (T)rhs, ret );
@@ -5832,13 +5989,13 @@ public:
     }
 
     // Division assignment
-    SafeInt< T, E >& operator /=( SafeInt< T, E > i )
+    SafeInt< T, E >& operator /=( SafeInt< T, E > i ) SAFEINT_CPP_THROW
     {
         DivisionHelper< T, T, DivisionMethod< T, T >::method >::template DivideThrow< E >( m_int, (T)i, m_int );
         return *this;
     }
 
-    template < typename U > SafeInt< T, E >& operator /=( U i )
+    template < typename U > SafeInt< T, E >& operator /=( U i ) SAFEINT_CPP_THROW
     {
         DivisionHelper< T, U, DivisionMethod< T, U >::method >::template DivideThrow< E >( m_int, i, m_int );
         return *this;
@@ -5853,7 +6010,7 @@ public:
     // For addition and subtraction
 
     // Addition
-    SafeInt< T, E > operator +( SafeInt< T, E > rhs ) const
+    SafeInt< T, E > operator +( SafeInt< T, E > rhs ) const SAFEINT_CPP_THROW
     {
         T ret( 0 );
         AdditionHelper< T, T, AdditionMethod< T, T >::method >::template AdditionThrow< E >( m_int, (T)rhs, ret );
@@ -5861,7 +6018,7 @@ public:
     }
 
     template < typename U >
-    SafeInt< T, E > operator +( U rhs ) const
+    SafeInt< T, E > operator +( U rhs ) const SAFEINT_CPP_THROW
     {
         T ret( 0 );
         AdditionHelper< T, U, AdditionMethod< T, U >::method >::template AdditionThrow< E >( m_int, rhs, ret );
@@ -5869,21 +6026,21 @@ public:
     }
 
     //addition assignment
-    SafeInt< T, E >& operator +=( SafeInt< T, E > rhs )
+    SafeInt< T, E >& operator +=( SafeInt< T, E > rhs ) SAFEINT_CPP_THROW
     {
         AdditionHelper< T, T, AdditionMethod< T, T >::method >::template AdditionThrow< E >( m_int, (T)rhs, m_int );
         return *this;
     }
 
     template < typename U >
-    SafeInt< T, E >& operator +=( U rhs )
+    SafeInt< T, E >& operator +=( U rhs ) SAFEINT_CPP_THROW
     {
         AdditionHelper< T, U, AdditionMethod< T, U >::method >::template AdditionThrow< E >( m_int, rhs, m_int );
         return *this;
     }
 
     template < typename U >
-    SafeInt< T, E >& operator +=( SafeInt< U, E > rhs )
+    SafeInt< T, E >& operator +=( SafeInt< U, E > rhs ) SAFEINT_CPP_THROW
     {
         AdditionHelper< T, U, AdditionMethod< T, U >::method >::template AdditionThrow< E >( m_int, (U)rhs, m_int );
         return *this;
@@ -5891,14 +6048,14 @@ public:
 
     // Subtraction
     template < typename U >
-    SafeInt< T, E > operator -( U rhs ) const
+    SafeInt< T, E > operator -( U rhs ) const SAFEINT_CPP_THROW
     {
         T ret( 0 );
         SubtractionHelper< T, U, SubtractionMethod< T, U >::method >::template SubtractThrow< E >( m_int, rhs, ret );
         return SafeInt< T, E >( ret );
     }
 
-    SafeInt< T, E > operator -(SafeInt< T, E > rhs) const
+    SafeInt< T, E > operator -(SafeInt< T, E > rhs) const SAFEINT_CPP_THROW
     {
         T ret( 0 );
         SubtractionHelper< T, T, SubtractionMethod< T, T >::method >::template SubtractThrow< E >( m_int, (T)rhs, ret );
@@ -5906,106 +6063,25 @@ public:
     }
 
     // Subtraction assignment
-    SafeInt< T, E >& operator -=( SafeInt< T, E > rhs )
+    SafeInt< T, E >& operator -=( SafeInt< T, E > rhs ) SAFEINT_CPP_THROW
     {
         SubtractionHelper< T, T, SubtractionMethod< T, T >::method >::template SubtractThrow< E >( m_int, (T)rhs, m_int );
         return *this;
     }
 
     template < typename U >
-    SafeInt< T, E >& operator -=( U rhs )
+    SafeInt< T, E >& operator -=( U rhs ) SAFEINT_CPP_THROW
     {
         SubtractionHelper< T, U, SubtractionMethod< T, U >::method >::template SubtractThrow< E >( m_int, rhs, m_int );
         return *this;
     }
 
     template < typename U >
-    SafeInt< T, E >& operator -=( SafeInt< U, E > rhs )
+    SafeInt< T, E >& operator -=( SafeInt< U, E > rhs ) SAFEINT_CPP_THROW
     {
         SubtractionHelper< T, U, SubtractionMethod< T, U >::method >::template SubtractThrow< E >( m_int, (U)rhs, m_int );
         return *this;
     }
-
-    // Comparison operators
-    // Additional overloads defined outside the class
-    // to allow for cases where the SafeInt is the rhs value
-
-    // Less than
-    template < typename U >
-    bool operator <( U rhs ) const throw()
-    {
-        return GreaterThanTest< U, T, ValidComparison< U, T >::method >::GreaterThan( rhs, m_int );
-    }
-
-    bool operator <( SafeInt< T, E > rhs ) const throw()
-    {
-        return m_int < (T)rhs;
-    }
-
-    // Greater than or eq.
-    template < typename U >
-    bool operator >=( U rhs ) const throw()
-    {
-        return !GreaterThanTest< U, T, ValidComparison< U, T >::method >::GreaterThan( rhs, m_int );
-    }
-
-    bool operator >=( SafeInt< T, E > rhs ) const throw()
-    {
-        return m_int >= (T)rhs;
-    }
-
-    // Greater than
-    template < typename U >
-    bool operator >( U rhs ) const throw()
-    {
-        return GreaterThanTest< T, U, ValidComparison< T, U >::method >::GreaterThan( m_int, rhs );
-    }
-
-    bool operator >( SafeInt< T, E > rhs ) const throw()
-    {
-        return m_int > (T)rhs;
-    }
-
-    // Less than or eq.
-    template < typename U >
-    bool operator <=( U rhs ) const throw()
-    {
-        return !GreaterThanTest< T, U, ValidComparison< T, U >::method >::GreaterThan( m_int, rhs );
-    }
-
-    bool operator <=( SafeInt< T, E > rhs ) const throw()
-    {
-        return m_int <= (T)rhs;
-    }
-
-    // Equality
-    template < typename U >
-    bool operator ==( U rhs ) const throw()
-    {
-        return EqualityTest< T, U, ValidComparison< T, U >::method >::IsEquals( m_int, rhs );
-    }
-
-    // Need an explicit override for type bool
-    bool operator ==( bool rhs ) const throw()
-    {
-        return ( m_int == 0 ? false : true ) == rhs;
-    }
-
-    bool operator ==( SafeInt< T, E > rhs ) const throw() { return m_int == (T)rhs; }
-
-    // != operators
-    template < typename U >
-    bool operator !=( U rhs ) const throw()
-    {
-        return !EqualityTest< T, U, ValidComparison< T, U >::method >::IsEquals( m_int, rhs );
-    }
-
-    bool operator !=( bool b ) const throw()
-    {
-        return ( m_int == 0 ? false : true ) != b;
-    }
-
-    bool operator !=( SafeInt< T, E > rhs ) const throw() { return m_int != (T)rhs; }
 
     // Shift operators
     // Note - shift operators ALWAYS return the same type as the lhs
@@ -6017,11 +6093,11 @@ public:
 #ifdef SAFEINT_DISABLE_SHIFT_ASSERT
     #define ShiftAssert(x)
 #else
-    #define ShiftAssert(x) assert(x)
+    #define ShiftAssert(x) SAFEINT_ASSERT(x)
 #endif
 
     template < typename U >
-    SafeInt< T, E > operator <<( U bits ) const throw()
+    SafeInt< T, E > operator <<( U bits ) const SAFEINT_NOTHROW
     {
         ShiftAssert( !IntTraits< U >::isSigned || bits >= 0 );
         ShiftAssert( bits < (int)IntTraits< T >::bitCount );
@@ -6030,7 +6106,7 @@ public:
     }
 
     template < typename U >
-    SafeInt< T, E > operator <<( SafeInt< U, E > bits ) const throw()
+    SafeInt< T, E > operator <<( SafeInt< U, E > bits ) const SAFEINT_NOTHROW
     {
         ShiftAssert( !IntTraits< U >::isSigned || (U)bits >= 0 );
         ShiftAssert( (U)bits < (int)IntTraits< T >::bitCount );
@@ -6041,7 +6117,7 @@ public:
     // Left shift assignment
 
     template < typename U >
-    SafeInt< T, E >& operator <<=( U bits ) throw()
+    SafeInt< T, E >& operator <<=( U bits ) SAFEINT_NOTHROW
     {
         ShiftAssert( !IntTraits< U >::isSigned || bits >= 0 );
         ShiftAssert( bits < (int)IntTraits< T >::bitCount );
@@ -6051,7 +6127,7 @@ public:
     }
 
     template < typename U >
-    SafeInt< T, E >& operator <<=( SafeInt< U, E > bits ) throw()
+    SafeInt< T, E >& operator <<=( SafeInt< U, E > bits ) SAFEINT_NOTHROW
     {
         ShiftAssert( !IntTraits< U >::isSigned || (U)bits >= 0 );
         ShiftAssert( (U)bits < (int)IntTraits< T >::bitCount );
@@ -6062,7 +6138,7 @@ public:
 
     // Right shift
     template < typename U >
-    SafeInt< T, E > operator >>( U bits ) const throw()
+    SafeInt< T, E > operator >>( U bits ) const SAFEINT_NOTHROW
     {
         ShiftAssert( !IntTraits< U >::isSigned || bits >= 0 );
         ShiftAssert( bits < (int)IntTraits< T >::bitCount );
@@ -6071,7 +6147,7 @@ public:
     }
 
     template < typename U >
-    SafeInt< T, E > operator >>( SafeInt< U, E > bits ) const throw()
+    SafeInt< T, E > operator >>( SafeInt< U, E > bits ) const SAFEINT_NOTHROW
     {
         ShiftAssert( !IntTraits< U >::isSigned || (U)bits >= 0 );
         ShiftAssert( bits < (int)IntTraits< T >::bitCount );
@@ -6081,7 +6157,7 @@ public:
 
     // Right shift assignment
     template < typename U >
-    SafeInt< T, E >& operator >>=( U bits ) throw()
+    SafeInt< T, E >& operator >>=( U bits ) SAFEINT_NOTHROW
     {
         ShiftAssert( !IntTraits< U >::isSigned || bits >= 0 );
         ShiftAssert( bits < (int)IntTraits< T >::bitCount );
@@ -6091,7 +6167,7 @@ public:
     }
 
     template < typename U >
-    SafeInt< T, E >& operator >>=( SafeInt< U, E > bits ) throw()
+    SafeInt< T, E >& operator >>=( SafeInt< U, E > bits ) SAFEINT_NOTHROW
     {
         ShiftAssert( !IntTraits< U >::isSigned || (U)bits >= 0 );
         ShiftAssert( (U)bits < (int)IntTraits< T >::bitCount );
@@ -6105,13 +6181,13 @@ public:
     // demand a type T, or something that fits into a type T
 
     // Bitwise &
-    SafeInt< T, E > operator &( SafeInt< T, E > rhs ) const throw()
+    SafeInt< T, E > operator &( SafeInt< T, E > rhs ) const SAFEINT_NOTHROW
     {
         return SafeInt< T, E >( m_int & (T)rhs );
     }
 
     template < typename U >
-    SafeInt< T, E > operator &( U rhs ) const throw()
+    SafeInt< T, E > operator &( U rhs ) const SAFEINT_NOTHROW
     {
         // we want to avoid setting bits by surprise
         // consider the case of lhs = int, value = 0xffffffff
@@ -6129,34 +6205,34 @@ public:
     }
 
     // Bitwise & assignment
-    SafeInt< T, E >& operator &=( SafeInt< T, E > rhs ) throw()
+    SafeInt< T, E >& operator &=( SafeInt< T, E > rhs ) SAFEINT_NOTHROW
     {
         m_int &= (T)rhs;
         return *this;
     }
 
     template < typename U >
-    SafeInt< T, E >& operator &=( U rhs ) throw()
+    SafeInt< T, E >& operator &=( U rhs ) SAFEINT_NOTHROW
     {
         m_int = BinaryAndHelper< T, U, BinaryMethod< T, U >::method >::And( m_int, rhs );
         return *this;
     }
 
     template < typename U >
-    SafeInt< T, E >& operator &=( SafeInt< U, E > rhs ) throw()
+    SafeInt< T, E >& operator &=( SafeInt< U, E > rhs ) SAFEINT_NOTHROW
     {
         m_int = BinaryAndHelper< T, U, BinaryMethod< T, U >::method >::And( m_int, (U)rhs );
         return *this;
     }
 
     // XOR
-    SafeInt< T, E > operator ^( SafeInt< T, E > rhs ) const throw()
+    SafeInt< T, E > operator ^( SafeInt< T, E > rhs ) const SAFEINT_NOTHROW
     {
         return SafeInt< T, E >( (T)( m_int ^ (T)rhs ) );
     }
 
     template < typename U >
-    SafeInt< T, E > operator ^( U rhs ) const throw()
+    SafeInt< T, E > operator ^( U rhs ) const SAFEINT_NOTHROW
     {
         // If you land in the assert, this is because the bitwise operator
         // was causing unexpected behavior. Fix is to properly cast your inputs
@@ -6166,80 +6242,80 @@ public:
     }
 
     // XOR assignment
-    SafeInt< T, E >& operator ^=( SafeInt< T, E > rhs ) throw()
+    SafeInt< T, E >& operator ^=( SafeInt< T, E > rhs ) SAFEINT_NOTHROW
     {
         m_int ^= (T)rhs;
         return *this;
     }
 
     template < typename U >
-    SafeInt< T, E >& operator ^=( U rhs ) throw()
+    SafeInt< T, E >& operator ^=( U rhs ) SAFEINT_NOTHROW
     {
         m_int = BinaryXorHelper< T, U, BinaryMethod< T, U >::method >::Xor( m_int, rhs );
         return *this;
     }
 
     template < typename U >
-    SafeInt< T, E >& operator ^=( SafeInt< U, E > rhs ) throw()
+    SafeInt< T, E >& operator ^=( SafeInt< U, E > rhs ) SAFEINT_NOTHROW
     {
         m_int = BinaryXorHelper< T, U, BinaryMethod< T, U >::method >::Xor( m_int, (U)rhs );
         return *this;
     }
 
     // bitwise OR
-    SafeInt< T, E > operator |( SafeInt< T, E > rhs ) const throw()
+    SafeInt< T, E > operator |( SafeInt< T, E > rhs ) const SAFEINT_NOTHROW
     {
         return SafeInt< T, E >( (T)( m_int | (T)rhs ) );
     }
 
     template < typename U >
-    SafeInt< T, E > operator |( U rhs ) const throw()
+    SafeInt< T, E > operator |( U rhs ) const SAFEINT_NOTHROW
     {
         return SafeInt< T, E >( BinaryOrHelper< T, U, BinaryMethod< T, U >::method >::Or( m_int, rhs ) );
     }
 
     // bitwise OR assignment
-    SafeInt< T, E >& operator |=( SafeInt< T, E > rhs ) throw()
+    SafeInt< T, E >& operator |=( SafeInt< T, E > rhs ) SAFEINT_NOTHROW
     {
         m_int |= (T)rhs;
         return *this;
     }
 
     template < typename U >
-    SafeInt< T, E >& operator |=( U rhs ) throw()
+    SafeInt< T, E >& operator |=( U rhs ) SAFEINT_NOTHROW
     {
         m_int = BinaryOrHelper< T, U, BinaryMethod< T, U >::method >::Or( m_int, rhs );
         return *this;
     }
 
     template < typename U >
-    SafeInt< T, E >& operator |=( SafeInt< U, E > rhs ) throw()
+    SafeInt< T, E >& operator |=( SafeInt< U, E > rhs ) SAFEINT_NOTHROW
     {
         m_int = BinaryOrHelper< T, U, BinaryMethod< T, U >::method >::Or( m_int, (U)rhs );
         return *this;
     }
 
     // Miscellaneous helper functions
-    SafeInt< T, E > Min( SafeInt< T, E > test, const T floor = IntTraits< T >::minInt ) const throw()
+    SafeInt< T, E > Min( SafeInt< T, E > test, const T floor = IntTraits< T >::minInt ) const SAFEINT_NOTHROW
     {
         T tmp = test < m_int ? (T)test : m_int;
         return tmp < floor ? floor : tmp;
     }
 
-    SafeInt< T, E > Max( SafeInt< T, E > test, const T upper = IntTraits< T >::maxInt ) const throw()
+    SafeInt< T, E > Max( SafeInt< T, E > test, const T upper = IntTraits< T >::maxInt ) const SAFEINT_NOTHROW
     {
         T tmp = test > m_int ? (T)test : m_int;
         return tmp > upper ? upper : tmp;
     }
 
-    void Swap( SafeInt< T, E >& with ) throw()
+    void Swap( SafeInt< T, E >& with ) SAFEINT_NOTHROW
     {
         T temp( m_int );
         m_int = with.m_int;
         with.m_int = temp;
     }
 
-    static SafeInt< T, E > SafeAtoI( const char* input )
+    static SafeInt< T, E > SafeAtoI( const char* input ) SAFEINT_CPP_THROW
     {
         return SafeTtoI( input );
     }
@@ -6262,7 +6338,7 @@ public:
     };
 
     template < alignBits bits >
-    const SafeInt< T, E >& Align()
+    const SafeInt< T, E >& Align() SAFEINT_CPP_THROW
     {
         // Zero is always aligned
         if( m_int == 0 )
@@ -6302,7 +6378,7 @@ private:
     // This is here because it is useful, and it is an example of what
     // can be done easily with SafeInt.
     template < typename U >
-    static SafeInt< T, E > SafeTtoI( U* input )
+    static SafeInt< T, E > SafeTtoI( U* input ) SAFEINT_CPP_THROW
     {
         U* tmp  = input;
         SafeInt< T, E > s;
@@ -6348,59 +6424,85 @@ private:
 // Helper function used to subtract pointers.
 // Used to squelch warnings
 template <typename P>
-SafeInt<ptrdiff_t, SafeIntDefaultExceptionHandler> SafePtrDiff(const P* p1, const P* p2)
+SafeInt<ptrdiff_t, SafeIntDefaultExceptionHandler> SafePtrDiff(const P* p1, const P* p2) SAFEINT_CPP_THROW
 {
     return SafeInt<ptrdiff_t, SafeIntDefaultExceptionHandler>( p1 - p2 );
 }
 
-// Externally defined functions for the case of U op SafeInt< T, E >
+// Comparison operators
+
+//Less than
 template < typename T, typename U, typename E >
-bool operator <( U lhs, SafeInt< T, E > rhs ) throw()
+bool operator <( U lhs, SafeInt< T, E > rhs ) SAFEINT_NOTHROW
 {
     return GreaterThanTest< T, U, ValidComparison< T, U >::method >::GreaterThan( (T)rhs, lhs );
 }
 
 template < typename T, typename U, typename E >
-bool operator <( SafeInt< U, E > lhs, SafeInt< T, E > rhs ) throw()
+bool operator <( SafeInt<T, E> lhs, U rhs ) SAFEINT_NOTHROW
+{
+	return GreaterThanTest< U, T, ValidComparison< U, T >::method >::GreaterThan( rhs, (T)lhs );
+}
+
+template < typename T, typename U, typename E >
+bool operator <( SafeInt< U, E > lhs, SafeInt< T, E > rhs ) SAFEINT_NOTHROW
 {
     return GreaterThanTest< T, U, ValidComparison< T, U >::method >::GreaterThan( (T)rhs, (U)lhs );
 }
 
 // Greater than
 template < typename T, typename U, typename E >
-bool operator >( U lhs, SafeInt< T, E > rhs ) throw()
+bool operator >( U lhs, SafeInt< T, E > rhs ) SAFEINT_NOTHROW
 {
     return GreaterThanTest< U, T, ValidComparison< U, T >::method >::GreaterThan( lhs, (T)rhs );
 }
 
 template < typename T, typename U, typename E >
-bool operator >( SafeInt< T, E > lhs, SafeInt< U, E > rhs ) throw()
+bool operator >( SafeInt<T, E> lhs, U rhs ) SAFEINT_NOTHROW
+{
+	return GreaterThanTest< T, U, ValidComparison< T, U >::method >::GreaterThan( (T)lhs, rhs );
+}
+
+template < typename T, typename U, typename E >
+bool operator >( SafeInt< T, E > lhs, SafeInt< U, E > rhs ) SAFEINT_NOTHROW
 {
     return GreaterThanTest< T, U, ValidComparison< T, U >::method >::GreaterThan( (T)lhs, (U)rhs );
 }
 
 // Greater than or equal
 template < typename T, typename U, typename E >
-bool operator >=( U lhs, SafeInt< T, E > rhs ) throw()
+bool operator >=( U lhs, SafeInt< T, E > rhs ) SAFEINT_NOTHROW
 {
     return !GreaterThanTest< T, U, ValidComparison< T, U >::method >::GreaterThan( (T)rhs, lhs );
 }
 
 template < typename T, typename U, typename E >
-bool operator >=( SafeInt< T, E > lhs, SafeInt< U, E > rhs ) throw()
+bool operator >=( SafeInt<T, E> lhs, U rhs ) SAFEINT_NOTHROW
+{
+	return !GreaterThanTest< U, T, ValidComparison< U, T >::method >::GreaterThan( rhs, (T)lhs );
+}
+
+template < typename T, typename U, typename E >
+bool operator >=( SafeInt< T, E > lhs, SafeInt< U, E > rhs ) SAFEINT_NOTHROW
 {
     return !GreaterThanTest< U, T, ValidComparison< U, T >::method >::GreaterThan( (U)rhs, (T)lhs );
 }
 
 // Less than or equal
 template < typename T, typename U, typename E >
-bool operator <=( U lhs, SafeInt< T, E > rhs ) throw()
+bool operator <=( U lhs, SafeInt< T, E > rhs ) SAFEINT_NOTHROW
 {
     return !GreaterThanTest< U, T, ValidComparison< U, T >::method >::GreaterThan( lhs, (T)rhs );
 }
 
 template < typename T, typename U, typename E >
-bool operator <=( SafeInt< T, E > lhs, SafeInt< U, E > rhs ) throw()
+bool operator <=( SafeInt< T, E > lhs, U rhs ) SAFEINT_NOTHROW
+{
+    return !GreaterThanTest< T, U, ValidComparison< T, U >::method >::GreaterThan( (T)lhs, rhs );
+}
+
+template < typename T, typename U, typename E >
+bool operator <=( SafeInt< T, E > lhs, SafeInt< U, E > rhs ) SAFEINT_NOTHROW
 {
     return !GreaterThanTest< T, U, ValidComparison< T, U >::method >::GreaterThan( (T)lhs, (U)rhs );
 }
@@ -6408,41 +6510,67 @@ bool operator <=( SafeInt< T, E > lhs, SafeInt< U, E > rhs ) throw()
 // equality
 // explicit overload for bool
 template < typename T, typename E >
-bool operator ==( bool lhs, SafeInt< T, E > rhs ) throw()
+bool operator ==( bool lhs, SafeInt< T, E > rhs ) SAFEINT_NOTHROW
 {
     return lhs == ( (T)rhs == 0 ? false : true );
 }
 
+template < typename T, typename E >
+bool operator ==( SafeInt< T, E > lhs, bool rhs ) SAFEINT_NOTHROW
+{
+    return rhs == ( (T)lhs == 0 ? false : true );
+}
+
 template < typename T, typename U, typename E >
-bool operator ==( U lhs, SafeInt< T, E > rhs ) throw()
+bool operator ==( U lhs, SafeInt< T, E > rhs ) SAFEINT_NOTHROW
 {
     return EqualityTest< T, U, ValidComparison< T, U >::method >::IsEquals((T)rhs, lhs);
 }
 
 template < typename T, typename U, typename E >
-bool operator ==( SafeInt< T, E > lhs, SafeInt< U, E > rhs ) throw()
+bool operator ==( SafeInt< T, E > lhs, U rhs ) SAFEINT_NOTHROW
+{
+    return EqualityTest< T, U, ValidComparison< T, U >::method >::IsEquals( (T)lhs, rhs );
+}
+
+template < typename T, typename U, typename E >
+bool operator ==( SafeInt< T, E > lhs, SafeInt< U, E > rhs ) SAFEINT_NOTHROW
 {
     return EqualityTest< T, U, ValidComparison< T, U >::method >::IsEquals( (T)lhs, (U)rhs );
 }
 
 //not equals
 template < typename T, typename U, typename E >
-bool operator !=( U lhs, SafeInt< T, E > rhs ) throw()
+bool operator !=( U lhs, SafeInt< T, E > rhs ) SAFEINT_NOTHROW
 {
-    return !EqualityTest< T, U, ValidComparison< T, U >::method >::IsEquals( rhs, lhs );
+    return !EqualityTest< T, U, ValidComparison< T, U >::method >::IsEquals( (T)rhs, lhs );
 }
 
+template < typename T, typename U, typename E >
+bool operator !=( SafeInt< T, E > lhs, U rhs ) SAFEINT_NOTHROW
+{
+    return !EqualityTest< T, U, ValidComparison< T, U >::method >::IsEquals( (T)lhs, rhs );
+}
+
+template < typename T, typename U, typename E >
+bool operator !=( SafeInt< T, E > lhs, SafeInt< U, E > rhs ) SAFEINT_NOTHROW
+{
+    return !EqualityTest< T, U, ValidComparison< T, U >::method >::IsEquals( lhs, rhs );
+}
+
+
 template < typename T, typename E >
-bool operator !=( bool lhs, SafeInt< T, E > rhs ) throw()
+bool operator !=( bool lhs, SafeInt< T, E > rhs ) SAFEINT_NOTHROW
 {
     return ( (T)rhs == 0 ? false : true ) != lhs;
 }
 
-template < typename T, typename U, typename E >
-bool operator !=( SafeInt< T, E > lhs, SafeInt< U, E > rhs ) throw()
+template < typename T, typename E >
+bool operator !=( SafeInt< T, E > lhs, bool rhs ) SAFEINT_NOTHROW
 {
-    return !EqualityTest< T, U, ValidComparison< T, U >::method >::IsEquals( lhs, rhs );
+    return ( (T)lhs == 0 ? false : true ) != rhs;
 }
+
 
 template < typename T, typename U, typename E, int method > class ModulusSimpleCaseHelper;
 
@@ -6451,7 +6579,7 @@ template < typename T, typename E, int method > class ModulusSignedCaseHelper;
 template < typename T, typename E > class ModulusSignedCaseHelper < T, E, true >
 {
 public:
-    static bool SignedCase( SafeInt< T, E > rhs, SafeInt< T, E >& result )
+    static bool SignedCase( SafeInt< T, E > rhs, SafeInt< T, E >& result ) SAFEINT_NOTHROW
     {
         if( (T)rhs == (T)-1 )
         {
@@ -6465,7 +6593,7 @@ public:
 template < typename T, typename E > class ModulusSignedCaseHelper < T, E, false >
 {
 public:
-    static bool SignedCase( SafeInt< T, E > /*rhs*/, SafeInt< T, E >& /*result*/ )
+    static bool SignedCase( SafeInt< T, E > /*rhs*/, SafeInt< T, E >& /*result*/ ) SAFEINT_NOTHROW
     {
         return false;
     }
@@ -6475,7 +6603,7 @@ template < typename T, typename U, typename E >
 class ModulusSimpleCaseHelper < T, U, E, true >
 {
 public:
-    static bool ModulusSimpleCase( U lhs, SafeInt< T, E > rhs, SafeInt< T, E >& result )
+    static bool ModulusSimpleCase( U lhs, SafeInt< T, E > rhs, SafeInt< T, E >& result ) SAFEINT_CPP_THROW
     {
         if( rhs != 0 )
         {
@@ -6487,7 +6615,6 @@ public:
         }
 
         E::SafeIntOnDivZero();
-        NotReachedReturn(false);
     }
 };
 
@@ -6495,7 +6622,7 @@ template< typename T, typename U, typename E >
 class ModulusSimpleCaseHelper < T, U, E, false >
 {
 public:
-    static bool ModulusSimpleCase( U /*lhs*/, SafeInt< T, E > /*rhs*/, SafeInt< T, E >& /*result*/ )
+    static bool ModulusSimpleCase( U /*lhs*/, SafeInt< T, E > /*rhs*/, SafeInt< T, E >& /*result*/ ) SAFEINT_NOTHROW
     {
         return false;
     }
@@ -6503,7 +6630,7 @@ public:
 
 // Modulus
 template < typename T, typename U, typename E >
-SafeInt< T, E > operator %( U lhs, SafeInt< T, E > rhs )
+SafeInt< T, E > operator %( U lhs, SafeInt< T, E > rhs ) SAFEINT_CPP_THROW
 {
     // Value of return depends on sign of lhs
     // This one may not be safe - bounds check in constructor
@@ -6522,7 +6649,7 @@ SafeInt< T, E > operator %( U lhs, SafeInt< T, E > rhs )
 
 // Multiplication
 template < typename T, typename U, typename E >
-SafeInt< T, E > operator *( U lhs, SafeInt< T, E > rhs )
+SafeInt< T, E > operator *( U lhs, SafeInt< T, E > rhs ) SAFEINT_CPP_THROW
 {
     T ret( 0 );
     MultiplicationHelper< T, U, MultiplicationMethod< T, U >::method >::template MultiplyThrow< E >( (T)rhs, lhs, ret );
@@ -6534,7 +6661,7 @@ template < typename T, typename U, typename E, int method > class DivisionNegati
 template < typename T, typename U, typename E > class DivisionNegativeCornerCaseHelper< T, U, E, true >
 {
 public:
-    static bool NegativeCornerCase( U lhs, SafeInt< T, E > rhs, SafeInt<T, E>& result )
+    static bool NegativeCornerCase( U lhs, SafeInt< T, E > rhs, SafeInt<T, E>& result ) SAFEINT_CPP_THROW
     {
         // Problem case - normal casting behavior changes meaning
         // flip rhs to positive
@@ -6562,14 +6689,13 @@ public:
         }
 
         E::SafeIntOnOverflow();
-        NotReachedReturn(false);
     }
 };
 
 template < typename T, typename U, typename E > class DivisionNegativeCornerCaseHelper< T, U, E, false >
 {
 public:
-    static bool NegativeCornerCase( U /*lhs*/, SafeInt< T, E > /*rhs*/, SafeInt<T, E>& /*result*/ )
+    static bool NegativeCornerCase( U /*lhs*/, SafeInt< T, E > /*rhs*/, SafeInt<T, E>& /*result*/ ) SAFEINT_NOTHROW
     {
         return false;
     }
@@ -6580,7 +6706,7 @@ template < typename T, typename U, typename E, int method > class DivisionCorner
 template < typename T, typename U, typename E > class DivisionCornerCaseHelper < T, U, E, true >
 {
 public:
-    static bool DivisionCornerCase1( U lhs, SafeInt< T, E > rhs, SafeInt<T, E>& result )
+    static bool DivisionCornerCase1( U lhs, SafeInt< T, E > rhs, SafeInt<T, E>& result ) SAFEINT_CPP_THROW
     {
         if( (T)rhs > 0 )
         {
@@ -6599,14 +6725,13 @@ public:
         }
 
         E::SafeIntOnDivZero();
-        NotReachedReturn(false);
     }
 };
 
 template < typename T, typename U, typename E > class DivisionCornerCaseHelper < T, U, E, false >
 {
 public:
-    static bool DivisionCornerCase1( U /*lhs*/, SafeInt< T, E > /*rhs*/, SafeInt<T, E>& /*result*/ )
+    static bool DivisionCornerCase1( U /*lhs*/, SafeInt< T, E > /*rhs*/, SafeInt<T, E>& /*result*/ ) SAFEINT_NOTHROW
     {
         return false;
     }
@@ -6617,7 +6742,7 @@ template < typename T, typename U, typename E, int method > class DivisionCorner
 template < typename T, typename U, typename E > class DivisionCornerCaseHelper2 < T, U, E, true >
 {
 public:
-    static bool DivisionCornerCase2( U lhs, SafeInt< T, E > rhs, SafeInt<T, E>& result )
+    static bool DivisionCornerCase2( U lhs, SafeInt< T, E > rhs, SafeInt<T, E>& result ) SAFEINT_CPP_THROW
     {
         if( lhs == IntTraits< U >::minInt && (T)rhs == -1 )
         {
@@ -6626,7 +6751,7 @@ public:
             // if rhs is a larger type than lhs
             // If types are wrong, throws
 
-#if !defined __GNUC__
+#if SAFEINT_COMPILER == VISUAL_STUDIO_COMPILER
 #pragma warning(push)
 //cast truncates constant value
 #pragma warning(disable:4310)
@@ -6637,7 +6762,7 @@ public:
             else
                 E::SafeIntOnOverflow();
 
-#if !defined __GNUC__
+#if SAFEINT_COMPILER == VISUAL_STUDIO_COMPILER
 #pragma warning(pop)
 #endif
 
@@ -6651,14 +6776,14 @@ public:
 template < typename T, typename U, typename E > class DivisionCornerCaseHelper2 < T, U, E, false >
 {
 public:
-    static bool DivisionCornerCase2( U /*lhs*/, SafeInt< T, E > /*rhs*/, SafeInt<T, E>& /*result*/ )
+    static bool DivisionCornerCase2( U /*lhs*/, SafeInt< T, E > /*rhs*/, SafeInt<T, E>& /*result*/ ) SAFEINT_NOTHROW
     {
         return false;
     }
 };
 
 // Division
-template < typename T, typename U, typename E > SafeInt< T, E > operator /( U lhs, SafeInt< T, E > rhs )
+template < typename T, typename U, typename E > SafeInt< T, E > operator /( U lhs, SafeInt< T, E > rhs ) SAFEINT_CPP_THROW
 {
     // Corner case - has to be handled seperately
     SafeInt< T, E > result;
@@ -6676,7 +6801,7 @@ template < typename T, typename U, typename E > SafeInt< T, E > operator /( U lh
 
 // Addition
 template < typename T, typename U, typename E >
-SafeInt< T, E > operator +( U lhs, SafeInt< T, E > rhs )
+SafeInt< T, E > operator +( U lhs, SafeInt< T, E > rhs ) SAFEINT_CPP_THROW
 {
     T ret( 0 );
     AdditionHelper< T, U, AdditionMethod< T, U >::method >::template AdditionThrow< E >( (T)rhs, lhs, ret );
@@ -6685,7 +6810,7 @@ SafeInt< T, E > operator +( U lhs, SafeInt< T, E > rhs )
 
 // Subtraction
 template < typename T, typename U, typename E >
-SafeInt< T, E > operator -( U lhs, SafeInt< T, E > rhs )
+SafeInt< T, E > operator -( U lhs, SafeInt< T, E > rhs ) SAFEINT_CPP_THROW
 {
     T ret( 0 );
     SubtractionHelper< U, T, SubtractionMethod2< U, T >::method >::template SubtractThrow< E >( lhs, rhs.Ref(), ret );
@@ -6697,7 +6822,7 @@ SafeInt< T, E > operator -( U lhs, SafeInt< T, E > rhs )
 // to a normal int - this at least makes the last operation safe
 // +=
 template < typename T, typename U, typename E >
-T& operator +=( T& lhs, SafeInt< U, E > rhs )
+T& operator +=( T& lhs, SafeInt< U, E > rhs ) SAFEINT_CPP_THROW
 {
     T ret( 0 );
     AdditionHelper< T, U, AdditionMethod< T, U >::method >::template AdditionThrow< E >( lhs, (U)rhs, ret );
@@ -6706,7 +6831,7 @@ T& operator +=( T& lhs, SafeInt< U, E > rhs )
 }
 
 template < typename T, typename U, typename E >
-T& operator -=( T& lhs, SafeInt< U, E > rhs )
+T& operator -=( T& lhs, SafeInt< U, E > rhs ) SAFEINT_CPP_THROW
 {
     T ret( 0 );
     SubtractionHelper< T, U, SubtractionMethod< T, U >::method >::template SubtractThrow< E >( lhs, (U)rhs, ret );
@@ -6715,7 +6840,7 @@ T& operator -=( T& lhs, SafeInt< U, E > rhs )
 }
 
 template < typename T, typename U, typename E >
-T& operator *=( T& lhs, SafeInt< U, E > rhs )
+T& operator *=( T& lhs, SafeInt< U, E > rhs ) SAFEINT_CPP_THROW
 {
     T ret( 0 );
     MultiplicationHelper< T, U, MultiplicationMethod< T, U >::method >::template MultiplyThrow< E >( lhs, (U)rhs, ret );
@@ -6724,7 +6849,7 @@ T& operator *=( T& lhs, SafeInt< U, E > rhs )
 }
 
 template < typename T, typename U, typename E >
-T& operator /=( T& lhs, SafeInt< U, E > rhs )
+T& operator /=( T& lhs, SafeInt< U, E > rhs ) SAFEINT_CPP_THROW
 {
     T ret( 0 );
     DivisionHelper< T, U, DivisionMethod< T, U >::method >::template DivideThrow< E >( lhs, (U)rhs, ret );
@@ -6733,7 +6858,7 @@ T& operator /=( T& lhs, SafeInt< U, E > rhs )
 }
 
 template < typename T, typename U, typename E >
-T& operator %=( T& lhs, SafeInt< U, E > rhs )
+T& operator %=( T& lhs, SafeInt< U, E > rhs ) SAFEINT_CPP_THROW
 {
     T ret( 0 );
     ModulusHelper< T, U, ValidComparison< T, U >::method >::template ModulusThrow< E >( lhs, (U)rhs, ret );
@@ -6742,35 +6867,35 @@ T& operator %=( T& lhs, SafeInt< U, E > rhs )
 }
 
 template < typename T, typename U, typename E >
-T& operator &=( T& lhs, SafeInt< U, E > rhs ) throw()
+T& operator &=( T& lhs, SafeInt< U, E > rhs ) SAFEINT_NOTHROW
 {
     lhs = BinaryAndHelper< T, U, BinaryMethod< T, U >::method >::And( lhs, (U)rhs );
     return lhs;
 }
 
 template < typename T, typename U, typename E >
-T& operator ^=( T& lhs, SafeInt< U, E > rhs ) throw()
+T& operator ^=( T& lhs, SafeInt< U, E > rhs ) SAFEINT_NOTHROW
 {
     lhs = BinaryXorHelper< T, U, BinaryMethod< T, U >::method >::Xor( lhs, (U)rhs );
     return lhs;
 }
 
 template < typename T, typename U, typename E >
-T& operator |=( T& lhs, SafeInt< U, E > rhs ) throw()
+T& operator |=( T& lhs, SafeInt< U, E > rhs ) SAFEINT_NOTHROW
 {
     lhs = BinaryOrHelper< T, U, BinaryMethod< T, U >::method >::Or( lhs, (U)rhs );
     return lhs;
 }
 
 template < typename T, typename U, typename E >
-T& operator <<=( T& lhs, SafeInt< U, E > rhs ) throw()
+T& operator <<=( T& lhs, SafeInt< U, E > rhs ) SAFEINT_NOTHROW
 {
     lhs = (T)( SafeInt< T, E >( lhs ) << (U)rhs );
     return lhs;
 }
 
 template < typename T, typename U, typename E >
-T& operator >>=( T& lhs, SafeInt< U, E > rhs ) throw()
+T& operator >>=( T& lhs, SafeInt< U, E > rhs ) SAFEINT_NOTHROW
 {
     lhs = (T)( SafeInt< T, E >( lhs ) >> (U)rhs );
     return lhs;
@@ -6781,7 +6906,7 @@ T& operator >>=( T& lhs, SafeInt< U, E > rhs ) throw()
 // that the resulting pointer is still in the buffer, only
 // that no int overflows happened on the way to getting the new pointer
 template < typename T, typename U, typename E >
-T*& operator +=( T*& lhs, SafeInt< U, E > rhs )
+T*& operator +=( T*& lhs, SafeInt< U, E > rhs ) SAFEINT_CPP_THROW
 {
     // Cast the pointer to a number so we can do arithmetic
     SafeInt< size_t, E > ptr_val = reinterpret_cast< size_t >( lhs );
@@ -6794,7 +6919,7 @@ T*& operator +=( T*& lhs, SafeInt< U, E > rhs )
 }
 
 template < typename T, typename U, typename E >
-T*& operator -=( T*& lhs, SafeInt< U, E > rhs )
+T*& operator -=( T*& lhs, SafeInt< U, E > rhs ) SAFEINT_CPP_THROW
 {
     // Cast the pointer to a number so we can do arithmetic
     SafeInt< size_t, E > ptr_val = reinterpret_cast< size_t >( lhs );
@@ -6804,7 +6929,7 @@ T*& operator -=( T*& lhs, SafeInt< U, E > rhs )
 }
 
 template < typename T, typename U, typename E >
-T*& operator *=( T*& lhs, SafeInt< U, E > rhs )
+T*& operator *=( T*& lhs, SafeInt< U, E > ) SAFEINT_NOTHROW
 {
     // This operator explicitly not supported
     C_ASSERT( sizeof(T) == 0 );
@@ -6812,7 +6937,7 @@ T*& operator *=( T*& lhs, SafeInt< U, E > rhs )
 }
 
 template < typename T, typename U, typename E >
-T*& operator /=( T*& lhs, SafeInt< U, E > rhs )
+T*& operator /=( T*& lhs, SafeInt< U, E > ) SAFEINT_NOTHROW
 {
     // This operator explicitly not supported
     C_ASSERT( sizeof(T) == 0 );
@@ -6820,7 +6945,7 @@ T*& operator /=( T*& lhs, SafeInt< U, E > rhs )
 }
 
 template < typename T, typename U, typename E >
-T*& operator %=( T*& lhs, SafeInt< U, E > rhs )
+T*& operator %=( T*& lhs, SafeInt< U, E > ) SAFEINT_NOTHROW
 {
     // This operator explicitly not supported
     C_ASSERT( sizeof(T) == 0 );
@@ -6828,7 +6953,7 @@ T*& operator %=( T*& lhs, SafeInt< U, E > rhs )
 }
 
 template < typename T, typename U, typename E >
-T*& operator &=( T*& lhs, SafeInt< U, E > rhs )
+T*& operator &=( T*& lhs, SafeInt< U, E > ) SAFEINT_NOTHROW
 {
     // This operator explicitly not supported
     C_ASSERT( sizeof(T) == 0 );
@@ -6836,7 +6961,7 @@ T*& operator &=( T*& lhs, SafeInt< U, E > rhs )
 }
 
 template < typename T, typename U, typename E >
-T*& operator ^=( T*& lhs, SafeInt< U, E > rhs )
+T*& operator ^=( T*& lhs, SafeInt< U, E > ) SAFEINT_NOTHROW
 {
     // This operator explicitly not supported
     C_ASSERT( sizeof(T) == 0 );
@@ -6844,7 +6969,7 @@ T*& operator ^=( T*& lhs, SafeInt< U, E > rhs )
 }
 
 template < typename T, typename U, typename E >
-T*& operator |=( T*& lhs, SafeInt< U, E > rhs )
+T*& operator |=( T*& lhs, SafeInt< U, E > ) SAFEINT_NOTHROW
 {
     // This operator explicitly not supported
     C_ASSERT( sizeof(T) == 0 );
@@ -6852,7 +6977,7 @@ T*& operator |=( T*& lhs, SafeInt< U, E > rhs )
 }
 
 template < typename T, typename U, typename E >
-T*& operator <<=( T*& lhs, SafeInt< U, E > rhs )
+T*& operator <<=( T*& lhs, SafeInt< U, E > ) SAFEINT_NOTHROW
 {
     // This operator explicitly not supported
     C_ASSERT( sizeof(T) == 0 );
@@ -6860,7 +6985,7 @@ T*& operator <<=( T*& lhs, SafeInt< U, E > rhs )
 }
 
 template < typename T, typename U, typename E >
-T*& operator >>=( T*& lhs, SafeInt< U, E > rhs )
+T*& operator >>=( T*& lhs, SafeInt< U, E > ) SAFEINT_NOTHROW
 {
     // This operator explicitly not supported
     C_ASSERT( sizeof(T) == 0 );
@@ -6872,7 +6997,7 @@ T*& operator >>=( T*& lhs, SafeInt< U, E > rhs )
 
 // Left shift
 template < typename T, typename U, typename E >
-SafeInt< U, E > operator <<( U lhs, SafeInt< T, E > bits ) throw()
+SafeInt< U, E > operator <<( U lhs, SafeInt< T, E > bits ) SAFEINT_NOTHROW
 {
     ShiftAssert( !IntTraits< T >::isSigned || (T)bits >= 0 );
     ShiftAssert( (T)bits < (int)IntTraits< U >::bitCount );
@@ -6882,7 +7007,7 @@ SafeInt< U, E > operator <<( U lhs, SafeInt< T, E > bits ) throw()
 
 // Right shift
 template < typename T, typename U, typename E >
-SafeInt< U, E > operator >>( U lhs, SafeInt< T, E > bits ) throw()
+SafeInt< U, E > operator >>( U lhs, SafeInt< T, E > bits ) SAFEINT_NOTHROW
 {
     ShiftAssert( !IntTraits< T >::isSigned || (T)bits >= 0 );
     ShiftAssert( (T)bits < (int)IntTraits< U >::bitCount );
@@ -6896,23 +7021,36 @@ SafeInt< U, E > operator >>( U lhs, SafeInt< T, E > bits ) throw()
 
 // Bitwise &
 template < typename T, typename U, typename E >
-SafeInt< T, E > operator &( U lhs, SafeInt< T, E > rhs ) throw()
+SafeInt< T, E > operator &( U lhs, SafeInt< T, E > rhs ) SAFEINT_NOTHROW
 {
     return SafeInt< T, E >( BinaryAndHelper< T, U, BinaryMethod< T, U >::method >::And( (T)rhs, lhs ) );
 }
 
 // Bitwise XOR
 template < typename T, typename U, typename E >
-SafeInt< T, E > operator ^( U lhs, SafeInt< T, E > rhs ) throw()
+SafeInt< T, E > operator ^( U lhs, SafeInt< T, E > rhs ) SAFEINT_NOTHROW
 {
     return SafeInt< T, E >(BinaryXorHelper< T, U, BinaryMethod< T, U >::method >::Xor( (T)rhs, lhs ) );
 }
 
 // Bitwise OR
 template < typename T, typename U, typename E >
-SafeInt< T, E > operator |( U lhs, SafeInt< T, E > rhs ) throw()
+SafeInt< T, E > operator |( U lhs, SafeInt< T, E > rhs ) SAFEINT_NOTHROW
 {
     return SafeInt< T, E >( BinaryOrHelper< T, U, BinaryMethod< T, U >::method >::Or( (T)rhs, lhs ) );
 }
 
+#if SAFEINT_COMPILER == GCC_COMPILER
+#pragma GCC diagnostic pop
+#endif
+
+#if SAFEINT_COMPILER == CLANG_COMPILER
+#pragma clang diagnostic pop
+#endif
 #endif //SAFEINT_HPP
+
+#if defined VISUAL_STUDIO_SAFEINT_COMPAT
+} // utilities
+} // msl
+#endif
+
