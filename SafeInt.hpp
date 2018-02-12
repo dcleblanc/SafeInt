@@ -497,6 +497,9 @@ SAFEINT_DISABLE_SHIFT_ASSERT       - Set this option if you don't want to assert
                   Also started to converge the code base such that the public CodePlex version will
                   be a drop-in replacement for the Visual Studio version.
 
+* Feb 12, 2018    Fixed floating point bug
+*                 Fix to allow initialization by an enum
+
 *  Note about code style - throughout this class, casts will be written using C-style (T),
 *  not C++ style static_cast< T >. This is because the class is nearly always dealing with integer
 *  types, and in this case static_cast and a C cast are equivalent. Given the large number of casts,
@@ -906,7 +909,7 @@ public:
     C_ASSERT( NumericType<T>::isInt );
     enum
     {
-        isSigned  = ( (T)(-1) < 0 ),
+        isSigned  = ( (T)(-1) < (T)0 ),
         is64Bit   = ( sizeof(T) == 8 ),
         is32Bit   = ( sizeof(T) == 4 ),
         is16Bit   = ( sizeof(T) == 2 ),

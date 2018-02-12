@@ -148,6 +148,7 @@
   <ItemGroup>
     <ClCompile Include="..\AddVerify.cpp" />
     <ClCompile Include="..\CastVerify.cpp" />
+    <ClCompile Include="..\CompileTest.cpp" />
     <ClCompile Include="..\DivVerify.cpp" />
     <ClCompile Include="..\IncDecVerify.cpp" />
     <ClCompile Include="..\ModVerify.cpp" />
