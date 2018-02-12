@@ -1,0 +1,6 @@
+# Remove build directories from checkin
+Debug/
+Release/
+.vs/
+*.sdf
+*.opendb

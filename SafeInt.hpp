@@ -78,6 +78,11 @@ Please read the leading comments before using the class.
 #pragma warning( push )
 // Disable warnings coming from headers
 #pragma warning( disable:4987 4820 4987 4820 )
+// Note - under /Wall, this also emits a lot of warnings such as 
+// warning C4711: function 'bool __cdecl operator!=<__int64,__int64,class SafeIntInternal::SafeIntExceptionHandler<class SafeIntException> 
+// >(class SafeInt<__int64,class SafeIntInternal::SafeIntExceptionHandler<class SafeIntException> >,__int64)' selected for automatic inline expansion
+// It apparently does not work to suppress this just within scope of the header, and it also comes from other headers
+// this warning is off by default, so if you choose to compile with /Wall, 
 
 #endif
 
@@ -1264,31 +1269,89 @@ public:
 };
 
 // special case floats and doubles
-// tolerate loss of precision
 template < typename T, typename U > class SafeCastHelper < T, U, CastFromFloat >
 {
 public:
+
+	template <typename T>
+	static bool CheckFloatingPointCast(double d)
+	{
+		// A double can hold at most 53 bits of the value
+		// 53 bits is:
+		const unsigned __int64 signifDouble = 0x1fffffffffffff;
+		bool fValid;
+
+		switch (fpclassify(d))
+		{
+		case FP_NORMAL:    // A positive or negative normalized non - zero value
+		case FP_SUBNORMAL: // A positive or negative denormalized value
+		case FP_ZERO:      // A positive or negative zero value
+			fValid = true;
+			break;
+
+		case FP_NAN:       // A quiet, signaling, or indeterminate NaN
+		case FP_INFINITE:  // A positive or negative infinity
+		default:
+			fValid = false;
+			break;
+		}
+
+		if (!fValid)
+			return false;
+
+		// For the unsigned case
+		if (CompileConst< !IntTraits< T >::isSigned >::Value())
+		{
+			// Anything larger than this either is larger than 2^64-1, or cannot be represented by a double
+			const unsigned __int64 maxUnsignedDouble = signifDouble << 11;
+
+			// There is the possibility of both negative and positive zero,
+			// but we'll allow either, since (-0.0 < 0) == false
+			// if we wanted to change that, then use the signbit() macro
+			if (d < 0 || d > static_cast<double>(maxUnsignedDouble))
+				return false;
+
+			// The input can now safely be cast to an unsigned long long
+			if (static_cast<unsigned __int64>(d) > IntTraits< T >::maxInt)
+				return false;
+		}
+		else
+		{
+			// This has to fit in 2^63-1
+			const unsigned __int64 maxSignedDouble = signifDouble << 10;
+			// The smallest signed long long is easier
+			const __int64 minSignedDouble = static_cast<__int64>(0x8000000000000000);
+
+			if (d < static_cast<double>(minSignedDouble) || d > static_cast<double>(maxSignedDouble))
+				return false;
+
+			// And now cast to long long, and check against min and max for this type
+			__int64 test = static_cast<__int64>(d);
+			if (test < IntTraits< T >::minInt || test > IntTraits< T >::maxInt)
+				return false;
+		}
+		return true;
+	}
+
     static bool Cast( U u, T& t ) SAFEINT_NOTHROW
     {
-        if( u <= (U)IntTraits< T >::maxInt &&
-            u >= (U)IntTraits< T >::minInt )
-        {
-            t = (T)u;
-            return true;
-        }
-        return false;
+		if(CheckFloatingPointCast<T>(u))
+		{
+			t = (T)u;
+			return true;
+		}
+		return false;
     }
 
     template < typename E >
     static void CastThrow( U u, T& t ) SAFEINT_CPP_THROW
     {
-        if( u <= (U)IntTraits< T >::maxInt &&
-            u >= (U)IntTraits< T >::minInt )
-        {
-            t = (T)u;
-            return;
-        }
-        E::SafeIntOnOverflow();
+		if (CheckFloatingPointCast<T>(u))
+		{
+			t = (T)u;
+			return;
+		}
+		E::SafeIntOnOverflow();
     }
 };
 

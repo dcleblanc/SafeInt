@@ -50,12 +50,13 @@ Copyright (c) Microsoft Corporation.  All rights reserved.
 
 int main(int, char*)
 {
+	cast_verify::CastVerify();
 	mult_verify::MultVerify();
-   div_verify::DivVerify();
-   sub_verify::SubVerify();
-   add_verify::AddVerify();
-   mod_verify::ModVerify();
-   incdec_verify::IncDecVerify();
+	div_verify::DivVerify();
+	sub_verify::SubVerify();
+	add_verify::AddVerify();
+	mod_verify::ModVerify();
+	incdec_verify::IncDecVerify();
    
 	return 0;
 }
