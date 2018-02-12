@@ -508,6 +508,7 @@ SAFEINT_DISABLE_SHIFT_ASSERT       - Set this option if you don't want to assert
 * Feb 12, 2018    Fixed floating point bug
 *                 Fix to allow initialization by an enum
 *                 Add support for static_assert, make it default to fix compiler warnings from C_ASSERT on gcc, clang
+*                 Changed throw() to noexcept
 
 *  Note about code style - throughout this class, casts will be written using C-style (T),
 *  not C++ style static_cast< T >. This is because the class is nearly always dealing with integer
@@ -650,7 +651,7 @@ enum SafeIntError
 #if defined SAFEINT_REMOVE_NOTHROW
 #define SAFEINT_NOTHROW
 #else
-#define SAFEINT_NOTHROW throw()
+#define SAFEINT_NOTHROW noexcept
 #endif
 
 #if defined VISUAL_STUDIO_SAFEINT_COMPAT
