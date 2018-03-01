@@ -1286,7 +1286,6 @@ template < typename T, typename U > class SafeCastHelper < T, U, CastFromFloat >
 {
 public:
 
-	template <typename T>
 	static bool CheckFloatingPointCast(double d)
 	{
 		// A double can hold at most 53 bits of the value
@@ -1294,7 +1293,7 @@ public:
 		const unsigned __int64 signifDouble = 0x1fffffffffffff;
 		bool fValid;
 
-		switch (fpclassify(d))
+		switch (std::fpclassify(d))
 		{
 		case FP_NORMAL:    // A positive or negative normalized non - zero value
 		case FP_SUBNORMAL: // A positive or negative denormalized value
@@ -1348,7 +1347,7 @@ public:
 
     static bool Cast( U u, T& t ) SAFEINT_NOTHROW
     {
-		if(CheckFloatingPointCast<T>(u))
+		if(CheckFloatingPointCast(u))
 		{
 			t = (T)u;
 			return true;
@@ -1359,7 +1358,7 @@ public:
     template < typename E >
     static void CastThrow( U u, T& t ) SAFEINT_CPP_THROW
     {
-		if (CheckFloatingPointCast<T>(u))
+		if (CheckFloatingPointCast(u))
 		{
 			t = (T)u;
 			return;
