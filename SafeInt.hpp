@@ -88,6 +88,7 @@ Please read the leading comments before using the class.
 
 // Need this for ptrdiff_t on some compilers
 #include <cstddef>
+#include <cmath>
 
 #if SAFEINT_COMPILER == VISUAL_STUDIO_COMPILER && defined _M_AMD64
     #include <intrin.h>

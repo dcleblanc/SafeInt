@@ -24,7 +24,7 @@ using std::dec;
 // Suppress warnings in test files, but not in source header
 #if SAFEINT_COMPILER == VISUAL_STUDIO_COMPILER
 
-#pragma warning(disable: 4838 4477)
+#pragma warning(disable: 4838 4477 4310)
 #endif
 
 #if !defined(COUNTOF)
