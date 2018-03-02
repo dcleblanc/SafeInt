@@ -5,6 +5,7 @@
 #pragma warning( disable: 4464 4711 )
 #endif
 
+#include <iostream>
 #include "../SafeInt.hpp"
 
 enum class Foo
@@ -30,4 +31,10 @@ void CompileMe()
 	// Test some initialization
 	SafeInt<int> i(Foo::Foo1);
 
+}
+
+int main(int, char**)
+{
+  std::cout << "It compiles!\n";
+  return 0;
 }
