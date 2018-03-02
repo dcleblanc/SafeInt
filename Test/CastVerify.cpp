@@ -45,6 +45,10 @@ Copyright (c) Microsoft Corporation. All rights reserved.
 #include "TestMain.h"
 #include <math.h>
 
+#if !defined _countof
+#define _countof(x) (sizeof(x)/sizeof(x[0]))
+#endif
+
 namespace cast_verify
 {
 	template <typename T>

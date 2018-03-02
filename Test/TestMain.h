@@ -27,6 +27,7 @@ using std::dec;
 #pragma warning(disable: 4838 4477 4310)
 #elif SAFEINT_COMPILER == CLANG_COMPILER || SAFEINT_COMPILER == GCC_COMPILER
 #pragma GCC diagnostic ignored "-Wc++11-narrowing"
+#pragma GCC diagnostic ignored "-Wformat"
 #endif
 
 #if !defined(COUNTOF)

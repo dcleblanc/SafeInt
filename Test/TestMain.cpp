@@ -48,7 +48,7 @@ Copyright (c) Microsoft Corporation.  All rights reserved.
 #pragma warning( disable: 4711 4514 4820 )
 #endif
 
-int main(int, char*)
+int main(int, char**)
 {
 	cast_verify::CastVerify();
 	mult_verify::MultVerify();
