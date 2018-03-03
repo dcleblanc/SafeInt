@@ -688,7 +688,11 @@ namespace utilities
     #define SAFEINT_WEAK
 #endif
 
-class SAFEINT_VISIBLE SAFEINT_WEAK SafeIntException
+// Note - removed weak annotation on class due to gcc complaints
+// This was the only place in the file that used it, need to better understand 
+// whether it was put there correctly in the first place
+
+class SAFEINT_VISIBLE SafeIntException
 {
 public:
     SafeIntException() SAFEINT_NOTHROW { m_code = SafeIntNoError; }
