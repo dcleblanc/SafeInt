@@ -741,10 +741,8 @@ namespace utilities
 class SAFEINT_VISIBLE SafeIntException
 {
 public:
-    SafeIntException() SAFEINT_NOTHROW { m_code = SafeIntNoError; }
-    SafeIntException( SafeIntError code ) SAFEINT_NOTHROW
+	_CONSTEXPR11 SafeIntException( SafeIntError code = SafeIntNoError) SAFEINT_NOTHROW  : m_code(code)
     {
-        m_code = code;
     }
     SafeIntError m_code;
 };
@@ -874,8 +872,8 @@ typedef SafeIntInternal::SafeIntWin32ExceptionHandler Win32ExceptionHandler;
 // Turns out we can fool the compiler into not seeing compile-time constants with
 // a simple template specialization
 template < int method > class CompileConst;
-template <> class CompileConst<true> { public: static bool Value() SAFEINT_NOTHROW { return true; } };
-template <> class CompileConst<false> { public: static bool Value() SAFEINT_NOTHROW { return false; } };
+template <> class CompileConst<true> { public: _CONSTEXPR11 static bool Value() SAFEINT_NOTHROW { return true; } };
+template <> class CompileConst<false> { public: _CONSTEXPR11 static bool Value() SAFEINT_NOTHROW { return false; } };
 
 // The following template magic is because we're now not allowed
 // to cast a float to an enum. This means that if we happen to assign
@@ -946,6 +944,7 @@ public:
 // Use this to avoid compile-time const truncation warnings
 template < int fSigned, int bits > class SafeIntMinMax;
 
+// Static const members do not need constexpr
 template <> class SafeIntMinMax< true,   8 > { public: const static signed __int8  min = (-0x7f - 1);
                                                 const static signed __int8  max = 0x7f; };
 template <> class SafeIntMinMax< true,  16 > { public: const static __int16 min = ( -0x7fff - 1 );
@@ -1171,12 +1170,12 @@ template <>
 class SignedNegation <signed __int32>
 {
 public:
-    static signed __int32 Value(unsigned __int64 in) SAFEINT_NOTHROW
+    _CONSTEXPR11 static signed __int32 Value(unsigned __int64 in) SAFEINT_NOTHROW
     {
         return (signed __int32)(~(unsigned __int32)in + 1);
     }
 
-    static signed __int32 Value(unsigned __int32 in) SAFEINT_NOTHROW
+	_CONSTEXPR11 static signed __int32 Value(unsigned __int32 in) SAFEINT_NOTHROW
     {
         return (signed __int32)(~in + 1);
     }
@@ -1186,7 +1185,7 @@ template <>
 class SignedNegation <signed __int64>
 {
 public:
-    static signed __int64 Value(unsigned __int64 in) SAFEINT_NOTHROW
+	_CONSTEXPR11 static signed __int64 Value(unsigned __int64 in) SAFEINT_NOTHROW
     {
         return (signed __int64)(~in + 1);
     }
@@ -1597,19 +1596,19 @@ template <typename T, typename U, int state> class EqualityTest;
 template < typename T, typename U > class EqualityTest< T, U, ComparisonMethod_Ok >
 {
 public:
-    static bool IsEquals( const T t, const U u ) SAFEINT_NOTHROW { return ( t == u ); }
+	_CONSTEXPR11 static bool IsEquals( const T t, const U u ) SAFEINT_NOTHROW { return ( t == u ); }
 };
 
 template < typename T, typename U > class EqualityTest< T, U, ComparisonMethod_CastInt >
 {
 public:
-    static bool IsEquals( const T t, const U u ) SAFEINT_NOTHROW { return ( (int)t == (int)u ); }
+	_CONSTEXPR11 static bool IsEquals( const T t, const U u ) SAFEINT_NOTHROW { return ( (int)t == (int)u ); }
 };
 
 template < typename T, typename U > class EqualityTest< T, U, ComparisonMethod_CastInt64 >
 {
 public:
-    static bool IsEquals( const T t, const U u ) SAFEINT_NOTHROW { return ( (__int64)t == (__int64)u ); }
+	_CONSTEXPR11 static bool IsEquals( const T t, const U u ) SAFEINT_NOTHROW { return ( (__int64)t == (__int64)u ); }
 };
 
 template < typename T, typename U > class EqualityTest< T, U, ComparisonMethod_UnsignedT >
@@ -1645,19 +1644,19 @@ template <typename T, typename U, int state> class GreaterThanTest;
 template < typename T, typename U > class GreaterThanTest< T, U, ComparisonMethod_Ok >
 {
 public:
-    static bool GreaterThan( const T t, const U u ) SAFEINT_NOTHROW { return ( t > u ); }
+	_CONSTEXPR11 static bool GreaterThan( const T t, const U u ) SAFEINT_NOTHROW { return ( t > u ); }
 };
 
 template < typename T, typename U > class GreaterThanTest< T, U, ComparisonMethod_CastInt >
 {
 public:
-    static bool GreaterThan( const T t, const U u ) SAFEINT_NOTHROW { return ( (int)t > (int)u ); }
+	_CONSTEXPR11 static bool GreaterThan( const T t, const U u ) SAFEINT_NOTHROW { return ( (int)t > (int)u ); }
 };
 
 template < typename T, typename U > class GreaterThanTest< T, U, ComparisonMethod_CastInt64 >
 {
 public:
-    static bool GreaterThan( const T t, const U u ) SAFEINT_NOTHROW { return ( (__int64)t > (__int64)u ); }
+	_CONSTEXPR11 static bool GreaterThan( const T t, const U u ) SAFEINT_NOTHROW { return ( (__int64)t > (__int64)u ); }
 };
 
 template < typename T, typename U > class GreaterThanTest< T, U, ComparisonMethod_UnsignedT >
@@ -5493,13 +5492,13 @@ template < typename T, typename U, int method > class BinaryAndHelper;
 template < typename T, typename U > class BinaryAndHelper< T, U, BinaryState_OK >
 {
 public:
-    static T And( T lhs, U rhs ) SAFEINT_NOTHROW { return (T)( lhs & rhs ); }
+	_CONSTEXPR11 static T And( T lhs, U rhs ) SAFEINT_NOTHROW { return (T)( lhs & rhs ); }
 };
 
 template < typename T, typename U > class BinaryAndHelper< T, U, BinaryState_Int8 >
 {
 public:
-    static T And( T lhs, U rhs ) SAFEINT_NOTHROW
+	_CONSTEXPR11 static T And( T lhs, U rhs ) SAFEINT_NOTHROW
     {
         // cast forces sign extension to be zeros
         BinaryAssert( ( lhs & rhs ) == ( lhs & (unsigned __int8)rhs ) );
@@ -5510,7 +5509,7 @@ public:
 template < typename T, typename U > class BinaryAndHelper< T, U, BinaryState_Int16 >
 {
 public:
-    static T And( T lhs, U rhs ) SAFEINT_NOTHROW
+	_CONSTEXPR11 static T And( T lhs, U rhs ) SAFEINT_NOTHROW
     {
         //cast forces sign extension to be zeros
         BinaryAssert( ( lhs & rhs ) == ( lhs & (unsigned __int16)rhs ) );
@@ -5521,7 +5520,7 @@ public:
 template < typename T, typename U > class BinaryAndHelper< T, U, BinaryState_Int32 >
 {
 public:
-    static T And( T lhs, U rhs ) SAFEINT_NOTHROW
+	_CONSTEXPR11 static T And( T lhs, U rhs ) SAFEINT_NOTHROW
     {
         //cast forces sign extension to be zeros
         BinaryAssert( ( lhs & rhs ) == ( lhs & (unsigned __int32)rhs ) );
@@ -5534,13 +5533,13 @@ template < typename T, typename U, int method > class BinaryOrHelper;
 template < typename T, typename U > class BinaryOrHelper< T, U, BinaryState_OK >
 {
 public:
-    static T Or( T lhs, U rhs ) SAFEINT_NOTHROW { return (T)( lhs | rhs ); }
+	_CONSTEXPR11 static T Or( T lhs, U rhs ) SAFEINT_NOTHROW { return (T)( lhs | rhs ); }
 };
 
 template < typename T, typename U > class BinaryOrHelper< T, U, BinaryState_Int8 >
 {
 public:
-    static T Or( T lhs, U rhs ) SAFEINT_NOTHROW
+	_CONSTEXPR11 static T Or( T lhs, U rhs ) SAFEINT_NOTHROW
     {
         //cast forces sign extension to be zeros
         BinaryAssert( ( lhs | rhs ) == ( lhs | (unsigned __int8)rhs ) );
@@ -5551,7 +5550,7 @@ public:
 template < typename T, typename U > class BinaryOrHelper< T, U, BinaryState_Int16 >
 {
 public:
-    static T Or( T lhs, U rhs ) SAFEINT_NOTHROW
+	_CONSTEXPR11 static T Or( T lhs, U rhs ) SAFEINT_NOTHROW
     {
         //cast forces sign extension to be zeros
         BinaryAssert( ( lhs | rhs ) == ( lhs | (unsigned __int16)rhs ) );
@@ -5575,13 +5574,13 @@ template <typename T, typename U, int method > class BinaryXorHelper;
 template < typename T, typename U > class BinaryXorHelper< T, U, BinaryState_OK >
 {
 public:
-    static T Xor( T lhs, U rhs ) SAFEINT_NOTHROW { return (T)( lhs ^ rhs ); }
+	_CONSTEXPR11 static T Xor( T lhs, U rhs ) SAFEINT_NOTHROW { return (T)( lhs ^ rhs ); }
 };
 
 template < typename T, typename U > class BinaryXorHelper< T, U, BinaryState_Int8 >
 {
 public:
-    static T Xor( T lhs, U rhs ) SAFEINT_NOTHROW
+	static T Xor( T lhs, U rhs ) SAFEINT_NOTHROW
     {
         // cast forces sign extension to be zeros
         BinaryAssert( ( lhs ^ rhs ) == ( lhs ^ (unsigned __int8)rhs ) );
@@ -5695,27 +5694,24 @@ inline bool SafeSubtract( T t, U u, T& result ) SAFEINT_NOTHROW
 template < typename T, typename E = SafeIntDefaultExceptionHandler > class SafeInt
 {
 public:
-    SafeInt() SAFEINT_NOTHROW
+	_CONSTEXPR11 SafeInt() SAFEINT_NOTHROW : m_int(0)
     {
         SAFEINT_STATIC_ASSERT( NumericType< T >::isInt );
-        m_int = 0;
     }
 
     // Having a constructor for every type of int
     // avoids having the compiler evade our checks when doing implicit casts -
     // e.g., SafeInt<char> s = 0x7fffffff;
-    SafeInt( const T& i ) SAFEINT_NOTHROW
+	_CONSTEXPR11 SafeInt( const T& i ) SAFEINT_NOTHROW : m_int(i)
     {
         SAFEINT_STATIC_ASSERT( NumericType< T >::isInt );
         //always safe
-        m_int = i;
     }
 
     // provide explicit boolean converter
-    SafeInt( bool b ) SAFEINT_NOTHROW
+	_CONSTEXPR11 SafeInt( bool b ) SAFEINT_NOTHROW : m_int((T)(b ? 1 : 0))
     {
         SAFEINT_STATIC_ASSERT( NumericType< T >::isInt );
-        m_int = (T)( b ? 1 : 0 );
     }
 
     template < typename U >
@@ -5775,7 +5771,7 @@ public:
 
     // Casting operators
 
-    operator bool() const SAFEINT_NOTHROW
+	_CONSTEXPR11 operator bool() const SAFEINT_NOTHROW
     {
         return !!m_int;
     }
@@ -5905,25 +5901,25 @@ public:
     // this could be dangerous, but allows you to correctly pass
     // instances of this class to APIs that take a pointer to an integer
     // also see overloaded address-of operator below
-    T* Ptr() SAFEINT_NOTHROW { return &m_int; }
-    const T* Ptr() const SAFEINT_NOTHROW { return &m_int; }
-    const T& Ref() const SAFEINT_NOTHROW { return m_int; }
+	T* Ptr() SAFEINT_NOTHROW { return &m_int; }
+	const T* Ptr() const SAFEINT_NOTHROW { return &m_int; }
+	const T& Ref() const SAFEINT_NOTHROW { return m_int; }
 
     // Or if SafeInt< T, E >::Ptr() is inconvenient, use the overload
     // operator &
     // This allows you to do unsafe things!
     // It is meant to allow you to more easily
     // pass a SafeInt into things like ReadFile
-    T* operator &() SAFEINT_NOTHROW { return &m_int; }
-    const T* operator &() const SAFEINT_NOTHROW { return &m_int; }
+	T* operator &() SAFEINT_NOTHROW { return &m_int; }
+	const T* operator &() const SAFEINT_NOTHROW { return &m_int; }
 
     // Unary operators
-    bool operator !() const SAFEINT_NOTHROW { return (!m_int) ? true : false; }
+	_CONSTEXPR11 bool operator !() const SAFEINT_NOTHROW { return (!m_int) ? true : false; }
 
     // operator + (unary)
     // note - normally, the '+' and '-' operators will upcast to a signed int
     // for T < 32 bits. This class changes behavior to preserve type
-    const SafeInt< T, E >& operator +() const SAFEINT_NOTHROW { return *this; }
+	_CONSTEXPR11 const SafeInt< T, E >& operator +() const SAFEINT_NOTHROW { return *this; }
 
     //unary  -
 
@@ -5987,7 +5983,7 @@ public:
     // One's complement
     // Note - this operator will normally change size to an int
     // cast in return improves perf and maintains type
-    SafeInt< T, E > operator ~() const SAFEINT_NOTHROW { return SafeInt< T, E >( (T)~m_int ); }
+	_CONSTEXPR11 SafeInt< T, E > operator ~() const SAFEINT_NOTHROW { return SafeInt< T, E >( (T)~m_int ); }
 
     // Binary operators
     //
@@ -6550,7 +6546,7 @@ private:
 // Helper function used to subtract pointers.
 // Used to squelch warnings
 template <typename P>
-SafeInt<ptrdiff_t, SafeIntDefaultExceptionHandler> SafePtrDiff(const P* p1, const P* p2) SAFEINT_CPP_THROW
+_CONSTEXPR11 SafeInt<ptrdiff_t, SafeIntDefaultExceptionHandler> SafePtrDiff(const P* p1, const P* p2) SAFEINT_CPP_THROW
 {
     return SafeInt<ptrdiff_t, SafeIntDefaultExceptionHandler>( p1 - p2 );
 }
@@ -6559,51 +6555,51 @@ SafeInt<ptrdiff_t, SafeIntDefaultExceptionHandler> SafePtrDiff(const P* p1, cons
 
 //Less than
 template < typename T, typename U, typename E >
-bool operator <( U lhs, SafeInt< T, E > rhs ) SAFEINT_NOTHROW
+_CONSTEXPR11 bool operator <( U lhs, SafeInt< T, E > rhs ) SAFEINT_NOTHROW
 {
     return GreaterThanTest< T, U, ValidComparison< T, U >::method >::GreaterThan( (T)rhs, lhs );
 }
 
 template < typename T, typename U, typename E >
-bool operator <( SafeInt<T, E> lhs, U rhs ) SAFEINT_NOTHROW
+_CONSTEXPR11 bool operator <( SafeInt<T, E> lhs, U rhs ) SAFEINT_NOTHROW
 {
 	return GreaterThanTest< U, T, ValidComparison< U, T >::method >::GreaterThan( rhs, (T)lhs );
 }
 
 template < typename T, typename U, typename E >
-bool operator <( SafeInt< U, E > lhs, SafeInt< T, E > rhs ) SAFEINT_NOTHROW
+_CONSTEXPR11 bool operator <( SafeInt< U, E > lhs, SafeInt< T, E > rhs ) SAFEINT_NOTHROW
 {
     return GreaterThanTest< T, U, ValidComparison< T, U >::method >::GreaterThan( (T)rhs, (U)lhs );
 }
 
 // Greater than
 template < typename T, typename U, typename E >
-bool operator >( U lhs, SafeInt< T, E > rhs ) SAFEINT_NOTHROW
+_CONSTEXPR11 bool operator >( U lhs, SafeInt< T, E > rhs ) SAFEINT_NOTHROW
 {
     return GreaterThanTest< U, T, ValidComparison< U, T >::method >::GreaterThan( lhs, (T)rhs );
 }
 
 template < typename T, typename U, typename E >
-bool operator >( SafeInt<T, E> lhs, U rhs ) SAFEINT_NOTHROW
+_CONSTEXPR11 bool operator >( SafeInt<T, E> lhs, U rhs ) SAFEINT_NOTHROW
 {
 	return GreaterThanTest< T, U, ValidComparison< T, U >::method >::GreaterThan( (T)lhs, rhs );
 }
 
 template < typename T, typename U, typename E >
-bool operator >( SafeInt< T, E > lhs, SafeInt< U, E > rhs ) SAFEINT_NOTHROW
+_CONSTEXPR11 bool operator >( SafeInt< T, E > lhs, SafeInt< U, E > rhs ) SAFEINT_NOTHROW
 {
     return GreaterThanTest< T, U, ValidComparison< T, U >::method >::GreaterThan( (T)lhs, (U)rhs );
 }
 
 // Greater than or equal
 template < typename T, typename U, typename E >
-bool operator >=( U lhs, SafeInt< T, E > rhs ) SAFEINT_NOTHROW
+_CONSTEXPR11 bool operator >=( U lhs, SafeInt< T, E > rhs ) SAFEINT_NOTHROW
 {
     return !GreaterThanTest< T, U, ValidComparison< T, U >::method >::GreaterThan( (T)rhs, lhs );
 }
 
 template < typename T, typename U, typename E >
-bool operator >=( SafeInt<T, E> lhs, U rhs ) SAFEINT_NOTHROW
+_CONSTEXPR11 bool operator >=( SafeInt<T, E> lhs, U rhs ) SAFEINT_NOTHROW
 {
 	return !GreaterThanTest< U, T, ValidComparison< U, T >::method >::GreaterThan( rhs, (T)lhs );
 }
@@ -6616,19 +6612,19 @@ bool operator >=( SafeInt< T, E > lhs, SafeInt< U, E > rhs ) SAFEINT_NOTHROW
 
 // Less than or equal
 template < typename T, typename U, typename E >
-bool operator <=( U lhs, SafeInt< T, E > rhs ) SAFEINT_NOTHROW
+_CONSTEXPR11 bool operator <=( U lhs, SafeInt< T, E > rhs ) SAFEINT_NOTHROW
 {
     return !GreaterThanTest< U, T, ValidComparison< U, T >::method >::GreaterThan( lhs, (T)rhs );
 }
 
 template < typename T, typename U, typename E >
-bool operator <=( SafeInt< T, E > lhs, U rhs ) SAFEINT_NOTHROW
+_CONSTEXPR11 bool operator <=( SafeInt< T, E > lhs, U rhs ) SAFEINT_NOTHROW
 {
     return !GreaterThanTest< T, U, ValidComparison< T, U >::method >::GreaterThan( (T)lhs, rhs );
 }
 
 template < typename T, typename U, typename E >
-bool operator <=( SafeInt< T, E > lhs, SafeInt< U, E > rhs ) SAFEINT_NOTHROW
+_CONSTEXPR11 bool operator <=( SafeInt< T, E > lhs, SafeInt< U, E > rhs ) SAFEINT_NOTHROW
 {
     return !GreaterThanTest< T, U, ValidComparison< T, U >::method >::GreaterThan( (T)lhs, (U)rhs );
 }
@@ -6636,63 +6632,63 @@ bool operator <=( SafeInt< T, E > lhs, SafeInt< U, E > rhs ) SAFEINT_NOTHROW
 // equality
 // explicit overload for bool
 template < typename T, typename E >
-bool operator ==( bool lhs, SafeInt< T, E > rhs ) SAFEINT_NOTHROW
+_CONSTEXPR11 bool operator ==( bool lhs, SafeInt< T, E > rhs ) SAFEINT_NOTHROW
 {
     return lhs == ( (T)rhs == 0 ? false : true );
 }
 
 template < typename T, typename E >
-bool operator ==( SafeInt< T, E > lhs, bool rhs ) SAFEINT_NOTHROW
+_CONSTEXPR11 bool operator ==( SafeInt< T, E > lhs, bool rhs ) SAFEINT_NOTHROW
 {
     return rhs == ( (T)lhs == 0 ? false : true );
 }
 
 template < typename T, typename U, typename E >
-bool operator ==( U lhs, SafeInt< T, E > rhs ) SAFEINT_NOTHROW
+_CONSTEXPR11 bool operator ==( U lhs, SafeInt< T, E > rhs ) SAFEINT_NOTHROW
 {
     return EqualityTest< T, U, ValidComparison< T, U >::method >::IsEquals((T)rhs, lhs);
 }
 
 template < typename T, typename U, typename E >
-bool operator ==( SafeInt< T, E > lhs, U rhs ) SAFEINT_NOTHROW
+_CONSTEXPR11 bool operator ==( SafeInt< T, E > lhs, U rhs ) SAFEINT_NOTHROW
 {
     return EqualityTest< T, U, ValidComparison< T, U >::method >::IsEquals( (T)lhs, rhs );
 }
 
 template < typename T, typename U, typename E >
-bool operator ==( SafeInt< T, E > lhs, SafeInt< U, E > rhs ) SAFEINT_NOTHROW
+_CONSTEXPR11 bool operator ==( SafeInt< T, E > lhs, SafeInt< U, E > rhs ) SAFEINT_NOTHROW
 {
     return EqualityTest< T, U, ValidComparison< T, U >::method >::IsEquals( (T)lhs, (U)rhs );
 }
 
 //not equals
 template < typename T, typename U, typename E >
-bool operator !=( U lhs, SafeInt< T, E > rhs ) SAFEINT_NOTHROW
+_CONSTEXPR11 bool operator !=( U lhs, SafeInt< T, E > rhs ) SAFEINT_NOTHROW
 {
     return !EqualityTest< T, U, ValidComparison< T, U >::method >::IsEquals( (T)rhs, lhs );
 }
 
 template < typename T, typename U, typename E >
-bool operator !=( SafeInt< T, E > lhs, U rhs ) SAFEINT_NOTHROW
+_CONSTEXPR11 bool operator !=( SafeInt< T, E > lhs, U rhs ) SAFEINT_NOTHROW
 {
     return !EqualityTest< T, U, ValidComparison< T, U >::method >::IsEquals( (T)lhs, rhs );
 }
 
 template < typename T, typename U, typename E >
-bool operator !=( SafeInt< T, E > lhs, SafeInt< U, E > rhs ) SAFEINT_NOTHROW
+_CONSTEXPR11 bool operator !=( SafeInt< T, E > lhs, SafeInt< U, E > rhs ) SAFEINT_NOTHROW
 {
     return !EqualityTest< T, U, ValidComparison< T, U >::method >::IsEquals( lhs, rhs );
 }
 
 
 template < typename T, typename E >
-bool operator !=( bool lhs, SafeInt< T, E > rhs ) SAFEINT_NOTHROW
+_CONSTEXPR11 bool operator !=( bool lhs, SafeInt< T, E > rhs ) SAFEINT_NOTHROW
 {
     return ( (T)rhs == 0 ? false : true ) != lhs;
 }
 
 template < typename T, typename E >
-bool operator !=( SafeInt< T, E > lhs, bool rhs ) SAFEINT_NOTHROW
+_CONSTEXPR11 bool operator !=( SafeInt< T, E > lhs, bool rhs ) SAFEINT_NOTHROW
 {
     return ( (T)lhs == 0 ? false : true ) != rhs;
 }
@@ -6719,7 +6715,7 @@ public:
 template < typename T, typename E > class ModulusSignedCaseHelper < T, E, false >
 {
 public:
-    static bool SignedCase( SafeInt< T, E > /*rhs*/, SafeInt< T, E >& /*result*/ ) SAFEINT_NOTHROW
+	_CONSTEXPR11 static bool SignedCase( SafeInt< T, E > /*rhs*/, SafeInt< T, E >& /*result*/ ) SAFEINT_NOTHROW
     {
         return false;
     }
@@ -6748,7 +6744,7 @@ template< typename T, typename U, typename E >
 class ModulusSimpleCaseHelper < T, U, E, false >
 {
 public:
-    static bool ModulusSimpleCase( U /*lhs*/, SafeInt< T, E > /*rhs*/, SafeInt< T, E >& /*result*/ ) SAFEINT_NOTHROW
+	_CONSTEXPR11 static bool ModulusSimpleCase( U /*lhs*/, SafeInt< T, E > /*rhs*/, SafeInt< T, E >& /*result*/ ) SAFEINT_NOTHROW
     {
         return false;
     }
@@ -6821,7 +6817,7 @@ public:
 template < typename T, typename U, typename E > class DivisionNegativeCornerCaseHelper< T, U, E, false >
 {
 public:
-    static bool NegativeCornerCase( U /*lhs*/, SafeInt< T, E > /*rhs*/, SafeInt<T, E>& /*result*/ ) SAFEINT_NOTHROW
+	_CONSTEXPR11 static bool NegativeCornerCase( U /*lhs*/, SafeInt< T, E > /*rhs*/, SafeInt<T, E>& /*result*/ ) SAFEINT_NOTHROW
     {
         return false;
     }
@@ -6857,7 +6853,7 @@ public:
 template < typename T, typename U, typename E > class DivisionCornerCaseHelper < T, U, E, false >
 {
 public:
-    static bool DivisionCornerCase1( U /*lhs*/, SafeInt< T, E > /*rhs*/, SafeInt<T, E>& /*result*/ ) SAFEINT_NOTHROW
+	_CONSTEXPR11 static bool DivisionCornerCase1( U /*lhs*/, SafeInt< T, E > /*rhs*/, SafeInt<T, E>& /*result*/ ) SAFEINT_NOTHROW
     {
         return false;
     }
@@ -6902,7 +6898,7 @@ public:
 template < typename T, typename U, typename E > class DivisionCornerCaseHelper2 < T, U, E, false >
 {
 public:
-    static bool DivisionCornerCase2( U /*lhs*/, SafeInt< T, E > /*rhs*/, SafeInt<T, E>& /*result*/ ) SAFEINT_NOTHROW
+	_CONSTEXPR11 static bool DivisionCornerCase2( U /*lhs*/, SafeInt< T, E > /*rhs*/, SafeInt<T, E>& /*result*/ ) SAFEINT_NOTHROW
     {
         return false;
     }
@@ -7147,21 +7143,21 @@ SafeInt< U, E > operator >>( U lhs, SafeInt< T, E > bits ) SAFEINT_NOTHROW
 
 // Bitwise &
 template < typename T, typename U, typename E >
-SafeInt< T, E > operator &( U lhs, SafeInt< T, E > rhs ) SAFEINT_NOTHROW
+_CONSTEXPR11 SafeInt< T, E > operator &( U lhs, SafeInt< T, E > rhs ) SAFEINT_NOTHROW
 {
     return SafeInt< T, E >( BinaryAndHelper< T, U, BinaryMethod< T, U >::method >::And( (T)rhs, lhs ) );
 }
 
 // Bitwise XOR
 template < typename T, typename U, typename E >
-SafeInt< T, E > operator ^( U lhs, SafeInt< T, E > rhs ) SAFEINT_NOTHROW
+_CONSTEXPR11 SafeInt< T, E > operator ^( U lhs, SafeInt< T, E > rhs ) SAFEINT_NOTHROW
 {
     return SafeInt< T, E >(BinaryXorHelper< T, U, BinaryMethod< T, U >::method >::Xor( (T)rhs, lhs ) );
 }
 
 // Bitwise OR
 template < typename T, typename U, typename E >
-SafeInt< T, E > operator |( U lhs, SafeInt< T, E > rhs ) SAFEINT_NOTHROW
+_CONSTEXPR11 SafeInt< T, E > operator |( U lhs, SafeInt< T, E > rhs ) SAFEINT_NOTHROW
 {
     return SafeInt< T, E >( BinaryOrHelper< T, U, BinaryMethod< T, U >::method >::Or( (T)rhs, lhs ) );
 }
