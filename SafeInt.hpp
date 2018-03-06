@@ -73,6 +73,52 @@ Please read the leading comments before using the class.
 #define SAFEINT_COMPILER UNKNOWN_COMPILER
 #endif
 
+#define CPLUSPLUS_98 0
+#define CPLUSPLUS_11 1
+#define CPLUSPLUS_14 2
+#define CPLUSPLUS_17 3 // Future use
+
+// Determine C++ support level
+#if SAFEINT_COMPILER == CLANG_COMPILER || SAFEINT_COMPILER == GCC_COMPILER
+
+#if __cplusplus < 201103L
+#define CPLUSPLUS_STD CPLUSPLUS_98
+#elif __cplusplus < 201402L
+#define CPLUSPLUS_STD CPLUSPLUS_11
+#else 
+#define CPLUSPLUS_STD CPLUSPLUS_14
+#endif
+
+#elif SAFEINT_COMPILER == VISUAL_STUDIO_COMPILER
+
+// This needs additional testing to get more versions of _MSCVER
+#if _MSC_VER < 1900 // Prior to VS 2015, need more testing to determine support
+#define CPLUSPLUS_STD CPLUSPLUS_98
+#elif _MSC_VER < 1912 // VS 2015
+#define CPLUSPLUS_STD CPLUSPLUS_11
+#else // VS 2017 or later
+#define CPLUSPLUS_STD CPLUSPLUS_14
+#endif
+
+#else
+// Unknown compiler, assume C++ 98
+#define CPLUSPLUS_STD CPLUSPLUS_98
+#endif
+
+// Now that we know the standard, can decide which constexpr behavior works
+#if CPLUSPLUS_STD == CPLUSPLUS_98
+#define _CONSTEXPR11
+#define _CONSTEXPR14
+#elif CPLUSPLUS_STD == CPLUSPLUS_11
+#define _CONSTEXPR11 constexpr
+#define _CONSTEXPR14
+#elif CPLUSPLUS_STD == CPLUSPLUS_14
+#define _CONSTEXPR11 constexpr
+#define _CONSTEXPR14 constexpr
+#else
+#error "Unexpected value of CPLUSPLUS_STD"
+#endif
+
 // Enable compiling with /Wall under VC
 #if SAFEINT_COMPILER == VISUAL_STUDIO_COMPILER
 #pragma warning( push )
