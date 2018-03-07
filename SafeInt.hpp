@@ -5498,7 +5498,7 @@ public:
 template < typename T, typename U > class BinaryAndHelper< T, U, BinaryState_Int8 >
 {
 public:
-	_CONSTEXPR11 static T And( T lhs, U rhs ) SAFEINT_NOTHROW
+	static T And( T lhs, U rhs ) SAFEINT_NOTHROW
     {
         // cast forces sign extension to be zeros
         BinaryAssert( ( lhs & rhs ) == ( lhs & (unsigned __int8)rhs ) );
@@ -5509,7 +5509,7 @@ public:
 template < typename T, typename U > class BinaryAndHelper< T, U, BinaryState_Int16 >
 {
 public:
-	_CONSTEXPR11 static T And( T lhs, U rhs ) SAFEINT_NOTHROW
+	static T And( T lhs, U rhs ) SAFEINT_NOTHROW
     {
         //cast forces sign extension to be zeros
         BinaryAssert( ( lhs & rhs ) == ( lhs & (unsigned __int16)rhs ) );
@@ -5520,7 +5520,7 @@ public:
 template < typename T, typename U > class BinaryAndHelper< T, U, BinaryState_Int32 >
 {
 public:
-	_CONSTEXPR11 static T And( T lhs, U rhs ) SAFEINT_NOTHROW
+	static T And( T lhs, U rhs ) SAFEINT_NOTHROW
     {
         //cast forces sign extension to be zeros
         BinaryAssert( ( lhs & rhs ) == ( lhs & (unsigned __int32)rhs ) );
@@ -5539,7 +5539,7 @@ public:
 template < typename T, typename U > class BinaryOrHelper< T, U, BinaryState_Int8 >
 {
 public:
-	_CONSTEXPR11 static T Or( T lhs, U rhs ) SAFEINT_NOTHROW
+	static T Or( T lhs, U rhs ) SAFEINT_NOTHROW
     {
         //cast forces sign extension to be zeros
         BinaryAssert( ( lhs | rhs ) == ( lhs | (unsigned __int8)rhs ) );
@@ -5550,7 +5550,7 @@ public:
 template < typename T, typename U > class BinaryOrHelper< T, U, BinaryState_Int16 >
 {
 public:
-	_CONSTEXPR11 static T Or( T lhs, U rhs ) SAFEINT_NOTHROW
+	static T Or( T lhs, U rhs ) SAFEINT_NOTHROW
     {
         //cast forces sign extension to be zeros
         BinaryAssert( ( lhs | rhs ) == ( lhs | (unsigned __int16)rhs ) );
