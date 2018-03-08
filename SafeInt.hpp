@@ -886,7 +886,10 @@ template <> class CompileConst<false> { public: _CONSTEXPR11 static bool Value()
 // If we have support for std<typetraits>, then we can do this easily, and detect enums as well
 template < typename T > class NumericType;
 
-#if defined _LIBCPP_TYPE_TRAITS || defined _TYPE_TRAITS_
+#if !(defined _LIBCPP_TYPE_TRAITS || defined _TYPE_TRAITS_ || defined _GLIBCXX_TYPE_TRAITS)
+#error "type traits are now required in order to properly support initialization from an enum"
+#endif // type traits
+
 // Continue to special case bool
 template <> class NumericType<bool>             { public: enum{ isBool = true,  isFloat = false, isInt = false }; };
 template < typename T > class NumericType
@@ -900,13 +903,9 @@ template < typename T > class NumericType
             // This does allow someone to make a SafeInt from an enum type, which is not recommended,
             // but it also allows someone to add an enum value to a SafeInt, which is handy.
             isInt = std::is_integral<T>::value || std::is_enum<T>::value,
-			isEnum = std::is_enum<T>::value
+            isEnum = std::is_enum<T>::value
         };
 };
-
-#else
-#error "type traits are now required in order to properly support initialization from an enum"
-#endif // type traits
 
 // Use this to avoid compile-time const truncation warnings
 template < int fSigned, int bits > class SafeIntMinMax;
@@ -1391,7 +1390,7 @@ template < typename T, typename U > class SafeCastHelper < T, U, CastFromEnum >
 public:
 	static bool Cast(U u, T& t) SAFEINT_NOTHROW
 	{
-		return SafeCastHelper< T, int, GetCastMethod< T, int >::method >::Cast(static_cast<int>u, t);
+		return SafeCastHelper< T, int, GetCastMethod< T, int >::method >::Cast(static_cast<int>(u), t);
 	}
 
 	template < typename E >
