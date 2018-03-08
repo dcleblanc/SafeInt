@@ -3,6 +3,8 @@
 // relative include path contains '..'
 // (function) selected for automatic inline expansion
 #pragma warning( disable: 4464 4711 )
+#else
+#pragma GCC diagnostic ignored "-Wunused-variable"
 #endif
 
 #include <iostream>
