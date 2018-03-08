@@ -132,6 +132,7 @@ Please read the leading comments before using the class.
 
 #endif
 
+#include <type_traits> // This is now required
 // Need this for ptrdiff_t on some compilers
 #include <cstddef>
 #include <cmath>
