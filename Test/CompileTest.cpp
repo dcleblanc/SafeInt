@@ -14,23 +14,54 @@ enum class Foo
 	Foo2
 };
 
+template <typename T, typename U>
+void CompiledMixedType()
+{
+	// Mixed constructors
+	U u = 0;
+	SafeInt<T> st(u);
+	SafeInt<U> su(u);
+	SafeInt<T> st2(su);
+}
+
+template <typename T>
+void CompileType()
+{
+	// Test constructors
+	SafeInt<T> s;
+	SafeInt<T> i(Foo::Foo1);
+	T t = 0;
+	SafeInt<T> st(t);
+	SafeInt<T> b(false);
+
+	// Mixed operations
+	CompiledMixedType<T, char>();
+	CompiledMixedType<T, signed char>();
+	CompiledMixedType<T, unsigned char>();
+	CompiledMixedType<T, short>();
+	CompiledMixedType<T, unsigned short>();
+	CompiledMixedType<T, int>();
+	CompiledMixedType<T, unsigned int>();
+	CompiledMixedType<T, long>();
+	CompiledMixedType<T, unsigned long>();
+	CompiledMixedType<T, long long>();
+	CompiledMixedType<T, unsigned long long>();
+}
+
 void CompileMe()
 {
-	SafeInt<char> c;
-	SafeInt<unsigned char> uc;
-	SafeInt<signed char> sc;
-	SafeInt<unsigned short> us;
-	SafeInt<signed short> ss;
-	SafeInt<unsigned int> ui;
-	SafeInt<signed int> si;
-	SafeInt<unsigned long> ul;
-	SafeInt<signed long> sl;
-	SafeInt<unsigned long long> ull;
-	SafeInt<signed long long> sll;
-	
-	// Test some initialization
-	SafeInt<int> i(Foo::Foo1);
+	CompileType<char>();
+	CompileType<unsigned char>();
+	CompileType<signed char>();
 
+	CompileType<unsigned short>();
+	CompileType<signed short>();
+	CompileType<unsigned int>();
+	CompileType<signed int>();
+	CompileType<unsigned long>();
+	CompileType<signed long>();
+	CompileType<unsigned long long>();
+	CompileType<signed long long>();
 }
 
 int main(int, char**)

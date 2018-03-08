@@ -898,47 +898,13 @@ template < typename T > class NumericType
             // If it is an enum, then consider it an int type
             // This does allow someone to make a SafeInt from an enum type, which is not recommended,
             // but it also allows someone to add an enum value to a SafeInt, which is handy.
-            isInt = std::is_integral<T>::value || std::is_enum<T>::value
+            isInt = std::is_integral<T>::value || std::is_enum<T>::value,
+			isEnum = std::is_enum<T>::value
         };
 };
 
 #else
-
-template <> class NumericType<bool>             { public: enum{ isBool = true,  isFloat = false, isInt = false }; };
-template <> class NumericType<char>             { public: enum{ isBool = false, isFloat = false, isInt = true }; };
-template <> class NumericType<unsigned char>    { public: enum{ isBool = false, isFloat = false, isInt = true }; };
-template <> class NumericType<signed char>      { public: enum{ isBool = false, isFloat = false, isInt = true }; };
-template <> class NumericType<short>            { public: enum{ isBool = false, isFloat = false, isInt = true }; };
-template <> class NumericType<unsigned short>   { public: enum{ isBool = false, isFloat = false, isInt = true }; };
-#if defined SAFEINT_USE_WCHAR_T || defined _NATIVE_WCHAR_T_DEFINED
-template <> class NumericType<wchar_t>          { public: enum{ isBool = false, isFloat = false, isInt = true }; };
-#endif
-template <> class NumericType<int>              { public: enum{ isBool = false, isFloat = false, isInt = true }; };
-template <> class NumericType<unsigned int>     { public: enum{ isBool = false, isFloat = false, isInt = true }; };
-template <> class NumericType<long>             { public: enum{ isBool = false, isFloat = false, isInt = true }; };
-template <> class NumericType<unsigned long>    { public: enum{ isBool = false, isFloat = false, isInt = true }; };
-template <> class NumericType<__int64>          { public: enum{ isBool = false, isFloat = false, isInt = true }; };
-template <> class NumericType<unsigned __int64> { public: enum{ isBool = false, isFloat = false, isInt = true }; };
-template <> class NumericType<float>            { public: enum{ isBool = false, isFloat = true,  isInt = false }; };
-template <> class NumericType<double>           { public: enum{ isBool = false, isFloat = true,  isInt = false }; };
-template <> class NumericType<long double>      { public: enum{ isBool = false, isFloat = true,  isInt = false }; };
-// Catch-all for anything not supported
-template < typename T > class NumericType       
-{ 
-public: 
-    // We have some unknown type, which could be an enum. For parity with the code that uses <type_traits>,
-    // We can try a static_cast<int> - it if compiles, then it might be an enum, and should work.
-    // If it is something else that just happens to have a constructor that takes an int, and a casting operator,
-    // then it is possible something will go wrong, and for best results, cast it directly to an int before letting it
-    // interact with a SafeInt
-
-    enum
-    { 
-        isBool = false, 
-        isFloat = false, 
-        isInt = static_cast<int>( static_cast<T>(0) ) == 0
-    }; 
-};
+#error "type traits are now required in order to properly support initialization from an enum"
 #endif // type traits
 
 // Use this to avoid compile-time const truncation warnings
@@ -1244,7 +1210,8 @@ enum CastMethod
     CastToFloat,
     CastFromFloat,
     CastToBool,
-    CastFromBool
+    CastFromBool,
+	CastFromEnum
 };
 
 
@@ -1254,7 +1221,8 @@ class GetCastMethod
 public:
     enum
     {
-        method =  ( IntTraits< FromType >::isBool &&
+        method = ( NumericType<FromType>::isEnum )                     ? CastFromEnum :
+		         ( IntTraits< FromType >::isBool &&
                      !IntTraits< ToType >::isBool )                    ? CastFromBool :
 
                  ( !IntTraits< FromType >::isBool &&
@@ -1415,6 +1383,21 @@ public:
 		}
 		E::SafeIntOnOverflow();
     }
+};
+
+template < typename T, typename U > class SafeCastHelper < T, U, CastFromEnum >
+{
+public:
+	static bool Cast(U u, T& t) SAFEINT_NOTHROW
+	{
+		return SafeCastHelper< T, int, GetCastMethod< T, int >::method >::Cast(static_cast<int>u, t);
+	}
+
+	template < typename E >
+	static void CastThrow(U u, T& t) SAFEINT_CPP_THROW
+	{
+		SafeCastHelper< T, int, GetCastMethod< T, int >::method >::template CastThrow< E >(static_cast<int>(u), t);
+	}
 };
 
 // Match on any method where a bool is cast to type T
