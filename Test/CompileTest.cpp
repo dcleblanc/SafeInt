@@ -27,6 +27,9 @@ void CompiledMixedType()
 	SafeInt<U> su(u);
 	SafeInt<T> st2(su);
 
+	// Shut up the compiler
+	b = !b;
+
 	// Assignment
 	st = t;
 	st = u;
