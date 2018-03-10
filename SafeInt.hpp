@@ -5838,14 +5838,12 @@ public:
         return val;
     }
 
-#if defined SAFEINT_USE_WCHAR_T || defined _NATIVE_WCHAR_T_DEFINED
     operator wchar_t() const SAFEINT_CPP_THROW
     {
         wchar_t val;
         SafeCastHelper< wchar_t, T, GetCastMethod< wchar_t, T >::method >::template CastThrow< E >( m_int, val );
         return val;
     }
-#endif
 
 #ifdef SIZE_T_CAST_NEEDED
     // We also need an explicit cast to size_t, or the compiler will complain
