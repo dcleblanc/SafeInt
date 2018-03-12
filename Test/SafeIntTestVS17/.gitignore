@@ -1,0 +1,10 @@
+# Remove build directories from checkin
+Debug/
+Release/
+CompileTest/Debug
+CompileTest/Release
+SafeIntTestVS17/Debug
+SafeIntTestVS17/Release
+.vs/
+*.sdf
+*.opendb

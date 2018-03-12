@@ -1,5 +1,5 @@
 #if !defined __GNUC__
-#pragma warning( disable: 4571 4820 4514 4987 4710 4309 4986 4548)
+#pragma warning( disable: 4571 4820 4514 4987 4710 4309 4986 4548 4365 4625 4626 5026 5027 4774)
 // relative include path contains '..'
 // (function) selected for automatic inline expansion
 #pragma warning( disable: 4464 4711 )

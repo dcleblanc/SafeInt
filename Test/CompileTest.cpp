@@ -1,5 +1,5 @@
 #if !defined __GNUC__
-#pragma warning( disable: 4571 4820 4514 4987 4710 4309 4986 4548)
+#pragma warning( disable: 4571 4820 4514 4987 4710 4309 4986 4548 4189)
 // relative include path contains '..'
 // (function) selected for automatic inline expansion
 #pragma warning( disable: 4464 4711 )
@@ -7,7 +7,6 @@
 #pragma GCC diagnostic ignored "-Wunused-variable"
 #endif
 
-#include <iostream>
 #include "../SafeInt.hpp"
 
 enum class Foo
@@ -390,6 +389,5 @@ int main(int, char**)
 {
 	CompileMe();
 	TestConstExpr::ConstExprTest();
-	std::cout << "It compiles!\n";
 	return 0;
 }
