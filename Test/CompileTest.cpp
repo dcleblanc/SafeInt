@@ -16,6 +16,14 @@ enum class Foo
 };
 
 template <typename T, typename U>
+void ModulusFriendTest()
+{
+	U u = 3;
+	SafeInt<T> st(1);
+	T t = u % st;
+}
+
+template <typename T, typename U>
 void CompiledMixedType()
 {
 	// Mixed constructors
@@ -38,22 +46,25 @@ void CompiledMixedType()
 	// Casting
 	U u2 = (U)st;
 
-	// Modulus, modulus assignment
-	u = 1;
-	t = st % u;
-	st2 = 1;
-	t = st % st2;
-	t = u % st;
-
-	st %= u;
-	st %= su;
-
 	// Multiplication
 	t = st * u;
 	t = st * st2;
 	t = u * st;
 	st *= u;
 	st *= su;
+
+	// Modulus, modulus assignment
+	u = 1;
+	st = 1;
+	su = 1;
+	// For some reason, this is annoying the VS17 link time code generation
+//	t = u % st;
+
+	t = st % u;
+	st2 = 1;
+	t = st % st2;
+	st %= u;
+	st %= su;
 
 	// Division
 	u = 1;
@@ -73,10 +84,16 @@ void CompiledMixedType()
 	st += su;
 
 	// Subtraction
+	st = 0;
+	u = 0;
+	st2 = 0;
 	t = st - u;
 	t = st - st2;
 	t = u - st;
 	st -= u;
+
+	st = 1;
+	su = 1;
 	st -= su;
 
 	// Shift operators
@@ -175,6 +192,32 @@ void CompileType()
 	SafeInt<T> st(t);
 	SafeInt<T> sb(false);
 
+	// Mixed operations
+	CompiledMixedType<T, char>();
+	CompiledMixedType<T, signed char>();
+	CompiledMixedType<T, unsigned char>();
+	CompiledMixedType<T, short>();
+	CompiledMixedType<T, unsigned short>();
+	CompiledMixedType<T, int>();
+	CompiledMixedType<T, unsigned int>();
+	CompiledMixedType<T, long>();
+	CompiledMixedType<T, unsigned long>();
+	CompiledMixedType<T, long long>();
+	CompiledMixedType<T, unsigned long long>();
+
+	// This is making trouble for the compiler
+	ModulusFriendTest<T, char>();
+	ModulusFriendTest<T, signed char>();
+	ModulusFriendTest<T, unsigned char>();
+	ModulusFriendTest<T, short>();
+	ModulusFriendTest<T, unsigned short>();
+	ModulusFriendTest<T, int>();
+	ModulusFriendTest<T, unsigned int>();
+	ModulusFriendTest<T, long>();
+	ModulusFriendTest<T, unsigned long>();
+	ModulusFriendTest<T, long long>();
+	ModulusFriendTest<T, unsigned long long>();
+	
 	// Special case casts
 	bool b = (bool)s;
 	wchar_t w = (wchar_t)s;
@@ -199,19 +242,6 @@ void CompileType()
 	st--;
 	--st;
 	t = ~st;
-
-	// Mixed operations
-	CompiledMixedType<T, char>();
-	CompiledMixedType<T, signed char>();
-	CompiledMixedType<T, unsigned char>();
-	CompiledMixedType<T, short>();
-	CompiledMixedType<T, unsigned short>();
-	CompiledMixedType<T, int>();
-	CompiledMixedType<T, unsigned int>();
-	CompiledMixedType<T, long>();
-	CompiledMixedType<T, unsigned long>();
-	CompiledMixedType<T, long long>();
-	CompiledMixedType<T, unsigned long long>();
 }
 
 void CompileMe()

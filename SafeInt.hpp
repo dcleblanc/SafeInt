@@ -6713,7 +6713,7 @@ public:
             if( ModulusSignedCaseHelper< T, E, IntTraits< T >::isSigned >::SignedCase( rhs, result ) )
             return true;
 
-            result = SafeInt< T, E >( (T)( lhs % (T)rhs ) );
+            result = (T)( lhs % (T)rhs );
             return true;
         }
 
@@ -6747,7 +6747,8 @@ SafeInt< T, E > operator %( U lhs, SafeInt< T, E > rhs ) SAFEINT_CPP_THROW
         sizeof(T) == sizeof(U) && (bool)IntTraits< T >::isSigned == (bool)IntTraits< U >::isSigned >::ModulusSimpleCase( lhs, rhs, result ) )
         return result;
 
-    return SafeInt< T, E >( ( SafeInt< U, E >( lhs ) % (T)rhs ) );
+	result = (SafeInt< U, E >(lhs) % (T)rhs);
+    return result;
 }
 
 // Multiplication
