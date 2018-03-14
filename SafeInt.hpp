@@ -121,6 +121,10 @@ Please read the leading comments before using the class.
 
 // Enable compiling with /Wall under VC
 #if SAFEINT_COMPILER == VISUAL_STUDIO_COMPILER
+// Off by default - unreferenced inline function has been removed
+// Note - this intentionally leaks from the header, doesn't quench the warnings otherwise
+#pragma warning( disable: 4514 )
+
 #pragma warning( push )
 // Disable warnings coming from headers
 #pragma warning( disable:4987 4820 4987 4820 )
@@ -1286,14 +1290,14 @@ template < typename T, typename U, int > class SafeCastHelper;
 template < typename T, typename U > class SafeCastHelper < T, U, CastOK >
 {
 public:
-    static bool Cast( U u, T& t ) SAFEINT_NOTHROW
+	_CONSTEXPR14 static bool Cast( U u, T& t ) SAFEINT_NOTHROW
     {
         t = (T)u;
         return true;
     }
 
     template < typename E >
-    static void CastThrow( U u, T& t ) SAFEINT_CPP_THROW
+	_CONSTEXPR14 static void CastThrow( U u, T& t ) SAFEINT_CPP_THROW
     {
         t = (T)u;
     }
@@ -1388,13 +1392,13 @@ public:
 template < typename T, typename U > class SafeCastHelper < T, U, CastFromEnum >
 {
 public:
-	static bool Cast(U u, T& t) SAFEINT_NOTHROW
+	_CONSTEXPR14 static bool Cast(U u, T& t) SAFEINT_NOTHROW
 	{
 		return SafeCastHelper< T, int, GetCastMethod< T, int >::method >::Cast(static_cast<int>(u), t);
 	}
 
 	template < typename E >
-	static void CastThrow(U u, T& t) SAFEINT_CPP_THROW
+	_CONSTEXPR14 static void CastThrow(U u, T& t) SAFEINT_CPP_THROW
 	{
 		SafeCastHelper< T, int, GetCastMethod< T, int >::method >::template CastThrow< E >(static_cast<int>(u), t);
 	}
@@ -1404,14 +1408,14 @@ public:
 template < typename T > class SafeCastHelper < T, bool, CastFromBool >
 {
 public:
-    static bool Cast( bool b, T& t ) SAFEINT_NOTHROW
+	_CONSTEXPR14 static bool Cast( bool b, T& t ) SAFEINT_NOTHROW
     {
         t = (T)( b ? 1 : 0 );
         return true;
     }
 
     template < typename E >
-    static void CastThrow( bool b, T& t ) SAFEINT_CPP_THROW
+	_CONSTEXPR14 static void CastThrow( bool b, T& t ) SAFEINT_CPP_THROW
     {
         t = (T)( b ? 1 : 0 );
     }
@@ -1420,14 +1424,14 @@ public:
 template < typename T > class SafeCastHelper < bool, T, CastToBool >
 {
 public:
-    static bool Cast( T t, bool& b ) SAFEINT_NOTHROW
+	_CONSTEXPR14 static bool Cast( T t, bool& b ) SAFEINT_NOTHROW
     {
         b = !!t;
         return true;
     }
 
     template < typename E >
-    static void CastThrow( bool b, T& t ) SAFEINT_CPP_THROW
+	_CONSTEXPR14 static void CastThrow( bool b, T& t ) SAFEINT_CPP_THROW
     {
         b = !!t;
     }
@@ -1436,7 +1440,7 @@ public:
 template < typename T, typename U > class SafeCastHelper < T, U, CastCheckLTZero >
 {
 public:
-    static bool Cast( U u, T& t ) SAFEINT_NOTHROW
+	_CONSTEXPR14 static bool Cast( U u, T& t ) SAFEINT_NOTHROW
     {
         if( u < 0 )
             return false;
@@ -1446,7 +1450,7 @@ public:
     }
 
     template < typename E >
-    static void CastThrow( U u, T& t ) SAFEINT_CPP_THROW
+	_CONSTEXPR14 static void CastThrow( U u, T& t ) SAFEINT_CPP_THROW
     {
         if( u < 0 )
             E::SafeIntOnOverflow();
@@ -1458,7 +1462,7 @@ public:
 template < typename T, typename U > class SafeCastHelper < T, U, CastCheckGTMax >
 {
 public:
-    static bool Cast( U u, T& t ) SAFEINT_NOTHROW
+	_CONSTEXPR14 static bool Cast( U u, T& t ) SAFEINT_NOTHROW
     {
         if( u > (U)IntTraits< T >::maxInt )
             return false;
@@ -1468,7 +1472,7 @@ public:
     }
 
     template < typename E >
-    static void CastThrow( U u, T& t ) SAFEINT_CPP_THROW
+	_CONSTEXPR14 static void CastThrow( U u, T& t ) SAFEINT_CPP_THROW
     {
         if( u > (U)IntTraits< T >::maxInt )
             E::SafeIntOnOverflow();
@@ -1480,7 +1484,7 @@ public:
 template < typename T, typename U > class SafeCastHelper < T, U, CastCheckSafeIntMinMaxUnsigned >
 {
 public:
-    static bool Cast( U u, T& t ) SAFEINT_NOTHROW
+	_CONSTEXPR14 static bool Cast( U u, T& t ) SAFEINT_NOTHROW
     {
         // U is signed - T could be either signed or unsigned
         if( u > IntTraits< T >::maxInt || u < 0 )
@@ -1491,7 +1495,7 @@ public:
     }
 
     template < typename E >
-    static void CastThrow( U u, T& t ) SAFEINT_CPP_THROW
+	_CONSTEXPR14 static void CastThrow( U u, T& t ) SAFEINT_CPP_THROW
     {
         // U is signed - T could be either signed or unsigned
         if( u > IntTraits< T >::maxInt || u < 0 )
@@ -1504,7 +1508,7 @@ public:
 template < typename T, typename U > class SafeCastHelper < T, U, CastCheckSafeIntMinMaxSigned >
 {
 public:
-    static bool Cast( U u, T& t ) SAFEINT_NOTHROW
+	_CONSTEXPR14 static bool Cast( U u, T& t ) SAFEINT_NOTHROW
     {
         // T, U are signed
         if( u > IntTraits< T >::maxInt || u < IntTraits< T >::minInt )
@@ -1515,7 +1519,7 @@ public:
     }
 
     template < typename E >
-    static void CastThrow( U u, T& t ) SAFEINT_CPP_THROW
+	_CONSTEXPR14 static void CastThrow( U u, T& t ) SAFEINT_CPP_THROW
     {
         //T, U are signed
         if( u > IntTraits< T >::maxInt || u < IntTraits< T >::minInt )
@@ -5759,49 +5763,49 @@ public:
         return !!m_int;
     }
 
-    operator char() const SAFEINT_CPP_THROW
+	_CONSTEXPR14 operator char() const SAFEINT_CPP_THROW
     {
         char val;
         SafeCastHelper< char, T, GetCastMethod< char, T >::method >::template CastThrow< E >( m_int, val );
         return val;
     }
 
-    operator signed char() const SAFEINT_CPP_THROW
+	_CONSTEXPR14 operator signed char() const SAFEINT_CPP_THROW
     {
         signed char val;
         SafeCastHelper< signed char, T, GetCastMethod< signed char, T >::method >::template CastThrow< E >( m_int, val );
         return val;
     }
 
-    operator unsigned char() const SAFEINT_CPP_THROW
+	_CONSTEXPR14 operator unsigned char() const SAFEINT_CPP_THROW
     {
         unsigned char val;
         SafeCastHelper< unsigned char, T, GetCastMethod< unsigned char, T >::method >::template CastThrow< E >( m_int, val );
         return val;
     }
 
-    operator __int16() const SAFEINT_CPP_THROW
+	_CONSTEXPR14 operator __int16() const SAFEINT_CPP_THROW
     {
         __int16 val;
         SafeCastHelper< __int16, T, GetCastMethod< __int16, T >::method >::template CastThrow< E >( m_int, val );
         return val;
     }
 
-    operator unsigned __int16() const SAFEINT_CPP_THROW
+	_CONSTEXPR14 operator unsigned __int16() const SAFEINT_CPP_THROW
     {
         unsigned __int16 val;
         SafeCastHelper< unsigned __int16, T, GetCastMethod< unsigned __int16, T >::method >::template CastThrow< E >( m_int, val );
         return val;
     }
 
-    operator __int32() const SAFEINT_CPP_THROW
+	_CONSTEXPR14 operator __int32() const SAFEINT_CPP_THROW
     {
         __int32 val;
         SafeCastHelper< __int32, T, GetCastMethod< __int32, T >::method >::template CastThrow< E >( m_int, val );
         return val;
     }
 
-    operator unsigned __int32() const SAFEINT_CPP_THROW
+	_CONSTEXPR14 operator unsigned __int32() const SAFEINT_CPP_THROW
     {
         unsigned __int32 val;
         SafeCastHelper< unsigned __int32, T, GetCastMethod< unsigned __int32, T >::method >::template CastThrow< E >( m_int, val );
@@ -5810,35 +5814,35 @@ public:
 
     // The compiler knows that int == __int32
     // but not that long == __int32
-    operator long() const SAFEINT_CPP_THROW
+	_CONSTEXPR14 operator long() const SAFEINT_CPP_THROW
     {
         long val;
         SafeCastHelper< long, T, GetCastMethod< long, T >::method >::template CastThrow< E >( m_int, val );
         return  val;
     }
 
-    operator unsigned long() const SAFEINT_CPP_THROW
+	_CONSTEXPR14 operator unsigned long() const SAFEINT_CPP_THROW
     {
         unsigned long val;
         SafeCastHelper< unsigned long, T, GetCastMethod< unsigned long, T >::method >::template CastThrow< E >( m_int, val );
         return val;
     }
 
-    operator __int64() const SAFEINT_CPP_THROW
+	_CONSTEXPR14 operator __int64() const SAFEINT_CPP_THROW
     {
         __int64 val;
         SafeCastHelper< __int64, T, GetCastMethod< __int64, T >::method >::template CastThrow< E >( m_int, val );
         return val;
     }
 
-    operator unsigned __int64() const SAFEINT_CPP_THROW
+	_CONSTEXPR14 operator unsigned __int64() const SAFEINT_CPP_THROW
     {
         unsigned __int64 val;
         SafeCastHelper< unsigned __int64, T, GetCastMethod< unsigned __int64, T >::method >::template CastThrow< E >( m_int, val );
         return val;
     }
 
-    operator wchar_t() const SAFEINT_CPP_THROW
+	_CONSTEXPR14 operator wchar_t() const SAFEINT_CPP_THROW
     {
         wchar_t val;
         SafeCastHelper< wchar_t, T, GetCastMethod< wchar_t, T >::method >::template CastThrow< E >( m_int, val );
@@ -5858,20 +5862,20 @@ public:
 #endif
 
     // Also provide a cast operator for floating point types
-    operator float() const SAFEINT_CPP_THROW
+	_CONSTEXPR14 operator float() const SAFEINT_CPP_THROW
     {
         float val;
         SafeCastHelper< float, T, GetCastMethod< float, T >::method >::template CastThrow< E >( m_int, val );
         return val;
     }
 
-    operator double() const SAFEINT_CPP_THROW
+	_CONSTEXPR14 operator double() const SAFEINT_CPP_THROW
     {
         double val;
         SafeCastHelper< double, T, GetCastMethod< double, T >::method >::template CastThrow< E >( m_int, val );
         return val;
     }
-    operator long double() const SAFEINT_CPP_THROW
+	_CONSTEXPR14 operator long double() const SAFEINT_CPP_THROW
     {
         long double val;
         SafeCastHelper< long double, T, GetCastMethod< long double, T >::method >::template CastThrow< E >( m_int, val );
@@ -6113,7 +6117,7 @@ public:
     // For addition and subtraction
 
     // Addition
-    SafeInt< T, E > operator +( SafeInt< T, E > rhs ) const SAFEINT_CPP_THROW
+	_CONSTEXPR14 SafeInt< T, E > operator +( SafeInt< T, E > rhs ) const SAFEINT_CPP_THROW
     {
         T ret( 0 );
         AdditionHelper< T, T, AdditionMethod< T, T >::method >::template AdditionThrow< E >( m_int, (T)rhs, ret );
@@ -6121,7 +6125,7 @@ public:
     }
 
     template < typename U >
-    SafeInt< T, E > operator +( U rhs ) const SAFEINT_CPP_THROW
+	_CONSTEXPR14 SafeInt< T, E > operator +( U rhs ) const SAFEINT_CPP_THROW
     {
         T ret( 0 );
         AdditionHelper< T, U, AdditionMethod< T, U >::method >::template AdditionThrow< E >( m_int, rhs, ret );
@@ -6129,21 +6133,21 @@ public:
     }
 
     //addition assignment
-    SafeInt< T, E >& operator +=( SafeInt< T, E > rhs ) SAFEINT_CPP_THROW
+	_CONSTEXPR14 SafeInt< T, E >& operator +=( SafeInt< T, E > rhs ) SAFEINT_CPP_THROW
     {
         AdditionHelper< T, T, AdditionMethod< T, T >::method >::template AdditionThrow< E >( m_int, (T)rhs, m_int );
         return *this;
     }
 
     template < typename U >
-    SafeInt< T, E >& operator +=( U rhs ) SAFEINT_CPP_THROW
+	_CONSTEXPR14 SafeInt< T, E >& operator +=( U rhs ) SAFEINT_CPP_THROW
     {
         AdditionHelper< T, U, AdditionMethod< T, U >::method >::template AdditionThrow< E >( m_int, rhs, m_int );
         return *this;
     }
 
     template < typename U >
-    SafeInt< T, E >& operator +=( SafeInt< U, E > rhs ) SAFEINT_CPP_THROW
+	_CONSTEXPR14 SafeInt< T, E >& operator +=( SafeInt< U, E > rhs ) SAFEINT_CPP_THROW
     {
         AdditionHelper< T, U, AdditionMethod< T, U >::method >::template AdditionThrow< E >( m_int, (U)rhs, m_int );
         return *this;
@@ -6905,7 +6909,7 @@ template < typename T, typename U, typename E > SafeInt< T, E > operator /( U lh
 
 // Addition
 template < typename T, typename U, typename E >
-SafeInt< T, E > operator +( U lhs, SafeInt< T, E > rhs ) SAFEINT_CPP_THROW
+_CONSTEXPR14 SafeInt< T, E > operator +( U lhs, SafeInt< T, E > rhs ) SAFEINT_CPP_THROW
 {
     T ret( 0 );
     AdditionHelper< T, U, AdditionMethod< T, U >::method >::template AdditionThrow< E >( (T)rhs, lhs, ret );
