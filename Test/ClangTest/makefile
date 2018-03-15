@@ -12,3 +12,5 @@ SafeIntTest: ../AddVerify.cpp ../CastVerify.cpp ../DivVerify.cpp ../IncDecVerify
 CompileTest: ../CompileTest.cpp ../../SafeInt.hpp ../ConstExpr.cpp ../CleanCompile.cpp
 	clang++ -Wall --std=c++11 ../CompileTest.cpp ../ConstExpr.cpp ../CleanCompile.cpp -o CompileTest
 
+CompileTest14: ../CompileTest.cpp ../../SafeInt.hpp ../ConstExpr.cpp ../CleanCompile.cpp
+	clang++ -Wall --std=c++14 ../CompileTest.cpp ../ConstExpr.cpp ../CleanCompile.cpp -o CompileTest
