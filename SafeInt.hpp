@@ -5855,7 +5855,7 @@ public:
     // Leave here in case we decide to backport this to an earlier compiler
     operator size_t() const SAFEINT_CPP_THROW
     {
-        size_t val;
+        size_t val = 0;
         SafeCastHelper< size_t, T, GetCastMethod< size_t, T >::method >::template CastThrow< E >( m_int, val );
         return val;
     }
@@ -5864,20 +5864,20 @@ public:
     // Also provide a cast operator for floating point types
 	_CONSTEXPR14 operator float() const SAFEINT_CPP_THROW
     {
-        float val;
+        float val = 0.0;
         SafeCastHelper< float, T, GetCastMethod< float, T >::method >::template CastThrow< E >( m_int, val );
         return val;
     }
 
 	_CONSTEXPR14 operator double() const SAFEINT_CPP_THROW
     {
-        double val;
+        double val = 0.0;
         SafeCastHelper< double, T, GetCastMethod< double, T >::method >::template CastThrow< E >( m_int, val );
         return val;
     }
 	_CONSTEXPR14 operator long double() const SAFEINT_CPP_THROW
     {
-        long double val;
+        long double val = 0.0;
         SafeCastHelper< long double, T, GetCastMethod< long double, T >::method >::template CastThrow< E >( m_int, val );
         return val;
     }
