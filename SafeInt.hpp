@@ -1601,7 +1601,7 @@ public:
 template < typename T, typename U > class EqualityTest< T, U, ComparisonMethod_UnsignedT >
 {
 public:
-    static bool IsEquals( const T t, const U u ) SAFEINT_NOTHROW
+	_CONSTEXPR14 static bool IsEquals( const T t, const U u ) SAFEINT_NOTHROW
     {
         //one operand is 32 or 64-bit unsigned, and the other is signed and the same size or smaller
         if( u < 0 )
@@ -1615,7 +1615,7 @@ public:
 template < typename T, typename U > class EqualityTest< T, U, ComparisonMethod_UnsignedU>
 {
 public:
-    static bool IsEquals( const T t, const U u ) SAFEINT_NOTHROW
+	_CONSTEXPR14 static bool IsEquals( const T t, const U u ) SAFEINT_NOTHROW
     {
         //one operand is 32 or 64-bit unsigned, and the other is signed and the same size or smaller
         if( t < 0 )
@@ -5916,7 +5916,7 @@ public:
     }
 
     // prefix increment operator
-    SafeInt< T, E >& operator ++() SAFEINT_CPP_THROW
+	_CONSTEXPR14 SafeInt< T, E >& operator ++() SAFEINT_CPP_THROW
     {
         if( m_int != IntTraits< T >::maxInt )
         {
@@ -5941,7 +5941,7 @@ public:
     // characteristics
 
     // postfix increment operator
-    SafeInt< T, E > operator ++( int )  SAFEINT_CPP_THROW // dummy arg to comply with spec
+	_CONSTEXPR14 SafeInt< T, E > operator ++( int )  SAFEINT_CPP_THROW // dummy arg to comply with spec
     {
         if( m_int != IntTraits< T >::maxInt )
         {

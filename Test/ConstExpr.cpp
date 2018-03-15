@@ -114,6 +114,60 @@ namespace TestConstExpr
 		static const bool b = ConstBool<T>();
 	}
 
+	template <typename T>
+	_CONSTEXPR11 SafeInt<T> ConstSafeInt()
+	{
+		return SafeInt<T>(1);
+	}
+
+	template <typename T>
+	void ConstCastTestT()
+	{
+		static_assert(SafeInt<T>(1) == (T)1, "ConstCastTestT");
+
+		static const bool b = ConstSafeInt<T>();
+		static const wchar_t w = ConstSafeInt<T>();
+		static const char c = ConstSafeInt<T>();
+		static const signed char sc = ConstSafeInt<T>();
+		static const unsigned char uc = ConstSafeInt<T>();
+		static const signed short s = ConstSafeInt<T>();
+		static const unsigned short us = ConstSafeInt<T>();
+		static const signed int i = ConstSafeInt<T>();
+		static const unsigned int ui = ConstSafeInt<T>();
+		static const signed long l = ConstSafeInt<T>();
+		static const unsigned long ul = ConstSafeInt<T>();
+		static const signed long long ll = ConstSafeInt<T>();
+		static const unsigned long long ull = ConstSafeInt<T>();
+		static const size_t st = ConstSafeInt<T>();
+		static const ptrdiff_t pt = ConstSafeInt<T>();
+
+		// Also catch the useless unary + operator
+		static const int pl = +ConstSafeInt<T>();
+	}
+
+#if CPLUSPLUS_STD == CPLUSPLUS_14
+	template <typename T, typename U>
+	_CONSTEXPR14 T ConstMultiplyTU()
+	{
+		return (SafeInt<T>(2) * (U)1) + (U(4) * SafeInt<T>(3)) + (SafeInt<T>(6) * SafeInt<T>(5));
+	}
+
+	template <typename T>
+	void ConstMultiplyT()
+	{
+		static const T c = ConstMultiplyTU< T, char >();
+		static const T sc = ConstMultiplyTU< T, signed char >();
+		static const T uc = ConstMultiplyTU< T, unsigned char >();
+		static const T ss = ConstMultiplyTU< T, signed short >();
+		static const T us = ConstMultiplyTU< T, unsigned short >();
+		static const T si = ConstMultiplyTU< T, signed int >();
+		static const T ui = ConstMultiplyTU< T, unsigned int >();
+		static const T sl = ConstMultiplyTU< T, signed long >();
+		static const T ul = ConstMultiplyTU< T, unsigned long >();
+		static const T sll = ConstMultiplyTU< T, signed long long >();
+		static const T ull = ConstMultiplyTU< T, unsigned long long >();
+	}
+
 	template <typename T, typename U>
 	_CONSTEXPR14 T ConstSubtractTU()
 	{
@@ -136,14 +190,10 @@ namespace TestConstExpr
 		static const T ull = ConstSubtractTU< T, unsigned long long >();
 	}
 
-	int foo() {
-		return 2;
-	}
-
 	template <typename T, typename U>
 	_CONSTEXPR14 T ConstAddTU()
 	{
-		return (SafeInt<T>(1) + (U)2) + (U(3) + SafeInt<T>(4)) + (SafeInt<T>(5) + SafeInt<T>(6)) + foo();
+		return (SafeInt<T>(1) + (U)2) + (U(3) + SafeInt<T>(4)) + (SafeInt<T>(5) + SafeInt<T>(6));
 	}
 
 	template <typename T>
@@ -163,33 +213,28 @@ namespace TestConstExpr
 	}
 
 	template <typename T>
-	_CONSTEXPR14 SafeInt<T> ConstSafeInt()
+	_CONSTEXPR14 T PrefixInc(T i)
 	{
-		return SafeInt<T>(1);
+		return ++SafeInt<T>(i);
 	}
 
 	template <typename T>
-	void ConstCastTestT()
+	_CONSTEXPR14 T PostfixInc(T i)
 	{
-		static const bool b = ConstSafeInt<T>();
-		static const wchar_t w = ConstSafeInt<T>();
-		static const char c = ConstSafeInt<T>();
-		static const signed char sc = ConstSafeInt<T>();
-		static const unsigned char uc = ConstSafeInt<T>();
-		static const signed short s = ConstSafeInt<T>();
-		static const unsigned short us = ConstSafeInt<T>();
-		static const signed int i = ConstSafeInt<T>();
-		static const unsigned int ui = ConstSafeInt<T>();
-		static const signed long l = ConstSafeInt<T>();
-		static const unsigned long ul = ConstSafeInt<T>();
-		static const signed long long ll = ConstSafeInt<T>();
-		static const unsigned long long ull = ConstSafeInt<T>();
-		static const size_t st = ConstSafeInt<T>();
-		static const ptrdiff_t pt = ConstSafeInt<T>();
-
-		// Also catch the useless unary + operator
-		static const int pl = +ConstSafeInt<T>();
+		return SafeInt<T>(i)++;
 	}
+
+	template <typename T>
+	_CONSTEXPR14 T PrePostTest()
+	{
+		static const T t1 = PrefixInc<T>((T)1);
+		static const T t2 = PostfixInc<T>((T)2);
+		static_assert(t1 + t2 == 4, "Failed");
+
+		return (T)(t1 + t2);
+	}
+
+#endif // CPLUSPLUS_14
 
 	template <typename T>
 	void ConstExprTestT()
@@ -197,8 +242,13 @@ namespace TestConstExpr
 		ConstTestT<T>();
 		ComparisonTestT<T>();
 		ConstCastTestT<T>();
+
+#if CPLUSPLUS_STD == CPLUSPLUS_14
 		ConstAddT<T>();
 		ConstSubtractT<T>();
+		ConstMultiplyT<T>();
+		PrePostTest<T>();
+#endif
 	}
 
 	void ConstExprTest()
