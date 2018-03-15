@@ -3,7 +3,7 @@
 #pragma warning( disable: 4464 )
 
 #else
-// #pragma GCC diagnostic ignored "-Wunused-variable"
+#pragma GCC diagnostic ignored "-Wunused-variable"
 #endif
 
 #include "../SafeInt.hpp"
