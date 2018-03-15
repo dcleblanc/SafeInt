@@ -114,46 +114,112 @@ namespace TestConstExpr
 		static const bool b = ConstBool<T>();
 	}
 
-	_CONSTEXPR14 int ConstAdditionTest()
+	template <typename T, typename U>
+	_CONSTEXPR14 T ConstSubtractTU()
 	{
-		return (SafeInt<int>(3) + 4) + SafeInt<int>(5);
+		return (SafeInt<T>(2) - (U)1) + (U(4) - SafeInt<T>(3)) + (SafeInt<T>(6) - SafeInt<T>(5));
+	}
+
+	template <typename T>
+	void ConstSubtractT()
+	{
+		static const T c = ConstSubtractTU< T, char >();
+		static const T sc = ConstSubtractTU< T, signed char >();
+		static const T uc = ConstSubtractTU< T, unsigned char >();
+		static const T ss = ConstSubtractTU< T, signed short >();
+		static const T us = ConstSubtractTU< T, unsigned short >();
+		static const T si = ConstSubtractTU< T, signed int >();
+		static const T ui = ConstSubtractTU< T, unsigned int >();
+		static const T sl = ConstSubtractTU< T, signed long >();
+		static const T ul = ConstSubtractTU< T, unsigned long >();
+		static const T sll = ConstSubtractTU< T, signed long long >();
+		static const T ull = ConstSubtractTU< T, unsigned long long >();
+	}
+
+	int foo() {
+		return 2;
+	}
+
+	template <typename T, typename U>
+	_CONSTEXPR14 T ConstAddTU()
+	{
+		return (SafeInt<T>(1) + (U)2) + (U(3) + SafeInt<T>(4)) + (SafeInt<T>(5) + SafeInt<T>(6)) + foo();
+	}
+
+	template <typename T>
+	void ConstAddT()
+	{
+		static const T c   = ConstAddTU< T, char >();
+		static const T sc  = ConstAddTU< T, signed char >();
+		static const T uc  = ConstAddTU< T, unsigned char >();
+		static const T ss  = ConstAddTU< T, signed short >();
+		static const T us  = ConstAddTU< T, unsigned short >();
+		static const T si  = ConstAddTU< T, signed int >();
+		static const T ui  = ConstAddTU< T, unsigned int >();
+		static const T sl  = ConstAddTU< T, signed long >();
+		static const T ul  = ConstAddTU< T, unsigned long >();
+		static const T sll = ConstAddTU< T, signed long long >();
+		static const T ull = ConstAddTU< T, unsigned long long >();
+	}
+
+	template <typename T>
+	_CONSTEXPR14 SafeInt<T> ConstSafeInt()
+	{
+		return SafeInt<T>(1);
+	}
+
+	template <typename T>
+	void ConstCastTestT()
+	{
+		static const bool b = ConstSafeInt<T>();
+		static const wchar_t w = ConstSafeInt<T>();
+		static const char c = ConstSafeInt<T>();
+		static const signed char sc = ConstSafeInt<T>();
+		static const unsigned char uc = ConstSafeInt<T>();
+		static const signed short s = ConstSafeInt<T>();
+		static const unsigned short us = ConstSafeInt<T>();
+		static const signed int i = ConstSafeInt<T>();
+		static const unsigned int ui = ConstSafeInt<T>();
+		static const signed long l = ConstSafeInt<T>();
+		static const unsigned long ul = ConstSafeInt<T>();
+		static const signed long long ll = ConstSafeInt<T>();
+		static const unsigned long long ull = ConstSafeInt<T>();
+		static const size_t st = ConstSafeInt<T>();
+		static const ptrdiff_t pt = ConstSafeInt<T>();
+
+		// Also catch the useless unary + operator
+		static const int pl = +ConstSafeInt<T>();
+	}
+
+	template <typename T>
+	void ConstExprTestT()
+	{
+		ConstTestT<T>();
+		ComparisonTestT<T>();
+		ConstCastTestT<T>();
+		ConstAddT<T>();
+		ConstSubtractT<T>();
 	}
 
 	void ConstExprTest()
 	{
-		ConstTestT<char>();
-		ConstTestT<signed char>();
-		ConstTestT<unsigned char>();
-		ConstTestT<signed short>();
-		ConstTestT<unsigned short>();
-		ConstTestT<signed int>();
-		ConstTestT<unsigned int>();
-		ConstTestT<signed long>();
-		ConstTestT<unsigned long>();
-		ConstTestT<signed long long>();
-		ConstTestT<unsigned long long>();
+		ConstExprTestT<char>();
+		ConstExprTestT<signed char>();
+		ConstExprTestT<unsigned char>();
+		ConstExprTestT<signed short>();
+		ConstExprTestT<unsigned short>();
+		ConstExprTestT<signed int>();
+		ConstExprTestT<unsigned int>();
+		ConstExprTestT<signed long>();
+		ConstExprTestT<unsigned long>();
+		ConstExprTestT<signed long long>();
+		ConstExprTestT<unsigned long long>();
 
 		// Catch the SafePtrDiff function, since it is marked. Can't think of a scenario for this being constexpr, though.
 		const char* p1 = (char*)1;
 		const char* p2 = nullptr;
 
 		static const SafeInt<ptrdiff_t> pt = SafePtrDiff(p1, p2);
-
-		// Now the comparison test ComparisonTestT
-		ComparisonTestT<char>();
-		ComparisonTestT<signed char>();
-		ComparisonTestT<unsigned char>();
-		ComparisonTestT<signed short>();
-		ComparisonTestT<unsigned short>();
-		ComparisonTestT<signed int>();
-		ComparisonTestT<unsigned int>();
-		ComparisonTestT<signed long>();
-		ComparisonTestT<unsigned long>();
-		ComparisonTestT<signed long long>();
-		ComparisonTestT<unsigned long long>();
-
-		static const int i = ConstAdditionTest();
-
 	}
 
 }

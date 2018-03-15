@@ -1,18 +1,18 @@
 #include "../../../SafeInt.hpp"
+#include <stdio.h>
 
 /*
 Use this to check specific scenarios
 */
-template <typename T, typename U>
-void ModulusFriendTest()
+
+constexpr int Foo()
 {
-	U u = 3;
-	SafeInt<T> st(1);
-	T t = u % st;
+	return SafeInt<char>(255) * 5;
 }
 
 int main(int, char**)
 {
-	ModulusFriendTest<long long, long long>();
+	static const int x = Foo();
+	printf("%d", x);
 	return 0;
 }
