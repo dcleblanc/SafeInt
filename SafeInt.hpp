@@ -141,7 +141,7 @@ Please read the leading comments before using the class.
 #include <cstddef>
 #include <cmath>
 
-#if SAFEINT_COMPILER == VISUAL_STUDIO_COMPILER && defined _M_AMD64
+#if SAFEINT_COMPILER == VISUAL_STUDIO_COMPILER && defined _M_AMD64 && !defined SAFEINT_USE_INTRINSICS
     #include <intrin.h>
     #define SAFEINT_USE_INTRINSICS 1
 #else
@@ -1108,7 +1108,7 @@ template < typename T > class NegationHelper <T, true> // Signed
 {
 public:
     template <typename E>
-    static T NegativeThrow( T t ) SAFEINT_CPP_THROW
+	_CONSTEXPR14 static T NegativeThrow( T t ) SAFEINT_CPP_THROW
     {
         // corner case
         if( t != IntTraits< T >::minInt )
@@ -1119,7 +1119,7 @@ public:
         E::SafeIntOnOverflow();
     }
 
-    static bool Negative( T t, T& ret ) SAFEINT_NOTHROW
+	_CONSTEXPR14 static bool Negative( T t, T& ret ) SAFEINT_NOTHROW
     {
         // corner case
         if( t != IntTraits< T >::minInt )
@@ -1165,7 +1165,7 @@ template < typename T > class NegationHelper <T, false> // unsigned
 {
 public:
     template <typename E>
-    static T NegativeThrow( T t ) SAFEINT_CPP_THROW
+	_CONSTEXPR14 static T NegativeThrow( T t ) SAFEINT_CPP_THROW
     {
 #if defined SAFEINT_DISALLOW_UNSIGNED_NEGATION
         SAFEINT_STATIC_ASSERT( sizeof(T) == 0 );
@@ -1187,7 +1187,7 @@ public:
 #endif
     }
 
-    static bool Negative( T t, T& ret ) SAFEINT_NOTHROW
+	_CONSTEXPR14 static bool Negative( T t, T& ret ) SAFEINT_NOTHROW
     {
         if( IntTraits<T>::isLT32Bit )
         {
@@ -1313,7 +1313,7 @@ public:
 		// A double can hold at most 53 bits of the value
 		// 53 bits is:
 		const unsigned __int64 signifDouble = 0x1fffffffffffff;
-		bool fValid;
+		bool fValid = false;
 
 		switch (std::fpclassify(d))
 		{
@@ -1367,7 +1367,7 @@ public:
 		return true;
 	}
 
-    static bool Cast( U u, T& t ) SAFEINT_NOTHROW
+	static bool Cast( U u, T& t ) SAFEINT_NOTHROW
     {
 		if(CheckFloatingPointCast(u))
 		{
@@ -1378,7 +1378,7 @@ public:
     }
 
     template < typename E >
-    static void CastThrow( U u, T& t ) SAFEINT_CPP_THROW
+	static void CastThrow( U u, T& t ) SAFEINT_CPP_THROW
     {
 		if (CheckFloatingPointCast(u))
 		{
@@ -1681,7 +1681,7 @@ template <typename T, typename U, int method > class ModulusHelper;
 template <typename T, typename U> class ModulusHelper <T, U, ComparisonMethod_Ok>
 {
 public:
-    static SafeIntError Modulus( const T& t, const U& u, T& result ) SAFEINT_NOTHROW
+	_CONSTEXPR14 static SafeIntError Modulus( const T& t, const U& u, T& result ) SAFEINT_NOTHROW
     {
         if(u == 0)
             return SafeIntDivideByZero;
@@ -1703,7 +1703,7 @@ public:
     }
 
     template < typename E >
-    static void ModulusThrow( const T& t, const U& u, T& result ) SAFEINT_CPP_THROW
+	_CONSTEXPR14 static void ModulusThrow( const T& t, const U& u, T& result ) SAFEINT_CPP_THROW
     {
         if(u == 0)
             E::SafeIntOnDivZero();
@@ -1725,7 +1725,7 @@ public:
 template <typename T, typename U> class ModulusHelper <T, U, ComparisonMethod_CastInt>
 {
 public:
-    static SafeIntError Modulus( const T& t, const U& u, T& result ) SAFEINT_NOTHROW
+	_CONSTEXPR14 static SafeIntError Modulus( const T& t, const U& u, T& result ) SAFEINT_NOTHROW
     {
         if(u == 0)
             return SafeIntDivideByZero;
@@ -1745,7 +1745,7 @@ public:
     }
 
     template < typename E >
-    static void ModulusThrow( const T& t, const U& u, T& result ) SAFEINT_CPP_THROW
+	_CONSTEXPR14 static void ModulusThrow( const T& t, const U& u, T& result ) SAFEINT_CPP_THROW
     {
         if(u == 0)
             E::SafeIntOnDivZero();
@@ -1767,7 +1767,7 @@ public:
 template < typename T, typename U > class ModulusHelper< T, U, ComparisonMethod_CastInt64>
 {
 public:
-    static SafeIntError Modulus( const T& t, const U& u, T& result ) SAFEINT_NOTHROW
+	_CONSTEXPR14 static SafeIntError Modulus( const T& t, const U& u, T& result ) SAFEINT_NOTHROW
     {
         if(u == 0)
             return SafeIntDivideByZero;
@@ -1787,7 +1787,7 @@ public:
     }
 
     template < typename E >
-    static void ModulusThrow( const T& t, const U& u, T& result ) SAFEINT_CPP_THROW
+	_CONSTEXPR14 static void ModulusThrow( const T& t, const U& u, T& result ) SAFEINT_CPP_THROW
     {
         if(u == 0)
             E::SafeIntOnDivZero();
@@ -1809,7 +1809,7 @@ public:
 template < typename T, typename U > class ModulusHelper< T, U, ComparisonMethod_UnsignedT>
 {
 public:
-    static SafeIntError Modulus( const T& t, const U& u, T& result ) SAFEINT_NOTHROW
+	_CONSTEXPR14 static SafeIntError Modulus( const T& t, const U& u, T& result ) SAFEINT_NOTHROW
     {
         if(u == 0)
             return SafeIntDivideByZero;
@@ -1825,7 +1825,7 @@ public:
     }
 
     template < typename E >
-    static void ModulusThrow( const T& t, const U& u, T& result ) SAFEINT_CPP_THROW
+	_CONSTEXPR14 static void ModulusThrow( const T& t, const U& u, T& result ) SAFEINT_CPP_THROW
     {
         if(u == 0)
             E::SafeIntOnDivZero();
@@ -1842,7 +1842,7 @@ public:
 template < typename T, typename U > class ModulusHelper< T, U, ComparisonMethod_UnsignedU>
 {
 public:
-    static SafeIntError Modulus( const T& t, const U& u, T& result ) SAFEINT_NOTHROW
+	_CONSTEXPR14 static SafeIntError Modulus( const T& t, const U& u, T& result ) SAFEINT_NOTHROW
     {
         if(u == 0)
             return SafeIntDivideByZero;
@@ -1857,7 +1857,7 @@ public:
     }
 
     template < typename E >
-    static void ModulusThrow( const T& t, const U& u, T& result ) SAFEINT_CPP_THROW
+	_CONSTEXPR14 static void ModulusThrow( const T& t, const U& u, T& result ) SAFEINT_CPP_THROW
     {
         if(u == 0)
             E::SafeIntOnDivZero();
@@ -1937,7 +1937,7 @@ template < typename T, typename U > class MultiplicationHelper< T, U, Multiplica
 {
 public:
     //accepts signed, both less than 32-bit
-    static bool Multiply( const T& t, const U& u, T& ret ) SAFEINT_NOTHROW
+	_CONSTEXPR14 static bool Multiply( const T& t, const U& u, T& ret ) SAFEINT_NOTHROW
     {
         int tmp = t * u;
 
@@ -1949,7 +1949,7 @@ public:
     }
 
     template < typename E >
-    static void MultiplyThrow( const T& t, const U& u, T& ret ) SAFEINT_CPP_THROW
+	_CONSTEXPR14 static void MultiplyThrow( const T& t, const U& u, T& ret ) SAFEINT_CPP_THROW
     {
         int tmp = t * u;
 
@@ -1964,7 +1964,7 @@ template < typename T, typename U > class MultiplicationHelper< T, U, Multiplica
 {
 public:
     //accepts unsigned, both less than 32-bit
-    static bool Multiply( const T& t, const U& u, T& ret ) SAFEINT_NOTHROW
+	_CONSTEXPR14 static bool Multiply( const T& t, const U& u, T& ret ) SAFEINT_NOTHROW
     {
         unsigned int tmp = (unsigned int)(t * u);
 
@@ -1976,7 +1976,7 @@ public:
     }
 
     template < typename E >
-    static void MultiplyThrow( const T& t, const U& u, T& ret ) SAFEINT_CPP_THROW
+	_CONSTEXPR14 static void MultiplyThrow( const T& t, const U& u, T& ret ) SAFEINT_CPP_THROW
     {
         unsigned int tmp = (unsigned int)( t * u );
 
@@ -1991,7 +1991,7 @@ template < typename T, typename U > class MultiplicationHelper< T, U, Multiplica
 {
 public:
     //mixed signed or both signed where at least one argument is 32-bit, and both a 32-bit or less
-    static bool Multiply( const T& t, const U& u, T& ret ) SAFEINT_NOTHROW
+	_CONSTEXPR14 static bool Multiply( const T& t, const U& u, T& ret ) SAFEINT_NOTHROW
     {
         __int64 tmp = (__int64)t * (__int64)u;
 
@@ -2003,7 +2003,7 @@ public:
     }
 
     template < typename E >
-    static void MultiplyThrow( const T& t, const U& u, T& ret ) SAFEINT_CPP_THROW
+	_CONSTEXPR14 static void MultiplyThrow( const T& t, const U& u, T& ret ) SAFEINT_CPP_THROW
     {
         __int64 tmp = (__int64)t * (__int64)u;
 
@@ -2018,7 +2018,7 @@ template < typename T, typename U > class MultiplicationHelper< T, U, Multiplica
 {
 public:
     //both unsigned where at least one argument is 32-bit, and both are 32-bit or less
-    static bool Multiply( const T& t, const U& u, T& ret ) SAFEINT_NOTHROW
+	_CONSTEXPR14 static bool Multiply( const T& t, const U& u, T& ret ) SAFEINT_NOTHROW
     {
         unsigned __int64 tmp = (unsigned __int64)t * (unsigned __int64)u;
 
@@ -2030,7 +2030,7 @@ public:
     }
 
     template < typename E >
-    static void MultiplyThrow( const T& t, const U& u, T& ret ) SAFEINT_CPP_THROW
+	_CONSTEXPR14 static void MultiplyThrow( const T& t, const U& u, T& ret ) SAFEINT_CPP_THROW
     {
         unsigned __int64 tmp = (unsigned __int64)t * (unsigned __int64)u;
 
@@ -2089,12 +2089,12 @@ inline bool IntrinsicMultiplyInt64( const signed __int64& a, const signed __int6
 template<> class LargeIntRegMultiply< unsigned __int64, unsigned __int64 >
 {
 public:
-    static bool RegMultiply( const unsigned __int64& a, const unsigned __int64& b, unsigned __int64* pRet ) SAFEINT_NOTHROW
+	_CONSTEXPR14 static bool RegMultiply( const unsigned __int64& a, const unsigned __int64& b, unsigned __int64* pRet ) SAFEINT_NOTHROW
     {
 #if SAFEINT_USE_INTRINSICS
         return IntrinsicMultiplyUint64( a, b, pRet );
 #else
-        unsigned __int32 aHigh, aLow, bHigh, bLow;
+        unsigned __int32 aHigh = 0, aLow = 0, bHigh = 0, bLow = 0;
 
         // Consider that a*b can be broken up into:
         // (aHigh * 2^32 + aLow) * (bHigh * 2^32 + bLow)
@@ -2129,7 +2129,7 @@ public:
 
         if(*pRet != 0)
         {
-            unsigned __int64 tmp;
+            unsigned __int64 tmp = 0;
 
             if((unsigned __int32)(*pRet >> 32) != 0)
                 return false;
@@ -2150,13 +2150,13 @@ public:
     }
 
     template < typename E >
-    static void RegMultiplyThrow( const unsigned __int64& a, const unsigned __int64& b, unsigned __int64* pRet ) SAFEINT_CPP_THROW
+	_CONSTEXPR14 static void RegMultiplyThrow( const unsigned __int64& a, const unsigned __int64& b, unsigned __int64* pRet ) SAFEINT_CPP_THROW
     {
 #if SAFEINT_USE_INTRINSICS
         if( !IntrinsicMultiplyUint64( a, b, pRet ) )
             E::SafeIntOnOverflow();
 #else
-        unsigned __int32 aHigh, aLow, bHigh, bLow;
+        unsigned __int32 aHigh = 0, aLow = 0, bHigh = 0, bLow = 0;
 
         // Consider that a*b can be broken up into:
         // (aHigh * 2^32 + aLow) * (bHigh * 2^32 + bLow)
@@ -2191,7 +2191,7 @@ public:
 
         if(*pRet != 0)
         {
-            unsigned __int64 tmp;
+            unsigned __int64 tmp = 0;
 
             if((unsigned __int32)(*pRet >> 32) != 0)
                 E::SafeIntOnOverflow();
@@ -2214,12 +2214,12 @@ public:
 template<> class LargeIntRegMultiply< unsigned __int64, unsigned __int32 >
 {
 public:
-    static bool RegMultiply( const unsigned __int64& a, unsigned __int32 b, unsigned __int64* pRet ) SAFEINT_NOTHROW
+	_CONSTEXPR14 static bool RegMultiply( const unsigned __int64& a, unsigned __int32 b, unsigned __int64* pRet ) SAFEINT_NOTHROW
     {
 #if SAFEINT_USE_INTRINSICS
         return IntrinsicMultiplyUint64( a, (unsigned __int64)b, pRet );
 #else
-        unsigned __int32 aHigh, aLow;
+        unsigned __int32 aHigh = 0, aLow = 0;
 
         // Consider that a*b can be broken up into:
         // (aHigh * 2^32 + aLow) * b
@@ -2234,7 +2234,7 @@ public:
         {
             *pRet = (unsigned __int64)aHigh * (unsigned __int64)b;
 
-            unsigned __int64 tmp;
+            unsigned __int64 tmp = 0;
 
             if((unsigned __int32)(*pRet >> 32) != 0)
                 return false;
@@ -2255,13 +2255,13 @@ public:
     }
 
     template < typename E >
-    static void RegMultiplyThrow( const unsigned __int64& a, unsigned __int32 b, unsigned __int64* pRet ) SAFEINT_CPP_THROW
+	_CONSTEXPR14 static void RegMultiplyThrow( const unsigned __int64& a, unsigned __int32 b, unsigned __int64* pRet ) SAFEINT_CPP_THROW
     {
 #if SAFEINT_USE_INTRINSICS
         if( !IntrinsicMultiplyUint64( a, (unsigned __int64)b, pRet ) )
             E::SafeIntOnOverflow();
 #else
-        unsigned __int32 aHigh, aLow;
+        unsigned __int32 aHigh = 0, aLow = 0;
 
         // Consider that a*b can be broken up into:
         // (aHigh * 2^32 + aLow) * b
@@ -2276,7 +2276,7 @@ public:
         {
             *pRet = (unsigned __int64)aHigh * (unsigned __int64)b;
 
-            unsigned __int64 tmp;
+            unsigned __int64 tmp = 0;
 
             if((unsigned __int32)(*pRet >> 32) != 0)
                 E::SafeIntOnOverflow();
@@ -2301,7 +2301,7 @@ template<> class LargeIntRegMultiply< unsigned __int64, signed __int32 >
 {
 public:
     // Intrinsic not needed
-    static bool RegMultiply( const unsigned __int64& a, signed __int32 b, unsigned __int64* pRet ) SAFEINT_NOTHROW
+	_CONSTEXPR14 static bool RegMultiply( const unsigned __int64& a, signed __int32 b, unsigned __int64* pRet ) SAFEINT_NOTHROW
     {
         if( b < 0 && a != 0 )
             return false;
@@ -2314,7 +2314,7 @@ public:
     }
 
     template < typename E >
-    static void RegMultiplyThrow( const unsigned __int64& a, signed __int32 b, unsigned __int64* pRet ) SAFEINT_CPP_THROW
+	_CONSTEXPR14 static void RegMultiplyThrow( const unsigned __int64& a, signed __int32 b, unsigned __int64* pRet ) SAFEINT_CPP_THROW
     {
         if( b < 0 && a != 0 )
             E::SafeIntOnOverflow();
@@ -2331,7 +2331,7 @@ public:
 template<> class LargeIntRegMultiply< unsigned __int64, signed __int64 >
 {
 public:
-    static bool RegMultiply( const unsigned __int64& a, signed __int64 b, unsigned __int64* pRet ) SAFEINT_NOTHROW
+	_CONSTEXPR14 static bool RegMultiply( const unsigned __int64& a, signed __int64 b, unsigned __int64* pRet ) SAFEINT_NOTHROW
     {
         if( b < 0 && a != 0 )
             return false;
@@ -2344,7 +2344,7 @@ public:
     }
 
     template < typename E >
-    static void RegMultiplyThrow( const unsigned __int64& a, signed __int64 b, unsigned __int64* pRet ) SAFEINT_CPP_THROW
+	_CONSTEXPR14 static void RegMultiplyThrow( const unsigned __int64& a, signed __int64 b, unsigned __int64* pRet ) SAFEINT_CPP_THROW
     {
         if( b < 0 && a != 0 )
             E::SafeIntOnOverflow();
@@ -2362,9 +2362,9 @@ template<> class LargeIntRegMultiply< signed __int32, unsigned __int64 >
 {
 public:
     // Devolves into ordinary 64-bit calculation
-    static bool RegMultiply( signed __int32 a, const unsigned __int64& b, signed __int32* pRet ) SAFEINT_NOTHROW
+	_CONSTEXPR14 static bool RegMultiply( signed __int32 a, const unsigned __int64& b, signed __int32* pRet ) SAFEINT_NOTHROW
     {
-        unsigned __int32 bHigh, bLow;
+        unsigned __int32 bHigh = 0, bLow = 0;
         bool fIsNegative = false;
 
         // Consider that a*b can be broken up into:
@@ -2412,9 +2412,9 @@ public:
     }
 
     template < typename E >
-    static void RegMultiplyThrow( signed __int32 a, const unsigned __int64& b, signed __int32* pRet ) SAFEINT_CPP_THROW
+	_CONSTEXPR14 static void RegMultiplyThrow( signed __int32 a, const unsigned __int64& b, signed __int32* pRet ) SAFEINT_CPP_THROW
     {
-        unsigned __int32 bHigh, bLow;
+        unsigned __int32 bHigh = 0, bLow = 0;
         bool fIsNegative = false;
 
         // Consider that a*b can be broken up into:
@@ -2462,7 +2462,7 @@ template<> class LargeIntRegMultiply< unsigned __int32, unsigned __int64 >
 {
 public:
     // Becomes ordinary 64-bit multiplication, intrinsic not needed
-    static bool RegMultiply( unsigned __int32 a, const unsigned __int64& b, unsigned __int32* pRet ) SAFEINT_NOTHROW
+	_CONSTEXPR14 static bool RegMultiply( unsigned __int32 a, const unsigned __int64& b, unsigned __int32* pRet ) SAFEINT_NOTHROW
     {
         // Consider that a*b can be broken up into:
         // (bHigh * 2^32 + bLow) * a
@@ -2483,7 +2483,7 @@ public:
     }
 
     template < typename E >
-    static void RegMultiplyThrow( unsigned __int32 a, const unsigned __int64& b, unsigned __int32* pRet ) SAFEINT_CPP_THROW
+	_CONSTEXPR14 static void RegMultiplyThrow( unsigned __int32 a, const unsigned __int64& b, unsigned __int32* pRet ) SAFEINT_CPP_THROW
     {
         if( (unsigned __int32)(b >> 32) != 0 && a != 0 )
             E::SafeIntOnOverflow();
@@ -2500,7 +2500,7 @@ public:
 template<> class LargeIntRegMultiply< unsigned __int32, signed __int64 >
 {
 public:
-    static bool RegMultiply( unsigned __int32 a, const signed __int64& b, unsigned __int32* pRet ) SAFEINT_NOTHROW
+	_CONSTEXPR14 static bool RegMultiply( unsigned __int32 a, const signed __int64& b, unsigned __int32* pRet ) SAFEINT_NOTHROW
     {
         if( b < 0 && a != 0 )
             return false;
@@ -2508,7 +2508,7 @@ public:
     }
 
     template < typename E >
-    static void RegMultiplyThrow( unsigned __int32 a, const signed __int64& b, unsigned __int32* pRet ) SAFEINT_CPP_THROW
+	_CONSTEXPR14 static void RegMultiplyThrow( unsigned __int32 a, const signed __int64& b, unsigned __int32* pRet ) SAFEINT_CPP_THROW
     {
         if( b < 0 && a != 0 )
             E::SafeIntOnOverflow();
@@ -2520,7 +2520,7 @@ public:
 template<> class LargeIntRegMultiply< signed __int64, signed __int64 >
 {
 public:
-    static bool RegMultiply( const signed __int64& a, const signed __int64& b, signed __int64* pRet ) SAFEINT_NOTHROW
+	_CONSTEXPR14 static bool RegMultiply( const signed __int64& a, const signed __int64& b, signed __int64* pRet ) SAFEINT_NOTHROW
     {
 #if SAFEINT_USE_INTRINSICS
         return IntrinsicMultiplyInt64( a, b, pRet );
@@ -2528,7 +2528,7 @@ public:
         bool aNegative = false;
         bool bNegative = false;
 
-        unsigned __int64 tmp;
+        unsigned __int64 tmp = 0;
         __int64 a1 = a;
         __int64 b1 = b;
 
@@ -2572,7 +2572,7 @@ public:
     }
 
     template < typename E >
-    static void RegMultiplyThrow( const signed __int64& a, const signed __int64& b, signed __int64* pRet ) SAFEINT_CPP_THROW
+	_CONSTEXPR14 static void RegMultiplyThrow( const signed __int64& a, const signed __int64& b, signed __int64* pRet ) SAFEINT_CPP_THROW
     {
 #if SAFEINT_USE_INTRINSICS
         if( !IntrinsicMultiplyInt64( a, b, pRet ) )
@@ -2581,7 +2581,7 @@ public:
         bool aNegative = false;
         bool bNegative = false;
 
-        unsigned __int64 tmp;
+        unsigned __int64 tmp = 0;
         __int64 a1 = a;
         __int64 b1 = b;
 
@@ -2627,13 +2627,13 @@ public:
 template<> class LargeIntRegMultiply< signed __int64, unsigned __int32 >
 {
 public:
-    static bool RegMultiply( const signed __int64& a, unsigned __int32 b, signed __int64* pRet ) SAFEINT_NOTHROW
+	_CONSTEXPR14 static bool RegMultiply( const signed __int64& a, unsigned __int32 b, signed __int64* pRet ) SAFEINT_NOTHROW
     {
 #if SAFEINT_USE_INTRINSICS
         return IntrinsicMultiplyInt64( a, (signed __int64)b, pRet );
 #else
         bool aNegative = false;
-        unsigned __int64 tmp;
+        unsigned __int64 tmp = 0;
         __int64 a1 = a;
 
         if( a1 < 0 )
@@ -2670,14 +2670,14 @@ public:
     }
 
     template < typename E >
-    static void RegMultiplyThrow( const signed __int64& a, unsigned __int32 b, signed __int64* pRet ) SAFEINT_CPP_THROW
+	_CONSTEXPR14 static void RegMultiplyThrow( const signed __int64& a, unsigned __int32 b, signed __int64* pRet ) SAFEINT_CPP_THROW
     {
 #if SAFEINT_USE_INTRINSICS
         if( !IntrinsicMultiplyInt64( a, (signed __int64)b, pRet ) )
             E::SafeIntOnOverflow();
 #else
         bool aNegative = false;
-        unsigned __int64 tmp;
+        unsigned __int64 tmp = 0;
         __int64 a1 = a;
 
         if( a1 < 0 )
@@ -2716,7 +2716,7 @@ public:
 template<> class LargeIntRegMultiply< signed __int64, signed __int32 >
 {
 public:
-    static bool RegMultiply( const signed __int64& a, signed __int32 b, signed __int64* pRet ) SAFEINT_NOTHROW
+	_CONSTEXPR14 static bool RegMultiply( const signed __int64& a, signed __int32 b, signed __int64* pRet ) SAFEINT_NOTHROW
     {
 #if SAFEINT_USE_INTRINSICS
         return IntrinsicMultiplyInt64( a, (signed __int64)b, pRet );
@@ -2724,7 +2724,7 @@ public:
         bool aNegative = false;
         bool bNegative = false;
 
-        unsigned __int64 tmp;
+        unsigned __int64 tmp = 0;
         __int64 a1 = a;
         __int64 b1 = b;
 
@@ -2768,7 +2768,7 @@ public:
     }
 
     template < typename E >
-    static void RegMultiplyThrow( signed __int64 a, signed __int32 b, signed __int64* pRet ) SAFEINT_CPP_THROW
+	_CONSTEXPR14 static void RegMultiplyThrow( signed __int64 a, signed __int32 b, signed __int64* pRet ) SAFEINT_CPP_THROW
     {
 #if SAFEINT_USE_INTRINSICS
         if( !IntrinsicMultiplyInt64( a, (signed __int64)b, pRet ) )
@@ -2777,7 +2777,7 @@ public:
         bool aNegative = false;
         bool bNegative = false;
 
-        unsigned __int64 tmp;
+        unsigned __int64 tmp = 0;
 
         if( a < 0 )
         {
@@ -2821,10 +2821,10 @@ public:
 template<> class LargeIntRegMultiply< signed __int32, signed __int64 >
 {
 public:
-    static bool RegMultiply( signed __int32 a, const signed __int64& b, signed __int32* pRet ) SAFEINT_NOTHROW
+	_CONSTEXPR14 static bool RegMultiply( signed __int32 a, const signed __int64& b, signed __int32* pRet ) SAFEINT_NOTHROW
     {
 #if SAFEINT_USE_INTRINSICS
-        __int64 tmp;
+        __int64 tmp = 0;
 
         if( IntrinsicMultiplyInt64( a, b, &tmp ) )
         {
@@ -2842,7 +2842,7 @@ public:
         bool aNegative = false;
         bool bNegative = false;
 
-        unsigned __int32 tmp;
+        unsigned __int32 tmp = 0;
         __int64 b1 = b;
 
         if( a < 0 )
@@ -2885,7 +2885,7 @@ public:
     }
 
     template < typename E >
-    static void RegMultiplyThrow( signed __int32 a, const signed __int64& b, signed __int32* pRet ) SAFEINT_CPP_THROW
+	_CONSTEXPR14 static void RegMultiplyThrow( signed __int32 a, const signed __int64& b, signed __int32* pRet ) SAFEINT_CPP_THROW
     {
 #if SAFEINT_USE_INTRINSICS
         __int64 tmp;
@@ -2906,7 +2906,7 @@ public:
         bool aNegative = false;
         bool bNegative = false;
 
-        unsigned __int32 tmp;
+        unsigned __int32 tmp = 0;
         signed __int64 b2 = b;
 
         if( a < 0 )
@@ -2952,11 +2952,11 @@ template<> class LargeIntRegMultiply< signed __int64, unsigned __int64 >
 {
 public:
     // Leave this one as-is - will call unsigned intrinsic internally
-    static bool RegMultiply( const signed __int64& a, const unsigned __int64& b, signed __int64* pRet ) SAFEINT_NOTHROW
+	_CONSTEXPR14 static bool RegMultiply( const signed __int64& a, const unsigned __int64& b, signed __int64* pRet ) SAFEINT_NOTHROW
     {
         bool aNegative = false;
 
-        unsigned __int64 tmp;
+        unsigned __int64 tmp = 0;
         __int64 a1 = a;
 
         if( a1 < 0 )
@@ -2992,10 +2992,10 @@ public:
     }
 
     template < typename E >
-    static void RegMultiplyThrow( const signed __int64& a, const unsigned __int64& b, signed __int64* pRet ) SAFEINT_CPP_THROW
+	_CONSTEXPR14 static void RegMultiplyThrow( const signed __int64& a, const unsigned __int64& b, signed __int64* pRet ) SAFEINT_CPP_THROW
     {
         bool aNegative = false;
-        unsigned __int64 tmp;
+        unsigned __int64 tmp = 0;
         __int64 a1 = a;
 
         if( a1 < 0 )
@@ -3040,7 +3040,7 @@ template < typename T, typename U > class MultiplicationHelper< T, U, Multiplica
 {
 public:
     // T, U are unsigned __int64
-    static bool Multiply( const T& t, const U& u, T& ret ) SAFEINT_NOTHROW
+	_CONSTEXPR14 static bool Multiply( const T& t, const U& u, T& ret ) SAFEINT_NOTHROW
     {
         SAFEINT_STATIC_ASSERT( IntTraits<T>::isUint64 && IntTraits<U>::isUint64 );
         unsigned __int64 t1 = t;
@@ -3049,7 +3049,7 @@ public:
     }
 
     template < typename E >
-    static void MultiplyThrow(const unsigned __int64& t, const unsigned __int64& u, T& ret) SAFEINT_CPP_THROW
+	_CONSTEXPR14 static void MultiplyThrow(const unsigned __int64& t, const unsigned __int64& u, T& ret) SAFEINT_CPP_THROW
     {
         SAFEINT_STATIC_ASSERT( IntTraits<T>::isUint64 && IntTraits<U>::isUint64 );
         unsigned __int64 t1 = t;
@@ -3063,7 +3063,7 @@ template < typename T, typename U > class MultiplicationHelper< T, U, Multiplica
 public:
     // T is unsigned __int64
     // U is any unsigned int 32-bit or less
-    static bool Multiply( const T& t, const U& u, T& ret ) SAFEINT_NOTHROW
+	_CONSTEXPR14 static bool Multiply( const T& t, const U& u, T& ret ) SAFEINT_NOTHROW
     {
         SAFEINT_STATIC_ASSERT( IntTraits<T>::isUint64 );
         unsigned __int64 t1 = t;
@@ -3071,7 +3071,7 @@ public:
     }
 
     template < typename E >
-    static void MultiplyThrow( const T& t, const U& u, T& ret ) SAFEINT_CPP_THROW
+	_CONSTEXPR14 static void MultiplyThrow( const T& t, const U& u, T& ret ) SAFEINT_CPP_THROW
     {
         SAFEINT_STATIC_ASSERT( IntTraits<T>::isUint64 );
         unsigned __int64 t1 = t;
@@ -3085,11 +3085,11 @@ template < typename T, typename U > class MultiplicationHelper< T, U, Multiplica
 public:
     // T is any unsigned int up to 32-bit
     // U is unsigned __int64
-    static bool Multiply(const T& t, const U& u, T& ret) SAFEINT_NOTHROW
+	_CONSTEXPR14 static bool Multiply(const T& t, const U& u, T& ret) SAFEINT_NOTHROW
     {
         SAFEINT_STATIC_ASSERT( IntTraits<U>::isUint64 );
         unsigned __int64 u1 = u;
-        unsigned __int32 tmp;
+        unsigned __int32 tmp = 0;
 
         if( LargeIntRegMultiply< unsigned __int32, unsigned __int64 >::RegMultiply( t, u1, &tmp ) &&
             SafeCastHelper< T, unsigned __int32, GetCastMethod< T, unsigned __int32 >::method >::Cast(tmp, ret) )
@@ -3101,11 +3101,11 @@ public:
     }
 
     template < typename E >
-    static void MultiplyThrow(const T& t, const U& u, T& ret) SAFEINT_CPP_THROW
+	_CONSTEXPR14 static void MultiplyThrow(const T& t, const U& u, T& ret) SAFEINT_CPP_THROW
     {
         SAFEINT_STATIC_ASSERT( IntTraits<U>::isUint64 );
         unsigned __int64 u1 = u;
-        unsigned __int32 tmp;
+        unsigned __int32 tmp = 0;
 
         LargeIntRegMultiply< unsigned __int32, unsigned __int64 >::template RegMultiplyThrow< E >( t, u1, &tmp );
         SafeCastHelper< T, unsigned __int32, GetCastMethod< T, unsigned __int32 >::method >::template CastThrow< E >(tmp, ret);
@@ -3117,7 +3117,7 @@ template < typename T, typename U > class MultiplicationHelper< T, U, Multiplica
 public:
     // T is unsigned __int64
     // U is any signed int, up to 64-bit
-    static bool Multiply(const T& t, const U& u, T& ret) SAFEINT_NOTHROW
+	_CONSTEXPR14 static bool Multiply(const T& t, const U& u, T& ret) SAFEINT_NOTHROW
     {
         SAFEINT_STATIC_ASSERT( IntTraits<T>::isUint64 );
         unsigned __int64 t1 = t;
@@ -3125,7 +3125,7 @@ public:
     }
 
     template < typename E >
-    static void MultiplyThrow(const T& t, const U& u, T& ret) SAFEINT_CPP_THROW
+	_CONSTEXPR14 static void MultiplyThrow(const T& t, const U& u, T& ret) SAFEINT_CPP_THROW
     {
         SAFEINT_STATIC_ASSERT( IntTraits<T>::isUint64 );
         unsigned __int64 t1 = t;
@@ -3138,7 +3138,7 @@ template < typename T, typename U > class MultiplicationHelper< T, U, Multiplica
 public:
     // T is unsigned __int64
     // U is __int64
-    static bool Multiply(const T& t, const U& u, T& ret) SAFEINT_NOTHROW
+	_CONSTEXPR14 static bool Multiply(const T& t, const U& u, T& ret) SAFEINT_NOTHROW
     {
         SAFEINT_STATIC_ASSERT( IntTraits<T>::isUint64 && IntTraits<U>::isInt64 );
         unsigned __int64 t1 = t;
@@ -3147,7 +3147,7 @@ public:
     }
 
     template < typename E >
-    static void MultiplyThrow(const T& t, const U& u, T& ret) SAFEINT_CPP_THROW
+	_CONSTEXPR14 static void MultiplyThrow(const T& t, const U& u, T& ret) SAFEINT_CPP_THROW
     {
         SAFEINT_STATIC_ASSERT( IntTraits<T>::isUint64 && IntTraits<U>::isInt64 );
         unsigned __int64 t1 = t;
@@ -3161,11 +3161,11 @@ template < typename T, typename U > class MultiplicationHelper< T, U, Multiplica
 public:
     // T is unsigned up to 32-bit
     // U is __int64
-    static bool Multiply(const T& t, const U& u, T& ret) SAFEINT_NOTHROW
+	_CONSTEXPR14 static bool Multiply(const T& t, const U& u, T& ret) SAFEINT_NOTHROW
     {
         SAFEINT_STATIC_ASSERT( IntTraits<U>::isInt64 );
         __int64          u1 = u;
-        unsigned __int32 tmp;
+        unsigned __int32 tmp = 0;
 
         if( LargeIntRegMultiply< unsigned __int32, __int64 >::RegMultiply( (unsigned __int32)t, u1, &tmp ) &&
             SafeCastHelper< T, unsigned __int32, GetCastMethod< T, unsigned __int32 >::method >::Cast(tmp, ret) )
@@ -3177,11 +3177,11 @@ public:
     }
 
     template < typename E >
-    static void MultiplyThrow(const T& t, const U& u, T& ret) SAFEINT_CPP_THROW
+	_CONSTEXPR14 static void MultiplyThrow(const T& t, const U& u, T& ret) SAFEINT_CPP_THROW
     {
         SAFEINT_STATIC_ASSERT( IntTraits<U>::isInt64 );
         __int64          u1 = u;
-        unsigned __int32 tmp;
+        unsigned __int32 tmp = 0;
 
         LargeIntRegMultiply< unsigned __int32, __int64 >::template RegMultiplyThrow< E >( (unsigned __int32)t, u1, &tmp );
         SafeCastHelper< T, unsigned __int32, GetCastMethod< T, unsigned __int32 >::method >::template CastThrow< E >(tmp, ret);
@@ -3193,7 +3193,7 @@ template < typename T, typename U > class MultiplicationHelper< T, U, Multiplica
 public:
     // T is __int64
     // U is unsigned up to 32-bit
-    static bool Multiply( const T& t, const U& u, T& ret ) SAFEINT_NOTHROW
+	_CONSTEXPR14 static bool Multiply( const T& t, const U& u, T& ret ) SAFEINT_NOTHROW
     {
         SAFEINT_STATIC_ASSERT( IntTraits<T>::isInt64 );
         __int64          t1 = t;
@@ -3201,7 +3201,7 @@ public:
     }
 
     template < typename E >
-    static void MultiplyThrow( const T& t, const U& u, T& ret ) SAFEINT_CPP_THROW
+	_CONSTEXPR14 static void MultiplyThrow( const T& t, const U& u, T& ret ) SAFEINT_CPP_THROW
     {
         SAFEINT_STATIC_ASSERT( IntTraits<T>::isInt64 );
         __int64          t1 = t;
@@ -3213,7 +3213,7 @@ template < typename T, typename U > class MultiplicationHelper< T, U, Multiplica
 {
 public:
     // T, U are __int64
-    static bool Multiply( const T& t, const U& u, T& ret ) SAFEINT_NOTHROW
+	_CONSTEXPR14 static bool Multiply( const T& t, const U& u, T& ret ) SAFEINT_NOTHROW
     {
         SAFEINT_STATIC_ASSERT( IntTraits<T>::isInt64 && IntTraits<U>::isInt64 );
         __int64          t1 = t;
@@ -3222,7 +3222,7 @@ public:
     }
 
     template < typename E >
-    static void MultiplyThrow( const T& t, const U& u, T& ret ) SAFEINT_CPP_THROW
+	_CONSTEXPR14 static void MultiplyThrow( const T& t, const U& u, T& ret ) SAFEINT_CPP_THROW
     {
         SAFEINT_STATIC_ASSERT( IntTraits<T>::isInt64 && IntTraits<U>::isInt64 );
         __int64          t1 = t;
@@ -3236,7 +3236,7 @@ template < typename T, typename U > class MultiplicationHelper< T, U, Multiplica
 public:
     // T is __int64
     // U is signed up to 32-bit
-    static bool Multiply( const T& t, U u, T& ret ) SAFEINT_NOTHROW
+	_CONSTEXPR14 static bool Multiply( const T& t, U u, T& ret ) SAFEINT_NOTHROW
     {
         SAFEINT_STATIC_ASSERT( IntTraits<T>::isInt64 );
         __int64          t1 = t;
@@ -3244,7 +3244,7 @@ public:
     }
 
     template < typename E >
-    static void MultiplyThrow( const __int64& t, U u, T& ret ) SAFEINT_CPP_THROW
+	_CONSTEXPR14 static void MultiplyThrow( const __int64& t, U u, T& ret ) SAFEINT_CPP_THROW
     {
         SAFEINT_STATIC_ASSERT( IntTraits<T>::isInt64 );
         __int64          t1 = t;
@@ -3257,7 +3257,7 @@ template < typename T, typename U > class MultiplicationHelper< T, U, Multiplica
 public:
     // T is signed up to 32-bit
     // U is unsigned __int64
-    static bool Multiply(T t, const U& u, T& ret) SAFEINT_NOTHROW
+	_CONSTEXPR14 static bool Multiply(T t, const U& u, T& ret) SAFEINT_NOTHROW
     {
         SAFEINT_STATIC_ASSERT( IntTraits<U>::isUint64 );
         unsigned __int64 u1 = u;
@@ -3273,11 +3273,11 @@ public:
     }
 
     template < typename E >
-    static void MultiplyThrow(T t, const unsigned __int64& u, T& ret) SAFEINT_CPP_THROW
+	_CONSTEXPR14 static void MultiplyThrow(T t, const unsigned __int64& u, T& ret) SAFEINT_CPP_THROW
     {
         SAFEINT_STATIC_ASSERT( IntTraits<U>::isUint64 );
         unsigned __int64 u1 = u;
-        __int32 tmp;
+        __int32 tmp = 0;
 
         LargeIntRegMultiply< __int32, unsigned __int64 >::template RegMultiplyThrow< E >( (__int32)t, u1, &tmp );
         SafeCastHelper< T, __int32, GetCastMethod< T, __int32 >::method >::template CastThrow< E >( tmp, ret );
@@ -3289,7 +3289,7 @@ template < typename T, typename U > class MultiplicationHelper< T, U, Multiplica
 public:
     // T is __int64
     // U is unsigned __int64
-    static bool Multiply( const T& t, const U& u, T& ret ) SAFEINT_NOTHROW
+	_CONSTEXPR14 static bool Multiply( const T& t, const U& u, T& ret ) SAFEINT_NOTHROW
     {
         SAFEINT_STATIC_ASSERT( IntTraits<T>::isInt64 && IntTraits<U>::isUint64 );
         __int64          t1 = t;
@@ -3298,7 +3298,7 @@ public:
     }
 
     template < typename E >
-    static void MultiplyThrow( const __int64& t, const unsigned __int64& u, T& ret ) SAFEINT_CPP_THROW
+	_CONSTEXPR14 static void MultiplyThrow( const __int64& t, const unsigned __int64& u, T& ret ) SAFEINT_CPP_THROW
     {
         SAFEINT_STATIC_ASSERT( IntTraits<T>::isInt64 && IntTraits<U>::isUint64 );
         __int64          t1 = t;
@@ -3312,11 +3312,11 @@ template < typename T, typename U > class MultiplicationHelper< T, U, Multiplica
 public:
     // T is signed, up to 32-bit
     // U is __int64
-    static bool Multiply( T t, const U& u, T& ret ) SAFEINT_NOTHROW
+	_CONSTEXPR14 static bool Multiply( T t, const U& u, T& ret ) SAFEINT_NOTHROW
     {
         SAFEINT_STATIC_ASSERT( IntTraits<U>::isInt64 );
         __int64 u1 = u;
-        __int32 tmp;
+        __int32 tmp = 0;
 
         if( LargeIntRegMultiply< __int32, __int64 >::RegMultiply( (__int32)t, u1, &tmp ) &&
             SafeCastHelper< T, __int32, GetCastMethod< T, __int32 >::method >::Cast( tmp, ret ) )
@@ -3328,11 +3328,11 @@ public:
     }
 
     template < typename E >
-    static void MultiplyThrow(T t, const U& u, T& ret) SAFEINT_CPP_THROW
+	_CONSTEXPR14 static void MultiplyThrow(T t, const U& u, T& ret) SAFEINT_CPP_THROW
     {
         SAFEINT_STATIC_ASSERT( IntTraits<U>::isInt64 );
         __int64 u1 = u;
-        __int32 tmp;
+        __int32 tmp = 0;
 
         LargeIntRegMultiply< __int32, __int64 >::template RegMultiplyThrow< E >( (__int32)t, u1, &tmp );
         SafeCastHelper< T, __int32, GetCastMethod< T, __int32 >::method >::template CastThrow< E >( tmp, ret );
@@ -5702,17 +5702,19 @@ public:
     }
 
     template < typename U >
-    SafeInt(const SafeInt< U, E >& u) SAFEINT_CPP_THROW
+	_CONSTEXPR14 SafeInt(const SafeInt< U, E >& u) SAFEINT_CPP_THROW : m_int(0)
     {
         SAFEINT_STATIC_ASSERT( NumericType< T >::isInt );
-        *this = SafeInt< T, E >( (U)u );
+		m_int = (T)SafeInt< T, E >( (U)u );
     }
 
     template < typename U >
-    SafeInt( const U& i ) SAFEINT_CPP_THROW
+	_CONSTEXPR14 SafeInt( const U& i ) SAFEINT_CPP_THROW : m_int(0)
     {
+		// m_int must be initialized to something to work with constexpr, because if it throws, then m_int is unknown
         SAFEINT_STATIC_ASSERT( NumericType< T >::isInt );
         // SafeCast will throw exceptions if i won't fit in type T
+		
         SafeCastHelper< T, U, GetCastMethod< T, U >::method >::template CastThrow< E >( i, m_int );
     }
 
@@ -5727,30 +5729,30 @@ public:
     // constructors exist for all int types and will ensure safety
 
     template < typename U >
-    SafeInt< T, E >& operator =( const U& rhs ) SAFEINT_CPP_THROW
+	_CONSTEXPR14 SafeInt< T, E >& operator =( const U& rhs ) SAFEINT_CPP_THROW
     {
         // use constructor to test size
         // constructor is optimized to do minimal checking based
         // on whether T can contain U
         // note - do not change this
-        *this = SafeInt< T, E >( rhs );
+        m_int = SafeInt< T, E >( rhs );
         return *this;
     }
 
-    SafeInt< T, E >& operator =( const T& rhs ) SAFEINT_NOTHROW
+	_CONSTEXPR14 SafeInt< T, E >& operator =( const T& rhs ) SAFEINT_NOTHROW
     {
         m_int = rhs;
         return *this;
     }
 
     template < typename U >
-    SafeInt< T, E >& operator =( const SafeInt< U, E >& rhs ) SAFEINT_CPP_THROW
+	_CONSTEXPR14 SafeInt< T, E >& operator =( const SafeInt< U, E >& rhs ) SAFEINT_CPP_THROW
     {
         SafeCastHelper< T, U, GetCastMethod< T, U >::method >::template CastThrow< E >( rhs.Ref(), m_int );
         return *this;
     }
 
-    SafeInt< T, E >& operator =( const SafeInt< T, E >& rhs ) SAFEINT_NOTHROW
+	_CONSTEXPR14 SafeInt< T, E >& operator =( const SafeInt< T, E >& rhs ) SAFEINT_NOTHROW
     {
         m_int = rhs.m_int;
         return *this;
@@ -5888,7 +5890,7 @@ public:
     // also see overloaded address-of operator below
 	T* Ptr() SAFEINT_NOTHROW { return &m_int; }
 	const T* Ptr() const SAFEINT_NOTHROW { return &m_int; }
-	const T& Ref() const SAFEINT_NOTHROW { return m_int; }
+	_CONSTEXPR14 const T& Ref() const SAFEINT_NOTHROW { return m_int; }
 
     // Or if SafeInt< T, E >::Ptr() is inconvenient, use the overload
     // operator &
@@ -5908,7 +5910,7 @@ public:
 
     //unary  -
 
-    SafeInt< T, E > operator -() const SAFEINT_CPP_THROW
+	_CONSTEXPR14 SafeInt< T, E > operator -() const SAFEINT_CPP_THROW
     {
         // Note - unsigned still performs the bitwise manipulation
         // will warn at level 2 or higher if the value is 32-bit or larger
@@ -5927,7 +5929,7 @@ public:
     }
 
     // prefix decrement operator
-    SafeInt< T, E >& operator --() SAFEINT_CPP_THROW
+	_CONSTEXPR14 SafeInt< T, E >& operator --() SAFEINT_CPP_THROW
     {
         if( m_int != IntTraits< T >::minInt )
         {
@@ -5954,7 +5956,7 @@ public:
     }
 
     // postfix decrement operator
-    SafeInt< T, E > operator --( int ) SAFEINT_CPP_THROW // dummy arg to comply with spec
+	_CONSTEXPR14 SafeInt< T, E > operator --( int ) SAFEINT_CPP_THROW // dummy arg to comply with spec
     {
         if( m_int != IntTraits< T >::minInt )
         {
@@ -6013,30 +6015,30 @@ public:
     // as well. It does, however, suffer from the same promotion
     // problems as comparisons, division and other operations
     template < typename U >
-    SafeInt< T, E > operator %( U rhs ) const SAFEINT_CPP_THROW
+	_CONSTEXPR14 SafeInt< T, E > operator %( U rhs ) const SAFEINT_CPP_THROW
     {
-        T result;
+        T result = 0;
         ModulusHelper< T, U, ValidComparison< T, U >::method >::template ModulusThrow< E >( m_int, rhs, result );
         return SafeInt< T, E >( result );
     }
 
-    SafeInt< T, E > operator %( SafeInt< T, E > rhs ) const SAFEINT_CPP_THROW
+	_CONSTEXPR14 SafeInt< T, E > operator %( SafeInt< T, E > rhs ) const SAFEINT_CPP_THROW
     {
-        T result;
+        T result = 0;
         ModulusHelper< T, T, ValidComparison< T, T >::method >::template ModulusThrow< E >( m_int, rhs, result );
         return SafeInt< T, E >( result );
     }
 
     // Modulus assignment
     template < typename U >
-    SafeInt< T, E >& operator %=( U rhs ) SAFEINT_CPP_THROW
+	_CONSTEXPR14 SafeInt< T, E >& operator %=( U rhs ) SAFEINT_CPP_THROW
     {
         ModulusHelper< T, U, ValidComparison< T, U >::method >::template ModulusThrow< E >( m_int, rhs, m_int );
         return *this;
     }
 
     template < typename U >
-    SafeInt< T, E >& operator %=( SafeInt< U, E > rhs ) SAFEINT_CPP_THROW
+	_CONSTEXPR14 SafeInt< T, E >& operator %=( SafeInt< U, E > rhs ) SAFEINT_CPP_THROW
     {
         ModulusHelper< T, U, ValidComparison< T, U >::method >::template ModulusThrow< E >( m_int, (U)rhs, m_int );
         return *this;
@@ -6044,14 +6046,14 @@ public:
 
     // Multiplication
     template < typename U >
-    SafeInt< T, E > operator *( U rhs ) const SAFEINT_CPP_THROW
+	_CONSTEXPR14 SafeInt< T, E > operator *( U rhs ) const SAFEINT_CPP_THROW
     {
         T ret( 0 );
         MultiplicationHelper< T, U, MultiplicationMethod< T, U >::method >::template MultiplyThrow< E >( m_int, rhs, ret );
         return SafeInt< T, E >( ret );
     }
 
-    SafeInt< T, E > operator *( SafeInt< T, E > rhs ) const SAFEINT_CPP_THROW
+	_CONSTEXPR14 SafeInt< T, E > operator *( SafeInt< T, E > rhs ) const SAFEINT_CPP_THROW
     {
         T ret( 0 );
         MultiplicationHelper< T, T, MultiplicationMethod< T, T >::method >::template MultiplyThrow< E >( m_int, (T)rhs, ret );
@@ -6059,21 +6061,21 @@ public:
     }
 
     // Multiplication assignment
-    SafeInt< T, E >& operator *=( SafeInt< T, E > rhs ) SAFEINT_CPP_THROW
+	_CONSTEXPR14 SafeInt< T, E >& operator *=( SafeInt< T, E > rhs ) SAFEINT_CPP_THROW
     {
         MultiplicationHelper< T, T, MultiplicationMethod< T, T >::method >::template MultiplyThrow< E >( m_int, (T)rhs, m_int );
         return *this;
     }
 
     template < typename U >
-    SafeInt< T, E >& operator *=( U rhs ) SAFEINT_CPP_THROW
+	_CONSTEXPR14 SafeInt< T, E >& operator *=( U rhs ) SAFEINT_CPP_THROW
     {
         MultiplicationHelper< T, U, MultiplicationMethod< T, U >::method >::template MultiplyThrow< E >( m_int, rhs, m_int );
         return *this;
     }
 
     template < typename U >
-    SafeInt< T, E >& operator *=( SafeInt< U, E > rhs ) SAFEINT_CPP_THROW
+	_CONSTEXPR14 SafeInt< T, E >& operator *=( SafeInt< U, E > rhs ) SAFEINT_CPP_THROW
     {
         MultiplicationHelper< T, U, MultiplicationMethod< T, U >::method >::template MultiplyThrow< E >( m_int, rhs.Ref(), m_int );
         return *this;
@@ -6686,7 +6688,7 @@ template < typename T, typename E, int method > class ModulusSignedCaseHelper;
 template < typename T, typename E > class ModulusSignedCaseHelper < T, E, true >
 {
 public:
-    static bool SignedCase( SafeInt< T, E > rhs, SafeInt< T, E >& result ) SAFEINT_NOTHROW
+	_CONSTEXPR14 static bool SignedCase( SafeInt< T, E > rhs, SafeInt< T, E >& result ) SAFEINT_NOTHROW
     {
         if( (T)rhs == (T)-1 )
         {
@@ -6710,7 +6712,7 @@ template < typename T, typename U, typename E >
 class ModulusSimpleCaseHelper < T, U, E, true >
 {
 public:
-    static bool ModulusSimpleCase( U lhs, SafeInt< T, E > rhs, SafeInt< T, E >& result ) SAFEINT_CPP_THROW
+	_CONSTEXPR14 static bool ModulusSimpleCase( U lhs, SafeInt< T, E > rhs, SafeInt< T, E >& result ) SAFEINT_CPP_THROW
     {
         if( rhs != 0 )
         {
@@ -6737,7 +6739,7 @@ public:
 
 // Modulus
 template < typename T, typename U, typename E >
-SafeInt< T, E > operator %( U lhs, SafeInt< T, E > rhs ) SAFEINT_CPP_THROW
+_CONSTEXPR14 SafeInt< T, E > operator %( U lhs, SafeInt< T, E > rhs ) SAFEINT_CPP_THROW
 {
     // Value of return depends on sign of lhs
     // This one may not be safe - bounds check in constructor
@@ -6757,7 +6759,7 @@ SafeInt< T, E > operator %( U lhs, SafeInt< T, E > rhs ) SAFEINT_CPP_THROW
 
 // Multiplication
 template < typename T, typename U, typename E >
-SafeInt< T, E > operator *( U lhs, SafeInt< T, E > rhs ) SAFEINT_CPP_THROW
+_CONSTEXPR14 SafeInt< T, E > operator *( U lhs, SafeInt< T, E > rhs ) SAFEINT_CPP_THROW
 {
     T ret( 0 );
     MultiplicationHelper< T, U, MultiplicationMethod< T, U >::method >::template MultiplyThrow< E >( (T)rhs, lhs, ret );
@@ -6948,7 +6950,7 @@ T& operator -=( T& lhs, SafeInt< U, E > rhs ) SAFEINT_CPP_THROW
 }
 
 template < typename T, typename U, typename E >
-T& operator *=( T& lhs, SafeInt< U, E > rhs ) SAFEINT_CPP_THROW
+_CONSTEXPR14 T& operator *=( T& lhs, SafeInt< U, E > rhs ) SAFEINT_CPP_THROW
 {
     T ret( 0 );
     MultiplicationHelper< T, U, MultiplicationMethod< T, U >::method >::template MultiplyThrow< E >( lhs, (U)rhs, ret );
@@ -6966,7 +6968,7 @@ T& operator /=( T& lhs, SafeInt< U, E > rhs ) SAFEINT_CPP_THROW
 }
 
 template < typename T, typename U, typename E >
-T& operator %=( T& lhs, SafeInt< U, E > rhs ) SAFEINT_CPP_THROW
+_CONSTEXPR14 T& operator %=( T& lhs, SafeInt< U, E > rhs ) SAFEINT_CPP_THROW
 {
     T ret( 0 );
     ModulusHelper< T, U, ValidComparison< T, U >::method >::template ModulusThrow< E >( lhs, (U)rhs, ret );

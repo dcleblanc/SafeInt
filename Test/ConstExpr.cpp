@@ -6,6 +6,10 @@
 #pragma GCC diagnostic ignored "-Wunused-variable"
 #endif
 
+// For testing - intrinsics can never be constexpr
+#undef SAFEINT_USE_INTRINSICS
+#define SAFEINT_USE_INTRINSICS 0
+
 #include "../SafeInt.hpp"
 
 namespace TestConstExpr
@@ -123,8 +127,6 @@ namespace TestConstExpr
 	template <typename T>
 	void ConstCastTestT()
 	{
-		static_assert(SafeInt<T>(1) == (T)1, "ConstCastTestT");
-
 		static const bool b = ConstSafeInt<T>();
 		static const wchar_t w = ConstSafeInt<T>();
 		static const char c = ConstSafeInt<T>();
@@ -146,6 +148,87 @@ namespace TestConstExpr
 	}
 
 #if CPLUSPLUS_STD == CPLUSPLUS_14
+
+	template <typename T, typename U>
+	void StaticAssertTU()
+	{
+		// Constructors
+		static_assert(SafeInt<T>(SafeInt<U>(1)), "SafeInt U constr");
+		static_assert(SafeInt<T>((U)1), "U constr");
+
+		// Assignment operators
+		static_assert((SafeInt<T>() = (U)1), "Assignment U");
+		static_assert((SafeInt<T>() = (T)1), "Assignment T");
+		static_assert((SafeInt<T>() = SafeInt<U>(1)), "Assignment SafeInt U");
+		// Next one happens when T == U, so already included
+		// static_assert((SafeInt<T>() = SafeInt<T>(1)), "Assignment SafeInt T");
+
+		// Test the casting operators
+		static_assert((U)(SafeInt<T>((T)1)), "Casting");
+
+		// Modulus
+		static_assert(SafeInt<T>((T)3) % (U)2, "Modulus");
+		static_assert(SafeInt<T>((T)3) % SafeInt<T>(2), "Modulus");
+		static_assert((SafeInt<T>((T)3) %= (U)2), "Modulus");
+		static_assert((SafeInt<T>((T)3) %= SafeInt<U>(2)), "Modulus");
+		static_assert((U)3 % SafeInt<T>(2), "Modulus");
+		static_assert((T)3 % SafeInt<U>(2), "Modulus");
+
+		// Multiplication
+		static_assert(SafeInt<T>((T)3) * (U)2, "Multiplication");
+		static_assert(SafeInt<T>((T)3) * SafeInt<T>(2), "Multiplication");
+		static_assert((SafeInt<T>((T)3) *= (U)2), "Multiplication");
+		static_assert((SafeInt<T>((T)3) *= SafeInt<U>(2)), "Multiplication");
+		static_assert((U)3 * SafeInt<T>(2), "Multiplication");
+		static_assert((T)3 * SafeInt<U>(2), "Multiplication");
+
+	}
+
+	template <typename T, typename U>
+	void StaticAssertMultiplyTU()
+	{
+
+	}
+
+	template <typename T>
+	void StaticAssertTest()
+	{
+		static_assert(SafeInt<T>() == 0, "Default constr");
+		static_assert(SafeInt<T>((T)1), "T constr");
+		static_assert(SafeInt<T>(true), "bool constr");
+		// Floating point will not work due to presence of fpclassify
+		// static_assert(SafeInt<T>((float)1.0), "float constr");
+
+		StaticAssertTU<T, char>();
+		StaticAssertTU<T, signed char>();
+		StaticAssertTU<T, unsigned char>();
+		StaticAssertTU<T, signed short>();
+		StaticAssertTU<T, unsigned short>();
+		StaticAssertTU<T, signed int>();
+		StaticAssertTU<T, unsigned int>();
+		StaticAssertTU<T, signed long>();
+		StaticAssertTU<T, unsigned long>();
+		StaticAssertTU<T, signed long long>();
+		StaticAssertTU<T, unsigned long long>();
+
+		// Special case casting
+		static_assert((bool)(SafeInt<T>((T)1)), "Casting");
+		static_assert((wchar_t)(SafeInt<T>((T)1)), "Casting");
+		static_assert((float)(SafeInt<T>((T)1)), "Casting");
+		static_assert((double)(SafeInt<T>((T)1)), "Casting");
+		static_assert((long double)(SafeInt<T>((T)1)), "Casting");
+
+		// Unary operations
+		static_assert(!SafeInt<T>((T)0), "operator !");
+		static_assert(++SafeInt<T>((T)1), "operator ++");
+		static_assert(SafeInt<T>((T)1)++, "operator ++");
+		static_assert(--SafeInt<T>((T)2), "operator --");
+		static_assert(SafeInt<T>((T)2)--, "operator --");
+		static_assert(~SafeInt<T>((T)0), "operator ~");
+
+
+	}
+
 	template <typename T, typename U>
 	_CONSTEXPR14 T ConstMultiplyTU()
 	{
@@ -234,6 +317,21 @@ namespace TestConstExpr
 		return (T)(t1 + t2);
 	}
 
+	template <typename T>
+	_CONSTEXPR14 void SignedOnly()
+	{
+		static_assert(-SafeInt<T>((T)1), "operator -");
+	}
+
+	void TestSignedOnly()
+	{
+		SignedOnly<signed char>();
+		SignedOnly<signed short>();
+		SignedOnly<signed int>();
+		SignedOnly<signed long>();
+		SignedOnly<signed long long>();
+	}
+
 #endif // CPLUSPLUS_14
 
 	template <typename T>
@@ -244,6 +342,9 @@ namespace TestConstExpr
 		ConstCastTestT<T>();
 
 #if CPLUSPLUS_STD == CPLUSPLUS_14
+		StaticAssertTest<T>();
+		TestSignedOnly();
+
 		ConstAddT<T>();
 		ConstSubtractT<T>();
 		ConstMultiplyT<T>();
