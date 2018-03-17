@@ -236,6 +236,81 @@ namespace TestConstExpr
 	}
 
 	template <typename T, typename U>
+	_CONSTEXPR14 T AndOperator()
+	{
+		// Have to explicitly force this operator
+		// to be used
+
+		T lhs = 3;
+		SafeInt<U> s(1);
+
+		T& r = operator &=(lhs, s);
+		return r;
+	}
+
+	template <typename T, typename U>
+	_CONSTEXPR14 U AndOperator2()
+	{
+		// Have to explicitly force this operator
+		// to be used
+		U lhs = 3;
+		SafeInt<T> s(1);
+
+		SafeInt<T> r = operator &(lhs, s);
+		return r;
+	}
+
+	template <typename T, typename U>
+	_CONSTEXPR14 T XorOperator()
+	{
+		// Have to explicitly force this operator
+		// to be used
+
+		T lhs = 3;
+		SafeInt<U> s(1);
+
+		T& r = operator ^=(lhs, s);
+		return r;
+	}
+
+	template <typename T, typename U>
+	_CONSTEXPR14 U XorOperator2()
+	{
+		// Have to explicitly force this operator
+		// to be used
+		U lhs = 3;
+		SafeInt<T> s(1);
+
+		SafeInt<T> r = operator ^(lhs, s);
+		return r;
+	}
+
+	template <typename T, typename U>
+	_CONSTEXPR14 T OrOperator()
+	{
+		// Have to explicitly force this operator
+		// to be used
+
+		T lhs = 3;
+		SafeInt<U> s(1);
+
+		T& r = operator |=(lhs, s);
+		return r;
+	}
+
+	template <typename T, typename U>
+	_CONSTEXPR14 U OrOperator2()
+	{
+		// Have to explicitly force this operator
+		// to be used
+		U lhs = 3;
+		SafeInt<T> s(1);
+
+		SafeInt<T> r = operator |(lhs, s);
+		return r;
+	}
+
+	template <typename T, typename U>
 	void StaticAssertTU()
 	{
 		// Constructors
@@ -309,7 +384,29 @@ namespace TestConstExpr
 		static_assert(RShiftOperator<T, U>(), "Shift");
 		static_assert(RShiftOperator2<T, U>(), "Shift");
 
+		// Binary And
+		static_assert(SafeInt<T>((T)3) & SafeInt<T>(1), "And");
+		static_assert(SafeInt<T>((T)3) & (U)1, "And");
+		static_assert((SafeInt<T>((T)3) &= (U)(1)), "And");
+		static_assert((SafeInt<T>((T)3) &= SafeInt<U>(1)), "And");
+		static_assert(AndOperator<T, U>(), "And");
+		static_assert(AndOperator2<T, U>(), "And");
 
+		// Binary Xor
+		static_assert(SafeInt<T>((T)3) ^ SafeInt<T>(1), "Xor");
+		static_assert(SafeInt<T>((T)3) ^ (U)1, "Xor");
+		static_assert((SafeInt<T>((T)3) ^= (U)(1)), "Xor");
+		static_assert((SafeInt<T>((T)3) ^= SafeInt<U>(1)), "Xor");
+		static_assert(XorOperator<T, U>(), "Xor");
+		static_assert(XorOperator2<T, U>(), "Xor");
+
+		// Binary Or
+		static_assert(SafeInt<T>((T)3) | SafeInt<T>(1), "Or");
+		static_assert(SafeInt<T>((T)3) | (U)1, "Or");
+		static_assert((SafeInt<T>((T)3) |= (U)(1)), "Or");
+		static_assert((SafeInt<T>((T)3) |= SafeInt<U>(1)), "Or");
+		static_assert(OrOperator<T, U>(), "Or");
+		static_assert(OrOperator2<T, U>(), "Or");
 	}
 
 	template <typename T>

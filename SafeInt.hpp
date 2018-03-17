@@ -5485,7 +5485,7 @@ public:
 template < typename T, typename U > class BinaryAndHelper< T, U, BinaryState_Int8 >
 {
 public:
-	static T And( T lhs, U rhs ) SAFEINT_NOTHROW
+	_CONSTEXPR14 static T And( T lhs, U rhs ) SAFEINT_NOTHROW
     {
         // cast forces sign extension to be zeros
         BinaryAssert( ( lhs & rhs ) == ( lhs & (unsigned __int8)rhs ) );
@@ -5496,7 +5496,7 @@ public:
 template < typename T, typename U > class BinaryAndHelper< T, U, BinaryState_Int16 >
 {
 public:
-	static T And( T lhs, U rhs ) SAFEINT_NOTHROW
+	_CONSTEXPR14 static T And( T lhs, U rhs ) SAFEINT_NOTHROW
     {
         //cast forces sign extension to be zeros
         BinaryAssert( ( lhs & rhs ) == ( lhs & (unsigned __int16)rhs ) );
@@ -5507,7 +5507,7 @@ public:
 template < typename T, typename U > class BinaryAndHelper< T, U, BinaryState_Int32 >
 {
 public:
-	static T And( T lhs, U rhs ) SAFEINT_NOTHROW
+	_CONSTEXPR14 static T And( T lhs, U rhs ) SAFEINT_NOTHROW
     {
         //cast forces sign extension to be zeros
         BinaryAssert( ( lhs & rhs ) == ( lhs & (unsigned __int32)rhs ) );
@@ -5526,7 +5526,7 @@ public:
 template < typename T, typename U > class BinaryOrHelper< T, U, BinaryState_Int8 >
 {
 public:
-	static T Or( T lhs, U rhs ) SAFEINT_NOTHROW
+	_CONSTEXPR14 static T Or( T lhs, U rhs ) SAFEINT_NOTHROW
     {
         //cast forces sign extension to be zeros
         BinaryAssert( ( lhs | rhs ) == ( lhs | (unsigned __int8)rhs ) );
@@ -5537,7 +5537,7 @@ public:
 template < typename T, typename U > class BinaryOrHelper< T, U, BinaryState_Int16 >
 {
 public:
-	static T Or( T lhs, U rhs ) SAFEINT_NOTHROW
+	_CONSTEXPR14 static T Or( T lhs, U rhs ) SAFEINT_NOTHROW
     {
         //cast forces sign extension to be zeros
         BinaryAssert( ( lhs | rhs ) == ( lhs | (unsigned __int16)rhs ) );
@@ -5548,7 +5548,7 @@ public:
 template < typename T, typename U > class BinaryOrHelper< T, U, BinaryState_Int32 >
 {
 public:
-    static T Or( T lhs, U rhs ) SAFEINT_NOTHROW
+	_CONSTEXPR14 static T Or( T lhs, U rhs ) SAFEINT_NOTHROW
     {
         //cast forces sign extension to be zeros
         BinaryAssert( ( lhs | rhs ) == ( lhs | (unsigned __int32)rhs ) );
@@ -5567,7 +5567,7 @@ public:
 template < typename T, typename U > class BinaryXorHelper< T, U, BinaryState_Int8 >
 {
 public:
-	static T Xor( T lhs, U rhs ) SAFEINT_NOTHROW
+	_CONSTEXPR14 static T Xor( T lhs, U rhs ) SAFEINT_NOTHROW
     {
         // cast forces sign extension to be zeros
         BinaryAssert( ( lhs ^ rhs ) == ( lhs ^ (unsigned __int8)rhs ) );
@@ -5578,7 +5578,7 @@ public:
 template < typename T, typename U > class BinaryXorHelper< T, U, BinaryState_Int16 >
 {
 public:
-    static T Xor( T lhs, U rhs ) SAFEINT_NOTHROW
+	_CONSTEXPR14 static T Xor( T lhs, U rhs ) SAFEINT_NOTHROW
     {
         // cast forces sign extension to be zeros
         BinaryAssert( ( lhs ^ rhs ) == ( lhs ^ (unsigned __int16)rhs ) );
@@ -5589,7 +5589,7 @@ public:
 template < typename T, typename U > class BinaryXorHelper< T, U, BinaryState_Int32 >
 {
 public:
-    static T Xor( T lhs, U rhs ) SAFEINT_NOTHROW
+	_CONSTEXPR14 static T Xor( T lhs, U rhs ) SAFEINT_NOTHROW
     {
         // cast forces sign extension to be zeros
         BinaryAssert( ( lhs ^ rhs ) == ( lhs ^ (unsigned __int32)rhs ) );
@@ -6292,13 +6292,13 @@ public:
     // demand a type T, or something that fits into a type T
 
     // Bitwise &
-    SafeInt< T, E > operator &( SafeInt< T, E > rhs ) const SAFEINT_NOTHROW
+	_CONSTEXPR14 SafeInt< T, E > operator &( SafeInt< T, E > rhs ) const SAFEINT_NOTHROW
     {
         return SafeInt< T, E >( m_int & (T)rhs );
     }
 
     template < typename U >
-    SafeInt< T, E > operator &( U rhs ) const SAFEINT_NOTHROW
+	_CONSTEXPR14 SafeInt< T, E > operator &( U rhs ) const SAFEINT_NOTHROW
     {
         // we want to avoid setting bits by surprise
         // consider the case of lhs = int, value = 0xffffffff
@@ -6316,34 +6316,34 @@ public:
     }
 
     // Bitwise & assignment
-    SafeInt< T, E >& operator &=( SafeInt< T, E > rhs ) SAFEINT_NOTHROW
+	_CONSTEXPR14 SafeInt< T, E >& operator &=( SafeInt< T, E > rhs ) SAFEINT_NOTHROW
     {
         m_int &= (T)rhs;
         return *this;
     }
 
     template < typename U >
-    SafeInt< T, E >& operator &=( U rhs ) SAFEINT_NOTHROW
+	_CONSTEXPR14 SafeInt< T, E >& operator &=( U rhs ) SAFEINT_NOTHROW
     {
         m_int = BinaryAndHelper< T, U, BinaryMethod< T, U >::method >::And( m_int, rhs );
         return *this;
     }
 
     template < typename U >
-    SafeInt< T, E >& operator &=( SafeInt< U, E > rhs ) SAFEINT_NOTHROW
+	_CONSTEXPR14 SafeInt< T, E >& operator &=( SafeInt< U, E > rhs ) SAFEINT_NOTHROW
     {
         m_int = BinaryAndHelper< T, U, BinaryMethod< T, U >::method >::And( m_int, (U)rhs );
         return *this;
     }
 
     // XOR
-    SafeInt< T, E > operator ^( SafeInt< T, E > rhs ) const SAFEINT_NOTHROW
+	_CONSTEXPR14 SafeInt< T, E > operator ^( SafeInt< T, E > rhs ) const SAFEINT_NOTHROW
     {
         return SafeInt< T, E >( (T)( m_int ^ (T)rhs ) );
     }
 
     template < typename U >
-    SafeInt< T, E > operator ^( U rhs ) const SAFEINT_NOTHROW
+	_CONSTEXPR14 SafeInt< T, E > operator ^( U rhs ) const SAFEINT_NOTHROW
     {
         // If you land in the assert, this is because the bitwise operator
         // was causing unexpected behavior. Fix is to properly cast your inputs
@@ -6353,54 +6353,54 @@ public:
     }
 
     // XOR assignment
-    SafeInt< T, E >& operator ^=( SafeInt< T, E > rhs ) SAFEINT_NOTHROW
+	_CONSTEXPR14 SafeInt< T, E >& operator ^=( SafeInt< T, E > rhs ) SAFEINT_NOTHROW
     {
         m_int ^= (T)rhs;
         return *this;
     }
 
     template < typename U >
-    SafeInt< T, E >& operator ^=( U rhs ) SAFEINT_NOTHROW
+	_CONSTEXPR14 SafeInt< T, E >& operator ^=( U rhs ) SAFEINT_NOTHROW
     {
         m_int = BinaryXorHelper< T, U, BinaryMethod< T, U >::method >::Xor( m_int, rhs );
         return *this;
     }
 
     template < typename U >
-    SafeInt< T, E >& operator ^=( SafeInt< U, E > rhs ) SAFEINT_NOTHROW
+	_CONSTEXPR14 SafeInt< T, E >& operator ^=( SafeInt< U, E > rhs ) SAFEINT_NOTHROW
     {
         m_int = BinaryXorHelper< T, U, BinaryMethod< T, U >::method >::Xor( m_int, (U)rhs );
         return *this;
     }
 
     // bitwise OR
-    SafeInt< T, E > operator |( SafeInt< T, E > rhs ) const SAFEINT_NOTHROW
+	_CONSTEXPR14 SafeInt< T, E > operator |( SafeInt< T, E > rhs ) const SAFEINT_NOTHROW
     {
         return SafeInt< T, E >( (T)( m_int | (T)rhs ) );
     }
 
     template < typename U >
-    SafeInt< T, E > operator |( U rhs ) const SAFEINT_NOTHROW
+	_CONSTEXPR14 SafeInt< T, E > operator |( U rhs ) const SAFEINT_NOTHROW
     {
         return SafeInt< T, E >( BinaryOrHelper< T, U, BinaryMethod< T, U >::method >::Or( m_int, rhs ) );
     }
 
     // bitwise OR assignment
-    SafeInt< T, E >& operator |=( SafeInt< T, E > rhs ) SAFEINT_NOTHROW
+	_CONSTEXPR14 SafeInt< T, E >& operator |=( SafeInt< T, E > rhs ) SAFEINT_NOTHROW
     {
         m_int |= (T)rhs;
         return *this;
     }
 
     template < typename U >
-    SafeInt< T, E >& operator |=( U rhs ) SAFEINT_NOTHROW
+	_CONSTEXPR14 SafeInt< T, E >& operator |=( U rhs ) SAFEINT_NOTHROW
     {
         m_int = BinaryOrHelper< T, U, BinaryMethod< T, U >::method >::Or( m_int, rhs );
         return *this;
     }
 
     template < typename U >
-    SafeInt< T, E >& operator |=( SafeInt< U, E > rhs ) SAFEINT_NOTHROW
+	_CONSTEXPR14 SafeInt< T, E >& operator |=( SafeInt< U, E > rhs ) SAFEINT_NOTHROW
     {
         m_int = BinaryOrHelper< T, U, BinaryMethod< T, U >::method >::Or( m_int, (U)rhs );
         return *this;
@@ -6980,21 +6980,21 @@ _CONSTEXPR14 T& operator %=( T& lhs, SafeInt< U, E > rhs ) SAFEINT_CPP_THROW
 }
 
 template < typename T, typename U, typename E >
-T& operator &=( T& lhs, SafeInt< U, E > rhs ) SAFEINT_NOTHROW
+_CONSTEXPR14 T& operator &=( T& lhs, SafeInt< U, E > rhs ) SAFEINT_NOTHROW
 {
     lhs = BinaryAndHelper< T, U, BinaryMethod< T, U >::method >::And( lhs, (U)rhs );
     return lhs;
 }
 
 template < typename T, typename U, typename E >
-T& operator ^=( T& lhs, SafeInt< U, E > rhs ) SAFEINT_NOTHROW
+_CONSTEXPR14 T& operator ^=( T& lhs, SafeInt< U, E > rhs ) SAFEINT_NOTHROW
 {
     lhs = BinaryXorHelper< T, U, BinaryMethod< T, U >::method >::Xor( lhs, (U)rhs );
     return lhs;
 }
 
 template < typename T, typename U, typename E >
-T& operator |=( T& lhs, SafeInt< U, E > rhs ) SAFEINT_NOTHROW
+_CONSTEXPR14 T& operator |=( T& lhs, SafeInt< U, E > rhs ) SAFEINT_NOTHROW
 {
     lhs = BinaryOrHelper< T, U, BinaryMethod< T, U >::method >::Or( lhs, (U)rhs );
     return lhs;
