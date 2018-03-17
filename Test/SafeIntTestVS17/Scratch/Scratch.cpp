@@ -5,14 +5,21 @@
 Use this to check specific scenarios
 */
 
-constexpr int Foo()
+template <typename T, typename U>
+_CONSTEXPR14 U LShiftOperator2()
 {
-	return SafeInt<char>(255) * 5;
+	// Have to explicitly force this operator
+	// to be used
+	U lhs = 3;
+	SafeInt<T> s(2);
+
+	SafeInt<U> r = operator <<(lhs, s);
+	return r;
 }
 
 int main(int, char**)
 {
-	static const int x = Foo();
-	printf("%d", x);
+	LShiftOperator2<char, int>();
+
 	return 0;
 }

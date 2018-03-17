@@ -148,6 +148,92 @@ namespace TestConstExpr
 	}
 
 #if CPLUSPLUS_STD == CPLUSPLUS_14
+	template <typename T, typename U>
+	_CONSTEXPR14 T DivOperator()
+	{
+		// Have to explicitly force this operator
+		// to be used
+		T lhs = 3;
+		SafeInt<U> s(2);
+
+		T& r = operator /=(lhs, s);
+		return r;
+	}
+
+	template <typename T, typename U>
+	_CONSTEXPR14 T AddOperator()
+	{
+		// Have to explicitly force this operator
+		// to be used
+		T lhs = 3;
+		SafeInt<U> s(2);
+
+		T& r = operator +=(lhs, s);
+		return r;
+	}
+
+	template <typename T, typename U>
+	_CONSTEXPR14 T SubOperator()
+	{
+		// Have to explicitly force this operator
+		// to be used
+		T lhs = 3;
+		SafeInt<U> s(2);
+
+		T& r = operator -=(lhs, s);
+		return r;
+	}
+
+	template <typename T, typename U>
+	_CONSTEXPR14 T LShiftOperator()
+	{
+		// Have to explicitly force this operator
+		// to be used
+		// T& operator <<=(T& lhs, SafeInt< U, E > rhs)
+
+		T lhs = 3;
+		SafeInt<U> s(2);
+
+		T& r = operator <<=(lhs, s);
+		return r;
+	}
+
+	template <typename T, typename U>
+	_CONSTEXPR14 U LShiftOperator2()
+	{
+		// Have to explicitly force this operator
+		// to be used
+		U lhs = 3;
+		SafeInt<T> s(2);
+
+		SafeInt<U> r = operator <<(lhs, s);
+		return r;
+	}
+
+	template <typename T, typename U>
+	_CONSTEXPR14 T RShiftOperator()
+	{
+		// Have to explicitly force this operator
+		// to be used
+
+		T lhs = 3;
+		SafeInt<U> s(1);
+
+		T& r = operator >>=(lhs, s);
+		return r;
+	}
+
+	template <typename T, typename U>
+	_CONSTEXPR14 U RShiftOperator2()
+	{
+		// Have to explicitly force this operator
+		// to be used
+		U lhs = 3;
+		SafeInt<T> s(1);
+
+		SafeInt<U> r = operator >>(lhs, s);
+		return r;
+	}
 
 	template <typename T, typename U>
 	void StaticAssertTU()
@@ -182,11 +268,47 @@ namespace TestConstExpr
 		static_assert((U)3 * SafeInt<T>(2), "Multiplication");
 		static_assert((T)3 * SafeInt<U>(2), "Multiplication");
 
-	}
+		// Division
+		static_assert(SafeInt<T>((T)3) / (U)2, "Division");
+		static_assert(SafeInt<T>((T)3) / SafeInt<T>(2), "Division");
+		static_assert((SafeInt<T>((T)3) /= (U)2), "Division");
+		static_assert((SafeInt<T>((T)3) /= SafeInt<U>(2)), "Division");
+		static_assert((U)3 / SafeInt<T>(2), "Division");
+		static_assert(DivOperator<T,U>(), "Division");
 
-	template <typename T, typename U>
-	void StaticAssertMultiplyTU()
-	{
+		// Addition
+		static_assert(SafeInt<T>((T)3) + (U)2, "Addition");
+		static_assert(SafeInt<T>((T)3) + SafeInt<T>(2), "Addition");
+		static_assert((SafeInt<T>((T)3) += (U)2), "Addition");
+		static_assert((SafeInt<T>((T)3) += SafeInt<U>(2)), "Addition");
+		static_assert((U)3 + SafeInt<T>(2), "Addition");
+		static_assert(AddOperator<T, U>(), "Addition");
+
+		// Subtraction
+		static_assert(SafeInt<T>((T)3) - (U)2, "Subtraction");
+		static_assert(SafeInt<T>((T)3) - SafeInt<T>(2), "Subtraction");
+		static_assert((SafeInt<T>((T)3) -= (U)2), "Subtraction");
+		static_assert((SafeInt<T>((T)3) -= SafeInt<U>(2)), "Subtraction");
+		static_assert((U)3 - SafeInt<T>(2), "Subtraction");
+		static_assert(SubOperator<T, U>(), "Subtraction");
+
+		// Shift
+		// Left
+		static_assert(SafeInt<T>((T)3) << (U)2, "Shift");
+		static_assert(SafeInt<T>((T)3) << SafeInt<U>(2), "Shift");
+		static_assert((SafeInt<T>((T)3) <<= (U)2), "Shift");
+		static_assert((SafeInt<T>((T)3) <<= SafeInt<U>(2)), "Shift");
+		static_assert(LShiftOperator<T, U>(), "Shift");
+		static_assert(LShiftOperator2<T, U>(), "Shift");
+
+		// Right
+		static_assert(SafeInt<T>((T)3) >> (U)1, "Shift");
+		static_assert(SafeInt<T>((T)3) >> SafeInt<U>(1), "Shift");
+		static_assert((SafeInt<T>((T)3) >>= (U)1), "Shift");
+		static_assert((SafeInt<T>((T)3) >>= SafeInt<U>(1)), "Shift");
+		static_assert(RShiftOperator<T, U>(), "Shift");
+		static_assert(RShiftOperator2<T, U>(), "Shift");
+
 
 	}
 
