@@ -780,13 +780,13 @@ namespace SafeIntInternal
     {
     public:
 
-		_CONSTEXPR14 static SAFEINT_NORETURN void SAFEINT_STDCALL SafeIntOnOverflow()
+		static SAFEINT_NORETURN void SAFEINT_STDCALL SafeIntOnOverflow()
         {
             SafeIntExceptionAssert();
             throw SafeIntException( SafeIntArithmeticOverflow );
         }
 
-		_CONSTEXPR14 static SAFEINT_NORETURN void SAFEINT_STDCALL SafeIntOnDivZero()
+		static SAFEINT_NORETURN void SAFEINT_STDCALL SafeIntOnDivZero()
         {
             SafeIntExceptionAssert();
             throw SafeIntException( SafeIntDivideByZero );
