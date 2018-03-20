@@ -662,7 +662,8 @@ namespace TestConstExpr
 		const char* p2 = nullptr;
 
 		static const SafeInt<ptrdiff_t> pt = SafePtrDiff(p1, p2);
-		pt;
+		if (pt > 0)
+			return;
 	}
 
 }
