@@ -3052,7 +3052,10 @@ public:
         SAFEINT_STATIC_ASSERT( IntTraits<T>::isUint64 && IntTraits<U>::isUint64 );
         unsigned __int64 t1 = t;
         unsigned __int64 u1 = u;
-        return LargeIntRegMultiply< unsigned __int64, unsigned __int64 >::RegMultiply( t1, u1, reinterpret_cast<unsigned __int64*>(&ret) );
+		unsigned __int64 tmp = 0;
+        bool f = LargeIntRegMultiply< unsigned __int64, unsigned __int64 >::RegMultiply( t1, u1, &tmp );
+		ret = tmp;
+		return f;
     }
 
     template < typename E >
@@ -3061,7 +3064,9 @@ public:
         SAFEINT_STATIC_ASSERT( IntTraits<T>::isUint64 && IntTraits<U>::isUint64 );
         unsigned __int64 t1 = t;
         unsigned __int64 u1 = u;
-        LargeIntRegMultiply< unsigned __int64, unsigned __int64 >::template RegMultiplyThrow< E >( t1, u1, reinterpret_cast<unsigned __int64*>(&ret) );
+		unsigned __int64 tmp = 0;
+        LargeIntRegMultiply< unsigned __int64, unsigned __int64 >::template RegMultiplyThrow< E >( t1, u1, &tmp );
+		ret = tmp;
     }
 };
 
@@ -3074,7 +3079,10 @@ public:
     {
         SAFEINT_STATIC_ASSERT( IntTraits<T>::isUint64 );
         unsigned __int64 t1 = t;
-        return LargeIntRegMultiply< unsigned __int64, unsigned __int32 >::RegMultiply( t1, (unsigned __int32)u, reinterpret_cast<unsigned __int64*>(&ret) );
+		unsigned __int64 tmp = 0;
+        bool f = LargeIntRegMultiply< unsigned __int64, unsigned __int32 >::RegMultiply( t1, (unsigned __int32)u, &tmp );
+		ret = tmp;
+		return f;
     }
 
     template < typename E >
@@ -3082,7 +3090,9 @@ public:
     {
         SAFEINT_STATIC_ASSERT( IntTraits<T>::isUint64 );
         unsigned __int64 t1 = t;
-        LargeIntRegMultiply< unsigned __int64, unsigned __int32 >::template RegMultiplyThrow< E >( t1, (unsigned __int32)u, reinterpret_cast<unsigned __int64*>(&ret) );
+		unsigned __int64 tmp = 0;
+        LargeIntRegMultiply< unsigned __int64, unsigned __int32 >::template RegMultiplyThrow< E >( t1, (unsigned __int32)u, &tmp );
+		ret = tmp;
     }
 };
 
@@ -3128,7 +3138,10 @@ public:
     {
         SAFEINT_STATIC_ASSERT( IntTraits<T>::isUint64 );
         unsigned __int64 t1 = t;
-        return LargeIntRegMultiply< unsigned __int64, signed __int32 >::RegMultiply(t1, (signed __int32)u, reinterpret_cast< unsigned __int64* >(&ret));
+		unsigned __int64 tmp = 0;
+        bool f = LargeIntRegMultiply< unsigned __int64, signed __int32 >::RegMultiply(t1, (signed __int32)u, &tmp);
+		ret = tmp;
+		return f;
     }
 
     template < typename E >
@@ -3136,7 +3149,9 @@ public:
     {
         SAFEINT_STATIC_ASSERT( IntTraits<T>::isUint64 );
         unsigned __int64 t1 = t;
-        LargeIntRegMultiply< unsigned __int64, signed __int32 >::template RegMultiplyThrow< E >(t1, (signed __int32)u, reinterpret_cast< unsigned __int64* >(&ret));
+		unsigned __int64 tmp = 0;
+        LargeIntRegMultiply< unsigned __int64, signed __int32 >::template RegMultiplyThrow< E >(t1, (signed __int32)u, &tmp);
+		ret = tmp;
     }
 };
 
@@ -3150,7 +3165,10 @@ public:
         SAFEINT_STATIC_ASSERT( IntTraits<T>::isUint64 && IntTraits<U>::isInt64 );
         unsigned __int64 t1 = t;
         __int64          u1 = u;
-        return LargeIntRegMultiply< unsigned __int64, __int64 >::RegMultiply(t1, u1, reinterpret_cast< unsigned __int64* >(&ret));
+		unsigned __int64 tmp = 0;
+        bool f = LargeIntRegMultiply< unsigned __int64, __int64 >::RegMultiply(t1, u1, &tmp);
+		ret = tmp;
+		return f;
     }
 
     template < typename E >
@@ -3159,7 +3177,9 @@ public:
         SAFEINT_STATIC_ASSERT( IntTraits<T>::isUint64 && IntTraits<U>::isInt64 );
         unsigned __int64 t1 = t;
         __int64          u1 = u;
-        LargeIntRegMultiply< unsigned __int64, __int64 >::template RegMultiplyThrow< E >(t1, u1, reinterpret_cast< unsigned __int64* >(&ret));
+		unsigned __int64 tmp = 0;
+		LargeIntRegMultiply< unsigned __int64, __int64 >::template RegMultiplyThrow< E >(t1, u1, &tmp);
+		ret = tmp;
     }
 };
 
@@ -3203,8 +3223,11 @@ public:
 	_CONSTEXPR14 static bool Multiply( const T& t, const U& u, T& ret ) SAFEINT_NOTHROW
     {
         SAFEINT_STATIC_ASSERT( IntTraits<T>::isInt64 );
-        __int64          t1 = t;
-        return LargeIntRegMultiply< __int64, unsigned __int32 >::RegMultiply( t1, (unsigned __int32)u, reinterpret_cast< __int64* >(&ret) );
+        __int64 t1 = t;
+		__int64 tmp = 0;
+        bool f = LargeIntRegMultiply< __int64, unsigned __int32 >::RegMultiply( t1, (unsigned __int32)u, &tmp );
+		ret = tmp;
+		return f;
     }
 
     template < typename E >
@@ -3212,7 +3235,9 @@ public:
     {
         SAFEINT_STATIC_ASSERT( IntTraits<T>::isInt64 );
         __int64          t1 = t;
-        LargeIntRegMultiply< __int64, unsigned __int32 >::template RegMultiplyThrow< E >( t1, (unsigned __int32)u, reinterpret_cast< __int64* >(&ret) );
+		__int64 tmp = 0;
+		LargeIntRegMultiply< __int64, unsigned __int32 >::template RegMultiplyThrow< E >( t1, (unsigned __int32)u, &tmp );
+		ret = tmp;
     }
 };
 
@@ -3223,18 +3248,23 @@ public:
 	_CONSTEXPR14 static bool Multiply( const T& t, const U& u, T& ret ) SAFEINT_NOTHROW
     {
         SAFEINT_STATIC_ASSERT( IntTraits<T>::isInt64 && IntTraits<U>::isInt64 );
-        __int64          t1 = t;
-        __int64          u1 = u;
-        return LargeIntRegMultiply< __int64, __int64 >::RegMultiply( t1, u1, reinterpret_cast< __int64* >(&ret) );
+        __int64  t1 = t;
+        __int64 u1 = u;
+		__int64 tmp = 0;
+        bool f = LargeIntRegMultiply< __int64, __int64 >::RegMultiply( t1, u1, &tmp );
+		ret = tmp;
+		return f;
     }
 
     template < typename E >
 	_CONSTEXPR14 static void MultiplyThrow( const T& t, const U& u, T& ret ) SAFEINT_CPP_THROW
     {
         SAFEINT_STATIC_ASSERT( IntTraits<T>::isInt64 && IntTraits<U>::isInt64 );
-        __int64          t1 = t;
-        __int64          u1 = u;
-        LargeIntRegMultiply< __int64, __int64 >::template RegMultiplyThrow< E >( t1, u1, reinterpret_cast< __int64* >(&ret));
+        __int64 t1 = t;
+        __int64 u1 = u;
+		__int64 tmp = 0;
+		LargeIntRegMultiply< __int64, __int64 >::template RegMultiplyThrow< E >( t1, u1, &tmp);
+		ret = tmp;
     }
 };
 
@@ -3306,7 +3336,10 @@ public:
         SAFEINT_STATIC_ASSERT( IntTraits<T>::isInt64 && IntTraits<U>::isUint64 );
         __int64          t1 = t;
         unsigned __int64 u1 = u;
-        return LargeIntRegMultiply< __int64, unsigned __int64 >::RegMultiply( t1, u1, reinterpret_cast< __int64* >(&ret) );
+		__int64 tmp = 0;
+        bool f = LargeIntRegMultiply< __int64, unsigned __int64 >::RegMultiply( t1, u1, &tmp );
+		ret = tmp;
+		return f;
     }
 
     template < typename E >
@@ -3315,7 +3348,9 @@ public:
         SAFEINT_STATIC_ASSERT( IntTraits<T>::isInt64 && IntTraits<U>::isUint64 );
         __int64          t1 = t;
         unsigned __int64 u1 = u;
-        LargeIntRegMultiply< __int64, unsigned __int64 >::template RegMultiplyThrow< E >( t1, u1, reinterpret_cast< __int64* >(&ret) );
+		__int64 tmp = 0;
+		LargeIntRegMultiply< __int64, unsigned __int64 >::template RegMultiplyThrow< E >( t1, u1, &tmp );
+		ret = tmp;
     }
 };
 
@@ -7033,6 +7068,7 @@ template < typename T, typename U, typename E >
 T*& operator +=( T*& lhs, SafeInt< U, E > rhs ) SAFEINT_CPP_THROW
 {
     // Cast the pointer to a number so we can do arithmetic
+	// Note: this doesn't really make sense as a constexpr, but cannot be because of the reinterpret_cast
     SafeInt< size_t, E > ptr_val = reinterpret_cast< size_t >( lhs );
     // Check first that rhs is valid for the type of ptrdiff_t
     // and that multiplying by sizeof( T ) doesn't overflow a ptrdiff_t
