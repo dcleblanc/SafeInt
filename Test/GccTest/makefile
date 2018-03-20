@@ -1,6 +1,6 @@
 #makefile for SafeInt test harness using clang
 
-all: SafeIntTest CompileTest
+all: SafeIntTest CompileTest CompileTest14
 
 clean:
 	rm -f SafeIntTest
@@ -10,8 +10,8 @@ SafeIntTest: ../AddVerify.cpp ../CastVerify.cpp ../DivVerify.cpp ../IncDecVerify
 	g++ --std=c++11 ../AddVerify.cpp ../CastVerify.cpp ../DivVerify.cpp ../IncDecVerify.cpp ../ModVerify.cpp ../MultVerify.cpp ../SubVerify.cpp ../TestMain.cpp -o SafeIntTest
 
 CompileTest: ../CompileTest.cpp ../../SafeInt.hpp ../ConstExpr.cpp ../CleanCompile.cpp
-	g++ -Wall --std=c++11 ../CompileTest.cpp ../ConstExpr.cpp ../CleanCompile.cpp -o CompileTest
+	g++ -Wall --std=c++11 ../CompileTest.cpp ../ConstExpr.cpp ../CleanCompile.cpp -o CompileTest 2> CompileTest.err
 
 CompileTest14: ../CompileTest.cpp ../../SafeInt.hpp ../ConstExpr.cpp ../CleanCompile.cpp
-	g++ -Wall --std=c++14 ../CompileTest.cpp ../ConstExpr.cpp ../CleanCompile.cpp -o CompileTest
+	g++ -Wall --std=c++14 ../CompileTest.cpp ../ConstExpr.cpp ../CleanCompile.cpp -o CompileTest14 2> CompileTest14.err
 
