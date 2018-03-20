@@ -6758,8 +6758,7 @@ _CONSTEXPR14 SafeInt< T, E > operator %( U lhs, SafeInt< T, E > rhs ) SAFEINT_CP
     // same size and same sign
     SafeInt< T, E > result;
 
-    if( ModulusSimpleCaseHelper< T, U, E,
-        sizeof(T) == sizeof(U) && (bool)IntTraits< T >::isSigned == (bool)IntTraits< U >::isSigned >::ModulusSimpleCase( lhs, rhs, result ) )
+    if( ModulusSimpleCaseHelper< T, U, E, sizeof(T) == sizeof(U) && (bool)IntTraits< T >::isSigned == (bool)IntTraits< U >::isSigned >::ModulusSimpleCase( lhs, rhs, result ) )
         return result;
 
 	result = (SafeInt< U, E >(lhs) % (T)rhs);
