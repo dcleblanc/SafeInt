@@ -1,6 +1,6 @@
 /*-----------------------------------------------------------------------------------------------------------
 SafeInt.hpp
-Version 3.0.18p
+Version 3.0.19p
 
 This software is licensed under the Microsoft Public License (Ms-PL).
 For more information about Microsoft open source licenses, refer to
@@ -103,6 +103,10 @@ Please read the leading comments before using the class.
 #else
 // Unknown compiler, assume C++ 98
 #define CPLUSPLUS_STD CPLUSPLUS_98
+#endif
+
+#if (SAFEINT_COMPILER == CLANG_COMPILER || SAFEINT_COMPILER == GCC_COMPILER) && CPLUSPLUS_STD < CPLUSPLUS_11
+#error "Must compile with --std=c++11, preferably --std=c++14 to use constexpr improvements"
 #endif
 
 // Now that we know the standard, can decide which constexpr behavior works
@@ -561,6 +565,9 @@ SAFEINT_DISABLE_SHIFT_ASSERT       - Set this option if you don't want to assert
 *                 Fix to allow initialization by an enum
 *                 Add support for static_assert, make it default to fix compiler warnings from C_ASSERT on gcc, clang
 *                 Changed throw() to noexcept
+
+* March, 2018     Introduced support for constexpr, both the C++11 and C++14 flavors work. The C++14 standard
+                  allows for much more thorough usage, and should be preferred.
 
 *  Note about code style - throughout this class, casts will be written using C-style (T),
 *  not C++ style static_cast< T >. This is because the class is nearly always dealing with integer
@@ -3261,7 +3268,7 @@ public:
     {
         SAFEINT_STATIC_ASSERT( IntTraits<U>::isUint64 );
         unsigned __int64 u1 = u;
-        __int32 tmp;
+        __int32 tmp = 0;
 
         if( LargeIntRegMultiply< __int32, unsigned __int64 >::RegMultiply( (__int32)t, u1, &tmp ) &&
             SafeCastHelper< T, __int32, GetCastMethod< T, __int32 >::method >::Cast( tmp, ret ) )
@@ -4010,7 +4017,7 @@ public:
 	_CONSTEXPR14 static bool Addition( const T& lhs, const U& rhs, T& result ) SAFEINT_NOTHROW
     {
         // lhs is unsigned __int64, rhs signed
-        unsigned __int64 tmp;
+        unsigned __int64 tmp = 0;
 
         if( rhs < 0 )
         {
@@ -4186,7 +4193,7 @@ public:
 	_CONSTEXPR14 static bool Addition( const T& lhs, const U& rhs, T& result ) SAFEINT_NOTHROW
     {
         //rhs is signed __int64, lhs signed
-        __int64 tmp;
+        __int64 tmp = 0;
 
         if( AdditionHelper< __int64, __int64, AdditionState_CastInt64CheckOverflow >::Addition( (__int64)lhs, (__int64)rhs, tmp ) &&
             tmp <= IntTraits< T >::maxInt &&

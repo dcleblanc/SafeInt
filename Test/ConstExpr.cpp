@@ -318,6 +318,38 @@ namespace TestConstExpr
 	}
 
 	template <typename T, typename U>
+	_CONSTEXPR14 bool SafeModulusTest()
+	{
+		U u = 2;
+		T result = 0;
+		return SafeModulus((T)3, u, result);
+	}
+
+	template <typename T, typename U>
+	_CONSTEXPR14 bool SafeMultiplyTest()
+	{
+		U u = 2;
+		T result = 0;
+		return SafeMultiply((T)3, u, result);
+	}
+
+	template <typename T, typename U>
+	_CONSTEXPR14 bool SafeDivideTest()
+	{
+		U u = 2;
+		T result = 0;
+		return SafeDivide((T)3, u, result);
+	}
+
+	template <typename T, typename U>
+	_CONSTEXPR14 bool SafeAddTest()
+	{
+		U u = 2;
+		T result = 0;
+		return SafeAdd((T)3, u, result);
+	}
+
+	template <typename T, typename U>
 	void StaticAssertTU()
 	{
 		// Constructors
@@ -454,12 +486,10 @@ namespace TestConstExpr
 		static_assert(SafeGreaterThanEquals((T)3, (U)2), "SafeGreaterThanEquals");
 		static_assert(SafeLessThan((T)1, (U)2), "SafeLessThan");
 		static_assert(SafeLessThanEquals((T)1, (U)2), "SafeLessThanEquals");
-		/*
-		inline bool SafeModulus( const T& t, const U& u, T& result ) SAFEINT_NOTHROW
-		inline bool SafeMultiply( T t, U u, T& result ) SAFEINT_NOTHROW
-		inline bool SafeDivide( T t, U u, T& result ) SAFEINT_NOTHROW
-		inline bool SafeAdd( T t, U u, T& result ) SAFEINT_NOTHROW
-		*/
+		static_assert(SafeModulusTest<T, U>(), "SafeModulus");
+		static_assert(SafeMultiplyTest<T, U>(), "SafeMultiply");
+		static_assert(SafeDivideTest<T, U>(), "SafeDivide");
+		static_assert(SafeAddTest<T, U>(), "SafeAdd");
 	}
 
 	template <typename T>
