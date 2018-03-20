@@ -380,7 +380,7 @@ namespace TestConstExpr
 		static_assert((SafeInt<T>((T)3) *= (U)2), "Multiplication");
 		static_assert((SafeInt<T>((T)3) *= SafeInt<U>(2)), "Multiplication");
 		static_assert((U)3 * SafeInt<T>(2), "Multiplication");
-		static_assert((T)3 * SafeInt<U>(2), "Multiplication");
+		static_assert(((T)3 * SafeInt<U>(2)), "Multiplication");
 
 		// Division
 		static_assert(SafeInt<T>((T)3) / (U)2, "Division");

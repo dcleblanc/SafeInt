@@ -3247,7 +3247,7 @@ public:
     {
         SAFEINT_STATIC_ASSERT( IntTraits<T>::isInt64 );
         __int64          t1 = t;
-        return LargeIntRegMultiply< __int64, __int32 >::RegMultiply( t1, (__int32)u, reinterpret_cast< __int64* >(&ret));
+        return LargeIntRegMultiply< __int64, __int32 >::RegMultiply( t1, (__int32)u, (__int64*)(&ret));
     }
 
     template < typename E >
@@ -3255,7 +3255,7 @@ public:
     {
         SAFEINT_STATIC_ASSERT( IntTraits<T>::isInt64 );
         __int64          t1 = t;
-        LargeIntRegMultiply< __int64, __int32 >::template RegMultiplyThrow< E >(t1, (__int32)u, reinterpret_cast< __int64* >(&ret));
+        LargeIntRegMultiply< __int64, __int32 >::template RegMultiplyThrow< E >(t1, (__int32)u, (__int64*)(&ret));
     }
 };
 
