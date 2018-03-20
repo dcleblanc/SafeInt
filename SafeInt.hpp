@@ -3246,16 +3246,21 @@ public:
 	_CONSTEXPR14 static bool Multiply( const T& t, U u, T& ret ) SAFEINT_NOTHROW
     {
         SAFEINT_STATIC_ASSERT( IntTraits<T>::isInt64 );
-        __int64          t1 = t;
-        return LargeIntRegMultiply< __int64, __int32 >::RegMultiply( t1, (__int32)u, (__int64*)(&ret));
+        __int64 t1 = t;
+		__int64 tmp = 0;
+        bool f = LargeIntRegMultiply< __int64, __int32 >::RegMultiply( t1, (__int32)u, &tmp);
+		ret = tmp;
+		return f;
     }
 
     template < typename E >
 	_CONSTEXPR14 static void MultiplyThrow( const __int64& t, U u, T& ret ) SAFEINT_CPP_THROW
     {
         SAFEINT_STATIC_ASSERT( IntTraits<T>::isInt64 );
-        __int64          t1 = t;
-        LargeIntRegMultiply< __int64, __int32 >::template RegMultiplyThrow< E >(t1, (__int32)u, (__int64*)(&ret));
+        __int64 t1 = t;
+		__int64 tmp = 0;
+        LargeIntRegMultiply< __int64, __int32 >::template RegMultiplyThrow< E >(t1, (__int32)u, &tmp);
+		ret = tmp;
     }
 };
 
