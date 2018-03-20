@@ -610,16 +610,6 @@ namespace TestConstExpr
 	}
 
 	template <typename T>
-	_CONSTEXPR14 T PrePostTest()
-	{
-		static const T t1 = PrefixInc<T>((T)1);
-		static const T t2 = PostfixInc<T>((T)2);
-		static_assert(t1 + t2 == 4, "Failed");
-
-		return (T)(t1 + t2);
-	}
-
-	template <typename T>
 	_CONSTEXPR14 void SignedOnly()
 	{
 		static_assert(-SafeInt<T>((T)1), "operator -");
@@ -650,7 +640,6 @@ namespace TestConstExpr
 		ConstAddT<T>();
 		ConstSubtractT<T>();
 		ConstMultiplyT<T>();
-		PrePostTest<T>();
 #endif
 	}
 

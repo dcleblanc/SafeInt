@@ -152,8 +152,23 @@ Please read the leading comments before using the class.
     #define SAFEINT_USE_INTRINSICS 0
 #endif
 
+// If you would like to use your own custom assert
+// Define SAFEINT_ASSERT
+#if !defined SAFEINT_ASSERT
+#include <assert.h>
+#define SAFEINT_ASSERT(x) assert(x)
+#endif
+
 #if SAFEINT_COMPILER == VISUAL_STUDIO_COMPILER
 #pragma warning( pop )
+#endif
+
+#if !defined _CRT_SECURE_INVALID_PARAMETER
+// Calling fail fast is somewhat more robust than calling abort, 
+// but abort is the closest we can manage without Visual Studio support
+// Need the header for abort()
+#include <stdlib.h>
+#define _CRT_SECURE_INVALID_PARAMETER(msg) abort()
 #endif
 
 // Various things needed for GCC
@@ -721,13 +736,6 @@ namespace utilities
 {
 #endif
 
-// If you would like to use your own custom assert
-// Define SAFEINT_ASSERT
-#if !defined SAFEINT_ASSERT
-#include <assert.h>
-#define SAFEINT_ASSERT(x) assert(x)
-#endif
-
 #if defined SAFEINT_ASSERT_ON_EXCEPTION
 	inline void SafeIntExceptionAssert() SAFEINT_NOTHROW { SAFEINT_ASSERT(false); }
 #else
@@ -784,14 +792,6 @@ namespace SafeIntInternal
             throw SafeIntException( SafeIntDivideByZero );
         }
     };
-
-#if !defined _CRT_SECURE_INVALID_PARAMETER
-	// Calling fail fast is somewhat more robust than calling abort, 
-	// but abort is the closest we can manage without Visual Studio support
-	// Need the header for abort()
-	#include <stdlib.h>
-	#define _CRT_SECURE_INVALID_PARAMETER(msg) abort()
-#endif
 
    class SafeInt_InvalidParameter
    {
