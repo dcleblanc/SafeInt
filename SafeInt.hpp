@@ -780,13 +780,13 @@ namespace SafeIntInternal
     {
     public:
 
-        static SAFEINT_NORETURN void SAFEINT_STDCALL SafeIntOnOverflow()
+		_CONSTEXPR14 static SAFEINT_NORETURN void SAFEINT_STDCALL SafeIntOnOverflow()
         {
             SafeIntExceptionAssert();
             throw SafeIntException( SafeIntArithmeticOverflow );
         }
 
-        static SAFEINT_NORETURN void SAFEINT_STDCALL SafeIntOnDivZero()
+		_CONSTEXPR14 static SAFEINT_NORETURN void SAFEINT_STDCALL SafeIntOnDivZero()
         {
             SafeIntExceptionAssert();
             throw SafeIntException( SafeIntDivideByZero );
@@ -796,13 +796,13 @@ namespace SafeIntInternal
    class SafeInt_InvalidParameter
    {
    public:
-       static SAFEINT_NORETURN void SafeIntOnOverflow() SAFEINT_NOTHROW
+	   static SAFEINT_NORETURN void SafeIntOnOverflow() SAFEINT_NOTHROW
        {
            SafeIntExceptionAssert();
            _CRT_SECURE_INVALID_PARAMETER("SafeInt Arithmetic Overflow");
        }
 
-       static SAFEINT_NORETURN void SafeIntOnDivZero() SAFEINT_NOTHROW
+	   static SAFEINT_NORETURN void SafeIntOnDivZero() SAFEINT_NOTHROW
        {
            SafeIntExceptionAssert();
            _CRT_SECURE_INVALID_PARAMETER("SafeInt Divide By Zero");
