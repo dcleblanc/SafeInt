@@ -311,6 +311,13 @@ namespace TestConstExpr
 	}
 
 	template <typename T, typename U>
+	_CONSTEXPR14 bool SafeCastTest()
+	{
+		U to = 0;
+		return SafeCast((T)3, to);
+	}
+
+	template <typename T, typename U>
 	void StaticAssertTU()
 	{
 		// Constructors
@@ -407,6 +414,52 @@ namespace TestConstExpr
 		static_assert((SafeInt<T>((T)3) |= SafeInt<U>(1)), "Or");
 		static_assert(OrOperator<T, U>(), "Or");
 		static_assert(OrOperator2<T, U>(), "Or");
+
+		// Comparisons
+		// Less than
+		static_assert(SafeInt<T>((T)2) < (U)3, "LT");
+		static_assert((T)2 < SafeInt<U>((U)3), "LT");
+		static_assert(SafeInt<T>((T)2) < SafeInt<U>((U)3), "LT");
+
+		// Less than or equal
+		static_assert(SafeInt<T>((T)2) <= (U)3, "LTE");
+		static_assert((T)2 <= SafeInt<U>((U)3), "LTE");
+		static_assert(SafeInt<T>((T)2) <= SafeInt<U>((U)3), "LTE");
+
+		// Greater than
+		static_assert(SafeInt<T>((T)4) > (U)3, "GT");
+		static_assert((T)4 > SafeInt<U>((U)3), "GT");
+		static_assert(SafeInt<T>((T)4) > SafeInt<U>((U)3), "GT");
+
+		// Less than or equal
+		static_assert(SafeInt<T>((T)4) >= (U)3, "GTE");
+		static_assert((T)4 >= SafeInt<U>((U)3), "GTE");
+		static_assert((SafeInt<T>((T)4) >= SafeInt<U>((U)3)), "GTE");
+
+		// Equals
+		static_assert(SafeInt<T>((T)3) == (U)3, "EQ");
+		static_assert((T)3 == SafeInt<U>((U)3), "EQ");
+		static_assert(SafeInt<T>((T)3) == SafeInt<U>((U)3), "EQ");
+
+		// Not equal
+		static_assert(SafeInt<T>((T)4) != (U)3, "NEQ");
+		static_assert((T)4 != SafeInt<U>((U)3), "NEQ");
+		static_assert(SafeInt<T>((T)4) != SafeInt<U>((U)3), "NEQ");
+
+		// Now need coverage for these:
+		static_assert(SafeCastTest<T,U>(), "SafeCast");
+		static_assert(SafeEquals((T)2, (U)2), "SafeEquals");
+		static_assert(SafeNotEquals((T)3, (U)2), "SafeNotEquals");
+		static_assert(SafeGreaterThan((T)3, (U)2), "SafeGreaterThan");
+		static_assert(SafeGreaterThanEquals((T)3, (U)2), "SafeGreaterThanEquals");
+		static_assert(SafeLessThan((T)1, (U)2), "SafeLessThan");
+		static_assert(SafeLessThanEquals((T)1, (U)2), "SafeLessThanEquals");
+		/*
+		inline bool SafeModulus( const T& t, const U& u, T& result ) SAFEINT_NOTHROW
+		inline bool SafeMultiply( T t, U u, T& result ) SAFEINT_NOTHROW
+		inline bool SafeDivide( T t, U u, T& result ) SAFEINT_NOTHROW
+		inline bool SafeAdd( T t, U u, T& result ) SAFEINT_NOTHROW
+		*/
 	}
 
 	template <typename T>

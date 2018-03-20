@@ -5603,73 +5603,73 @@ public:
 // non-class helper function so that you can check for a cast's validity
 // and handle errors how you like
 template < typename T, typename U >
-inline bool SafeCast( const T From, U& To ) SAFEINT_NOTHROW
+_CONSTEXPR11 inline bool SafeCast( const T From, U& To ) SAFEINT_NOTHROW
 {
     return SafeCastHelper< U, T, GetCastMethod< U, T >::method >::Cast( From, To );
 }
 
 template < typename T, typename U >
-inline bool SafeEquals( const T t, const U u ) SAFEINT_NOTHROW
+_CONSTEXPR11 inline bool SafeEquals( const T t, const U u ) SAFEINT_NOTHROW
 {
     return EqualityTest< T, U, ValidComparison< T, U >::method >::IsEquals( t, u );
 }
 
 template < typename T, typename U >
-inline bool SafeNotEquals( const T t, const U u ) SAFEINT_NOTHROW
+_CONSTEXPR11 inline bool SafeNotEquals( const T t, const U u ) SAFEINT_NOTHROW
 {
     return !EqualityTest< T, U, ValidComparison< T, U >::method >::IsEquals( t, u );
 }
 
 template < typename T, typename U >
-inline bool SafeGreaterThan( const T t, const U u ) SAFEINT_NOTHROW
+_CONSTEXPR11 inline bool SafeGreaterThan( const T t, const U u ) SAFEINT_NOTHROW
 {
     return GreaterThanTest< T, U, ValidComparison< T, U >::method >::GreaterThan( t, u );
 }
 
 template < typename T, typename U >
-inline bool SafeGreaterThanEquals( const T t, const U u ) SAFEINT_NOTHROW
+_CONSTEXPR11 inline bool SafeGreaterThanEquals( const T t, const U u ) SAFEINT_NOTHROW
 {
     return !GreaterThanTest< U, T, ValidComparison< U, T >::method >::GreaterThan( u, t );
 }
 
 template < typename T, typename U >
-inline bool SafeLessThan( const T t, const U u ) SAFEINT_NOTHROW
+_CONSTEXPR11 inline bool SafeLessThan( const T t, const U u ) SAFEINT_NOTHROW
 {
     return GreaterThanTest< U, T, ValidComparison< U, T >::method >::GreaterThan( u, t );
 }
 
 template < typename T, typename U >
-inline bool SafeLessThanEquals( const T t, const U u ) SAFEINT_NOTHROW
+_CONSTEXPR11 inline bool SafeLessThanEquals( const T t, const U u ) SAFEINT_NOTHROW
 {
     return !GreaterThanTest< T, U, ValidComparison< T, U >::method >::GreaterThan( t, u );
 }
 
 template < typename T, typename U >
-inline bool SafeModulus( const T& t, const U& u, T& result ) SAFEINT_NOTHROW
+_CONSTEXPR11 inline bool SafeModulus( const T& t, const U& u, T& result ) SAFEINT_NOTHROW
 {
     return ( ModulusHelper< T, U, ValidComparison< T, U >::method >::Modulus( t, u, result ) == SafeIntNoError );
 }
 
 template < typename T, typename U >
-inline bool SafeMultiply( T t, U u, T& result ) SAFEINT_NOTHROW
+_CONSTEXPR11 inline bool SafeMultiply( T t, U u, T& result ) SAFEINT_NOTHROW
 {
     return MultiplicationHelper< T, U, MultiplicationMethod< T, U >::method >::Multiply( t, u, result );
 }
 
 template < typename T, typename U >
-inline bool SafeDivide( T t, U u, T& result ) SAFEINT_NOTHROW
+_CONSTEXPR11 inline bool SafeDivide( T t, U u, T& result ) SAFEINT_NOTHROW
 {
     return ( DivisionHelper< T, U, DivisionMethod< T, U >::method >::Divide( t, u, result ) == SafeIntNoError );
 }
 
 template < typename T, typename U >
-inline bool SafeAdd( T t, U u, T& result ) SAFEINT_NOTHROW
+_CONSTEXPR11 inline bool SafeAdd( T t, U u, T& result ) SAFEINT_NOTHROW
 {
     return AdditionHelper< T, U, AdditionMethod< T, U >::method >::Addition( t, u, result );
 }
 
 template < typename T, typename U >
-inline bool SafeSubtract( T t, U u, T& result ) SAFEINT_NOTHROW
+_CONSTEXPR11 inline bool SafeSubtract( T t, U u, T& result ) SAFEINT_NOTHROW
 {
     return SubtractionHelper< T, U, SubtractionMethod< T, U >::method >::Subtract( t, u, result );
 }
@@ -6594,7 +6594,7 @@ _CONSTEXPR11 bool operator >=( SafeInt<T, E> lhs, U rhs ) SAFEINT_NOTHROW
 }
 
 template < typename T, typename U, typename E >
-bool operator >=( SafeInt< T, E > lhs, SafeInt< U, E > rhs ) SAFEINT_NOTHROW
+_CONSTEXPR11 bool operator >=( SafeInt< T, E > lhs, SafeInt< U, E > rhs ) SAFEINT_NOTHROW
 {
     return !GreaterThanTest< U, T, ValidComparison< U, T >::method >::GreaterThan( (U)rhs, (T)lhs );
 }
