@@ -4303,7 +4303,7 @@ public:
 template < typename T, typename U > class AdditionHelper < T, U, AdditionState_ManualCheckInt64Uint64 >
 {
 public:
-	_CONSTEXPR14 static bool Addition( const __int64& lhs, const unsigned __int64& rhs, __int64& result ) SAFEINT_NOTHROW
+	_CONSTEXPR14 static bool Addition( const __int64& lhs, const unsigned __int64& rhs, T& result ) SAFEINT_NOTHROW
     {
         SAFEINT_STATIC_ASSERT( IntTraits< T >::isInt64 && IntTraits< U >::isUint64 );
         // rhs is unsigned __int64, lhs __int64
@@ -4317,6 +4317,7 @@ public:
             return true;
         }
 
+		result = 0;
         return false;
     }
 
