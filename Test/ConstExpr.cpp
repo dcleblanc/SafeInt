@@ -10,7 +10,7 @@
 #undef SAFEINT_USE_INTRINSICS
 #define SAFEINT_USE_INTRINSICS 0
 
-#if !defined __clang__ && defined __GNUC__
+#if !defined __clang__ && defined __GNUC__ && __cplusplus >= 201402L
 // The gcc compiler isn't smart enough to sort out that the constexpr exception functions
 // are never hit, so create a null exception handler. Nothing in this file is tested at runtime in any case.
 class SafeIntGccCompileOnly
