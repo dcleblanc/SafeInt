@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License.
+
 #if !defined __GNUC__
 // relative include path contains '..', specific to this file
 #pragma warning( disable: 4464 )
