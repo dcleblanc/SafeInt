@@ -1070,7 +1070,7 @@ template < typename T, int > class AbsValueHelper;
 template < typename T > class AbsValueHelper < T, AbsMethodInt>
 {
 public:
-    static unsigned __int32 Abs( T t ) SAFEINT_NOTHROW
+	_CONSTEXPR14 static unsigned __int32 Abs( T t ) SAFEINT_NOTHROW
     {
         SAFEINT_ASSERT( t < 0 );
         return ~(unsigned __int32)t + 1;
@@ -1080,7 +1080,7 @@ public:
 template < typename T > class AbsValueHelper < T, AbsMethodInt64 >
 {
 public:
-    static unsigned __int64 Abs( T t ) SAFEINT_NOTHROW
+	_CONSTEXPR14 static unsigned __int64 Abs( T t ) SAFEINT_NOTHROW
     {
         SAFEINT_ASSERT( t < 0 );
         return ~(unsigned __int64)t + 1;
@@ -1090,7 +1090,7 @@ public:
 template < typename T > class AbsValueHelper < T, AbsMethodNoop >
 {
 public:
-    static T Abs( T t ) SAFEINT_NOTHROW
+	_CONSTEXPR14 static T Abs( T t ) SAFEINT_NOTHROW
     {
         // Why are you calling Abs on an unsigned number ???
         SAFEINT_ASSERT( false );
