@@ -5,21 +5,13 @@
 Use this to check specific scenarios
 */
 
-template <typename T, typename U>
-_CONSTEXPR14 U LShiftOperator2()
-{
-	// Have to explicitly force this operator
-	// to be used
-	U lhs = 3;
-	SafeInt<T> s(2);
-
-	SafeInt<U> r = operator <<(lhs, s);
-	return r;
-}
-
 int main(int, char**)
 {
-	LShiftOperator2<char, int>();
+	__int64 a = 2;
+	unsigned long b = 3;
+	__int64 ret;
+
+	bool f = SafeAdd(a, b, ret);
 
 	return 0;
 }
