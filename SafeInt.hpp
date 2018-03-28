@@ -157,6 +157,15 @@ Please read the leading comments before using the class.
 #define SAFEINT_WEAK
 #endif
 
+// On the Microsoft compiler, violating a throw() annotation is a silent error.
+// Other compilers might turn these into exceptions, and some users may want to not have throw() enabled.
+// In addition, some error handlers may not throw C++ exceptions, which makes everything no throw.
+#if defined SAFEINT_REMOVE_NOTHROW
+#define SAFEINT_NOTHROW
+#else
+#define SAFEINT_NOTHROW noexcept
+#endif
+
 #include <cstdint>
 #include <limits>
 
@@ -687,15 +696,6 @@ enum SafeIntError
 *    Overall, this is probably the best approach.
 * */
 
-// On the Microsoft compiler, violating a throw() annotation is a silent error.
-// Other compilers might turn these into exceptions, and some users may want to not have throw() enabled.
-// In addition, some error handlers may not throw C++ exceptions, which makes everything no throw.
-#if defined SAFEINT_REMOVE_NOTHROW
-#define SAFEINT_NOTHROW
-#else
-#define SAFEINT_NOTHROW noexcept
-#endif
-
 #if defined VISUAL_STUDIO_SAFEINT_COMPAT
 namespace msl
 {
@@ -850,20 +850,22 @@ template <> class CompileConst<false> { public: _CONSTEXPR11 static bool Value()
 // from compiling in the case of an enum, which is the point of the specialization
 // that follows.
 
-// If we have support for std<typetraits>, then we can do this easily, and detect enums as well
-template < typename T > class NumericType;
-
 #if !(defined _LIBCPP_TYPE_TRAITS || defined _TYPE_TRAITS_ || defined _GLIBCXX_TYPE_TRAITS)
 #error "type traits are now required in order to properly support initialization from an enum"
 #endif // type traits
 
-// Continue to special case bool
-template <> class NumericType<bool>             { public: enum{ isBool = true,  isFloat = false, isInt = false }; };
-template < typename T > class NumericType
+namespace safeint_internal
 {
-    public: 
+    // If we have support for std<typetraits>, then we can do this easily, and detect enums as well
+    template < typename T > class numeric_type;
+
+    // Continue to special case bool
+    template <> class numeric_type<bool> { public: enum { isBool = true, isFloat = false, isInt = false }; };
+    template < typename T > class numeric_type
+    {
+    public:
         enum
-        { 
+        {
             isBool = false, // We specialized out a bool  
             isFloat = std::is_floating_point<T>::value,
             // If it is an enum, then consider it an int type
@@ -872,60 +874,56 @@ template < typename T > class NumericType
             isInt = std::is_integral<T>::value || std::is_enum<T>::value,
             isEnum = std::is_enum<T>::value
         };
-};
-
-template < typename T > class IntTraits
-{
-public:
-    SAFEINT_STATIC_ASSERT( NumericType<T>::isInt );
-    enum
-    {
-        isSigned  = std::numeric_limits<T>::is_signed,
-        is64Bit   = ( sizeof(T) == 8 ),
-        is32Bit   = ( sizeof(T) == 4 ),
-        is16Bit   = ( sizeof(T) == 2 ),
-        is8Bit    = ( sizeof(T) == 1 ),
-        isLT32Bit = ( sizeof(T) < 4 ),
-        isLT64Bit = ( sizeof(T) < 8 ),
-        isInt8    = ( sizeof(T) == 1 && isSigned ),
-        isUint8   = ( sizeof(T) == 1 && !isSigned ),
-        isInt16   = ( sizeof(T) == 2 && isSigned ),
-        isUint16  = ( sizeof(T) == 2 && !isSigned ),
-        isInt32   = ( sizeof(T) == 4 && isSigned ),
-        isUint32  = ( sizeof(T) == 4 && !isSigned ),
-        isInt64   = ( sizeof(T) == 8 && isSigned ),
-        isUint64  = ( sizeof(T) == 8 && !isSigned ),
-        bitCount  = ( sizeof(T)*8 ),
-        isBool    = ( (T)2 == (T)1 )
     };
 
-    // On version 13.10 enums cannot define std::int64_t values
-    // so we'll use const statics instead!
-    // These must be cast to deal with the possibility of a SafeInt being given an enum as an argument
-    const static T maxInt = static_cast<T>(std::numeric_limits<T>::max());
-    const static T minInt = static_cast<T>(std::numeric_limits<T>::min());
-};
-
-template < typename T >
-const T IntTraits< T >::maxInt;
-template < typename T >
-const T IntTraits< T >::minInt;
-
-template < typename T, typename U > class SafeIntCompare
-{
-public:
-    enum
+    template < typename T > class int_traits
     {
-        isBothSigned = (IntTraits< T >::isSigned && IntTraits< U >::isSigned),
-        isBothUnsigned = (!IntTraits< T >::isSigned && !IntTraits< U >::isSigned),
-        isLikeSigned = ((bool)(IntTraits< T >::isSigned) == (bool)(IntTraits< U >::isSigned)),
-        isCastOK = ((isLikeSigned && sizeof(T) >= sizeof(U)) ||
-                    (IntTraits< T >::isSigned && sizeof(T) > sizeof(U))),
-        isBothLT32Bit = (IntTraits< T >::isLT32Bit && IntTraits< U >::isLT32Bit),
-        isBothLT64Bit = (IntTraits< T >::isLT64Bit && IntTraits< U >::isLT64Bit)
-    };
-};
+    public:
+        SAFEINT_STATIC_ASSERT(safeint_internal::numeric_type<T>::isInt);
+        enum
+        {
+            isSigned = std::numeric_limits<T>::is_signed,
+            is64Bit = (sizeof(T) == 8),
+            is32Bit = (sizeof(T) == 4),
+            is16Bit = (sizeof(T) == 2),
+            is8Bit = (sizeof(T) == 1),
+            isLT32Bit = (sizeof(T) < 4),
+            isLT64Bit = (sizeof(T) < 8),
+            isInt8 = (sizeof(T) == 1 && isSigned),
+            isUint8 = (sizeof(T) == 1 && !isSigned),
+            isInt16 = (sizeof(T) == 2 && isSigned),
+            isUint16 = (sizeof(T) == 2 && !isSigned),
+            isInt32 = (sizeof(T) == 4 && isSigned),
+            isUint32 = (sizeof(T) == 4 && !isSigned),
+            isInt64 = (sizeof(T) == 8 && isSigned),
+            isUint64 = (sizeof(T) == 8 && !isSigned),
+            bitCount = (sizeof(T) * 8),
+            isBool = ((T)2 == (T)1)
+        };
 
+        // On version 13.10 enums cannot define std::int64_t values
+        // so we'll use const statics instead!
+        // These must be cast to deal with the possibility of a SafeInt being given an enum as an argument
+        const static T maxInt = static_cast<T>(std::numeric_limits<T>::max());
+        const static T minInt = static_cast<T>(std::numeric_limits<T>::min());
+    };
+
+    template < typename T, typename U > class type_compare
+    {
+    public:
+        enum
+        {
+            isBothSigned = (safeint_internal::int_traits< T >::isSigned && safeint_internal::int_traits< U >::isSigned),
+            isBothUnsigned = (!safeint_internal::int_traits< T >::isSigned && !safeint_internal::int_traits< U >::isSigned),
+            isLikeSigned = ((bool)(safeint_internal::int_traits< T >::isSigned) == (bool)(safeint_internal::int_traits< U >::isSigned)),
+            isCastOK = ((isLikeSigned && sizeof(T) >= sizeof(U)) ||
+            (safeint_internal::int_traits< T >::isSigned && sizeof(T) > sizeof(U))),
+            isBothLT32Bit = (safeint_internal::int_traits< T >::isLT32Bit && safeint_internal::int_traits< U >::isLT32Bit),
+            isBothLT64Bit = (safeint_internal::int_traits< T >::isLT64Bit && safeint_internal::int_traits< U >::isLT64Bit)
+        };
+    };
+
+}
 //all of the arithmetic operators can be solved by the same code within
 //each of these regions without resorting to compile-time constant conditionals
 //most operators collapse the problem into less than the 22 zones, but this is used
@@ -938,35 +936,34 @@ public:
     enum
     {
         //unsigned-unsigned zone
-        IntZone_UintLT32_UintLT32 = SafeIntCompare< T,U >::isBothUnsigned && SafeIntCompare< T,U >::isBothLT32Bit,
-        IntZone_Uint32_UintLT64   = SafeIntCompare< T,U >::isBothUnsigned && IntTraits< T >::is32Bit && IntTraits< U >::isLT64Bit,
-        IntZone_UintLT32_Uint32   = SafeIntCompare< T,U >::isBothUnsigned && IntTraits< T >::isLT32Bit && IntTraits< U >::is32Bit,
-        IntZone_Uint64_Uint       = SafeIntCompare< T,U >::isBothUnsigned && IntTraits< T >::is64Bit,
-        IntZone_UintLT64_Uint64    = SafeIntCompare< T,U >::isBothUnsigned && IntTraits< T >::isLT64Bit && IntTraits< U >::is64Bit,
+        IntZone_UintLT32_UintLT32 = safeint_internal::type_compare< T,U >::isBothUnsigned && safeint_internal::type_compare< T,U >::isBothLT32Bit,
+        IntZone_Uint32_UintLT64   = safeint_internal::type_compare< T,U >::isBothUnsigned && safeint_internal::int_traits< T >::is32Bit && safeint_internal::int_traits< U >::isLT64Bit,
+        IntZone_UintLT32_Uint32   = safeint_internal::type_compare< T,U >::isBothUnsigned && safeint_internal::int_traits< T >::isLT32Bit && safeint_internal::int_traits< U >::is32Bit,
+        IntZone_Uint64_Uint       = safeint_internal::type_compare< T,U >::isBothUnsigned && safeint_internal::int_traits< T >::is64Bit,
+        IntZone_UintLT64_Uint64    = safeint_internal::type_compare< T,U >::isBothUnsigned && safeint_internal::int_traits< T >::isLT64Bit && safeint_internal::int_traits< U >::is64Bit,
         //unsigned-signed
-        IntZone_UintLT32_IntLT32  = !IntTraits< T >::isSigned && IntTraits< U >::isSigned && SafeIntCompare< T,U >::isBothLT32Bit,
-        IntZone_Uint32_IntLT64    = IntTraits< T >::isUint32 && IntTraits< U >::isSigned && IntTraits< U >::isLT64Bit,
-        IntZone_UintLT32_Int32    = !IntTraits< T >::isSigned && IntTraits< T >::isLT32Bit && IntTraits< U >::isInt32,
-        IntZone_Uint64_Int        = IntTraits< T >::isUint64 && IntTraits< U >::isSigned && IntTraits< U >::isLT64Bit,
-        IntZone_UintLT64_Int64    = !IntTraits< T >::isSigned && IntTraits< T >::isLT64Bit && IntTraits< U >::isInt64,
-        IntZone_Uint64_Int64      = IntTraits< T >::isUint64 && IntTraits< U >::isInt64,
+        IntZone_UintLT32_IntLT32  = !safeint_internal::int_traits< T >::isSigned && safeint_internal::int_traits< U >::isSigned && safeint_internal::type_compare< T,U >::isBothLT32Bit,
+        IntZone_Uint32_IntLT64    = safeint_internal::int_traits< T >::isUint32 && safeint_internal::int_traits< U >::isSigned && safeint_internal::int_traits< U >::isLT64Bit,
+        IntZone_UintLT32_Int32    = !safeint_internal::int_traits< T >::isSigned && safeint_internal::int_traits< T >::isLT32Bit && safeint_internal::int_traits< U >::isInt32,
+        IntZone_Uint64_Int        = safeint_internal::int_traits< T >::isUint64 && safeint_internal::int_traits< U >::isSigned && safeint_internal::int_traits< U >::isLT64Bit,
+        IntZone_UintLT64_Int64    = !safeint_internal::int_traits< T >::isSigned && safeint_internal::int_traits< T >::isLT64Bit && safeint_internal::int_traits< U >::isInt64,
+        IntZone_Uint64_Int64      = safeint_internal::int_traits< T >::isUint64 && safeint_internal::int_traits< U >::isInt64,
         //signed-signed
-        IntZone_IntLT32_IntLT32   = SafeIntCompare< T,U >::isBothSigned && SafeIntCompare< T, U >::isBothLT32Bit,
-        IntZone_Int32_IntLT64     = SafeIntCompare< T,U >::isBothSigned && IntTraits< T >::is32Bit && IntTraits< U >::isLT64Bit,
-        IntZone_IntLT32_Int32     = SafeIntCompare< T,U >::isBothSigned && IntTraits< T >::isLT32Bit && IntTraits< U >::is32Bit,
-        IntZone_Int64_Int64       = SafeIntCompare< T,U >::isBothSigned && IntTraits< T >::isInt64 && IntTraits< U >::isInt64,
-        IntZone_Int64_Int         = SafeIntCompare< T,U >::isBothSigned && IntTraits< T >::is64Bit && IntTraits< U >::isLT64Bit,
-        IntZone_IntLT64_Int64     = SafeIntCompare< T,U >::isBothSigned && IntTraits< T >::isLT64Bit && IntTraits< U >::is64Bit,
+        IntZone_IntLT32_IntLT32   = safeint_internal::type_compare< T,U >::isBothSigned && safeint_internal::type_compare< T, U >::isBothLT32Bit,
+        IntZone_Int32_IntLT64     = safeint_internal::type_compare< T,U >::isBothSigned && safeint_internal::int_traits< T >::is32Bit && safeint_internal::int_traits< U >::isLT64Bit,
+        IntZone_IntLT32_Int32     = safeint_internal::type_compare< T,U >::isBothSigned && safeint_internal::int_traits< T >::isLT32Bit && safeint_internal::int_traits< U >::is32Bit,
+        IntZone_Int64_Int64       = safeint_internal::type_compare< T,U >::isBothSigned && safeint_internal::int_traits< T >::isInt64 && safeint_internal::int_traits< U >::isInt64,
+        IntZone_Int64_Int         = safeint_internal::type_compare< T,U >::isBothSigned && safeint_internal::int_traits< T >::is64Bit && safeint_internal::int_traits< U >::isLT64Bit,
+        IntZone_IntLT64_Int64     = safeint_internal::type_compare< T,U >::isBothSigned && safeint_internal::int_traits< T >::isLT64Bit && safeint_internal::int_traits< U >::is64Bit,
         //signed-unsigned
-        IntZone_IntLT32_UintLT32  = IntTraits< T >::isSigned && !IntTraits< U >::isSigned && SafeIntCompare< T,U >::isBothLT32Bit,
-        IntZone_Int32_UintLT32    = IntTraits< T >::isInt32 && !IntTraits< U >::isSigned && IntTraits< U >::isLT32Bit,
-        IntZone_IntLT64_Uint32    = IntTraits< T >::isSigned && IntTraits< T >::isLT64Bit && IntTraits< U >::isUint32,
-        IntZone_Int64_UintLT64    = IntTraits< T >::isInt64 && !IntTraits< U >::isSigned && IntTraits< U >::isLT64Bit,
-        IntZone_Int_Uint64        = IntTraits< T >::isSigned && IntTraits< U >::isUint64 && IntTraits< T >::isLT64Bit,
-        IntZone_Int64_Uint64      = IntTraits< T >::isInt64 && IntTraits< U >::isUint64
+        IntZone_IntLT32_UintLT32  = safeint_internal::int_traits< T >::isSigned && !safeint_internal::int_traits< U >::isSigned && safeint_internal::type_compare< T,U >::isBothLT32Bit,
+        IntZone_Int32_UintLT32    = safeint_internal::int_traits< T >::isInt32 && !safeint_internal::int_traits< U >::isSigned && safeint_internal::int_traits< U >::isLT32Bit,
+        IntZone_IntLT64_Uint32    = safeint_internal::int_traits< T >::isSigned && safeint_internal::int_traits< T >::isLT64Bit && safeint_internal::int_traits< U >::isUint32,
+        IntZone_Int64_UintLT64    = safeint_internal::int_traits< T >::isInt64 && !safeint_internal::int_traits< U >::isSigned && safeint_internal::int_traits< U >::isLT64Bit,
+        IntZone_Int_Uint64        = safeint_internal::int_traits< T >::isSigned && safeint_internal::int_traits< U >::isUint64 && safeint_internal::int_traits< T >::isLT64Bit,
+        IntZone_Int64_Uint64      = safeint_internal::int_traits< T >::isInt64 && safeint_internal::int_traits< U >::isUint64
     };
 };
-
 
 // In all of the following functions, we have two versions
 // One for SafeInt, which throws C++ (or possibly SEH) exceptions
@@ -975,7 +972,6 @@ public:
 
 // There's no real alternative to duplicating logic, but keeping the two versions
 // immediately next to one another will help reduce problems
-
 
 // useful function to help with getting the magnitude of a negative number
 enum AbsMethod
@@ -991,8 +987,8 @@ class GetAbsMethod
 public:
     enum
     {
-        method = IntTraits< T >::isLT64Bit && IntTraits< T >::isSigned ? AbsMethodInt :
-                 IntTraits< T >::isInt64 ? AbsMethodInt64 : AbsMethodNoop
+        method = safeint_internal::int_traits< T >::isLT64Bit && safeint_internal::int_traits< T >::isSigned ? AbsMethodInt :
+                 safeint_internal::int_traits< T >::isInt64 ? AbsMethodInt64 : AbsMethodNoop
     };
 };
 
@@ -1052,7 +1048,7 @@ public:
     _CONSTEXPR14 static T NegativeThrow( T t ) SAFEINT_CPP_THROW
     {
         // corner case
-        if( t != IntTraits< T >::minInt )
+        if( t != safeint_internal::int_traits< T >::minInt )
         {
             // cast prevents unneeded checks in the case of small ints
             return -t;
@@ -1063,7 +1059,7 @@ public:
     _CONSTEXPR14 static bool Negative( T t, T& ret ) SAFEINT_NOTHROW
     {
         // corner case
-        if( t != IntTraits< T >::minInt )
+        if( t != safeint_internal::int_traits< T >::minInt )
         {
             // cast prevents unneeded checks in the case of small ints
             ret = -t;
@@ -1130,7 +1126,7 @@ public:
 
     _CONSTEXPR14 static bool Negative( T t, T& ret ) SAFEINT_NOTHROW
     {
-        if( IntTraits<T>::isLT32Bit )
+        if( safeint_internal::int_traits<T>::isLT32Bit )
         {
             // See above
             SAFEINT_ASSERT( false );
@@ -1166,26 +1162,26 @@ class GetCastMethod
 public:
     enum
     {
-        method = ( NumericType<FromType>::isEnum )                     ? CastFromEnum :
-                 ( IntTraits< FromType >::isBool &&
-                     !IntTraits< ToType >::isBool )                    ? CastFromBool :
+        method = ( safeint_internal::numeric_type<FromType>::isEnum )                     ? CastFromEnum :
+                 ( safeint_internal::int_traits< FromType >::isBool &&
+                     !safeint_internal::int_traits< ToType >::isBool )                    ? CastFromBool :
 
-                 ( !IntTraits< FromType >::isBool &&
-                     IntTraits< ToType >::isBool )                     ? CastToBool :
+                 ( !safeint_internal::int_traits< FromType >::isBool &&
+                     safeint_internal::int_traits< ToType >::isBool )                     ? CastToBool :
 
-                 ( SafeIntCompare< ToType, FromType >::isCastOK )      ? CastOK :
+                 ( safeint_internal::type_compare< ToType, FromType >::isCastOK )      ? CastOK :
 
-                 ( ( IntTraits< ToType >::isSigned &&
-                        !IntTraits< FromType >::isSigned &&
+                 ( ( safeint_internal::int_traits< ToType >::isSigned &&
+                        !safeint_internal::int_traits< FromType >::isSigned &&
                         sizeof( FromType ) >= sizeof( ToType ) ) ||
-                   ( SafeIntCompare< ToType, FromType >::isBothUnsigned &&
+                   ( safeint_internal::type_compare< ToType, FromType >::isBothUnsigned &&
                         sizeof( FromType ) > sizeof( ToType ) ) )      ? CastCheckGTMax :
 
-                 ( !IntTraits< ToType >::isSigned &&
-                     IntTraits< FromType >::isSigned &&
+                 ( !safeint_internal::int_traits< ToType >::isSigned &&
+                     safeint_internal::int_traits< FromType >::isSigned &&
                      sizeof( ToType ) >= sizeof( FromType ) )          ? CastCheckLTZero :
 
-                 ( !IntTraits< ToType >::isSigned )                    ? CastCheckSafeIntMinMaxUnsigned
+                 ( !safeint_internal::int_traits< ToType >::isSigned )                    ? CastCheckSafeIntMinMaxUnsigned
                                                                        : CastCheckSafeIntMinMaxSigned
     };
 };
@@ -1275,7 +1271,7 @@ public:
             return false;
 
         // For the unsigned case
-        if (CompileConst< !IntTraits< T >::isSigned >::Value())
+        if (CompileConst< !safeint_internal::int_traits< T >::isSigned >::Value())
         {
             // Anything larger than this either is larger than 2^64-1, or cannot be represented by a double
             const std::uint64_t maxUnsignedDouble = signifDouble << 11;
@@ -1287,7 +1283,7 @@ public:
                 return false;
 
             // The input can now safely be cast to an unsigned long long
-            if (static_cast<std::uint64_t>(d) > IntTraits< T >::maxInt)
+            if (static_cast<std::uint64_t>(d) > safeint_internal::int_traits< T >::maxInt)
                 return false;
         }
         else
@@ -1302,7 +1298,7 @@ public:
 
             // And now cast to long long, and check against min and max for this type
             std::int64_t test = static_cast<std::int64_t>(d);
-            if (test < IntTraits< T >::minInt || test > IntTraits< T >::maxInt)
+            if (test < safeint_internal::int_traits< T >::minInt || test > safeint_internal::int_traits< T >::maxInt)
                 return false;
         }
         return true;
@@ -1405,7 +1401,7 @@ template < typename T, typename U > class SafeCastHelper < T, U, CastCheckGTMax 
 public:
     _CONSTEXPR14 static bool Cast( U u, T& t ) SAFEINT_NOTHROW
     {
-        if( u > (U)IntTraits< T >::maxInt )
+        if( u > (U)safeint_internal::int_traits< T >::maxInt )
             return false;
 
         t = (T)u;
@@ -1415,7 +1411,7 @@ public:
     template < typename E >
     _CONSTEXPR14 static void CastThrow( U u, T& t ) SAFEINT_CPP_THROW
     {
-        if( u > (U)IntTraits< T >::maxInt )
+        if( u > (U)safeint_internal::int_traits< T >::maxInt )
             E::SafeIntOnOverflow();
 
         t = (T)u;
@@ -1428,7 +1424,7 @@ public:
     _CONSTEXPR14 static bool Cast( U u, T& t ) SAFEINT_NOTHROW
     {
         // U is signed - T could be either signed or unsigned
-        if( u > IntTraits< T >::maxInt || u < 0 )
+        if( u > safeint_internal::int_traits< T >::maxInt || u < 0 )
             return false;
 
         t = (T)u;
@@ -1439,7 +1435,7 @@ public:
     _CONSTEXPR14 static void CastThrow( U u, T& t ) SAFEINT_CPP_THROW
     {
         // U is signed - T could be either signed or unsigned
-        if( u > IntTraits< T >::maxInt || u < 0 )
+        if( u > safeint_internal::int_traits< T >::maxInt || u < 0 )
             E::SafeIntOnOverflow();
 
         t = (T)u;
@@ -1452,7 +1448,7 @@ public:
     _CONSTEXPR14 static bool Cast( U u, T& t ) SAFEINT_NOTHROW
     {
         // T, U are signed
-        if( u > IntTraits< T >::maxInt || u < IntTraits< T >::minInt )
+        if( u > safeint_internal::int_traits< T >::maxInt || u < safeint_internal::int_traits< T >::minInt )
             return false;
 
         t = (T)u;
@@ -1463,7 +1459,7 @@ public:
     _CONSTEXPR14 static void CastThrow( U u, T& t ) SAFEINT_CPP_THROW
     {
         //T, U are signed
-        if( u > IntTraits< T >::maxInt || u < IntTraits< T >::minInt )
+        if( u > safeint_internal::int_traits< T >::maxInt || u < safeint_internal::int_traits< T >::minInt )
             E::SafeIntOnOverflow();
 
         t = (T)u;
@@ -1508,12 +1504,12 @@ public:
 #ifdef ANSI_CONVERSIONS
         method = ComparisonMethod_Ok
 #else
-        method = ( ( SafeIntCompare< T, U >::isLikeSigned )                              ? ComparisonMethod_Ok :
-                 ( ( IntTraits< T >::isSigned && sizeof(T) < 8 && sizeof(U) < 4 ) ||
-                   ( IntTraits< U >::isSigned && sizeof(T) < 4 && sizeof(U) < 8 ) )  ? ComparisonMethod_CastInt :
-                 ( ( IntTraits< T >::isSigned && sizeof(U) < 8 ) ||
-                   ( IntTraits< U >::isSigned && sizeof(T) < 8 ) )                   ? ComparisonMethod_CastInt64 :
-                 ( !IntTraits< T >::isSigned )                                       ? ComparisonMethod_UnsignedT :
+        method = ( ( safeint_internal::type_compare< T, U >::isLikeSigned )                              ? ComparisonMethod_Ok :
+                 ( ( safeint_internal::int_traits< T >::isSigned && sizeof(T) < 8 && sizeof(U) < 4 ) ||
+                   ( safeint_internal::int_traits< U >::isSigned && sizeof(T) < 4 && sizeof(U) < 8 ) )  ? ComparisonMethod_CastInt :
+                 ( ( safeint_internal::int_traits< T >::isSigned && sizeof(U) < 8 ) ||
+                   ( safeint_internal::int_traits< U >::isSigned && sizeof(T) < 8 ) )                   ? ComparisonMethod_CastInt64 :
+                 ( !safeint_internal::int_traits< T >::isSigned )                                       ? ComparisonMethod_UnsignedT :
                                                                                        ComparisonMethod_UnsignedU )
 #endif
     };
@@ -1628,7 +1624,7 @@ public:
             return SafeIntDivideByZero;
 
         //trap corner case
-        if( CompileConst< IntTraits< U >::isSigned >::Value() )
+        if( CompileConst< safeint_internal::int_traits< U >::isSigned >::Value() )
         {
             // Some compilers don't notice that this only compiles when u is signed
             // Add cast to make them happy
@@ -1650,7 +1646,7 @@ public:
             E::SafeIntOnDivZero();
 
         //trap corner case
-        if( CompileConst< IntTraits< U >::isSigned >::Value() )
+        if( CompileConst< safeint_internal::int_traits< U >::isSigned >::Value() )
         {
             if( u == (U)-1 )
             {
@@ -1672,7 +1668,7 @@ public:
             return SafeIntDivideByZero;
 
         //trap corner case
-        if( CompileConst< IntTraits< U >::isSigned >::Value() )
+        if( CompileConst< safeint_internal::int_traits< U >::isSigned >::Value() )
         {
             if( u == (U)-1 )
             {
@@ -1692,7 +1688,7 @@ public:
             E::SafeIntOnDivZero();
 
         //trap corner case
-        if( CompileConst< IntTraits< U >::isSigned >::Value() )
+        if( CompileConst< safeint_internal::int_traits< U >::isSigned >::Value() )
         {
             if( u == (U)-1 )
             {
@@ -1714,7 +1710,7 @@ public:
             return SafeIntDivideByZero;
 
         //trap corner case
-        if( CompileConst< IntTraits< U >::isSigned >::Value() )
+        if( CompileConst< safeint_internal::int_traits< U >::isSigned >::Value() )
         {
             if( u == (U)-1 )
             {
@@ -1733,7 +1729,7 @@ public:
         if(u == 0)
             E::SafeIntOnDivZero();
 
-        if( CompileConst< IntTraits< U >::isSigned >::Value() )
+        if( CompileConst< safeint_internal::int_traits< U >::isSigned >::Value() )
         {
             if( u == (U)-1 )
             {
@@ -1843,8 +1839,8 @@ public:
         method = (IntRegion< T,U >::IntZone_UintLT32_UintLT32  ? MultiplicationState_CastUint :
                  (IntRegion< T,U >::IntZone_Uint32_UintLT64 ||
                   IntRegion< T,U >::IntZone_UintLT32_Uint32)   ? MultiplicationState_CastUint64 :
-                  SafeIntCompare< T,U >::isBothUnsigned &&
-                  IntTraits< T >::isUint64 && IntTraits< U >::isUint64 ? MultiplicationState_Uint64Uint64 :
+                  safeint_internal::type_compare< T,U >::isBothUnsigned &&
+                  safeint_internal::int_traits< T >::isUint64 && safeint_internal::int_traits< U >::isUint64 ? MultiplicationState_Uint64Uint64 :
                  (IntRegion< T,U >::IntZone_Uint64_Uint)       ? MultiplicationState_Uint64Uint :
                  (IntRegion< T,U >::IntZone_UintLT64_Uint64)   ? MultiplicationState_UintUint64 :
                  // unsigned-signed
@@ -1882,7 +1878,7 @@ public:
     {
         int tmp = t * u;
 
-        if( tmp > IntTraits< T >::maxInt || tmp < IntTraits< T >::minInt )
+        if( tmp > safeint_internal::int_traits< T >::maxInt || tmp < safeint_internal::int_traits< T >::minInt )
             return false;
 
         ret = (T)tmp;
@@ -1894,7 +1890,7 @@ public:
     {
         int tmp = t * u;
 
-        if( tmp > IntTraits< T >::maxInt || tmp < IntTraits< T >::minInt )
+        if( tmp > safeint_internal::int_traits< T >::maxInt || tmp < safeint_internal::int_traits< T >::minInt )
             E::SafeIntOnOverflow();
 
         ret = (T)tmp;
@@ -1909,7 +1905,7 @@ public:
     {
         unsigned int tmp = (unsigned int)(t * u);
 
-        if( tmp > IntTraits< T >::maxInt )
+        if( tmp > safeint_internal::int_traits< T >::maxInt )
             return false;
 
         ret = (T)tmp;
@@ -1921,7 +1917,7 @@ public:
     {
         unsigned int tmp = (unsigned int)( t * u );
 
-        if( tmp > IntTraits< T >::maxInt )
+        if( tmp > safeint_internal::int_traits< T >::maxInt )
             E::SafeIntOnOverflow();
 
         ret = (T)tmp;
@@ -1936,7 +1932,7 @@ public:
     {
         std::int64_t tmp = (std::int64_t)t * (std::int64_t)u;
 
-        if(tmp > (std::int64_t)IntTraits< T >::maxInt || tmp < (std::int64_t)IntTraits< T >::minInt)
+        if(tmp > (std::int64_t)safeint_internal::int_traits< T >::maxInt || tmp < (std::int64_t)safeint_internal::int_traits< T >::minInt)
             return false;
 
         ret = (T)tmp;
@@ -1948,7 +1944,7 @@ public:
     {
         std::int64_t tmp = (std::int64_t)t * (std::int64_t)u;
 
-        if(tmp > (std::int64_t)IntTraits< T >::maxInt || tmp < (std::int64_t)IntTraits< T >::minInt)
+        if(tmp > (std::int64_t)safeint_internal::int_traits< T >::maxInt || tmp < (std::int64_t)safeint_internal::int_traits< T >::minInt)
             E::SafeIntOnOverflow();
 
         ret = (T)tmp;
@@ -1963,7 +1959,7 @@ public:
     {
         std::uint64_t tmp = (std::uint64_t)t * (std::uint64_t)u;
 
-        if(tmp > (std::uint64_t)IntTraits< T >::maxInt)
+        if(tmp > (std::uint64_t)safeint_internal::int_traits< T >::maxInt)
             return false;
 
         ret = (T)tmp;
@@ -1975,7 +1971,7 @@ public:
     {
         std::uint64_t tmp = (std::uint64_t)t * (std::uint64_t)u;
 
-        if(tmp > (std::uint64_t)IntTraits< T >::maxInt)
+        if(tmp > (std::uint64_t)safeint_internal::int_traits< T >::maxInt)
             E::SafeIntOnOverflow();
 
         ret = (T)tmp;
@@ -2019,7 +2015,7 @@ inline bool IntrinsicMultiplyInt64( const std::int64_t& a, const std::int64_t& b
     {
         // Result should be positive
         // Check for overflow
-        if( llHigh == 0 && (std::uint64_t)*pRet <= IntTraits< std::int64_t >::maxInt )
+        if( llHigh == 0 && (std::uint64_t)*pRet <= safeint_internal::int_traits< std::int64_t >::maxInt )
             return true;
     }
     return false;
@@ -2334,7 +2330,7 @@ public:
 
         if( !fIsNegative )
         {
-            if( tmp <= (std::uint64_t)IntTraits< std::int32_t >::maxInt )
+            if( tmp <= (std::uint64_t)safeint_internal::int_traits< std::int32_t >::maxInt )
             {
                 *pRet = (std::int32_t)tmp;
                 return true;
@@ -2342,7 +2338,7 @@ public:
         }
         else
         {
-            if( tmp <= (std::uint64_t)IntTraits< std::int32_t >::maxInt+1 )
+            if( tmp <= (std::uint64_t)safeint_internal::int_traits< std::int32_t >::maxInt+1 )
             {
                 *pRet = SignedNegation< std::int32_t >::Value( tmp );
                 return true;
@@ -2380,7 +2376,7 @@ public:
 
         if( !fIsNegative )
         {
-            if( tmp <= (std::uint64_t)IntTraits< std::int32_t >::maxInt )
+            if( tmp <= (std::uint64_t)safeint_internal::int_traits< std::int32_t >::maxInt )
             {
                 *pRet = (std::int32_t)tmp;
                 return;
@@ -2388,7 +2384,7 @@ public:
         }
         else
         {
-            if( tmp <= (std::uint64_t)IntTraits< std::int32_t >::maxInt+1 )
+            if( tmp <= (std::uint64_t)safeint_internal::int_traits< std::int32_t >::maxInt+1 )
             {
                 *pRet = SignedNegation< std::int32_t >::Value( tmp );
                 return;
@@ -2491,7 +2487,7 @@ public:
             if( aNegative ^ bNegative )
             {
                 // Result must be negative
-                if( tmp <= (std::uint64_t)IntTraits< std::int64_t >::minInt )
+                if( tmp <= (std::uint64_t)safeint_internal::int_traits< std::int64_t >::minInt )
                 {
                     *pRet = SignedNegation< std::int64_t >::Value( tmp );
                     return true;
@@ -2500,7 +2496,7 @@ public:
             else
             {
                 // Result must be positive
-                if( tmp <= (std::uint64_t)IntTraits< std::int64_t >::maxInt )
+                if( tmp <= (std::uint64_t)safeint_internal::int_traits< std::int64_t >::maxInt )
                 {
                     *pRet = (std::int64_t)tmp;
                     return true;
@@ -2544,7 +2540,7 @@ public:
         if( aNegative ^ bNegative )
         {
             // Result must be negative
-            if( tmp <= (std::uint64_t)IntTraits< std::int64_t >::minInt )
+            if( tmp <= (std::uint64_t)safeint_internal::int_traits< std::int64_t >::minInt )
             {
                 *pRet = SignedNegation< std::int64_t >::Value( tmp );
                 return;
@@ -2553,7 +2549,7 @@ public:
         else
         {
             // Result must be positive
-            if( tmp <= (std::uint64_t)IntTraits< std::int64_t >::maxInt )
+            if( tmp <= (std::uint64_t)safeint_internal::int_traits< std::int64_t >::maxInt )
             {
                 *pRet = (std::int64_t)tmp;
                 return;
@@ -2589,7 +2585,7 @@ public:
             if( aNegative )
             {
                 // Result must be negative
-                if( tmp <= (std::uint64_t)IntTraits< std::int64_t >::minInt )
+                if( tmp <= (std::uint64_t)safeint_internal::int_traits< std::int64_t >::minInt )
                 {
                     *pRet = SignedNegation< std::int64_t >::Value( tmp );
                     return true;
@@ -2598,7 +2594,7 @@ public:
             else
             {
                 // Result must be positive
-                if( tmp <= (std::uint64_t)IntTraits< std::int64_t >::maxInt )
+                if( tmp <= (std::uint64_t)safeint_internal::int_traits< std::int64_t >::maxInt )
                 {
                     *pRet = (std::int64_t)tmp;
                     return true;
@@ -2633,7 +2629,7 @@ public:
         if( aNegative )
         {
             // Result must be negative
-            if( tmp <= (std::uint64_t)IntTraits< std::int64_t >::minInt )
+            if( tmp <= (std::uint64_t)safeint_internal::int_traits< std::int64_t >::minInt )
             {
                 *pRet = SignedNegation< std::int64_t >::Value( tmp );
                 return;
@@ -2642,7 +2638,7 @@ public:
         else
         {
             // Result must be positive
-            if( tmp <= (std::uint64_t)IntTraits< std::int64_t >::maxInt )
+            if( tmp <= (std::uint64_t)safeint_internal::int_traits< std::int64_t >::maxInt )
             {
                 *pRet = (std::int64_t)tmp;
                 return;
@@ -2687,7 +2683,7 @@ public:
             if( aNegative ^ bNegative )
             {
                 // Result must be negative
-                if( tmp <= (std::uint64_t)IntTraits< std::int64_t >::minInt )
+                if( tmp <= (std::uint64_t)safeint_internal::int_traits< std::int64_t >::minInt )
                 {
                     *pRet = SignedNegation< std::int64_t >::Value( tmp );
                     return true;
@@ -2696,7 +2692,7 @@ public:
             else
             {
                 // Result must be positive
-                if( tmp <= (std::uint64_t)IntTraits< std::int64_t >::maxInt )
+                if( tmp <= (std::uint64_t)safeint_internal::int_traits< std::int64_t >::maxInt )
                 {
                     *pRet = (std::int64_t)tmp;
                     return true;
@@ -2738,7 +2734,7 @@ public:
         if( aNegative ^ bNegative )
         {
             // Result must be negative
-            if( tmp <= (std::uint64_t)IntTraits< std::int64_t >::minInt )
+            if( tmp <= (std::uint64_t)safeint_internal::int_traits< std::int64_t >::minInt )
             {
                 *pRet = SignedNegation< std::int64_t >::Value( tmp );
                 return;
@@ -2747,7 +2743,7 @@ public:
         else
         {
             // Result must be positive
-            if( tmp <= (std::uint64_t)IntTraits< std::int64_t >::maxInt )
+            if( tmp <= (std::uint64_t)safeint_internal::int_traits< std::int64_t >::maxInt )
             {
                 *pRet = (std::int64_t)tmp;
                 return;
@@ -2769,8 +2765,8 @@ public:
 
         if( IntrinsicMultiplyInt64( a, b, &tmp ) )
         {
-            if( tmp > IntTraits< std::int32_t >::maxInt ||
-                tmp < IntTraits< std::int32_t >::minInt )
+            if( tmp > safeint_internal::int_traits< std::int32_t >::maxInt ||
+                tmp < safeint_internal::int_traits< std::int32_t >::minInt )
             {
                 return false;
             }
@@ -2804,7 +2800,7 @@ public:
             if( aNegative ^ bNegative )
             {
                 // Result must be negative
-                if( tmp <= (std::uint32_t)IntTraits< std::int32_t >::minInt )
+                if( tmp <= (std::uint32_t)safeint_internal::int_traits< std::int32_t >::minInt )
                 {
                     *pRet = SignedNegation< std::int32_t >::Value( tmp );
                     return true;
@@ -2813,7 +2809,7 @@ public:
             else
             {
                 // Result must be positive
-                if( tmp <= (std::uint32_t)IntTraits< std::int32_t >::maxInt )
+                if( tmp <= (std::uint32_t)safeint_internal::int_traits< std::int32_t >::maxInt )
                 {
                     *pRet = (std::int32_t)tmp;
                     return true;
@@ -2833,8 +2829,8 @@ public:
 
         if( IntrinsicMultiplyInt64( a, b, &tmp ) )
         {
-            if( tmp > IntTraits< std::int32_t >::maxInt ||
-                tmp < IntTraits< std::int32_t >::minInt )
+            if( tmp > safeint_internal::int_traits< std::int32_t >::maxInt ||
+                tmp < safeint_internal::int_traits< std::int32_t >::minInt )
             {
                 E::SafeIntOnOverflow();
             }
@@ -2868,7 +2864,7 @@ public:
         if( aNegative ^ bNegative )
         {
             // Result must be negative
-            if( tmp <= (std::uint32_t)IntTraits< std::int32_t >::minInt )
+            if( tmp <= (std::uint32_t)safeint_internal::int_traits< std::int32_t >::minInt )
             {
                 *pRet = SignedNegation< std::int32_t >::Value( tmp );
                 return;
@@ -2877,7 +2873,7 @@ public:
         else
         {
             // Result must be positive
-            if( tmp <= (std::uint32_t)IntTraits< std::int32_t >::maxInt )
+            if( tmp <= (std::uint32_t)safeint_internal::int_traits< std::int32_t >::maxInt )
             {
                 *pRet = (std::int32_t)tmp;
                 return;
@@ -2912,7 +2908,7 @@ public:
             if( aNegative )
             {
                 // Result must be negative
-                if( tmp <= (std::uint64_t)IntTraits< std::int64_t >::minInt )
+                if( tmp <= (std::uint64_t)safeint_internal::int_traits< std::int64_t >::minInt )
                 {
                     *pRet = SignedNegation< std::int64_t >::Value( tmp );
                     return true;
@@ -2921,7 +2917,7 @@ public:
             else
             {
                 // Result must be positive
-                if( tmp <= (std::uint64_t)IntTraits< std::int64_t >::maxInt )
+                if( tmp <= (std::uint64_t)safeint_internal::int_traits< std::int64_t >::maxInt )
                 {
                     *pRet = (std::int64_t)tmp;
                     return true;
@@ -2951,7 +2947,7 @@ public:
             if( aNegative )
             {
                 // Result must be negative
-                if( tmp <= (std::uint64_t)IntTraits< std::int64_t >::minInt )
+                if( tmp <= (std::uint64_t)safeint_internal::int_traits< std::int64_t >::minInt )
                 {
                     *pRet = SignedNegation< std::int64_t >::Value( tmp );
                     return;
@@ -2960,7 +2956,7 @@ public:
             else
             {
                 // Result must be positive
-                if( tmp <= (std::uint64_t)IntTraits< std::int64_t >::maxInt )
+                if( tmp <= (std::uint64_t)safeint_internal::int_traits< std::int64_t >::maxInt )
                 {
                     *pRet = (std::int64_t)tmp;
                     return;
@@ -2983,7 +2979,7 @@ public:
     // T, U are std::uint64_t
     _CONSTEXPR14 static bool Multiply( const T& t, const U& u, T& ret ) SAFEINT_NOTHROW
     {
-        SAFEINT_STATIC_ASSERT( IntTraits<T>::isUint64 && IntTraits<U>::isUint64 );
+        SAFEINT_STATIC_ASSERT( safeint_internal::int_traits<T>::isUint64 && safeint_internal::int_traits<U>::isUint64 );
         std::uint64_t t1 = t;
         std::uint64_t u1 = u;
         std::uint64_t tmp = 0;
@@ -2995,7 +2991,7 @@ public:
     template < typename E >
     _CONSTEXPR14 static void MultiplyThrow(const std::uint64_t& t, const std::uint64_t& u, T& ret) SAFEINT_CPP_THROW
     {
-        SAFEINT_STATIC_ASSERT( IntTraits<T>::isUint64 && IntTraits<U>::isUint64 );
+        SAFEINT_STATIC_ASSERT( safeint_internal::int_traits<T>::isUint64 && safeint_internal::int_traits<U>::isUint64 );
         std::uint64_t t1 = t;
         std::uint64_t u1 = u;
         std::uint64_t tmp = 0;
@@ -3011,7 +3007,7 @@ public:
     // U is any unsigned int 32-bit or less
     _CONSTEXPR14 static bool Multiply( const T& t, const U& u, T& ret ) SAFEINT_NOTHROW
     {
-        SAFEINT_STATIC_ASSERT( IntTraits<T>::isUint64 );
+        SAFEINT_STATIC_ASSERT( safeint_internal::int_traits<T>::isUint64 );
         std::uint64_t t1 = t;
         std::uint64_t tmp = 0;
         bool f = LargeIntRegMultiply< std::uint64_t, std::uint32_t >::RegMultiply( t1, (std::uint32_t)u, &tmp );
@@ -3022,7 +3018,7 @@ public:
     template < typename E >
     _CONSTEXPR14 static void MultiplyThrow( const T& t, const U& u, T& ret ) SAFEINT_CPP_THROW
     {
-        SAFEINT_STATIC_ASSERT( IntTraits<T>::isUint64 );
+        SAFEINT_STATIC_ASSERT( safeint_internal::int_traits<T>::isUint64 );
         std::uint64_t t1 = t;
         std::uint64_t tmp = 0;
         LargeIntRegMultiply< std::uint64_t, std::uint32_t >::template RegMultiplyThrow< E >( t1, (std::uint32_t)u, &tmp );
@@ -3038,7 +3034,7 @@ public:
     // U is std::uint64_t
     _CONSTEXPR14 static bool Multiply(const T& t, const U& u, T& ret) SAFEINT_NOTHROW
     {
-        SAFEINT_STATIC_ASSERT( IntTraits<U>::isUint64 );
+        SAFEINT_STATIC_ASSERT( safeint_internal::int_traits<U>::isUint64 );
         std::uint64_t u1 = u;
         std::uint32_t tmp = 0;
 
@@ -3054,7 +3050,7 @@ public:
     template < typename E >
     _CONSTEXPR14 static void MultiplyThrow(const T& t, const U& u, T& ret) SAFEINT_CPP_THROW
     {
-        SAFEINT_STATIC_ASSERT( IntTraits<U>::isUint64 );
+        SAFEINT_STATIC_ASSERT( safeint_internal::int_traits<U>::isUint64 );
         std::uint64_t u1 = u;
         std::uint32_t tmp = 0;
 
@@ -3070,7 +3066,7 @@ public:
     // U is any signed int, up to 64-bit
     _CONSTEXPR14 static bool Multiply(const T& t, const U& u, T& ret) SAFEINT_NOTHROW
     {
-        SAFEINT_STATIC_ASSERT( IntTraits<T>::isUint64 );
+        SAFEINT_STATIC_ASSERT( safeint_internal::int_traits<T>::isUint64 );
         std::uint64_t t1 = t;
         std::uint64_t tmp = 0;
         bool f = LargeIntRegMultiply< std::uint64_t, std::int32_t >::RegMultiply(t1, (std::int32_t)u, &tmp);
@@ -3081,7 +3077,7 @@ public:
     template < typename E >
     _CONSTEXPR14 static void MultiplyThrow(const T& t, const U& u, T& ret) SAFEINT_CPP_THROW
     {
-        SAFEINT_STATIC_ASSERT( IntTraits<T>::isUint64 );
+        SAFEINT_STATIC_ASSERT( safeint_internal::int_traits<T>::isUint64 );
         std::uint64_t t1 = t;
         std::uint64_t tmp = 0;
         LargeIntRegMultiply< std::uint64_t, std::int32_t >::template RegMultiplyThrow< E >(t1, (std::int32_t)u, &tmp);
@@ -3096,7 +3092,7 @@ public:
     // U is std::int64_t
     _CONSTEXPR14 static bool Multiply(const T& t, const U& u, T& ret) SAFEINT_NOTHROW
     {
-        SAFEINT_STATIC_ASSERT( IntTraits<T>::isUint64 && IntTraits<U>::isInt64 );
+        SAFEINT_STATIC_ASSERT( safeint_internal::int_traits<T>::isUint64 && safeint_internal::int_traits<U>::isInt64 );
         std::uint64_t t1 = t;
         std::int64_t          u1 = u;
         std::uint64_t tmp = 0;
@@ -3108,7 +3104,7 @@ public:
     template < typename E >
     _CONSTEXPR14 static void MultiplyThrow(const T& t, const U& u, T& ret) SAFEINT_CPP_THROW
     {
-        SAFEINT_STATIC_ASSERT( IntTraits<T>::isUint64 && IntTraits<U>::isInt64 );
+        SAFEINT_STATIC_ASSERT( safeint_internal::int_traits<T>::isUint64 && safeint_internal::int_traits<U>::isInt64 );
         std::uint64_t t1 = t;
         std::int64_t          u1 = u;
         std::uint64_t tmp = 0;
@@ -3124,7 +3120,7 @@ public:
     // U is std::int64_t
     _CONSTEXPR14 static bool Multiply(const T& t, const U& u, T& ret) SAFEINT_NOTHROW
     {
-        SAFEINT_STATIC_ASSERT( IntTraits<U>::isInt64 );
+        SAFEINT_STATIC_ASSERT( safeint_internal::int_traits<U>::isInt64 );
         std::int64_t          u1 = u;
         std::uint32_t tmp = 0;
 
@@ -3140,7 +3136,7 @@ public:
     template < typename E >
     _CONSTEXPR14 static void MultiplyThrow(const T& t, const U& u, T& ret) SAFEINT_CPP_THROW
     {
-        SAFEINT_STATIC_ASSERT( IntTraits<U>::isInt64 );
+        SAFEINT_STATIC_ASSERT( safeint_internal::int_traits<U>::isInt64 );
         std::int64_t          u1 = u;
         std::uint32_t tmp = 0;
 
@@ -3156,7 +3152,7 @@ public:
     // U is unsigned up to 32-bit
     _CONSTEXPR14 static bool Multiply( const T& t, const U& u, T& ret ) SAFEINT_NOTHROW
     {
-        SAFEINT_STATIC_ASSERT( IntTraits<T>::isInt64 );
+        SAFEINT_STATIC_ASSERT( safeint_internal::int_traits<T>::isInt64 );
         std::int64_t t1 = t;
         std::int64_t tmp = 0;
         bool f = LargeIntRegMultiply< std::int64_t, std::uint32_t >::RegMultiply( t1, (std::uint32_t)u, &tmp );
@@ -3167,7 +3163,7 @@ public:
     template < typename E >
     _CONSTEXPR14 static void MultiplyThrow( const T& t, const U& u, T& ret ) SAFEINT_CPP_THROW
     {
-        SAFEINT_STATIC_ASSERT( IntTraits<T>::isInt64 );
+        SAFEINT_STATIC_ASSERT( safeint_internal::int_traits<T>::isInt64 );
         std::int64_t          t1 = t;
         std::int64_t tmp = 0;
         LargeIntRegMultiply< std::int64_t, std::uint32_t >::template RegMultiplyThrow< E >( t1, (std::uint32_t)u, &tmp );
@@ -3181,7 +3177,7 @@ public:
     // T, U are std::int64_t
     _CONSTEXPR14 static bool Multiply( const T& t, const U& u, T& ret ) SAFEINT_NOTHROW
     {
-        SAFEINT_STATIC_ASSERT( IntTraits<T>::isInt64 && IntTraits<U>::isInt64 );
+        SAFEINT_STATIC_ASSERT( safeint_internal::int_traits<T>::isInt64 && safeint_internal::int_traits<U>::isInt64 );
         std::int64_t  t1 = t;
         std::int64_t u1 = u;
         std::int64_t tmp = 0;
@@ -3193,7 +3189,7 @@ public:
     template < typename E >
     _CONSTEXPR14 static void MultiplyThrow( const T& t, const U& u, T& ret ) SAFEINT_CPP_THROW
     {
-        SAFEINT_STATIC_ASSERT( IntTraits<T>::isInt64 && IntTraits<U>::isInt64 );
+        SAFEINT_STATIC_ASSERT( safeint_internal::int_traits<T>::isInt64 && safeint_internal::int_traits<U>::isInt64 );
         std::int64_t t1 = t;
         std::int64_t u1 = u;
         std::int64_t tmp = 0;
@@ -3209,7 +3205,7 @@ public:
     // U is signed up to 32-bit
     _CONSTEXPR14 static bool Multiply( const T& t, U u, T& ret ) SAFEINT_NOTHROW
     {
-        SAFEINT_STATIC_ASSERT( IntTraits<T>::isInt64 );
+        SAFEINT_STATIC_ASSERT( safeint_internal::int_traits<T>::isInt64 );
         std::int64_t t1 = t;
         std::int64_t tmp = 0;
         bool f = LargeIntRegMultiply< std::int64_t, std::int32_t >::RegMultiply( t1, (std::int32_t)u, &tmp);
@@ -3220,7 +3216,7 @@ public:
     template < typename E >
     _CONSTEXPR14 static void MultiplyThrow( const std::int64_t& t, U u, T& ret ) SAFEINT_CPP_THROW
     {
-        SAFEINT_STATIC_ASSERT( IntTraits<T>::isInt64 );
+        SAFEINT_STATIC_ASSERT( safeint_internal::int_traits<T>::isInt64 );
         std::int64_t t1 = t;
         std::int64_t tmp = 0;
         LargeIntRegMultiply< std::int64_t, std::int32_t >::template RegMultiplyThrow< E >(t1, (std::int32_t)u, &tmp);
@@ -3235,7 +3231,7 @@ public:
     // U is std::uint64_t
     _CONSTEXPR14 static bool Multiply(T t, const U& u, T& ret) SAFEINT_NOTHROW
     {
-        SAFEINT_STATIC_ASSERT( IntTraits<U>::isUint64 );
+        SAFEINT_STATIC_ASSERT( safeint_internal::int_traits<U>::isUint64 );
         std::uint64_t u1 = u;
         std::int32_t tmp = 0;
 
@@ -3251,7 +3247,7 @@ public:
     template < typename E >
     _CONSTEXPR14 static void MultiplyThrow(T t, const std::uint64_t& u, T& ret) SAFEINT_CPP_THROW
     {
-        SAFEINT_STATIC_ASSERT( IntTraits<U>::isUint64 );
+        SAFEINT_STATIC_ASSERT( safeint_internal::int_traits<U>::isUint64 );
         std::uint64_t u1 = u;
         std::int32_t tmp = 0;
 
@@ -3267,7 +3263,7 @@ public:
     // U is std::uint64_t
     _CONSTEXPR14 static bool Multiply( const T& t, const U& u, T& ret ) SAFEINT_NOTHROW
     {
-        SAFEINT_STATIC_ASSERT( IntTraits<T>::isInt64 && IntTraits<U>::isUint64 );
+        SAFEINT_STATIC_ASSERT( safeint_internal::int_traits<T>::isInt64 && safeint_internal::int_traits<U>::isUint64 );
         std::int64_t          t1 = t;
         std::uint64_t u1 = u;
         std::int64_t tmp = 0;
@@ -3279,7 +3275,7 @@ public:
     template < typename E >
     _CONSTEXPR14 static void MultiplyThrow( const std::int64_t& t, const std::uint64_t& u, T& ret ) SAFEINT_CPP_THROW
     {
-        SAFEINT_STATIC_ASSERT( IntTraits<T>::isInt64 && IntTraits<U>::isUint64 );
+        SAFEINT_STATIC_ASSERT( safeint_internal::int_traits<T>::isInt64 && safeint_internal::int_traits<U>::isUint64 );
         std::int64_t          t1 = t;
         std::uint64_t u1 = u;
         std::int64_t tmp = 0;
@@ -3295,7 +3291,7 @@ public:
     // U is std::int64_t
     _CONSTEXPR14 static bool Multiply( T t, const U& u, T& ret ) SAFEINT_NOTHROW
     {
-        SAFEINT_STATIC_ASSERT( IntTraits<U>::isInt64 );
+        SAFEINT_STATIC_ASSERT( safeint_internal::int_traits<U>::isInt64 );
         std::int64_t u1 = u;
         std::int32_t tmp = 0;
 
@@ -3311,7 +3307,7 @@ public:
     template < typename E >
     _CONSTEXPR14 static void MultiplyThrow(T t, const U& u, T& ret) SAFEINT_CPP_THROW
     {
-        SAFEINT_STATIC_ASSERT( IntTraits<U>::isInt64 );
+        SAFEINT_STATIC_ASSERT( safeint_internal::int_traits<U>::isInt64 );
         std::int64_t u1 = u;
         std::int32_t tmp = 0;
 
@@ -3335,13 +3331,13 @@ template < typename T, typename U > class DivisionMethod
 public:
     enum
     {
-        method = (SafeIntCompare< T, U >::isBothUnsigned                     ? DivisionState_OK :
-                 (!IntTraits< T >::isSigned && IntTraits< U >::isSigned) ? DivisionState_UnsignedSigned :
-                 (IntTraits< T >::isSigned &&
-                    IntTraits< U >::isUint32 &&
-                    IntTraits< T >::isLT64Bit)                           ? DivisionState_SignedUnsigned32 :
-                 (IntTraits< T >::isSigned && IntTraits< U >::isUint64)  ? DivisionState_SignedUnsigned64 :
-                 (IntTraits< T >::isSigned && !IntTraits< U >::isSigned) ? DivisionState_SignedUnsigned :
+        method = (safeint_internal::type_compare< T, U >::isBothUnsigned                     ? DivisionState_OK :
+                 (!safeint_internal::int_traits< T >::isSigned && safeint_internal::int_traits< U >::isSigned) ? DivisionState_UnsignedSigned :
+                 (safeint_internal::int_traits< T >::isSigned &&
+                    safeint_internal::int_traits< U >::isUint32 &&
+                    safeint_internal::int_traits< T >::isLT64Bit)                           ? DivisionState_SignedUnsigned32 :
+                 (safeint_internal::int_traits< T >::isSigned && safeint_internal::int_traits< U >::isUint64)  ? DivisionState_SignedUnsigned64 :
+                 (safeint_internal::int_traits< T >::isSigned && !safeint_internal::int_traits< U >::isSigned) ? DivisionState_SignedUnsigned :
                                                                            DivisionState_SignedSigned)
     };
 };
@@ -3501,7 +3497,7 @@ template < typename T, typename U > class DivisionHelper< T, U, DivisionState_Si
 public:
     _CONSTEXPR14 static SafeIntError Divide( const T& t, const std::uint64_t& u, T& result ) SAFEINT_NOTHROW
     {
-        SAFEINT_STATIC_ASSERT( IntTraits< U >::isUint64 );
+        SAFEINT_STATIC_ASSERT( safeint_internal::int_traits< U >::isUint64 );
 
         if( u == 0 )
         {
@@ -3514,7 +3510,7 @@ public:
             return SafeIntNoError;
         }
 
-        if( u <= (std::uint64_t)IntTraits< T >::maxInt )
+        if( u <= (std::uint64_t)safeint_internal::int_traits< T >::maxInt )
         {
             // Else u can safely be cast to T
             if( CompileConst< sizeof( T ) < sizeof( std::int64_t )>::Value() )
@@ -3523,7 +3519,7 @@ public:
                 result = (T)((std::int64_t)t/(std::int64_t)u);
         }
         else // Corner case
-        if( t == IntTraits< T >::minInt && u == (std::uint64_t)IntTraits< T >::minInt )
+        if( t == safeint_internal::int_traits< T >::minInt && u == (std::uint64_t)safeint_internal::int_traits< T >::minInt )
         {
             // Min int divided by it's own magnitude is -1
             result = -1;
@@ -3538,7 +3534,7 @@ public:
     template < typename E >
     _CONSTEXPR14 static void DivideThrow( const T& t, const std::uint64_t& u, T& result ) SAFEINT_CPP_THROW
     {
-        SAFEINT_STATIC_ASSERT( IntTraits< U >::isUint64 );
+        SAFEINT_STATIC_ASSERT( safeint_internal::int_traits< U >::isUint64 );
 
         if( u == 0 )
         {
@@ -3551,7 +3547,7 @@ public:
             return;
         }
 
-        if( u <= (std::uint64_t)IntTraits< T >::maxInt )
+        if( u <= (std::uint64_t)safeint_internal::int_traits< T >::maxInt )
         {
             // Else u can safely be cast to T
             if( CompileConst< sizeof( T ) < sizeof( std::int64_t ) >::Value() )
@@ -3560,7 +3556,7 @@ public:
                 result = (T)((std::int64_t)t/(std::int64_t)u);
         }
         else // Corner case
-        if( t == IntTraits< T >::minInt && u == (std::uint64_t)IntTraits< T >::minInt )
+        if( t == safeint_internal::int_traits< T >::minInt && u == (std::uint64_t)safeint_internal::int_traits< T >::minInt )
         {
             // Min int divided by it's own magnitude is -1
             result = -1;
@@ -3629,7 +3625,7 @@ public:
         }
 
         // Must test for corner case
-        if( t == IntTraits< T >::minInt && u == (U)-1 )
+        if( t == safeint_internal::int_traits< T >::minInt && u == (U)-1 )
             return SafeIntArithmeticOverflow;
 
         result = (T)( t/u );
@@ -3651,7 +3647,7 @@ public:
         }
 
         // Must test for corner case
-        if( t == IntTraits< T >::minInt && u == (U)-1 )
+        if( t == safeint_internal::int_traits< T >::minInt && u == (U)-1 )
             E::SafeIntOnOverflow();
 
         result = (T)( t/u );
@@ -3725,7 +3721,7 @@ public:
         //16-bit or less unsigned addition
         std::int32_t tmp = lhs + rhs;
 
-        if( tmp <= (std::int32_t)IntTraits< T >::maxInt )
+        if( tmp <= (std::int32_t)safeint_internal::int_traits< T >::maxInt )
         {
             result = (T)tmp;
             return true;
@@ -3740,7 +3736,7 @@ public:
         //16-bit or less unsigned addition
         std::int32_t tmp = lhs + rhs;
 
-        if( tmp <= (std::int32_t)IntTraits< T >::maxInt )
+        if( tmp <= (std::int32_t)safeint_internal::int_traits< T >::maxInt )
         {
             result = (T)tmp;
             return;
@@ -3792,7 +3788,7 @@ public:
         std::uint32_t tmp = (std::uint32_t)lhs + (std::uint32_t)rhs;
 
         // We added and it didn't get smaller or exceed maxInt
-        if( tmp >= lhs && tmp <= IntTraits< T >::maxInt )
+        if( tmp >= lhs && tmp <= safeint_internal::int_traits< T >::maxInt )
         {
             result = (T)tmp;
             return true;
@@ -3807,7 +3803,7 @@ public:
         std::uint32_t tmp = (std::uint32_t)lhs + (std::uint32_t)rhs;
 
         // We added and it didn't get smaller or exceed maxInt
-        if( tmp >= lhs && tmp <= IntTraits< T >::maxInt )
+        if( tmp >= lhs && tmp <= safeint_internal::int_traits< T >::maxInt )
         {
             result = (T)tmp;
             return;
@@ -3860,7 +3856,7 @@ public:
         std::uint64_t tmp = (std::uint64_t)lhs + (std::uint64_t)rhs;
 
         // We added and it didn't get smaller
-        if( tmp >= lhs && tmp <= IntTraits< T >::maxInt )
+        if( tmp >= lhs && tmp <= safeint_internal::int_traits< T >::maxInt )
         {
             result = (T)tmp;
             return true;
@@ -3876,7 +3872,7 @@ public:
         std::uint64_t tmp = (std::uint64_t)lhs + (std::uint64_t)rhs;
 
         // We added and it didn't get smaller
-        if( tmp >= lhs && tmp <= IntTraits< T >::maxInt )
+        if( tmp >= lhs && tmp <= safeint_internal::int_traits< T >::maxInt )
         {
             result = (T)tmp;
             return;
@@ -3894,7 +3890,7 @@ public:
         // 16-bit or less - one or both are signed
         std::int32_t tmp = lhs + rhs;
 
-        if( tmp <= (std::int32_t)IntTraits< T >::maxInt && tmp >= (std::int32_t)IntTraits< T >::minInt )
+        if( tmp <= (std::int32_t)safeint_internal::int_traits< T >::maxInt && tmp >= (std::int32_t)safeint_internal::int_traits< T >::minInt )
         {
             result = (T)tmp;
             return true;
@@ -3909,7 +3905,7 @@ public:
         // 16-bit or less - one or both are signed
         std::int32_t tmp = lhs + rhs;
 
-        if( tmp <= (std::int32_t)IntTraits< T >::maxInt && tmp >= (std::int32_t)IntTraits< T >::minInt )
+        if( tmp <= (std::int32_t)safeint_internal::int_traits< T >::maxInt && tmp >= (std::int32_t)safeint_internal::int_traits< T >::minInt )
         {
             result = (T)tmp;
             return;
@@ -3927,7 +3923,7 @@ public:
         // 32-bit or less - one or both are signed
         std::int64_t tmp = (std::int64_t)lhs + (std::int64_t)rhs;
 
-        if( tmp <= (std::int64_t)IntTraits< T >::maxInt && tmp >= (std::int64_t)IntTraits< T >::minInt )
+        if( tmp <= (std::int64_t)safeint_internal::int_traits< T >::maxInt && tmp >= (std::int64_t)safeint_internal::int_traits< T >::minInt )
         {
             result = (T)tmp;
             return true;
@@ -3942,7 +3938,7 @@ public:
         // 32-bit or less - one or both are signed
         std::int64_t tmp = (std::int64_t)lhs + (std::int64_t)rhs;
 
-        if( tmp <= (std::int64_t)IntTraits< T >::maxInt && tmp >= (std::int64_t)IntTraits< T >::minInt )
+        if( tmp <= (std::int64_t)safeint_internal::int_traits< T >::maxInt && tmp >= (std::int64_t)safeint_internal::int_traits< T >::minInt )
         {
             result = (T)tmp;
             return;
@@ -3960,7 +3956,7 @@ public:
         // 32-bit or less - lhs signed, rhs unsigned
         std::int64_t tmp = (std::int64_t)lhs + (std::int64_t)rhs;
 
-        if( tmp <= IntTraits< T >::maxInt )
+        if( tmp <= safeint_internal::int_traits< T >::maxInt )
         {
             result = (T)tmp;
             return true;
@@ -3975,7 +3971,7 @@ public:
         // 32-bit or less - lhs signed, rhs unsigned
         std::int64_t tmp = (std::int64_t)lhs + (std::int64_t)rhs;
 
-        if( tmp <= IntTraits< T >::maxInt )
+        if( tmp <= safeint_internal::int_traits< T >::maxInt )
         {
             result = (T)tmp;
             return;
@@ -4075,7 +4071,7 @@ public:
 
             // special case - rhs cannot be larger than 0x7fffffffffffffff, lhs cannot be larger than 0xffffffff
             // it is not possible for the operation above to overflow, so just check max
-            if( tmp <= IntTraits< T >::maxInt )
+            if( tmp <= safeint_internal::int_traits< T >::maxInt )
             {
                 result = (T)tmp;
                 return true;
@@ -4103,7 +4099,7 @@ public:
 
             // special case - rhs cannot be larger than 0x7fffffffffffffff, lhs cannot be larger than 0xffffffff
             // it is not possible for the operation above to overflow, so just check max
-            if( tmp <= IntTraits< T >::maxInt )
+            if( tmp <= safeint_internal::int_traits< T >::maxInt )
             {
                 result = (T)tmp;
                 return;
@@ -4170,8 +4166,8 @@ public:
         std::int64_t tmp = 0;
 
         if( AdditionHelper< std::int64_t, std::int64_t, AdditionState_CastInt64CheckOverflow >::Addition( (std::int64_t)lhs, (std::int64_t)rhs, tmp ) &&
-            tmp <= IntTraits< T >::maxInt &&
-            tmp >= IntTraits< T >::minInt )
+            tmp <= safeint_internal::int_traits< T >::maxInt &&
+            tmp >= safeint_internal::int_traits< T >::minInt )
         {
             result = (T)tmp;
             return true;
@@ -4188,8 +4184,8 @@ public:
 
         AdditionHelper< std::int64_t, std::int64_t, AdditionState_CastInt64CheckOverflow >::AdditionThrow< E >( (std::int64_t)lhs, (std::int64_t)rhs, tmp );
 
-        if( tmp <= IntTraits< T >::maxInt &&
-            tmp >= IntTraits< T >::minInt )
+        if( tmp <= safeint_internal::int_traits< T >::maxInt &&
+            tmp >= safeint_internal::int_traits< T >::minInt )
         {
             result = (T)tmp;
             return;
@@ -4239,7 +4235,7 @@ template < typename T, typename U > class AdditionHelper < T, U, AdditionState_M
 public:
     _CONSTEXPR14 static bool Addition( const std::int64_t& lhs, const std::uint64_t& rhs, T& result ) SAFEINT_NOTHROW
     {
-        SAFEINT_STATIC_ASSERT( IntTraits< T >::isInt64 && IntTraits< U >::isUint64 );
+        SAFEINT_STATIC_ASSERT( safeint_internal::int_traits< T >::isInt64 && safeint_internal::int_traits< U >::isUint64 );
         // rhs is std::uint64_t, lhs std::int64_t
         // cast everything to unsigned, perform addition, then
         // cast back for check - this is done to stop optimizers from removing the code
@@ -4258,7 +4254,7 @@ public:
     template < typename E >
     _CONSTEXPR14 static void AdditionThrow( const std::int64_t& lhs, const std::uint64_t& rhs, T& result ) SAFEINT_CPP_THROW
     {
-        SAFEINT_STATIC_ASSERT( IntTraits< T >::isInt64 && IntTraits< U >::isUint64 );
+        SAFEINT_STATIC_ASSERT( safeint_internal::int_traits< T >::isInt64 && safeint_internal::int_traits< U >::isUint64 );
         // rhs is std::uint64_t, lhs std::int64_t
         std::uint64_t tmp = (std::uint64_t)lhs + rhs;
 
@@ -4537,7 +4533,7 @@ public:
         // rhs is unsigned - check only minimum
         std::int32_t tmp = lhs - rhs;
 
-        if( tmp >= (std::int32_t)IntTraits< T >::minInt )
+        if( tmp >= (std::int32_t)safeint_internal::int_traits< T >::minInt )
         {
             result = (T)tmp;
             return true;
@@ -4553,7 +4549,7 @@ public:
         // rhs is unsigned - check only minimum
         std::int32_t tmp = lhs - rhs;
 
-        if( tmp >= (std::int32_t)IntTraits< T >::minInt )
+        if( tmp >= (std::int32_t)safeint_internal::int_traits< T >::minInt )
         {
             result = (T)tmp;
             return;
@@ -4618,7 +4614,7 @@ public:
         // rhs is unsigned - check only minimum
         std::int64_t tmp = (std::int64_t)lhs - (std::int64_t)rhs;
 
-        if( tmp >= (std::int64_t)IntTraits< T >::minInt )
+        if( tmp >= (std::int64_t)safeint_internal::int_traits< T >::minInt )
         {
             result = (T)tmp;
             return true;
@@ -4634,7 +4630,7 @@ public:
         // rhs is unsigned - check only minimum
         std::int64_t tmp = (std::int64_t)lhs - (std::int64_t)rhs;
 
-        if( tmp >= (std::int64_t)IntTraits< T >::minInt )
+        if( tmp >= (std::int64_t)safeint_internal::int_traits< T >::minInt )
         {
             result = (T)tmp;
             return;
@@ -4713,7 +4709,7 @@ public:
             tmp = lhs + (std::uint64_t)AbsValueHelper< T, GetAbsMethod< T >::method >::Abs( rhs );
 
             // must check for addition overflow and max
-            if( tmp >= lhs && tmp <= IntTraits< T >::maxInt )
+            if( tmp >= lhs && tmp <= safeint_internal::int_traits< T >::maxInt )
             {
                 result = (T)tmp;
                 return true;
@@ -4732,7 +4728,7 @@ public:
             // result is positive
             std::uint64_t tmp = (std::uint64_t)lhs - (std::uint64_t)rhs;
 
-            if( tmp <= IntTraits< T >::maxInt )
+            if( tmp <= safeint_internal::int_traits< T >::maxInt )
             {
                 result = (T)tmp;
                 return true;
@@ -4754,7 +4750,7 @@ public:
             tmp = lhs + (std::uint64_t)AbsValueHelper< T, GetAbsMethod< T >::method >::Abs( rhs );
 
             // must check for addition overflow and max
-            if( tmp >= lhs && tmp <= IntTraits< T >::maxInt )
+            if( tmp >= lhs && tmp <= safeint_internal::int_traits< T >::maxInt )
             {
                 result = (T)tmp;
                 return;
@@ -4773,7 +4769,7 @@ public:
             // result is positive
             std::uint64_t tmp = (std::uint64_t)lhs - (std::uint64_t)rhs;
 
-            if( tmp <= IntTraits< T >::maxInt )
+            if( tmp <= safeint_internal::int_traits< T >::maxInt )
             {
                 result = (T)tmp;
                 return;
@@ -4807,7 +4803,7 @@ public:
             std::uint64_t tmp = lhs + ~(std::uint64_t)( rhs ) + 1; // negation safe
 
             // but we could exceed MaxInt
-            if(tmp <= IntTraits< T >::maxInt)
+            if(tmp <= safeint_internal::int_traits< T >::maxInt)
             {
                 result = (T)tmp;
                 return true;
@@ -4838,7 +4834,7 @@ public:
             std::uint64_t tmp = lhs + ~(std::uint64_t)( rhs ) + 1; // negation safe
 
             // but we could exceed MaxInt
-            if(tmp <= IntTraits< T >::maxInt)
+            if(tmp <= safeint_internal::int_traits< T >::maxInt)
             {
                 result = (T)tmp;
                 return;
@@ -4867,7 +4863,7 @@ public:
             // which cannot overflow internally
             std::uint64_t tmp = (std::uint64_t)lhs + (std::uint64_t)( -rhs );
 
-            if( tmp <= (std::uint64_t)IntTraits< T >::maxInt )
+            if( tmp <= (std::uint64_t)safeint_internal::int_traits< T >::maxInt )
             {
                 result = (T)tmp;
                 return true;
@@ -4893,7 +4889,7 @@ public:
             // which cannot overflow internally
             std::uint64_t tmp = (std::uint64_t)lhs + (std::uint64_t)( -rhs );
 
-            if( tmp <= (std::uint64_t)IntTraits< T >::maxInt )
+            if( tmp <= (std::uint64_t)safeint_internal::int_traits< T >::maxInt )
             {
                 result = (T)tmp;
                 return;
@@ -4977,7 +4973,7 @@ public:
         {
             // if both positive, overflow to negative not possible
             // which is why we'll explicitly check maxInt, and not call SafeCast
-            if( ( IntTraits< T >::isLT64Bit && tmp > IntTraits< T >::maxInt ) ||
+            if( ( safeint_internal::int_traits< T >::isLT64Bit && tmp > safeint_internal::int_traits< T >::maxInt ) ||
                 ( rhs < 0 && tmp < lhs ) )
             {
                 return false;
@@ -4986,7 +4982,7 @@ public:
         else
         {
             // lhs negative
-            if( ( IntTraits< T >::isLT64Bit && tmp < IntTraits< T >::minInt) ||
+            if( ( safeint_internal::int_traits< T >::isLT64Bit && tmp < safeint_internal::int_traits< T >::minInt) ||
                 ( rhs >=0 && tmp > lhs ) )
             {
                 return false;
@@ -5014,7 +5010,7 @@ public:
         {
             // if both positive, overflow to negative not possible
             // which is why we'll explicitly check maxInt, and not call SafeCast
-            if( ( CompileConst< IntTraits< T >::isLT64Bit >::Value() && tmp > IntTraits< T >::maxInt ) ||
+            if( ( CompileConst< safeint_internal::int_traits< T >::isLT64Bit >::Value() && tmp > safeint_internal::int_traits< T >::maxInt ) ||
                 ( rhs < 0 && tmp < lhs ) )
             {
                 E::SafeIntOnOverflow();
@@ -5023,7 +5019,7 @@ public:
         else
         {
             // lhs negative
-            if( ( CompileConst< IntTraits< T >::isLT64Bit >::Value() && tmp < IntTraits< T >::minInt) ||
+            if( ( CompileConst< safeint_internal::int_traits< T >::isLT64Bit >::Value() && tmp < safeint_internal::int_traits< T >::minInt) ||
                 ( rhs >=0 && tmp > lhs ) )
             {
                 E::SafeIntOnOverflow();
@@ -5054,7 +5050,7 @@ public:
             // first case
             if( rhs >= 0 )
             {
-                if( tmp >= IntTraits< T >::minInt )
+                if( tmp >= safeint_internal::int_traits< T >::minInt )
                 {
                     result = (T)tmp;
                     return true;
@@ -5063,7 +5059,7 @@ public:
             else
             {
                 // second case
-                if( tmp >= lhs && tmp <= IntTraits< T >::maxInt )
+                if( tmp >= lhs && tmp <= safeint_internal::int_traits< T >::maxInt )
                 {
                     result = (T)tmp;
                     return true;
@@ -5076,7 +5072,7 @@ public:
             // third case
             if( rhs >= 0 )
             {
-                if( tmp <= lhs && tmp >= IntTraits< T >::minInt )
+                if( tmp <= lhs && tmp >= safeint_internal::int_traits< T >::minInt )
                 {
                     result = (T)tmp;
                     return true;
@@ -5085,7 +5081,7 @@ public:
             else
             {
                 // fourth case
-                if( tmp <= IntTraits< T >::maxInt )
+                if( tmp <= safeint_internal::int_traits< T >::maxInt )
                 {
                     result = (T)tmp;
                     return true;
@@ -5114,7 +5110,7 @@ public:
             // first case
             if( rhs >= 0 )
             {
-                if( tmp >= IntTraits< T >::minInt )
+                if( tmp >= safeint_internal::int_traits< T >::minInt )
                 {
                     result = (T)tmp;
                     return;
@@ -5123,7 +5119,7 @@ public:
             else
             {
                 // second case
-                if( tmp >= lhs && tmp <= IntTraits< T >::maxInt )
+                if( tmp >= lhs && tmp <= safeint_internal::int_traits< T >::maxInt )
                 {
                     result = (T)tmp;
                     return;
@@ -5136,7 +5132,7 @@ public:
             // third case
             if( rhs >= 0 )
             {
-                if( tmp <= lhs && tmp >= IntTraits< T >::minInt )
+                if( tmp <= lhs && tmp >= safeint_internal::int_traits< T >::minInt )
                 {
                     result = (T)tmp;
                     return;
@@ -5145,7 +5141,7 @@ public:
             else
             {
                 // fourth case
-                if( tmp <= IntTraits< T >::maxInt )
+                if( tmp <= safeint_internal::int_traits< T >::maxInt )
                 {
                     result = (T)tmp;
                     return;
@@ -5237,7 +5233,7 @@ public:
         // Do this as unsigned to prevent unwanted optimizations
         std::uint64_t tmp = (std::uint64_t)lhs - (std::uint64_t)rhs;
 
-        if( (std::int64_t)tmp <= IntTraits< T >::maxInt && (std::int64_t)tmp >= IntTraits< T >::minInt )
+        if( (std::int64_t)tmp <= safeint_internal::int_traits< T >::maxInt && (std::int64_t)tmp >= safeint_internal::int_traits< T >::minInt )
         {
             result = (T)(std::int64_t)tmp;
             return true;
@@ -5252,7 +5248,7 @@ public:
         // Do this as unsigned to prevent unwanted optimizations
         std::uint64_t tmp = (std::uint64_t)lhs - (std::uint64_t)rhs;
 
-        if( (std::int64_t)tmp <= IntTraits< T >::maxInt && (std::int64_t)tmp >= IntTraits< T >::minInt )
+        if( (std::int64_t)tmp <= safeint_internal::int_traits< T >::maxInt && (std::int64_t)tmp >= safeint_internal::int_traits< T >::minInt )
         {
             result = (T)(std::int64_t)tmp;
             return;
@@ -5270,9 +5266,9 @@ public:
         // lhs is any signed int, rhs unsigned int64
         // check against available range
 
-        // We need the absolute value of IntTraits< T >::minInt
+        // We need the absolute value of safeint_internal::int_traits< T >::minInt
         // This will give it to us without extraneous compiler warnings
-        const std::uint64_t AbsMinIntT = (std::uint64_t)IntTraits< T >::maxInt + 1;
+        const std::uint64_t AbsMinIntT = (std::uint64_t)safeint_internal::int_traits< T >::maxInt + 1;
 
         if( lhs < 0 )
         {
@@ -5300,9 +5296,9 @@ public:
         // lhs is any signed int, rhs unsigned int64
         // check against available range
 
-        // We need the absolute value of IntTraits< T >::minInt
+        // We need the absolute value of safeint_internal::int_traits< T >::minInt
         // This will give it to us without extraneous compiler warnings
-        const std::uint64_t AbsMinIntT = (std::uint64_t)IntTraits< T >::maxInt + 1;
+        const std::uint64_t AbsMinIntT = (std::uint64_t)safeint_internal::int_traits< T >::maxInt + 1;
 
         if( lhs < 0 )
         {
@@ -5360,7 +5356,7 @@ template < typename T, typename U > class SubtractionHelper< T, U, SubtractionSt
 public:
     _CONSTEXPR14 static bool Subtract( const std::int64_t& lhs, const std::uint64_t& rhs, std::int64_t& result ) SAFEINT_NOTHROW
     {
-        SAFEINT_STATIC_ASSERT( IntTraits< T >::isInt64 && IntTraits< U >::isUint64 );
+        SAFEINT_STATIC_ASSERT( safeint_internal::int_traits< T >::isInt64 && safeint_internal::int_traits< U >::isUint64 );
         // if we subtract, and it gets larger, there's a problem
         // Perform test as unsigned to prevent unwanted optimizations
         std::uint64_t tmp = (std::uint64_t)lhs - rhs;
@@ -5376,7 +5372,7 @@ public:
     template < typename E >
     _CONSTEXPR14 static void SubtractThrow( const std::int64_t& lhs, const std::uint64_t& rhs, T& result ) SAFEINT_CPP_THROW
     {
-        SAFEINT_STATIC_ASSERT( IntTraits< T >::isInt64 && IntTraits< U >::isUint64 );
+        SAFEINT_STATIC_ASSERT( safeint_internal::int_traits< T >::isInt64 && safeint_internal::int_traits< U >::isUint64 );
         // if we subtract, and it gets larger, there's a problem
         // Perform test as unsigned to prevent unwanted optimizations
         std::uint64_t tmp = (std::uint64_t)lhs - rhs;
@@ -5399,7 +5395,7 @@ public:
     // get smaller. If rhs > lhs, then it would also go negative, which is the other case
     _CONSTEXPR14 static bool Subtract( const std::int64_t& lhs, const std::uint64_t& rhs, T& result ) SAFEINT_NOTHROW
     {
-        SAFEINT_STATIC_ASSERT( IntTraits< T >::isUint64 && IntTraits< U >::isInt64 );
+        SAFEINT_STATIC_ASSERT( safeint_internal::int_traits< T >::isUint64 && safeint_internal::int_traits< U >::isInt64 );
         if( lhs >= 0 && (std::uint64_t)lhs >= rhs )
         {
             result = (std::uint64_t)lhs - rhs;
@@ -5412,7 +5408,7 @@ public:
     template < typename E >
     _CONSTEXPR14 static void SubtractThrow( const std::int64_t& lhs, const std::uint64_t& rhs, T& result ) SAFEINT_CPP_THROW
     {
-        SAFEINT_STATIC_ASSERT( IntTraits< T >::isUint64 && IntTraits< U >::isInt64 );
+        SAFEINT_STATIC_ASSERT( safeint_internal::int_traits< T >::isUint64 && safeint_internal::int_traits< U >::isInt64 );
         if( lhs >= 0 && (std::uint64_t)lhs >= rhs )
         {
             result = (std::uint64_t)lhs - rhs;
@@ -5442,10 +5438,10 @@ public:
         //    return type is larger and rhs is unsigned
         // Then binary operations won't produce unexpected results
         method = ( sizeof( T ) <= sizeof( U ) ||
-                 SafeIntCompare< T, U >::isBothUnsigned ||
-                 !IntTraits< U >::isSigned )          ? BinaryState_OK :
-                 IntTraits< U >::isInt8               ? BinaryState_Int8 :
-                 IntTraits< U >::isInt16              ? BinaryState_Int16
+                 safeint_internal::type_compare< T, U >::isBothUnsigned ||
+                 !safeint_internal::int_traits< U >::isSigned )          ? BinaryState_OK :
+                 safeint_internal::int_traits< U >::isInt8               ? BinaryState_Int8 :
+                 safeint_internal::int_traits< U >::isInt16              ? BinaryState_Int16
                                                       : BinaryState_Int32
     };
 };
@@ -5665,7 +5661,7 @@ template < typename T, typename E = SafeIntDefaultExceptionHandler > class SafeI
 public:
     _CONSTEXPR11 SafeInt() SAFEINT_NOTHROW : m_int(0)
     {
-        SAFEINT_STATIC_ASSERT( NumericType< T >::isInt );
+        SAFEINT_STATIC_ASSERT( safeint_internal::numeric_type< T >::isInt );
     }
 
     // Having a constructor for every type of int
@@ -5673,20 +5669,20 @@ public:
     // e.g., SafeInt<char> s = 0x7fffffff;
     _CONSTEXPR11 SafeInt( const T& i ) SAFEINT_NOTHROW : m_int(i)
     {
-        SAFEINT_STATIC_ASSERT( NumericType< T >::isInt );
+        SAFEINT_STATIC_ASSERT( safeint_internal::numeric_type< T >::isInt );
         //always safe
     }
 
     // provide explicit boolean converter
     _CONSTEXPR11 SafeInt( bool b ) SAFEINT_NOTHROW : m_int((T)(b ? 1 : 0))
     {
-        SAFEINT_STATIC_ASSERT( NumericType< T >::isInt );
+        SAFEINT_STATIC_ASSERT( safeint_internal::numeric_type< T >::isInt );
     }
 
     template < typename U >
     _CONSTEXPR14 SafeInt(const SafeInt< U, E >& u) SAFEINT_CPP_THROW : m_int(0)
     {
-        SAFEINT_STATIC_ASSERT( NumericType< T >::isInt );
+        SAFEINT_STATIC_ASSERT( safeint_internal::numeric_type< T >::isInt );
         m_int = (T)SafeInt< T, E >( (U)u );
     }
 
@@ -5694,7 +5690,7 @@ public:
     _CONSTEXPR14 SafeInt( const U& i ) SAFEINT_CPP_THROW : m_int(0)
     {
         // m_int must be initialized to something to work with constexpr, because if it throws, then m_int is unknown
-        SAFEINT_STATIC_ASSERT( NumericType< T >::isInt );
+        SAFEINT_STATIC_ASSERT( safeint_internal::numeric_type< T >::isInt );
         // SafeCast will throw exceptions if i won't fit in type T
         
         SafeCastHelper< T, U, GetCastMethod< T, U >::method >::template CastThrow< E >( i, m_int );
@@ -5896,13 +5892,13 @@ public:
     {
         // Note - unsigned still performs the bitwise manipulation
         // will warn at level 2 or higher if the value is 32-bit or larger
-        return SafeInt<T, E>(NegationHelper<T, IntTraits<T>::isSigned>::template NegativeThrow<E>(m_int));
+        return SafeInt<T, E>(NegationHelper<T, safeint_internal::int_traits<T>::isSigned>::template NegativeThrow<E>(m_int));
     }
 
     // prefix increment operator
     _CONSTEXPR14 SafeInt< T, E >& operator ++() SAFEINT_CPP_THROW
     {
-        if( m_int != IntTraits< T >::maxInt )
+        if( m_int != safeint_internal::int_traits< T >::maxInt )
         {
             ++m_int;
             return *this;
@@ -5913,7 +5909,7 @@ public:
     // prefix decrement operator
     _CONSTEXPR14 SafeInt< T, E >& operator --() SAFEINT_CPP_THROW
     {
-        if( m_int != IntTraits< T >::minInt )
+        if( m_int != safeint_internal::int_traits< T >::minInt )
         {
             --m_int;
             return *this;
@@ -5927,7 +5923,7 @@ public:
     // postfix increment operator
     _CONSTEXPR14 SafeInt< T, E > operator ++( int )  SAFEINT_CPP_THROW // dummy arg to comply with spec
     {
-        if( m_int != IntTraits< T >::maxInt )
+        if( m_int != safeint_internal::int_traits< T >::maxInt )
         {
             SafeInt< T, E > tmp( m_int );
 
@@ -5940,7 +5936,7 @@ public:
     // postfix decrement operator
     _CONSTEXPR14 SafeInt< T, E > operator --( int ) SAFEINT_CPP_THROW // dummy arg to comply with spec
     {
-        if( m_int != IntTraits< T >::minInt )
+        if( m_int != safeint_internal::int_traits< T >::minInt )
         {
             SafeInt< T, E > tmp( m_int );
             m_int--;
@@ -6192,8 +6188,8 @@ public:
     template < typename U >
     _CONSTEXPR14 SafeInt< T, E > operator <<( U bits ) const SAFEINT_NOTHROW
     {
-        ShiftAssert( !IntTraits< U >::isSigned || bits >= 0 );
-        ShiftAssert( bits < (int)IntTraits< T >::bitCount );
+        ShiftAssert( !safeint_internal::int_traits< U >::isSigned || bits >= 0 );
+        ShiftAssert( bits < (int)safeint_internal::int_traits< T >::bitCount );
 
         return SafeInt< T, E >( (T)( m_int << bits ) );
     }
@@ -6201,8 +6197,8 @@ public:
     template < typename U >
     _CONSTEXPR14 SafeInt< T, E > operator <<( SafeInt< U, E > bits ) const SAFEINT_NOTHROW
     {
-        ShiftAssert( !IntTraits< U >::isSigned || (U)bits >= 0 );
-        ShiftAssert( (U)bits < (int)IntTraits< T >::bitCount );
+        ShiftAssert( !safeint_internal::int_traits< U >::isSigned || (U)bits >= 0 );
+        ShiftAssert( (U)bits < (int)safeint_internal::int_traits< T >::bitCount );
 
         return SafeInt< T, E >( (T)( m_int << (U)bits ) );
     }
@@ -6212,8 +6208,8 @@ public:
     template < typename U >
     _CONSTEXPR14 SafeInt< T, E >& operator <<=( U bits ) SAFEINT_NOTHROW
     {
-        ShiftAssert( !IntTraits< U >::isSigned || bits >= 0 );
-        ShiftAssert( bits < (int)IntTraits< T >::bitCount );
+        ShiftAssert( !safeint_internal::int_traits< U >::isSigned || bits >= 0 );
+        ShiftAssert( bits < (int)safeint_internal::int_traits< T >::bitCount );
 
         m_int <<= bits;
         return *this;
@@ -6222,8 +6218,8 @@ public:
     template < typename U >
     _CONSTEXPR14 SafeInt< T, E >& operator <<=( SafeInt< U, E > bits ) SAFEINT_NOTHROW
     {
-        ShiftAssert( !IntTraits< U >::isSigned || (U)bits >= 0 );
-        ShiftAssert( (U)bits < (int)IntTraits< T >::bitCount );
+        ShiftAssert( !safeint_internal::int_traits< U >::isSigned || (U)bits >= 0 );
+        ShiftAssert( (U)bits < (int)safeint_internal::int_traits< T >::bitCount );
 
         m_int <<= (U)bits;
         return *this;
@@ -6233,8 +6229,8 @@ public:
     template < typename U >
     _CONSTEXPR14 SafeInt< T, E > operator >>( U bits ) const SAFEINT_NOTHROW
     {
-        ShiftAssert( !IntTraits< U >::isSigned || bits >= 0 );
-        ShiftAssert( bits < (int)IntTraits< T >::bitCount );
+        ShiftAssert( !safeint_internal::int_traits< U >::isSigned || bits >= 0 );
+        ShiftAssert( bits < (int)safeint_internal::int_traits< T >::bitCount );
 
         return SafeInt< T, E >( (T)( m_int >> bits ) );
     }
@@ -6242,8 +6238,8 @@ public:
     template < typename U >
     _CONSTEXPR14 SafeInt< T, E > operator >>( SafeInt< U, E > bits ) const SAFEINT_NOTHROW
     {
-        ShiftAssert( !IntTraits< U >::isSigned || (U)bits >= 0 );
-        ShiftAssert( (U)bits < (int)IntTraits< T >::bitCount );
+        ShiftAssert( !safeint_internal::int_traits< U >::isSigned || (U)bits >= 0 );
+        ShiftAssert( (U)bits < (int)safeint_internal::int_traits< T >::bitCount );
 
         return SafeInt< T, E >( (T)(m_int >> (U)bits) );
     }
@@ -6252,8 +6248,8 @@ public:
     template < typename U >
     _CONSTEXPR14 SafeInt< T, E >& operator >>=( U bits ) SAFEINT_NOTHROW
     {
-        ShiftAssert( !IntTraits< U >::isSigned || bits >= 0 );
-        ShiftAssert( bits < (int)IntTraits< T >::bitCount );
+        ShiftAssert( !safeint_internal::int_traits< U >::isSigned || bits >= 0 );
+        ShiftAssert( bits < (int)safeint_internal::int_traits< T >::bitCount );
 
         m_int >>= bits;
         return *this;
@@ -6262,8 +6258,8 @@ public:
     template < typename U >
     _CONSTEXPR14 SafeInt< T, E >& operator >>=( SafeInt< U, E > bits ) SAFEINT_NOTHROW
     {
-        ShiftAssert( !IntTraits< U >::isSigned || (U)bits >= 0 );
-        ShiftAssert( (U)bits < (int)IntTraits< T >::bitCount );
+        ShiftAssert( !safeint_internal::int_traits< U >::isSigned || (U)bits >= 0 );
+        ShiftAssert( (U)bits < (int)safeint_internal::int_traits< T >::bitCount );
 
         m_int >>= (U)bits;
         return *this;
@@ -6389,13 +6385,13 @@ public:
     }
 
     // Miscellaneous helper functions
-    SafeInt< T, E > Min( SafeInt< T, E > test, const T floor = IntTraits< T >::minInt ) const SAFEINT_NOTHROW
+    SafeInt< T, E > Min( SafeInt< T, E > test, const T floor = safeint_internal::int_traits< T >::minInt ) const SAFEINT_NOTHROW
     {
         T tmp = test < m_int ? (T)test : m_int;
         return tmp < floor ? floor : tmp;
     }
 
-    SafeInt< T, E > Max( SafeInt< T, E > test, const T upper = IntTraits< T >::maxInt ) const SAFEINT_NOTHROW
+    SafeInt< T, E > Max( SafeInt< T, E > test, const T upper = safeint_internal::int_traits< T >::maxInt ) const SAFEINT_NOTHROW
     {
         T tmp = test > m_int ? (T)test : m_int;
         return tmp > upper ? upper : tmp;
@@ -6442,9 +6438,9 @@ public:
         // or signed numbers on bitCount-1 (e.g., 7 bits = 128, signed char max = 127).
         // Also makes no sense to try to align on negative or no bits.
 
-        ShiftAssert( ( ( IntTraits<T>::isSigned && bits < (int)IntTraits< T >::bitCount - 1 )
-                    || ( !IntTraits<T>::isSigned && bits < (int)IntTraits< T >::bitCount ) ) &&
-                    bits >= 0 && ( !IntTraits<T>::isSigned || m_int > 0 ) );
+        ShiftAssert( ( ( safeint_internal::int_traits<T>::isSigned && bits < (int)safeint_internal::int_traits< T >::bitCount - 1 )
+                    || ( !safeint_internal::int_traits<T>::isSigned && bits < (int)safeint_internal::int_traits< T >::bitCount ) ) &&
+                    bits >= 0 && ( !safeint_internal::int_traits<T>::isSigned || m_int > 0 ) );
 
         const T AlignValue = ( (T)1 << bits ) - 1;
 
@@ -6700,7 +6696,7 @@ public:
     {
         if( rhs != 0 )
         {
-            if( ModulusSignedCaseHelper< T, E, IntTraits< T >::isSigned >::SignedCase( rhs, result ) )
+            if( ModulusSignedCaseHelper< T, E, safeint_internal::int_traits< T >::isSigned >::SignedCase( rhs, result ) )
             return true;
 
             result = (T)( lhs % (T)rhs );
@@ -6733,7 +6729,7 @@ _CONSTEXPR14 SafeInt< T, E > operator %( U lhs, SafeInt< T, E > rhs ) SAFEINT_CP
     // same size and same sign
     SafeInt< T, E > result;
 
-    if( ModulusSimpleCaseHelper< T, U, E, (sizeof(T) == sizeof(U)) && ((bool)IntTraits< T >::isSigned == (bool)IntTraits< U >::isSigned) >::ModulusSimpleCase( lhs, rhs, result ) )
+    if( ModulusSimpleCaseHelper< T, U, E, (sizeof(T) == sizeof(U)) && ((bool)safeint_internal::int_traits< T >::isSigned == (bool)safeint_internal::int_traits< U >::isSigned) >::ModulusSimpleCase( lhs, rhs, result ) )
         return result;
 
     result = (SafeInt< U, E >(lhs) % (T)rhs);
@@ -6766,17 +6762,17 @@ public:
         else
             tmp = lhs/(U)( ~(std::uint64_t)(T)rhs + 1 );
 
-        if( tmp <= (U)IntTraits< T >::maxInt )
+        if( tmp <= (U)safeint_internal::int_traits< T >::maxInt )
         {
             result = SafeInt< T, E >( (T)(~(std::uint64_t)tmp + 1) );
             return true;
         }
 
         // Corner case
-        T maxT = IntTraits< T >::maxInt;
+        T maxT = safeint_internal::int_traits< T >::maxInt;
         if( tmp == (U)maxT + 1 )
         {
-            T minT = IntTraits< T >::minInt;
+            T minT = safeint_internal::int_traits< T >::minInt;
             result = SafeInt< T, E >( minT );
             return true;
         }
@@ -6837,7 +6833,7 @@ template < typename T, typename U, typename E > class DivisionCornerCaseHelper2 
 public:
     _CONSTEXPR14 static bool DivisionCornerCase2( U lhs, SafeInt< T, E > rhs, SafeInt<T, E>& result ) SAFEINT_CPP_THROW
     {
-        if( lhs == IntTraits< U >::minInt && (T)rhs == -1 )
+        if( lhs == safeint_internal::int_traits< U >::minInt && (T)rhs == -1 )
         {
             // corner case of a corner case - lhs = min int, rhs = -1,
             // but rhs is the return type, so in essence, we can return -lhs
@@ -6851,7 +6847,7 @@ public:
 #endif
 
             if( CompileConst<sizeof( U ) < sizeof( T )>::Value() )
-                result = SafeInt< T, E >( (T)( -(T)IntTraits< U >::minInt ) );
+                result = SafeInt< T, E >( (T)( -(T)safeint_internal::int_traits< U >::minInt ) );
             else
                 E::SafeIntOnOverflow();
 
@@ -6884,7 +6880,7 @@ _CONSTEXPR14 SafeInt< T, E > operator /( U lhs, SafeInt< T, E > rhs ) SAFEINT_CP
     if( DivisionCornerCaseHelper< T, U, E, (int)DivisionMethod< U, T >::method == (int)DivisionState_UnsignedSigned >::DivisionCornerCase1( lhs, rhs, result ) )
         return result;
 
-    if( DivisionCornerCaseHelper2< T, U, E, SafeIntCompare< T, U >::isBothSigned >::DivisionCornerCase2( lhs, rhs, result ) )
+    if( DivisionCornerCaseHelper2< T, U, E, safeint_internal::type_compare< T, U >::isBothSigned >::DivisionCornerCase2( lhs, rhs, result ) )
         return result;
 
     // Otherwise normal logic works with addition of bounds check when casting from U->T
@@ -7094,8 +7090,8 @@ _CONSTEXPR14 T*& operator >>=( T*& lhs, SafeInt< U, E > ) SAFEINT_NOTHROW
 template < typename T, typename U, typename E >
 _CONSTEXPR14 SafeInt< U, E > operator <<( U lhs, SafeInt< T, E > bits ) SAFEINT_NOTHROW
 {
-    ShiftAssert( !IntTraits< T >::isSigned || (T)bits >= 0 );
-    ShiftAssert( (T)bits < (int)IntTraits< U >::bitCount );
+    ShiftAssert( !safeint_internal::int_traits< T >::isSigned || (T)bits >= 0 );
+    ShiftAssert( (T)bits < (int)safeint_internal::int_traits< U >::bitCount );
 
     return SafeInt< U, E >( (U)( lhs << (T)bits ) );
 }
@@ -7104,8 +7100,8 @@ _CONSTEXPR14 SafeInt< U, E > operator <<( U lhs, SafeInt< T, E > bits ) SAFEINT_
 template < typename T, typename U, typename E >
 _CONSTEXPR14 SafeInt< U, E > operator >>( U lhs, SafeInt< T, E > bits ) SAFEINT_NOTHROW
 {
-    ShiftAssert( !IntTraits< T >::isSigned || (T)bits >= 0 );
-    ShiftAssert( (T)bits < (int)IntTraits< U >::bitCount );
+    ShiftAssert( !safeint_internal::int_traits< T >::isSigned || (T)bits >= 0 );
+    ShiftAssert( (T)bits < (int)safeint_internal::int_traits< U >::bitCount );
 
     return SafeInt< U, E >( (U)( lhs >> (T)bits ) );
 }
