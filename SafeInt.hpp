@@ -208,14 +208,6 @@ Please read the leading comments before using the class.
 #pragma GCC diagnostic ignored "-Wunused-local-typedefs"
 #endif
 
-// clang only
-#if SAFEINT_COMPILER == CLANG_COMPILER
-
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wc++11-long-long"
-#pragma clang diagnostic ignored "-Wold-style-cast"
-#endif
-
 #endif
 
 // Static assert is always present
@@ -7134,9 +7126,6 @@ _CONSTEXPR11 SafeInt< T, E > operator |( U lhs, SafeInt< T, E > rhs ) SAFEINT_NO
 #pragma GCC diagnostic pop
 #endif
 
-#if SAFEINT_COMPILER == CLANG_COMPILER
-#pragma clang diagnostic pop
-#endif
 #endif //SAFEINT_HPP
 
 #if defined VISUAL_STUDIO_SAFEINT_COMPAT
