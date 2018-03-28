@@ -199,17 +199,6 @@ Please read the leading comments before using the class.
 #define _CRT_SECURE_INVALID_PARAMETER(msg) abort()
 #endif
 
-// Various things needed for GCC
-#if SAFEINT_COMPILER == GCC_COMPILER || SAFEINT_COMPILER == CLANG_COMPILER
-
-// GCC warning suppression
-#if SAFEINT_COMPILER == GCC_COMPILER
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wunused-local-typedefs"
-#endif
-
-#endif
-
 // Static assert is always present
 // TBD, replace the existing uses with strings that give more context
 #define SAFEINT_STATIC_ASSERT(x) static_assert((x), "SafeInt static assert failed")
@@ -7121,10 +7110,6 @@ _CONSTEXPR11 SafeInt< T, E > operator |( U lhs, SafeInt< T, E > rhs ) SAFEINT_NO
 {
     return SafeInt< T, E >( BinaryOrHelper< T, U, BinaryMethod< T, U >::method >::Or( (T)rhs, lhs ) );
 }
-
-#if SAFEINT_COMPILER == GCC_COMPILER
-#pragma GCC diagnostic pop
-#endif
 
 #endif //SAFEINT_HPP
 
