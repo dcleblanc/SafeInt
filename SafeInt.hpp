@@ -168,10 +168,9 @@ Please read the leading comments before using the class.
 
 #include <cstdint>
 #include <limits>
-
 #include <type_traits> // This is now required
 // Need this for ptrdiff_t on some compilers
-//#include <cstddef>
+#include <cstddef>
 #include <cmath> // Needed for floating point implementation
 
 #if SAFEINT_COMPILER == VISUAL_STUDIO_COMPILER && defined _M_AMD64 && !defined SAFEINT_USE_INTRINSICS
