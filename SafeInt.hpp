@@ -5792,7 +5792,7 @@ public:
     }
 
     // The compiler knows that int == std::int32_t
-    // but not that long == std::int32_t
+    // but not that long == std::int32_t, because on some systems, long == std::int64_t
     _CONSTEXPR14 operator long() const SAFEINT_CPP_THROW
     {
         long val = 0;
@@ -5828,7 +5828,6 @@ public:
         return val;
     }
 
-#ifdef SIZE_T_CAST_NEEDED
     // We also need an explicit cast to size_t, or the compiler will complain
     // Apparently, only SOME compilers complain, and cl 14.00.50727.42 isn't one of them
     // Leave here in case we decide to backport this to an earlier compiler
@@ -5838,7 +5837,6 @@ public:
         SafeCastHelper< size_t, T, GetCastMethod< size_t, T >::method >::template CastThrow< E >( m_int, val );
         return val;
     }
-#endif
 
     // Also provide a cast operator for floating point types
     _CONSTEXPR14 operator float() const SAFEINT_CPP_THROW
