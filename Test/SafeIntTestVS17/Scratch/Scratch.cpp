@@ -1,20 +1,18 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
-
-#include "../../../SafeInt.hpp"
-#include <stdio.h>
+#include <iostream>
 
 /*
 Use this to check specific scenarios
 */
 
-int main(int, char**)
+int main(int argc, char** argv)
 {
-	__int64 a = 2;
-	unsigned long b = 3;
-	__int64 ret;
+    std::int16_t a;
+    std::int32_t b;
+    std::uint16_t;
 
-	bool f = SafeAdd(a, b, ret);
 
-	return 0;
+    std::cout << __cpp_constexpr << std::endl;
+    return 0;
 }
