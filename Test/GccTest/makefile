@@ -6,10 +6,11 @@ clean:
 	rm -f SafeIntTest
 	rm -f CompileTest
 	rm -f CompileTest14
+	rm -f *.err
 
 
 SafeIntTest: ../AddVerify.cpp ../CastVerify.cpp ../DivVerify.cpp ../IncDecVerify.cpp ../ModVerify.cpp ../MultVerify.cpp ../SubVerify.cpp ../TestMain.cpp ../TestMain.h ../../SafeInt.hpp
-	g++ --std=c++11 ../AddVerify.cpp ../CastVerify.cpp ../DivVerify.cpp ../IncDecVerify.cpp ../ModVerify.cpp ../MultVerify.cpp ../SubVerify.cpp ../TestMain.cpp -o SafeIntTest
+	g++ --std=c++11 ../AddVerify.cpp ../CastVerify.cpp ../DivVerify.cpp ../IncDecVerify.cpp ../ModVerify.cpp ../MultVerify.cpp ../SubVerify.cpp ../TestMain.cpp -o SafeIntTest 2> SafeIntTest.err
 
 CompileTest: ../CompileTest.cpp ../../SafeInt.hpp ../ConstExpr.cpp ../CleanCompile.cpp
 	g++ -Wall --std=c++11 ../CompileTest.cpp ../ConstExpr.cpp ../CleanCompile.cpp -o CompileTest 2> CompileTest.err
