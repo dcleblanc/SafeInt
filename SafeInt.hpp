@@ -5765,28 +5765,28 @@ public:
 
     _CONSTEXPR14 operator short() const SAFEINT_CPP_THROW
     {
-        std::int16_t val = 0;
+        short val = 0;
         SafeCastHelper< short, T, GetCastMethod< short, T >::method >::template CastThrow< E >( m_int, val );
         return val;
     }
 
     _CONSTEXPR14 operator unsigned short() const SAFEINT_CPP_THROW
     {
-        std::uint16_t val = 0;
+        unsigned short val = 0;
         SafeCastHelper< unsigned short, T, GetCastMethod< unsigned short, T >::method >::template CastThrow< E >( m_int, val );
         return val;
     }
 
     _CONSTEXPR14 operator int() const SAFEINT_CPP_THROW
     {
-        std::int32_t val = 0;
+        int val = 0;
         SafeCastHelper< int, T, GetCastMethod< int, T >::method >::template CastThrow< E >( m_int, val );
         return val;
     }
 
     _CONSTEXPR14 operator unsigned int() const SAFEINT_CPP_THROW
     {
-        std::uint32_t val = 0;
+        unsigned int val = 0;
         SafeCastHelper< unsigned int, T, GetCastMethod< unsigned int, T >::method >::template CastThrow< E >( m_int, val );
         return val;
     }
@@ -5809,14 +5809,14 @@ public:
 
     _CONSTEXPR14 operator long long() const SAFEINT_CPP_THROW
     {
-        std::int64_t val = 0;
+        long long val = 0;
         SafeCastHelper< long long, T, GetCastMethod< long long, T >::method >::template CastThrow< E >( m_int, val );
         return val;
     }
 
     _CONSTEXPR14 operator unsigned long long() const SAFEINT_CPP_THROW
     {
-        std::uint64_t val = 0;
+        unsigned long long val = 0;
         SafeCastHelper< unsigned long long, T, GetCastMethod< unsigned long long, T >::method >::template CastThrow< E >( m_int, val );
         return val;
     }
