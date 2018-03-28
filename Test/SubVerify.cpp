@@ -15,7 +15,7 @@ struct SubTest
 };
 
 // For the most part, unsigned-unsigned combinations are not going to give us any problems
-static const SubTest< unsigned __int64, unsigned __int64 > uint64_uint64[] =
+static const SubTest< std::uint64_t, std::uint64_t > uint64_uint64[] =
 {
     { 0x0000000000000000, 0x0000000000000000, true},
     { 0x0000000000000001, 0x0000000000000000, true},
@@ -330,7 +330,7 @@ void SubVerifyUint64Uint64()
 
     for( i = 0; i < COUNTOF(uint64_uint64); ++i )
     {
-        unsigned __int64 ret;
+        std::uint64_t ret;
         if( SafeSubtract(uint64_uint64[i].x, uint64_uint64[i].y, ret) != uint64_uint64[i].fExpected )
         {
             cerr << "Error in case uint64_uint64: ";
@@ -343,7 +343,7 @@ void SubVerifyUint64Uint64()
         bool fSuccess = true;
         try
         {
-            SafeInt<unsigned __int64> si(uint64_uint64[i].x);
+            SafeInt<std::uint64_t> si(uint64_uint64[i].x);
             si -= uint64_uint64[i].y;
         }
         catch(...)
@@ -364,8 +364,8 @@ void SubVerifyUint64Uint64()
         fSuccess = true;
         try
         {
-            unsigned __int64 x(uint64_uint64[i].x);
-            x -= SafeInt<unsigned __int64>(uint64_uint64[i].y);
+            std::uint64_t x(uint64_uint64[i].x);
+            x -= SafeInt<std::uint64_t>(uint64_uint64[i].y);
         }
         catch(...)
         {
@@ -382,7 +382,7 @@ void SubVerifyUint64Uint64()
     }
 }
 
-static const SubTest< unsigned __int64, unsigned __int32 > uint64_uint32[] =
+static const SubTest< std::uint64_t, std::uint32_t > uint64_uint32[] =
 {
     { 0x0000000000000000, 0x00000000, true},
     { 0x0000000000000001, 0x00000000, true},
@@ -553,7 +553,7 @@ void SubVerifyUint64Uint32()
 
     for( i = 0; i < COUNTOF(uint64_uint32); ++i )
     {
-        unsigned __int64 ret;
+        std::uint64_t ret;
         if( SafeSubtract(uint64_uint32[i].x, uint64_uint32[i].y, ret) != uint64_uint32[i].fExpected )
         {
             cerr << "Error in case uint64_uint32: ";
@@ -566,7 +566,7 @@ void SubVerifyUint64Uint32()
         bool fSuccess = true;
         try
         {
-            SafeInt<unsigned __int64> si(uint64_uint32[i].x);
+            SafeInt<std::uint64_t> si(uint64_uint32[i].x);
             si -= uint64_uint32[i].y;
         }
         catch(...)
@@ -587,8 +587,8 @@ void SubVerifyUint64Uint32()
         fSuccess = true;
         try
         {
-            unsigned __int64 x(uint64_uint32[i].x);
-            x -= SafeInt<unsigned __int64>(uint64_uint32[i].y);
+            std::uint64_t x(uint64_uint32[i].x);
+            x -= SafeInt<std::uint64_t>(uint64_uint32[i].y);
         }
         catch(...)
         {
@@ -605,7 +605,7 @@ void SubVerifyUint64Uint32()
     }
 }
 
-static const SubTest< unsigned __int64, unsigned __int16 > uint64_uint16[] =
+static const SubTest< std::uint64_t, std::uint16_t > uint64_uint16[] =
 {
     { 0x0000000000000000, 0x0000, true},
     { 0x0000000000000001, 0x0000, true},
@@ -776,7 +776,7 @@ void SubVerifyUint64Uint16()
 
     for( i = 0; i < COUNTOF(uint64_uint16); ++i )
     {
-        unsigned __int64 ret;
+        std::uint64_t ret;
         if( SafeSubtract(uint64_uint16[i].x, uint64_uint16[i].y, ret) != uint64_uint16[i].fExpected )
         {
             cerr << "Error in case uint64_uint16: ";
@@ -789,7 +789,7 @@ void SubVerifyUint64Uint16()
         bool fSuccess = true;
         try
         {
-            SafeInt<unsigned __int64> si(uint64_uint16[i].x);
+            SafeInt<std::uint64_t> si(uint64_uint16[i].x);
             si -= uint64_uint16[i].y;
         }
         catch(...)
@@ -810,8 +810,8 @@ void SubVerifyUint64Uint16()
         fSuccess = true;
         try
         {
-            unsigned __int64 x(uint64_uint16[i].x);
-            x -= SafeInt<unsigned __int64>(uint64_uint16[i].y);
+            std::uint64_t x(uint64_uint16[i].x);
+            x -= SafeInt<std::uint64_t>(uint64_uint16[i].y);
         }
         catch(...)
         {
@@ -828,7 +828,7 @@ void SubVerifyUint64Uint16()
     }
 }
 
-static const SubTest< unsigned __int64, unsigned __int8 > uint64_uint8[] =
+static const SubTest< std::uint64_t, std::uint8_t > uint64_uint8[] =
 {
     { 0x0000000000000000, 0x00, true},
     { 0x0000000000000001, 0x00, true},
@@ -999,7 +999,7 @@ void SubVerifyUint64Uint8()
 
     for( i = 0; i < COUNTOF(uint64_uint8); ++i )
     {
-        unsigned __int64 ret;
+        std::uint64_t ret;
         if( SafeSubtract(uint64_uint8[i].x, uint64_uint8[i].y, ret) != uint64_uint8[i].fExpected )
         {
             cerr << "Error in case uint64_uint8: ";
@@ -1012,7 +1012,7 @@ void SubVerifyUint64Uint8()
         bool fSuccess = true;
         try
         {
-            SafeInt<unsigned __int64> si(uint64_uint8[i].x);
+            SafeInt<std::uint64_t> si(uint64_uint8[i].x);
             si -= uint64_uint8[i].y;
         }
         catch(...)
@@ -1033,8 +1033,8 @@ void SubVerifyUint64Uint8()
         fSuccess = true;
         try
         {
-            unsigned __int64 x(uint64_uint8[i].x);
-            x -= SafeInt<unsigned __int64>(uint64_uint8[i].y);
+            std::uint64_t x(uint64_uint8[i].x);
+            x -= SafeInt<std::uint64_t>(uint64_uint8[i].y);
         }
         catch(...)
         {
@@ -1051,7 +1051,7 @@ void SubVerifyUint64Uint8()
     }
 }
 
-static const SubTest< unsigned __int8, unsigned __int64 > uint8_uint64[] =
+static const SubTest< std::uint8_t, std::uint64_t > uint8_uint64[] =
 {
     { 0x00, 0x0000000000000000, true},
     { 0x01, 0x0000000000000000, true},
@@ -1230,7 +1230,7 @@ void SubVerifyUint8Uint64()
 
     for( i = 0; i < COUNTOF(uint8_uint64); ++i )
     {
-        unsigned __int8 ret;
+        std::uint8_t ret;
         if( SafeSubtract(uint8_uint64[i].x, uint8_uint64[i].y, ret) != uint8_uint64[i].fExpected )
         {
             cerr << "Error in case uint8_uint64: ";
@@ -1243,7 +1243,7 @@ void SubVerifyUint8Uint64()
         bool fSuccess = true;
         try
         {
-            SafeInt<unsigned __int8> si(uint8_uint64[i].x);
+            SafeInt<std::uint8_t> si(uint8_uint64[i].x);
             si -= uint8_uint64[i].y;
         }
         catch(...)
@@ -1264,8 +1264,8 @@ void SubVerifyUint8Uint64()
         fSuccess = true;
         try
         {
-            unsigned __int8 x(uint8_uint64[i].x);
-            x -= SafeInt<unsigned __int64>(uint8_uint64[i].y);
+            std::uint8_t x(uint8_uint64[i].x);
+            x -= SafeInt<std::uint64_t>(uint8_uint64[i].y);
         }
         catch(...)
         {
@@ -1282,7 +1282,7 @@ void SubVerifyUint8Uint64()
     }
 }
 
-static const SubTest< unsigned __int8, unsigned __int32 > uint8_uint32[] =
+static const SubTest< std::uint8_t, std::uint32_t > uint8_uint32[] =
 {
     { 0x00, 0x00000000, true},
     { 0x01, 0x00000000, true},
@@ -1381,7 +1381,7 @@ void SubVerifyUint8Uint32()
 
     for( i = 0; i < COUNTOF(uint8_uint32); ++i )
     {
-        unsigned __int8 ret;
+        std::uint8_t ret;
         if( SafeSubtract(uint8_uint32[i].x, uint8_uint32[i].y, ret) != uint8_uint32[i].fExpected )
         {
             cerr << "Error in case uint8_uint32: ";
@@ -1394,7 +1394,7 @@ void SubVerifyUint8Uint32()
         bool fSuccess = true;
         try
         {
-            SafeInt<unsigned __int8> si(uint8_uint32[i].x);
+            SafeInt<std::uint8_t> si(uint8_uint32[i].x);
             si -= uint8_uint32[i].y;
         }
         catch(...)
@@ -1415,8 +1415,8 @@ void SubVerifyUint8Uint32()
         fSuccess = true;
         try
         {
-            unsigned __int8 x(uint8_uint32[i].x);
-            x -= SafeInt<unsigned __int64>(uint8_uint32[i].y);
+            std::uint8_t x(uint8_uint32[i].x);
+            x -= SafeInt<std::uint64_t>(uint8_uint32[i].y);
         }
         catch(...)
         {
@@ -1433,7 +1433,7 @@ void SubVerifyUint8Uint32()
     }
 }
 
-static const SubTest< unsigned __int8, unsigned __int16 > uint8_uint16[] =
+static const SubTest< std::uint8_t, std::uint16_t > uint8_uint16[] =
 {
     { 0x00, 0x0000, true},
     { 0x01, 0x0000, true},
@@ -1532,7 +1532,7 @@ void SubVerifyUint8Uint16()
 
     for( i = 0; i < COUNTOF(uint8_uint16); ++i )
     {
-        unsigned __int8 ret;
+        std::uint8_t ret;
         if( SafeSubtract(uint8_uint16[i].x, uint8_uint16[i].y, ret) != uint8_uint16[i].fExpected )
         {
             cerr << "Error in case uint8_uint16: ";
@@ -1545,7 +1545,7 @@ void SubVerifyUint8Uint16()
         bool fSuccess = true;
         try
         {
-            SafeInt<unsigned __int8> si(uint8_uint16[i].x);
+            SafeInt<std::uint8_t> si(uint8_uint16[i].x);
             si -= uint8_uint16[i].y;
         }
         catch(...)
@@ -1566,8 +1566,8 @@ void SubVerifyUint8Uint16()
         fSuccess = true;
         try
         {
-            unsigned __int8 x(uint8_uint16[i].x);
-            x -= SafeInt<unsigned __int64>(uint8_uint16[i].y);
+            std::uint8_t x(uint8_uint16[i].x);
+            x -= SafeInt<std::uint64_t>(uint8_uint16[i].y);
         }
         catch(...)
         {
@@ -1584,7 +1584,7 @@ void SubVerifyUint8Uint16()
     }
 }
 
-static const SubTest< unsigned __int8, unsigned __int8 > uint8_uint8[] =
+static const SubTest< std::uint8_t, std::uint8_t > uint8_uint8[] =
 {
     { 0x00, 0x00, true},
     { 0x01, 0x00, true},
@@ -1683,7 +1683,7 @@ void SubVerifyUint8Uint8()
 
     for( i = 0; i < COUNTOF(uint8_uint8); ++i )
     {
-        unsigned __int8 ret;
+        std::uint8_t ret;
         if( SafeSubtract(uint8_uint8[i].x, uint8_uint8[i].y, ret) != uint8_uint8[i].fExpected )
         {
             cerr << "Error in case uint8_uint8: ";
@@ -1696,7 +1696,7 @@ void SubVerifyUint8Uint8()
         bool fSuccess = true;
         try
         {
-            SafeInt<unsigned __int8> si(uint8_uint8[i].x);
+            SafeInt<std::uint8_t> si(uint8_uint8[i].x);
             si -= uint8_uint8[i].y;
         }
         catch(...)
@@ -1717,8 +1717,8 @@ void SubVerifyUint8Uint8()
         fSuccess = true;
         try
         {
-            unsigned __int8 x(uint8_uint8[i].x);
-            x -= SafeInt<unsigned __int64>(uint8_uint8[i].y);
+            std::uint8_t x(uint8_uint8[i].x);
+            x -= SafeInt<std::uint64_t>(uint8_uint8[i].y);
         }
         catch(...)
         {
@@ -1735,7 +1735,7 @@ void SubVerifyUint8Uint8()
     }
 }
 
-static const SubTest< __int64, __int64 > int64_int64[] =
+static const SubTest< std::int64_t, std::int64_t > int64_int64[] =
 {
     { 0x0000000000000000, 0x0000000000000000, true},
     { 0x0000000000000001, 0x0000000000000000, true},
@@ -2050,7 +2050,7 @@ void SubVerifyInt64Int64()
 
     for( i = 0; i < COUNTOF(int64_int64); ++i )
     {
-        __int64 ret;
+        std::int64_t ret;
         if( SafeSubtract(int64_int64[i].x, int64_int64[i].y, ret) != int64_int64[i].fExpected )
         {
             cerr << "Error in case int64_int64: ";
@@ -2063,7 +2063,7 @@ void SubVerifyInt64Int64()
         bool fSuccess = true;
         try
         {
-            SafeInt<__int64> si(int64_int64[i].x);
+            SafeInt<std::int64_t> si(int64_int64[i].x);
             si -= int64_int64[i].y;
         }
         catch(...)
@@ -2084,8 +2084,8 @@ void SubVerifyInt64Int64()
         fSuccess = true;
         try
         {
-            __int64 x(int64_int64[i].x);
-            x -= SafeInt<__int64>(int64_int64[i].y);
+            std::int64_t x(int64_int64[i].x);
+            x -= SafeInt<std::int64_t>(int64_int64[i].y);
         }
         catch(...)
         {
@@ -2102,7 +2102,7 @@ void SubVerifyInt64Int64()
     }
 }
 
-static const SubTest< __int64, __int32 > int64_int32[] =
+static const SubTest< std::int64_t, std::int32_t > int64_int32[] =
 {
     { 0x0000000000000000, 0x00000000, true},
     { 0x0000000000000001, 0x00000000, true},
@@ -2273,7 +2273,7 @@ void SubVerifyInt64Int32()
 
     for( i = 0; i < COUNTOF(int64_int32); ++i )
     {
-        __int64 ret;
+        std::int64_t ret;
         if( SafeSubtract(int64_int32[i].x, int64_int32[i].y, ret) != int64_int32[i].fExpected )
         {
             cerr << "Error in case int64_int32: ";
@@ -2286,7 +2286,7 @@ void SubVerifyInt64Int32()
         bool fSuccess = true;
         try
         {
-            SafeInt<__int64> si(int64_int32[i].x);
+            SafeInt<std::int64_t> si(int64_int32[i].x);
             si -= int64_int32[i].y;
         }
         catch(...)
@@ -2307,8 +2307,8 @@ void SubVerifyInt64Int32()
         fSuccess = true;
         try
         {
-            __int64 x(int64_int32[i].x);
-            x -= SafeInt<__int64>(int64_int32[i].y);
+            std::int64_t x(int64_int32[i].x);
+            x -= SafeInt<std::int64_t>(int64_int32[i].y);
         }
         catch(...)
         {
@@ -2325,7 +2325,7 @@ void SubVerifyInt64Int32()
     }
 }
 
-static const SubTest< __int64, __int16 > int64_int16[] =
+static const SubTest< std::int64_t, std::int16_t > int64_int16[] =
 {
     { 0x0000000000000000, 0x0000, true},
     { 0x0000000000000001, 0x0000, true},
@@ -2496,7 +2496,7 @@ void SubVerifyInt64Int16()
 
     for( i = 0; i < COUNTOF(int64_int16); ++i )
     {
-        __int64 ret;
+        std::int64_t ret;
         if( SafeSubtract(int64_int16[i].x, int64_int16[i].y, ret) != int64_int16[i].fExpected )
         {
             cerr << "Error in case int64_int16: ";
@@ -2509,7 +2509,7 @@ void SubVerifyInt64Int16()
         bool fSuccess = true;
         try
         {
-            SafeInt<__int64> si(int64_int16[i].x);
+            SafeInt<std::int64_t> si(int64_int16[i].x);
             si -= int64_int16[i].y;
         }
         catch(...)
@@ -2530,8 +2530,8 @@ void SubVerifyInt64Int16()
         fSuccess = true;
         try
         {
-            __int64 x(int64_int16[i].x);
-            x -= SafeInt<__int64>(int64_int16[i].y);
+            std::int64_t x(int64_int16[i].x);
+            x -= SafeInt<std::int64_t>(int64_int16[i].y);
         }
         catch(...)
         {
@@ -2548,7 +2548,7 @@ void SubVerifyInt64Int16()
     }
 }
 
-static const SubTest< __int64, __int8 > int64_int8[] =
+static const SubTest< std::int64_t, std::int8_t > int64_int8[] =
 {
     { 0x0000000000000000, 0x00, true},
     { 0x0000000000000001, 0x00, true},
@@ -2719,7 +2719,7 @@ void SubVerifyInt64Int8()
 
     for( i = 0; i < COUNTOF(int64_int8); ++i )
     {
-        __int64 ret;
+        std::int64_t ret;
         if( SafeSubtract(int64_int8[i].x, int64_int8[i].y, ret) != int64_int8[i].fExpected )
         {
             cerr << "Error in case int64_int8: ";
@@ -2732,7 +2732,7 @@ void SubVerifyInt64Int8()
         bool fSuccess = true;
         try
         {
-            SafeInt<__int64> si(int64_int8[i].x);
+            SafeInt<std::int64_t> si(int64_int8[i].x);
             si -= int64_int8[i].y;
         }
         catch(...)
@@ -2753,8 +2753,8 @@ void SubVerifyInt64Int8()
         fSuccess = true;
         try
         {
-            __int64 x(int64_int8[i].x);
-            x -= SafeInt<__int64>(int64_int8[i].y);
+            std::int64_t x(int64_int8[i].x);
+            x -= SafeInt<std::int64_t>(int64_int8[i].y);
         }
         catch(...)
         {
@@ -2771,7 +2771,7 @@ void SubVerifyInt64Int8()
     }
 }
 
-static const SubTest< __int8, __int64 > int8_int64[] =
+static const SubTest< std::int8_t, std::int64_t > int8_int64[] =
 {
     { 0x00, 0x0000000000000000, true},
     { 0x01, 0x0000000000000000, true},
@@ -2950,7 +2950,7 @@ void SubVerifyInt8Int64()
 
     for( i = 0; i < COUNTOF(int8_int64); ++i )
     {
-        __int8 ret;
+        std::int8_t ret;
         if( SafeSubtract(int8_int64[i].x, int8_int64[i].y, ret) != int8_int64[i].fExpected )
         {
             cerr << "Error in case int8_int64: ";
@@ -2963,7 +2963,7 @@ void SubVerifyInt8Int64()
         bool fSuccess = true;
         try
         {
-            SafeInt<__int8> si(int8_int64[i].x);
+            SafeInt<std::int8_t> si(int8_int64[i].x);
             si -= int8_int64[i].y;
         }
         catch(...)
@@ -2984,8 +2984,8 @@ void SubVerifyInt8Int64()
         fSuccess = true;
         try
         {
-            __int8 x(int8_int64[i].x);
-            x -= SafeInt<__int64>(int8_int64[i].y);
+            std::int8_t x(int8_int64[i].x);
+            x -= SafeInt<std::int64_t>(int8_int64[i].y);
         }
         catch(...)
         {
@@ -3002,7 +3002,7 @@ void SubVerifyInt8Int64()
     }
 }
 
-static const SubTest< __int8, __int32 > int8_int32[] =
+static const SubTest< std::int8_t, std::int32_t > int8_int32[] =
 {
     { 0x00, 0x00000000, true},
     { 0x01, 0x00000000, true},
@@ -3101,7 +3101,7 @@ void SubVerifyInt8Int32()
 
     for( i = 0; i < COUNTOF(int8_int32); ++i )
     {
-        __int8 ret;
+        std::int8_t ret;
         if( SafeSubtract(int8_int32[i].x, int8_int32[i].y, ret) != int8_int32[i].fExpected )
         {
             cerr << "Error in case int8_int32: ";
@@ -3114,7 +3114,7 @@ void SubVerifyInt8Int32()
         bool fSuccess = true;
         try
         {
-            SafeInt<__int8> si(int8_int32[i].x);
+            SafeInt<std::int8_t> si(int8_int32[i].x);
             si -= int8_int32[i].y;
         }
         catch(...)
@@ -3135,8 +3135,8 @@ void SubVerifyInt8Int32()
         fSuccess = true;
         try
         {
-            __int8 x(int8_int32[i].x);
-            x -= SafeInt<__int64>(int8_int32[i].y);
+            std::int8_t x(int8_int32[i].x);
+            x -= SafeInt<std::int64_t>(int8_int32[i].y);
         }
         catch(...)
         {
@@ -3153,7 +3153,7 @@ void SubVerifyInt8Int32()
     }
 }
 
-static const SubTest< __int8, __int16 > int8_int16[] =
+static const SubTest< std::int8_t, std::int16_t > int8_int16[] =
 {
     { 0x00, 0x0000, true},
     { 0x01, 0x0000, true},
@@ -3252,7 +3252,7 @@ void SubVerifyInt8Int16()
 
     for( i = 0; i < COUNTOF(int8_int16); ++i )
     {
-        __int8 ret;
+        std::int8_t ret;
         if( SafeSubtract(int8_int16[i].x, int8_int16[i].y, ret) != int8_int16[i].fExpected )
         {
             cerr << "Error in case int8_int16: ";
@@ -3265,7 +3265,7 @@ void SubVerifyInt8Int16()
         bool fSuccess = true;
         try
         {
-            SafeInt<__int8> si(int8_int16[i].x);
+            SafeInt<std::int8_t> si(int8_int16[i].x);
             si -= int8_int16[i].y;
         }
         catch(...)
@@ -3286,8 +3286,8 @@ void SubVerifyInt8Int16()
         fSuccess = true;
         try
         {
-            __int8 x(int8_int16[i].x);
-            x -= SafeInt<__int64>(int8_int16[i].y);
+            std::int8_t x(int8_int16[i].x);
+            x -= SafeInt<std::int64_t>(int8_int16[i].y);
         }
         catch(...)
         {
@@ -3304,7 +3304,7 @@ void SubVerifyInt8Int16()
     }
 }
 
-static const SubTest< __int8, __int8 > int8_int8[] =
+static const SubTest< std::int8_t, std::int8_t > int8_int8[] =
 {
     { 0x00, 0x00, true},
     { 0x01, 0x00, true},
@@ -3403,7 +3403,7 @@ void SubVerifyInt8Int8()
 
     for( i = 0; i < COUNTOF(int8_int8); ++i )
     {
-        __int8 ret;
+        std::int8_t ret;
         if( SafeSubtract(int8_int8[i].x, int8_int8[i].y, ret) != int8_int8[i].fExpected )
         {
             cerr << "Error in case int8_int8: ";
@@ -3416,7 +3416,7 @@ void SubVerifyInt8Int8()
         bool fSuccess = true;
         try
         {
-            SafeInt<__int8> si(int8_int8[i].x);
+            SafeInt<std::int8_t> si(int8_int8[i].x);
             si -= int8_int8[i].y;
         }
         catch(...)
@@ -3437,8 +3437,8 @@ void SubVerifyInt8Int8()
         fSuccess = true;
         try
         {
-            __int8 x(int8_int8[i].x);
-            x -= SafeInt<__int64>(int8_int8[i].y);
+            std::int8_t x(int8_int8[i].x);
+            x -= SafeInt<std::int64_t>(int8_int8[i].y);
         }
         catch(...)
         {
@@ -3455,7 +3455,7 @@ void SubVerifyInt8Int8()
     }
 }
 
-static const SubTest< unsigned __int64, __int64 > uint64_int64[] =
+static const SubTest< std::uint64_t, std::int64_t > uint64_int64[] =
 {
     { 0x0000000000000000, 0x0000000000000000, true},
     { 0x0000000000000001, 0x0000000000000000, true},
@@ -3770,7 +3770,7 @@ void SubVerifyUint64Int64()
 
     for( i = 0; i < COUNTOF(uint64_int64); ++i )
     {
-        unsigned __int64 ret;
+        std::uint64_t ret;
         if( SafeSubtract(uint64_int64[i].x, uint64_int64[i].y, ret) != uint64_int64[i].fExpected )
         {
             cerr << "Error in case uint64_int64: ";
@@ -3783,8 +3783,8 @@ void SubVerifyUint64Int64()
         bool fSuccess = true;
         try
         {
-            SafeInt<unsigned __int64> si(uint64_int64[i].x);
-            si -= (__int64)uint64_int64[i].y;
+            SafeInt<std::uint64_t> si(uint64_int64[i].x);
+            si -= (std::int64_t)uint64_int64[i].y;
         }
         catch(...)
         {
@@ -3804,8 +3804,8 @@ void SubVerifyUint64Int64()
         fSuccess = true;
         try
         {
-            unsigned __int64 x(uint64_int64[i].x);
-            x -= SafeInt<__int64>(uint64_int64[i].y);
+            std::uint64_t x(uint64_int64[i].x);
+            x -= SafeInt<std::int64_t>(uint64_int64[i].y);
         }
         catch(...)
         {
@@ -3822,7 +3822,7 @@ void SubVerifyUint64Int64()
     }
 }
 
-static const SubTest< unsigned __int64, __int32 > uint64_int32[] =
+static const SubTest< std::uint64_t, std::int32_t > uint64_int32[] =
 {
     { 0x0000000000000000, 0x00000000, true},
     { 0x0000000000000001, 0x00000000, true},
@@ -3993,7 +3993,7 @@ void SubVerifyUint64Int32()
 
     for( i = 0; i < COUNTOF(uint64_int32); ++i )
     {
-        unsigned __int64 ret;
+        std::uint64_t ret;
         if( SafeSubtract(uint64_int32[i].x, uint64_int32[i].y, ret) != uint64_int32[i].fExpected )
         {
             cerr << "Error in case uint64_int32: ";
@@ -4006,8 +4006,8 @@ void SubVerifyUint64Int32()
         bool fSuccess = true;
         try
         {
-            SafeInt<unsigned __int64> si(uint64_int32[i].x);
-            si -= (__int32)uint64_int32[i].y;
+            SafeInt<std::uint64_t> si(uint64_int32[i].x);
+            si -= (std::int32_t)uint64_int32[i].y;
         }
         catch(...)
         {
@@ -4027,8 +4027,8 @@ void SubVerifyUint64Int32()
         fSuccess = true;
         try
         {
-            unsigned __int64 x(uint64_int32[i].x);
-            x -= SafeInt<__int32>(uint64_int32[i].y);
+            std::uint64_t x(uint64_int32[i].x);
+            x -= SafeInt<std::int32_t>(uint64_int32[i].y);
         }
         catch(...)
         {
@@ -4045,7 +4045,7 @@ void SubVerifyUint64Int32()
     }
 }
 
-static const SubTest< unsigned __int64, __int16 > uint64_int16[] =
+static const SubTest< std::uint64_t, std::int16_t > uint64_int16[] =
 {
     { 0x0000000000000000, 0x0000, true},
     { 0x0000000000000001, 0x0000, true},
@@ -4216,7 +4216,7 @@ void SubVerifyUint64Int16()
 
     for( i = 0; i < COUNTOF(uint64_int16); ++i )
     {
-        unsigned __int64 ret;
+        std::uint64_t ret;
         if( SafeSubtract(uint64_int16[i].x, uint64_int16[i].y, ret) != uint64_int16[i].fExpected )
         {
             cerr << "Error in case uint64_int16: ";
@@ -4229,8 +4229,8 @@ void SubVerifyUint64Int16()
         bool fSuccess = true;
         try
         {
-            SafeInt<unsigned __int64> si(uint64_int16[i].x);
-            si -= (__int16)uint64_int16[i].y;
+            SafeInt<std::uint64_t> si(uint64_int16[i].x);
+            si -= (std::int16_t)uint64_int16[i].y;
         }
         catch(...)
         {
@@ -4250,8 +4250,8 @@ void SubVerifyUint64Int16()
         fSuccess = true;
         try
         {
-            unsigned __int64 x(uint64_int16[i].x);
-            x -= SafeInt<__int16>(uint64_int16[i].y);
+            std::uint64_t x(uint64_int16[i].x);
+            x -= SafeInt<std::int16_t>(uint64_int16[i].y);
         }
         catch(...)
         {
@@ -4268,7 +4268,7 @@ void SubVerifyUint64Int16()
     }
 }
 
-static const SubTest< unsigned __int64, __int8 > uint64_int8[] =
+static const SubTest< std::uint64_t, std::int8_t > uint64_int8[] =
 {
     { 0x0000000000000000, 0x00, true},
     { 0x0000000000000001, 0x00, true},
@@ -4439,7 +4439,7 @@ void SubVerifyUint64Int8()
 
     for( i = 0; i < COUNTOF(uint64_int8); ++i )
     {
-        unsigned __int64 ret;
+        std::uint64_t ret;
         if( SafeSubtract(uint64_int8[i].x, uint64_int8[i].y, ret) != uint64_int8[i].fExpected )
         {
             cerr << "Error in case uint64_int8: ";
@@ -4452,8 +4452,8 @@ void SubVerifyUint64Int8()
         bool fSuccess = true;
         try
         {
-            SafeInt<unsigned __int64> si(uint64_int8[i].x);
-            si -= (__int8)uint64_int8[i].y;
+            SafeInt<std::uint64_t> si(uint64_int8[i].x);
+            si -= (std::int8_t)uint64_int8[i].y;
         }
         catch(...)
         {
@@ -4473,8 +4473,8 @@ void SubVerifyUint64Int8()
         fSuccess = true;
         try
         {
-            unsigned __int64 x(uint64_int8[i].x);
-            x -= SafeInt<__int8>(uint64_int8[i].y);
+            std::uint64_t x(uint64_int8[i].x);
+            x -= SafeInt<std::int8_t>(uint64_int8[i].y);
         }
         catch(...)
         {
@@ -4491,7 +4491,7 @@ void SubVerifyUint64Int8()
     }
 }
 
-static const SubTest< unsigned __int8, __int64 > uint8_int64[] =
+static const SubTest< std::uint8_t, std::int64_t > uint8_int64[] =
 {
     { 0x00, 0x0000000000000000, true},
     { 0x01, 0x0000000000000000, true},
@@ -4670,7 +4670,7 @@ void SubVerifyUint8Int64()
 
     for( i = 0; i < COUNTOF(uint8_int64); ++i )
     {
-        unsigned __int8 ret;
+        std::uint8_t ret;
         if( SafeSubtract(uint8_int64[i].x, uint8_int64[i].y, ret) != uint8_int64[i].fExpected )
         {
             cerr << "Error in case uint8_int64: ";
@@ -4683,7 +4683,7 @@ void SubVerifyUint8Int64()
         bool fSuccess = true;
         try
         {
-            SafeInt<unsigned __int8> si(uint8_int64[i].x);
+            SafeInt<std::uint8_t> si(uint8_int64[i].x);
             si -= uint8_int64[i].y;
         }
         catch(...)
@@ -4704,8 +4704,8 @@ void SubVerifyUint8Int64()
         fSuccess = true;
         try
         {
-            unsigned __int8 x(uint8_int64[i].x);
-            x -= SafeInt<__int64>(uint8_int64[i].y);
+            std::uint8_t x(uint8_int64[i].x);
+            x -= SafeInt<std::int64_t>(uint8_int64[i].y);
         }
         catch(...)
         {
@@ -4722,7 +4722,7 @@ void SubVerifyUint8Int64()
     }
 }
 
-static const SubTest< unsigned __int8, __int32 > uint8_int32[] =
+static const SubTest< std::uint8_t, std::int32_t > uint8_int32[] =
 {
     { 0x00, 0x00000000, true},
     { 0x01, 0x00000000, true},
@@ -4821,7 +4821,7 @@ void SubVerifyUint8Int32()
 
     for( i = 0; i < COUNTOF(uint8_int32); ++i )
     {
-        unsigned __int8 ret;
+        std::uint8_t ret;
         if( SafeSubtract(uint8_int32[i].x, uint8_int32[i].y, ret) != uint8_int32[i].fExpected )
         {
             cerr << "Error in case uint8_int32: ";
@@ -4834,7 +4834,7 @@ void SubVerifyUint8Int32()
         bool fSuccess = true;
         try
         {
-            SafeInt<unsigned __int8> si(uint8_int32[i].x);
+            SafeInt<std::uint8_t> si(uint8_int32[i].x);
             si -= uint8_int32[i].y;
         }
         catch(...)
@@ -4855,8 +4855,8 @@ void SubVerifyUint8Int32()
         fSuccess = true;
         try
         {
-            unsigned __int8 x(uint8_int32[i].x);
-            x -= SafeInt<__int32>(uint8_int32[i].y);
+            std::uint8_t x(uint8_int32[i].x);
+            x -= SafeInt<std::int32_t>(uint8_int32[i].y);
         }
         catch(...)
         {
@@ -4873,7 +4873,7 @@ void SubVerifyUint8Int32()
     }
 }
 
-static const SubTest< unsigned __int8, __int16 > uint8_int16[] =
+static const SubTest< std::uint8_t, std::int16_t > uint8_int16[] =
 {
     { 0x00, 0x0000, true},
     { 0x01, 0x0000, true},
@@ -4972,7 +4972,7 @@ void SubVerifyUint8Int16()
 
     for( i = 0; i < COUNTOF(uint8_int16); ++i )
     {
-        unsigned __int8 ret;
+        std::uint8_t ret;
         if( SafeSubtract(uint8_int16[i].x, uint8_int16[i].y, ret) != uint8_int16[i].fExpected )
         {
             cerr << "Error in case uint8_int16: ";
@@ -4985,7 +4985,7 @@ void SubVerifyUint8Int16()
         bool fSuccess = true;
         try
         {
-            SafeInt<unsigned __int8> si(uint8_int16[i].x);
+            SafeInt<std::uint8_t> si(uint8_int16[i].x);
             si -= uint8_int16[i].y;
         }
         catch(...)
@@ -5006,8 +5006,8 @@ void SubVerifyUint8Int16()
         fSuccess = true;
         try
         {
-            unsigned __int8 x(uint8_int16[i].x);
-            x -= SafeInt<__int16>(uint8_int16[i].y);
+            std::uint8_t x(uint8_int16[i].x);
+            x -= SafeInt<std::int16_t>(uint8_int16[i].y);
         }
         catch(...)
         {
@@ -5024,7 +5024,7 @@ void SubVerifyUint8Int16()
     }
 }
 
-static const SubTest< unsigned __int8, __int8 > uint8_int8[] =
+static const SubTest< std::uint8_t, std::int8_t > uint8_int8[] =
 {
     { 0x00, 0x00, true},
     { 0x01, 0x00, true},
@@ -5123,7 +5123,7 @@ void SubVerifyUint8Int8()
 
     for( i = 0; i < COUNTOF(uint8_int8); ++i )
     {
-        unsigned __int8 ret;
+        std::uint8_t ret;
         if( SafeSubtract(uint8_int8[i].x, uint8_int8[i].y, ret) != uint8_int8[i].fExpected )
         {
             cerr << "Error in case uint8_int8: ";
@@ -5136,7 +5136,7 @@ void SubVerifyUint8Int8()
         bool fSuccess = true;
         try
         {
-            SafeInt<unsigned __int8> si(uint8_int8[i].x);
+            SafeInt<std::uint8_t> si(uint8_int8[i].x);
             si -= uint8_int8[i].y;
         }
         catch(...)
@@ -5157,8 +5157,8 @@ void SubVerifyUint8Int8()
         fSuccess = true;
         try
         {
-            unsigned __int8 x(uint8_int8[i].x);
-            x -= SafeInt<__int8>(uint8_int8[i].y);
+            std::uint8_t x(uint8_int8[i].x);
+            x -= SafeInt<std::int8_t>(uint8_int8[i].y);
         }
         catch(...)
         {
@@ -5175,7 +5175,7 @@ void SubVerifyUint8Int8()
     }
 }
 
-static const SubTest< __int64, unsigned __int64 > int64_uint64[] =
+static const SubTest< std::int64_t, std::uint64_t > int64_uint64[] =
 {
     { 0x0000000000000000, 0x0000000000000000, true},
     { 0x0000000000000001, 0x0000000000000000, true},
@@ -5490,7 +5490,7 @@ void SubVerifyInt64Uint64()
 
     for( i = 0; i < COUNTOF(int64_uint64); ++i )
     {
-        __int64 ret;
+        std::int64_t ret;
         if( SafeSubtract(int64_uint64[i].x, int64_uint64[i].y, ret) != int64_uint64[i].fExpected )
         {
             cerr << "Error in case int64_uint64: ";
@@ -5503,7 +5503,7 @@ void SubVerifyInt64Uint64()
         bool fSuccess = true;
         try
         {
-            SafeInt<__int64> si(int64_uint64[i].x);
+            SafeInt<std::int64_t> si(int64_uint64[i].x);
             si -= int64_uint64[i].y;
         }
         catch(...)
@@ -5524,8 +5524,8 @@ void SubVerifyInt64Uint64()
         fSuccess = true;
         try
         {
-            __int64 x(int64_uint64[i].x);
-            x -= SafeInt<unsigned __int64>(int64_uint64[i].y);
+            std::int64_t x(int64_uint64[i].x);
+            x -= SafeInt<std::uint64_t>(int64_uint64[i].y);
         }
         catch(...)
         {
@@ -5542,7 +5542,7 @@ void SubVerifyInt64Uint64()
     }
 }
 
-static const SubTest< __int64, unsigned __int32 > int64_uint32[] =
+static const SubTest< std::int64_t, std::uint32_t > int64_uint32[] =
 {
     { 0x0000000000000000, 0x00000000, true},
     { 0x0000000000000001, 0x00000000, true},
@@ -5713,7 +5713,7 @@ void SubVerifyInt64Uint32()
 
     for( i = 0; i < COUNTOF(int64_uint32); ++i )
     {
-        __int64 ret;
+        std::int64_t ret;
         if( SafeSubtract(int64_uint32[i].x, int64_uint32[i].y, ret) != int64_uint32[i].fExpected )
         {
             cerr << "Error in case int64_uint32: ";
@@ -5726,7 +5726,7 @@ void SubVerifyInt64Uint32()
         bool fSuccess = true;
         try
         {
-            SafeInt<__int64> si(int64_uint32[i].x);
+            SafeInt<std::int64_t> si(int64_uint32[i].x);
             si -= int64_uint32[i].y;
         }
         catch(...)
@@ -5747,8 +5747,8 @@ void SubVerifyInt64Uint32()
         fSuccess = true;
         try
         {
-            __int64 x(int64_uint32[i].x);
-            x -= SafeInt<unsigned __int32>(int64_uint32[i].y);
+            std::int64_t x(int64_uint32[i].x);
+            x -= SafeInt<std::uint32_t>(int64_uint32[i].y);
         }
         catch(...)
         {
@@ -5765,7 +5765,7 @@ void SubVerifyInt64Uint32()
     }
 }
 
-static const SubTest< __int64, unsigned __int16 > int64_uint16[] =
+static const SubTest< std::int64_t, std::uint16_t > int64_uint16[] =
 {
     { 0x0000000000000000, 0x0000, true},
     { 0x0000000000000001, 0x0000, true},
@@ -5936,7 +5936,7 @@ void SubVerifyInt64Uint16()
 
     for( i = 0; i < COUNTOF(int64_uint16); ++i )
     {
-        __int64 ret;
+        std::int64_t ret;
         if( SafeSubtract(int64_uint16[i].x, int64_uint16[i].y, ret) != int64_uint16[i].fExpected )
         {
             cerr << "Error in case int64_uint16: ";
@@ -5949,7 +5949,7 @@ void SubVerifyInt64Uint16()
         bool fSuccess = true;
         try
         {
-            SafeInt<__int64> si(int64_uint16[i].x);
+            SafeInt<std::int64_t> si(int64_uint16[i].x);
             si -= int64_uint16[i].y;
         }
         catch(...)
@@ -5970,8 +5970,8 @@ void SubVerifyInt64Uint16()
         fSuccess = true;
         try
         {
-            __int64 x(int64_uint16[i].x);
-            x -= SafeInt<unsigned __int16>(int64_uint16[i].y);
+            std::int64_t x(int64_uint16[i].x);
+            x -= SafeInt<std::uint16_t>(int64_uint16[i].y);
         }
         catch(...)
         {
@@ -5988,7 +5988,7 @@ void SubVerifyInt64Uint16()
     }
 }
 
-static const SubTest< __int64, unsigned __int8 > int64_uint8[] =
+static const SubTest< std::int64_t, std::uint8_t > int64_uint8[] =
 {
     { 0x0000000000000000, 0x00, true},
     { 0x0000000000000001, 0x00, true},
@@ -6159,7 +6159,7 @@ void SubVerifyInt64Uint8()
 
     for( i = 0; i < COUNTOF(int64_uint8); ++i )
     {
-        __int64 ret;
+        std::int64_t ret;
         if( SafeSubtract(int64_uint8[i].x, int64_uint8[i].y, ret) != int64_uint8[i].fExpected )
         {
             cerr << "Error in case int64_uint8: ";
@@ -6172,7 +6172,7 @@ void SubVerifyInt64Uint8()
         bool fSuccess = true;
         try
         {
-            SafeInt<__int64> si(int64_uint8[i].x);
+            SafeInt<std::int64_t> si(int64_uint8[i].x);
             si -= int64_uint8[i].y;
         }
         catch(...)
@@ -6193,8 +6193,8 @@ void SubVerifyInt64Uint8()
         fSuccess = true;
         try
         {
-            __int64 x(int64_uint8[i].x);
-            x -= SafeInt<unsigned __int8>(int64_uint8[i].y);
+            std::int64_t x(int64_uint8[i].x);
+            x -= SafeInt<std::uint8_t>(int64_uint8[i].y);
         }
         catch(...)
         {
@@ -6211,7 +6211,7 @@ void SubVerifyInt64Uint8()
     }
 }
 
-static const SubTest< __int8, unsigned __int64 > int8_uint64[] =
+static const SubTest< std::int8_t, std::uint64_t > int8_uint64[] =
 {
     { 0x00, 0x0000000000000000, true},
     { 0x01, 0x0000000000000000, true},
@@ -6390,7 +6390,7 @@ void SubVerifyInt8Uint64()
 
     for( i = 0; i < COUNTOF(int8_uint64); ++i )
     {
-        __int8 ret;
+        std::int8_t ret;
         if( SafeSubtract(int8_uint64[i].x, int8_uint64[i].y, ret) != int8_uint64[i].fExpected )
         {
             cerr << "Error in case int8_uint64: ";
@@ -6403,7 +6403,7 @@ void SubVerifyInt8Uint64()
         bool fSuccess = true;
         try
         {
-            SafeInt<__int8> si(int8_uint64[i].x);
+            SafeInt<std::int8_t> si(int8_uint64[i].x);
             si -= int8_uint64[i].y;
         }
         catch(...)
@@ -6424,8 +6424,8 @@ void SubVerifyInt8Uint64()
         fSuccess = true;
         try
         {
-            __int8 x(int8_uint64[i].x);
-            x -= SafeInt<unsigned __int64>(int8_uint64[i].y);
+            std::int8_t x(int8_uint64[i].x);
+            x -= SafeInt<std::uint64_t>(int8_uint64[i].y);
         }
         catch(...)
         {
@@ -6442,7 +6442,7 @@ void SubVerifyInt8Uint64()
     }
 }
 
-static const SubTest< __int8, unsigned __int32 > int8_uint32[] =
+static const SubTest< std::int8_t, std::uint32_t > int8_uint32[] =
 {
     { 0x00, 0x00000000, true},
     { 0x01, 0x00000000, true},
@@ -6541,7 +6541,7 @@ void SubVerifyInt8Uint32()
 
     for( i = 0; i < COUNTOF(int8_uint32); ++i )
     {
-        __int8 ret;
+        std::int8_t ret;
         if( SafeSubtract(int8_uint32[i].x, int8_uint32[i].y, ret) != int8_uint32[i].fExpected )
         {
             cerr << "Error in case int8_uint32: ";
@@ -6554,7 +6554,7 @@ void SubVerifyInt8Uint32()
         bool fSuccess = true;
         try
         {
-            SafeInt<__int8> si(int8_uint32[i].x);
+            SafeInt<std::int8_t> si(int8_uint32[i].x);
             si -= int8_uint32[i].y;
         }
         catch(...)
@@ -6575,8 +6575,8 @@ void SubVerifyInt8Uint32()
         fSuccess = true;
         try
         {
-            __int8 x(int8_uint32[i].x);
-            x -= SafeInt<unsigned __int32>(int8_uint32[i].y);
+            std::int8_t x(int8_uint32[i].x);
+            x -= SafeInt<std::uint32_t>(int8_uint32[i].y);
         }
         catch(...)
         {
@@ -6593,7 +6593,7 @@ void SubVerifyInt8Uint32()
     }
 }
 
-static const SubTest< __int8, unsigned __int16 > int8_uint16[] =
+static const SubTest< std::int8_t, std::uint16_t > int8_uint16[] =
 {
     { 0x00, 0x0000, true},
     { 0x01, 0x0000, true},
@@ -6692,7 +6692,7 @@ void SubVerifyInt8Uint16()
 
     for( i = 0; i < COUNTOF(int8_uint16); ++i )
     {
-        __int8 ret;
+        std::int8_t ret;
         if( SafeSubtract(int8_uint16[i].x, int8_uint16[i].y, ret) != int8_uint16[i].fExpected )
         {
             cerr << "Error in case int8_uint16: ";
@@ -6705,7 +6705,7 @@ void SubVerifyInt8Uint16()
         bool fSuccess = true;
         try
         {
-            SafeInt<__int8> si(int8_uint16[i].x);
+            SafeInt<std::int8_t> si(int8_uint16[i].x);
             si -= int8_uint16[i].y;
         }
         catch(...)
@@ -6726,8 +6726,8 @@ void SubVerifyInt8Uint16()
         fSuccess = true;
         try
         {
-            __int8 x(int8_uint16[i].x);
-            x -= SafeInt<unsigned __int16>(int8_uint16[i].y);
+            std::int8_t x(int8_uint16[i].x);
+            x -= SafeInt<std::uint16_t>(int8_uint16[i].y);
         }
         catch(...)
         {
@@ -6744,7 +6744,7 @@ void SubVerifyInt8Uint16()
     }
 }
 
-static const SubTest< __int8, unsigned __int8 > int8_uint8[] =
+static const SubTest< std::int8_t, std::uint8_t > int8_uint8[] =
 {
     { 0x00, 0x00, true},
     { 0x01, 0x00, true},
@@ -6843,7 +6843,7 @@ void SubVerifyInt8Uint8()
 
     for( i = 0; i < COUNTOF(int8_uint8); ++i )
     {
-        __int8 ret;
+        std::int8_t ret;
         if( SafeSubtract(int8_uint8[i].x, int8_uint8[i].y, ret) != int8_uint8[i].fExpected )
         {
             cerr << "Error in case int8_uint8: ";
@@ -6856,7 +6856,7 @@ void SubVerifyInt8Uint8()
         bool fSuccess = true;
         try
         {
-            SafeInt<__int8> si(int8_uint8[i].x);
+            SafeInt<std::int8_t> si(int8_uint8[i].x);
             si -= int8_uint8[i].y;
         }
         catch(...)
@@ -6877,8 +6877,8 @@ void SubVerifyInt8Uint8()
         fSuccess = true;
         try
         {
-            __int8 x(int8_uint8[i].x);
-            x -= SafeInt<unsigned __int8>(int8_uint8[i].y);
+            std::int8_t x(int8_uint8[i].x);
+            x -= SafeInt<std::uint8_t>(int8_uint8[i].y);
         }
         catch(...)
         {

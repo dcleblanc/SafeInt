@@ -14,7 +14,7 @@ struct AddTest
     bool fExpected;
 };
 
-static const AddTest< unsigned __int64, unsigned __int64 > uint64_uint64[] = 
+static const AddTest< std::uint64_t, std::uint64_t > uint64_uint64[] = 
 { 
 	{ 0x0000000000000000, 0x0000000000000000, true},
 	{ 0x0000000000000001, 0x0000000000000000, true},
@@ -329,7 +329,7 @@ void AddVerifyUint64Uint64()
 
     for( i = 0; i < COUNTOF(uint64_uint64); ++i )
     {
-        unsigned __int64 ret;
+        std::uint64_t ret;
         if( SafeAdd(uint64_uint64[i].x, uint64_uint64[i].y, ret) != uint64_uint64[i].fExpected )
         {
             cerr << "Error in case uint64_uint64: ";
@@ -342,7 +342,7 @@ void AddVerifyUint64Uint64()
         bool fSuccess = true;
         try
         {
-            SafeInt<unsigned __int64> si(uint64_uint64[i].x);
+            SafeInt<std::uint64_t> si(uint64_uint64[i].x);
             si += uint64_uint64[i].y;
         }
         catch(...)
@@ -363,8 +363,8 @@ void AddVerifyUint64Uint64()
         fSuccess = true;
         try
         {
-            unsigned __int64 x(uint64_uint64[i].x);
-            x += SafeInt<unsigned __int64>(uint64_uint64[i].y);
+            std::uint64_t x(uint64_uint64[i].x);
+            x += SafeInt<std::uint64_t>(uint64_uint64[i].y);
         }
         catch(...)
         {
@@ -381,7 +381,7 @@ void AddVerifyUint64Uint64()
     }
 }
 
-static const AddTest< unsigned __int64, unsigned __int32 > uint64_uint32[] = 
+static const AddTest< std::uint64_t, std::uint32_t > uint64_uint32[] = 
 { 
 	{ 0x0000000000000000, 0x00000000, true},
 	{ 0x0000000000000001, 0x00000000, true},
@@ -552,7 +552,7 @@ void AddVerifyUint64Uint32()
 
     for( i = 0; i < COUNTOF(uint64_uint32); ++i )
     {
-        unsigned __int64 ret;
+        std::uint64_t ret;
         if( SafeAdd(uint64_uint32[i].x, uint64_uint32[i].y, ret) != uint64_uint32[i].fExpected )
         {
             cerr << "Error in case uint64_uint32: ";
@@ -565,7 +565,7 @@ void AddVerifyUint64Uint32()
         bool fSuccess = true;
         try
         {
-            SafeInt<unsigned __int64> si(uint64_uint32[i].x);
+            SafeInt<std::uint64_t> si(uint64_uint32[i].x);
             si += uint64_uint32[i].y;
         }
         catch(...)
@@ -586,8 +586,8 @@ void AddVerifyUint64Uint32()
         fSuccess = true;
         try
         {
-            unsigned __int64 x(uint64_uint32[i].x);
-            x += SafeInt<unsigned __int32>(uint64_uint32[i].y);
+            std::uint64_t x(uint64_uint32[i].x);
+            x += SafeInt<std::uint32_t>(uint64_uint32[i].y);
         }
         catch(...)
         {
@@ -604,7 +604,7 @@ void AddVerifyUint64Uint32()
     }
 }
 
-static const AddTest< unsigned __int64, unsigned __int16 > uint64_uint16[] = 
+static const AddTest< std::uint64_t, std::uint16_t > uint64_uint16[] = 
 { 
 	{ 0x0000000000000000, 0x0000, true},
 	{ 0x0000000000000001, 0x0000, true},
@@ -775,7 +775,7 @@ void AddVerifyUint64Uint16()
 
     for( i = 0; i < COUNTOF(uint64_uint16); ++i )
     {
-        unsigned __int64 ret;
+        std::uint64_t ret;
         if( SafeAdd(uint64_uint16[i].x, uint64_uint16[i].y, ret) != uint64_uint16[i].fExpected )
         {
             cerr << "Error in case uint64_uint16: ";
@@ -788,7 +788,7 @@ void AddVerifyUint64Uint16()
         bool fSuccess = true;
         try
         {
-            SafeInt<unsigned __int64> si(uint64_uint16[i].x);
+            SafeInt<std::uint64_t> si(uint64_uint16[i].x);
             si += uint64_uint16[i].y;
         }
         catch(...)
@@ -809,8 +809,8 @@ void AddVerifyUint64Uint16()
         fSuccess = true;
         try
         {
-            unsigned __int64 x(uint64_uint16[i].x);
-            x += SafeInt<unsigned __int16>(uint64_uint16[i].y);
+            std::uint64_t x(uint64_uint16[i].x);
+            x += SafeInt<std::uint16_t>(uint64_uint16[i].y);
         }
         catch(...)
         {
@@ -827,7 +827,7 @@ void AddVerifyUint64Uint16()
     }
 }
 
-static const AddTest< unsigned __int64, unsigned __int8 > uint64_uint8[] = 
+static const AddTest< std::uint64_t, std::uint8_t > uint64_uint8[] = 
 { 
 	{ 0x0000000000000000, 0x00, true},
 	{ 0x0000000000000001, 0x00, true},
@@ -998,7 +998,7 @@ void AddVerifyUint64Uint8()
 
     for( i = 0; i < COUNTOF(uint64_uint8); ++i )
     {
-        unsigned __int64 ret;
+        std::uint64_t ret;
         if( SafeAdd(uint64_uint8[i].x, uint64_uint8[i].y, ret) != uint64_uint8[i].fExpected )
         {
             cerr << "Error in case uint64_uint8: ";
@@ -1011,7 +1011,7 @@ void AddVerifyUint64Uint8()
         bool fSuccess = true;
         try
         {
-            SafeInt<unsigned __int64> si(uint64_uint8[i].x);
+            SafeInt<std::uint64_t> si(uint64_uint8[i].x);
             si += uint64_uint8[i].y;
         }
         catch(...)
@@ -1032,8 +1032,8 @@ void AddVerifyUint64Uint8()
         fSuccess = true;
         try
         {
-            unsigned __int64 x(uint64_uint8[i].x);
-            x += SafeInt<unsigned __int8>(uint64_uint8[i].y);
+            std::uint64_t x(uint64_uint8[i].x);
+            x += SafeInt<std::uint8_t>(uint64_uint8[i].y);
         }
         catch(...)
         {
@@ -1050,7 +1050,7 @@ void AddVerifyUint64Uint8()
     }
 }
 
-static const AddTest< unsigned __int64, __int64 > uint64_int64[] = 
+static const AddTest< std::uint64_t, std::int64_t > uint64_int64[] = 
 { 
 	{ 0x0000000000000000, 0x0000000000000000, true},
 	{ 0x0000000000000001, 0x0000000000000000, true},
@@ -1286,77 +1286,77 @@ static const AddTest< unsigned __int64, __int64 > uint64_int64[] =
 	{ 0xfffffffffffffffe, 0x7fffffffffffffff, false},
 	{ 0xffffffffffffffff, 0x7fffffffffffffff, false},
 
-	{ 0x0000000000000000, (__int64)0x8000000000000000, false},
-	{ 0x0000000000000001, (__int64)0x8000000000000000, false},
-	{ 0x0000000000000002, (__int64)0x8000000000000000, false},
-	{ 0x000000007ffffffe, (__int64)0x8000000000000000, false},
-	{ 0x000000007fffffff, (__int64)0x8000000000000000, false},
-	{ 0x0000000080000000, (__int64)0x8000000000000000, false},
-	{ 0x0000000080000001, (__int64)0x8000000000000000, false},
-	{ 0x00000000fffffffe, (__int64)0x8000000000000000, false},
-	{ 0x00000000ffffffff, (__int64)0x8000000000000000, false},
-	{ 0x0000000100000000, (__int64)0x8000000000000000, false},
-	{ 0x0000000200000000, (__int64)0x8000000000000000, false},
-	{ 0x7ffffffffffffffe, (__int64)0x8000000000000000, false},
-	{ 0x7fffffffffffffff, (__int64)0x8000000000000000, false},
-	{ 0x8000000000000000, (__int64)0x8000000000000000, true},
-	{ 0x8000000000000001, (__int64)0x8000000000000000, true},
-	{ 0xfffffffffffffffe, (__int64)0x8000000000000000, true},
-	{ 0xffffffffffffffff, (__int64)0x8000000000000000, true},
+	{ 0x0000000000000000, (std::int64_t)0x8000000000000000, false},
+	{ 0x0000000000000001, (std::int64_t)0x8000000000000000, false},
+	{ 0x0000000000000002, (std::int64_t)0x8000000000000000, false},
+	{ 0x000000007ffffffe, (std::int64_t)0x8000000000000000, false},
+	{ 0x000000007fffffff, (std::int64_t)0x8000000000000000, false},
+	{ 0x0000000080000000, (std::int64_t)0x8000000000000000, false},
+	{ 0x0000000080000001, (std::int64_t)0x8000000000000000, false},
+	{ 0x00000000fffffffe, (std::int64_t)0x8000000000000000, false},
+	{ 0x00000000ffffffff, (std::int64_t)0x8000000000000000, false},
+	{ 0x0000000100000000, (std::int64_t)0x8000000000000000, false},
+	{ 0x0000000200000000, (std::int64_t)0x8000000000000000, false},
+	{ 0x7ffffffffffffffe, (std::int64_t)0x8000000000000000, false},
+	{ 0x7fffffffffffffff, (std::int64_t)0x8000000000000000, false},
+	{ 0x8000000000000000, (std::int64_t)0x8000000000000000, true},
+	{ 0x8000000000000001, (std::int64_t)0x8000000000000000, true},
+	{ 0xfffffffffffffffe, (std::int64_t)0x8000000000000000, true},
+	{ 0xffffffffffffffff, (std::int64_t)0x8000000000000000, true},
 
-	{ 0x0000000000000000, (__int64)0x8000000000000001, false},
-	{ 0x0000000000000001, (__int64)0x8000000000000001, false},
-	{ 0x0000000000000002, (__int64)0x8000000000000001, false},
-	{ 0x000000007ffffffe, (__int64)0x8000000000000001, false},
-	{ 0x000000007fffffff, (__int64)0x8000000000000001, false},
-	{ 0x0000000080000000, (__int64)0x8000000000000001, false},
-	{ 0x0000000080000001, (__int64)0x8000000000000001, false},
-	{ 0x00000000fffffffe, (__int64)0x8000000000000001, false},
-	{ 0x00000000ffffffff, (__int64)0x8000000000000001, false},
-	{ 0x0000000100000000, (__int64)0x8000000000000001, false},
-	{ 0x0000000200000000, (__int64)0x8000000000000001, false},
-	{ 0x7ffffffffffffffe, (__int64)0x8000000000000001, false},
-	{ 0x7fffffffffffffff, (__int64)0x8000000000000001, true},
-	{ 0x8000000000000000, (__int64)0x8000000000000001, true},
-	{ 0x8000000000000001, (__int64)0x8000000000000001, true},
-	{ 0xfffffffffffffffe, (__int64)0x8000000000000001, true},
-	{ 0xffffffffffffffff, (__int64)0x8000000000000001, true},
+	{ 0x0000000000000000, (std::int64_t)0x8000000000000001, false},
+	{ 0x0000000000000001, (std::int64_t)0x8000000000000001, false},
+	{ 0x0000000000000002, (std::int64_t)0x8000000000000001, false},
+	{ 0x000000007ffffffe, (std::int64_t)0x8000000000000001, false},
+	{ 0x000000007fffffff, (std::int64_t)0x8000000000000001, false},
+	{ 0x0000000080000000, (std::int64_t)0x8000000000000001, false},
+	{ 0x0000000080000001, (std::int64_t)0x8000000000000001, false},
+	{ 0x00000000fffffffe, (std::int64_t)0x8000000000000001, false},
+	{ 0x00000000ffffffff, (std::int64_t)0x8000000000000001, false},
+	{ 0x0000000100000000, (std::int64_t)0x8000000000000001, false},
+	{ 0x0000000200000000, (std::int64_t)0x8000000000000001, false},
+	{ 0x7ffffffffffffffe, (std::int64_t)0x8000000000000001, false},
+	{ 0x7fffffffffffffff, (std::int64_t)0x8000000000000001, true},
+	{ 0x8000000000000000, (std::int64_t)0x8000000000000001, true},
+	{ 0x8000000000000001, (std::int64_t)0x8000000000000001, true},
+	{ 0xfffffffffffffffe, (std::int64_t)0x8000000000000001, true},
+	{ 0xffffffffffffffff, (std::int64_t)0x8000000000000001, true},
 
-	{ 0x0000000000000000, (__int64)0xfffffffffffffffe, false},
-	{ 0x0000000000000001, (__int64)0xfffffffffffffffe, false},
-	{ 0x0000000000000002, (__int64)0xfffffffffffffffe, true},
-	{ 0x000000007ffffffe, (__int64)0xfffffffffffffffe, true},
-	{ 0x000000007fffffff, (__int64)0xfffffffffffffffe, true},
-	{ 0x0000000080000000, (__int64)0xfffffffffffffffe, true},
-	{ 0x0000000080000001, (__int64)0xfffffffffffffffe, true},
-	{ 0x00000000fffffffe, (__int64)0xfffffffffffffffe, true},
-	{ 0x00000000ffffffff, (__int64)0xfffffffffffffffe, true},
-	{ 0x0000000100000000, (__int64)0xfffffffffffffffe, true},
-	{ 0x0000000200000000, (__int64)0xfffffffffffffffe, true},
-	{ 0x7ffffffffffffffe, (__int64)0xfffffffffffffffe, true},
-	{ 0x7fffffffffffffff, (__int64)0xfffffffffffffffe, true},
-	{ 0x8000000000000000, (__int64)0xfffffffffffffffe, true},
-	{ 0x8000000000000001, (__int64)0xfffffffffffffffe, true},
-	{ 0xfffffffffffffffe, (__int64)0xfffffffffffffffe, true},
-	{ 0xffffffffffffffff, (__int64)0xfffffffffffffffe, true},
+	{ 0x0000000000000000, (std::int64_t)0xfffffffffffffffe, false},
+	{ 0x0000000000000001, (std::int64_t)0xfffffffffffffffe, false},
+	{ 0x0000000000000002, (std::int64_t)0xfffffffffffffffe, true},
+	{ 0x000000007ffffffe, (std::int64_t)0xfffffffffffffffe, true},
+	{ 0x000000007fffffff, (std::int64_t)0xfffffffffffffffe, true},
+	{ 0x0000000080000000, (std::int64_t)0xfffffffffffffffe, true},
+	{ 0x0000000080000001, (std::int64_t)0xfffffffffffffffe, true},
+	{ 0x00000000fffffffe, (std::int64_t)0xfffffffffffffffe, true},
+	{ 0x00000000ffffffff, (std::int64_t)0xfffffffffffffffe, true},
+	{ 0x0000000100000000, (std::int64_t)0xfffffffffffffffe, true},
+	{ 0x0000000200000000, (std::int64_t)0xfffffffffffffffe, true},
+	{ 0x7ffffffffffffffe, (std::int64_t)0xfffffffffffffffe, true},
+	{ 0x7fffffffffffffff, (std::int64_t)0xfffffffffffffffe, true},
+	{ 0x8000000000000000, (std::int64_t)0xfffffffffffffffe, true},
+	{ 0x8000000000000001, (std::int64_t)0xfffffffffffffffe, true},
+	{ 0xfffffffffffffffe, (std::int64_t)0xfffffffffffffffe, true},
+	{ 0xffffffffffffffff, (std::int64_t)0xfffffffffffffffe, true},
 
-	{ 0x0000000000000000, (__int64)0xffffffffffffffff, false},
-	{ 0x0000000000000001, (__int64)0xffffffffffffffff, true},
-	{ 0x0000000000000002, (__int64)0xffffffffffffffff, true},
-	{ 0x000000007ffffffe, (__int64)0xffffffffffffffff, true},
-	{ 0x000000007fffffff, (__int64)0xffffffffffffffff, true},
-	{ 0x0000000080000000, (__int64)0xffffffffffffffff, true},
-	{ 0x0000000080000001, (__int64)0xffffffffffffffff, true},
-	{ 0x00000000fffffffe, (__int64)0xffffffffffffffff, true},
-	{ 0x00000000ffffffff, (__int64)0xffffffffffffffff, true},
-	{ 0x0000000100000000, (__int64)0xffffffffffffffff, true},
-	{ 0x0000000200000000, (__int64)0xffffffffffffffff, true},
-	{ 0x7ffffffffffffffe, (__int64)0xffffffffffffffff, true},
-	{ 0x7fffffffffffffff, (__int64)0xffffffffffffffff, true},
-	{ 0x8000000000000000, (__int64)0xffffffffffffffff, true},
-	{ 0x8000000000000001, (__int64)0xffffffffffffffff, true},
-	{ 0xfffffffffffffffe, (__int64)0xffffffffffffffff, true},
-	{ 0xffffffffffffffff, (__int64)0xffffffffffffffff, true},
+	{ 0x0000000000000000, (std::int64_t)0xffffffffffffffff, false},
+	{ 0x0000000000000001, (std::int64_t)0xffffffffffffffff, true},
+	{ 0x0000000000000002, (std::int64_t)0xffffffffffffffff, true},
+	{ 0x000000007ffffffe, (std::int64_t)0xffffffffffffffff, true},
+	{ 0x000000007fffffff, (std::int64_t)0xffffffffffffffff, true},
+	{ 0x0000000080000000, (std::int64_t)0xffffffffffffffff, true},
+	{ 0x0000000080000001, (std::int64_t)0xffffffffffffffff, true},
+	{ 0x00000000fffffffe, (std::int64_t)0xffffffffffffffff, true},
+	{ 0x00000000ffffffff, (std::int64_t)0xffffffffffffffff, true},
+	{ 0x0000000100000000, (std::int64_t)0xffffffffffffffff, true},
+	{ 0x0000000200000000, (std::int64_t)0xffffffffffffffff, true},
+	{ 0x7ffffffffffffffe, (std::int64_t)0xffffffffffffffff, true},
+	{ 0x7fffffffffffffff, (std::int64_t)0xffffffffffffffff, true},
+	{ 0x8000000000000000, (std::int64_t)0xffffffffffffffff, true},
+	{ 0x8000000000000001, (std::int64_t)0xffffffffffffffff, true},
+	{ 0xfffffffffffffffe, (std::int64_t)0xffffffffffffffff, true},
+	{ 0xffffffffffffffff, (std::int64_t)0xffffffffffffffff, true},
 };
 
 void AddVerifyUint64Int64()
@@ -1365,7 +1365,7 @@ void AddVerifyUint64Int64()
 
     for( i = 0; i < COUNTOF(uint64_int64); ++i )
     {
-        unsigned __int64 ret;
+        std::uint64_t ret;
         if( SafeAdd(uint64_int64[i].x, uint64_int64[i].y, ret) != uint64_int64[i].fExpected )
         {
             cerr << "Error in case uint64_int64: ";
@@ -1378,7 +1378,7 @@ void AddVerifyUint64Int64()
         bool fSuccess = true;
         try
         {
-            SafeInt<unsigned __int64> si(uint64_int64[i].x);
+            SafeInt<std::uint64_t> si(uint64_int64[i].x);
             si += uint64_int64[i].y;
         }
         catch(...)
@@ -1399,8 +1399,8 @@ void AddVerifyUint64Int64()
         fSuccess = true;
         try
         {
-            unsigned __int64 x(uint64_int64[i].x);
-            x += SafeInt<__int64>(uint64_int64[i].y);
+            std::uint64_t x(uint64_int64[i].x);
+            x += SafeInt<std::int64_t>(uint64_int64[i].y);
         }
         catch(...)
         {
@@ -1417,7 +1417,7 @@ void AddVerifyUint64Int64()
     }
 }
 
-static const AddTest< unsigned __int64, __int32 > uint64_int32[] = 
+static const AddTest< std::uint64_t, std::int32_t > uint64_int32[] = 
 { 
 	{ 0x0000000000000000, 0x00000000, true},
 	{ 0x0000000000000001, 0x00000000, true},
@@ -1509,77 +1509,77 @@ static const AddTest< unsigned __int64, __int32 > uint64_int32[] =
 	{ 0xfffffffffffffffe, 0x7fffffff, false},
 	{ 0xffffffffffffffff, 0x7fffffff, false},
 
-	{ 0x0000000000000000, (__int32)0x80000000, false},
-	{ 0x0000000000000001, (__int32)0x80000000, false},
-	{ 0x0000000000000002, (__int32)0x80000000, false},
-	{ 0x000000007ffffffe, (__int32)0x80000000, false},
-	{ 0x000000007fffffff, (__int32)0x80000000, false},
-	{ 0x0000000080000000, (__int32)0x80000000, true},
-	{ 0x0000000080000001, (__int32)0x80000000, true},
-	{ 0x00000000fffffffe, (__int32)0x80000000, true},
-	{ 0x00000000ffffffff, (__int32)0x80000000, true},
-	{ 0x0000000100000000, (__int32)0x80000000, true},
-	{ 0x0000000200000000, (__int32)0x80000000, true},
-	{ 0x7ffffffffffffffe, (__int32)0x80000000, true},
-	{ 0x7fffffffffffffff, (__int32)0x80000000, true},
-	{ 0x8000000000000000, (__int32)0x80000000, true},
-	{ 0x8000000000000001, (__int32)0x80000000, true},
-	{ 0xfffffffffffffffe, (__int32)0x80000000, true},
-	{ 0xffffffffffffffff, (__int32)0x80000000, true},
+	{ 0x0000000000000000, (std::int32_t)0x80000000, false},
+	{ 0x0000000000000001, (std::int32_t)0x80000000, false},
+	{ 0x0000000000000002, (std::int32_t)0x80000000, false},
+	{ 0x000000007ffffffe, (std::int32_t)0x80000000, false},
+	{ 0x000000007fffffff, (std::int32_t)0x80000000, false},
+	{ 0x0000000080000000, (std::int32_t)0x80000000, true},
+	{ 0x0000000080000001, (std::int32_t)0x80000000, true},
+	{ 0x00000000fffffffe, (std::int32_t)0x80000000, true},
+	{ 0x00000000ffffffff, (std::int32_t)0x80000000, true},
+	{ 0x0000000100000000, (std::int32_t)0x80000000, true},
+	{ 0x0000000200000000, (std::int32_t)0x80000000, true},
+	{ 0x7ffffffffffffffe, (std::int32_t)0x80000000, true},
+	{ 0x7fffffffffffffff, (std::int32_t)0x80000000, true},
+	{ 0x8000000000000000, (std::int32_t)0x80000000, true},
+	{ 0x8000000000000001, (std::int32_t)0x80000000, true},
+	{ 0xfffffffffffffffe, (std::int32_t)0x80000000, true},
+	{ 0xffffffffffffffff, (std::int32_t)0x80000000, true},
 
-	{ 0x0000000000000000, (__int32)0x80000001, false},
-	{ 0x0000000000000001, (__int32)0x80000001, false},
-	{ 0x0000000000000002, (__int32)0x80000001, false},
-	{ 0x000000007ffffffe, (__int32)0x80000001, false},
-	{ 0x000000007fffffff, (__int32)0x80000001, true},
-	{ 0x0000000080000000, (__int32)0x80000001, true},
-	{ 0x0000000080000001, (__int32)0x80000001, true},
-	{ 0x00000000fffffffe, (__int32)0x80000001, true},
-	{ 0x00000000ffffffff, (__int32)0x80000001, true},
-	{ 0x0000000100000000, (__int32)0x80000001, true},
-	{ 0x0000000200000000, (__int32)0x80000001, true},
-	{ 0x7ffffffffffffffe, (__int32)0x80000001, true},
-	{ 0x7fffffffffffffff, (__int32)0x80000001, true},
-	{ 0x8000000000000000, (__int32)0x80000001, true},
-	{ 0x8000000000000001, (__int32)0x80000001, true},
-	{ 0xfffffffffffffffe, (__int32)0x80000001, true},
-	{ 0xffffffffffffffff, (__int32)0x80000001, true},
+	{ 0x0000000000000000, (std::int32_t)0x80000001, false},
+	{ 0x0000000000000001, (std::int32_t)0x80000001, false},
+	{ 0x0000000000000002, (std::int32_t)0x80000001, false},
+	{ 0x000000007ffffffe, (std::int32_t)0x80000001, false},
+	{ 0x000000007fffffff, (std::int32_t)0x80000001, true},
+	{ 0x0000000080000000, (std::int32_t)0x80000001, true},
+	{ 0x0000000080000001, (std::int32_t)0x80000001, true},
+	{ 0x00000000fffffffe, (std::int32_t)0x80000001, true},
+	{ 0x00000000ffffffff, (std::int32_t)0x80000001, true},
+	{ 0x0000000100000000, (std::int32_t)0x80000001, true},
+	{ 0x0000000200000000, (std::int32_t)0x80000001, true},
+	{ 0x7ffffffffffffffe, (std::int32_t)0x80000001, true},
+	{ 0x7fffffffffffffff, (std::int32_t)0x80000001, true},
+	{ 0x8000000000000000, (std::int32_t)0x80000001, true},
+	{ 0x8000000000000001, (std::int32_t)0x80000001, true},
+	{ 0xfffffffffffffffe, (std::int32_t)0x80000001, true},
+	{ 0xffffffffffffffff, (std::int32_t)0x80000001, true},
 
-	{ 0x0000000000000000, (__int32)0xfffffffe, false},
-	{ 0x0000000000000001, (__int32)0xfffffffe, false},
-	{ 0x0000000000000002, (__int32)0xfffffffe, true},
-	{ 0x000000007ffffffe, (__int32)0xfffffffe, true},
-	{ 0x000000007fffffff, (__int32)0xfffffffe, true},
-	{ 0x0000000080000000, (__int32)0xfffffffe, true},
-	{ 0x0000000080000001, (__int32)0xfffffffe, true},
-	{ 0x00000000fffffffe, (__int32)0xfffffffe, true},
-	{ 0x00000000ffffffff, (__int32)0xfffffffe, true},
-	{ 0x0000000100000000, (__int32)0xfffffffe, true},
-	{ 0x0000000200000000, (__int32)0xfffffffe, true},
-	{ 0x7ffffffffffffffe, (__int32)0xfffffffe, true},
-	{ 0x7fffffffffffffff, (__int32)0xfffffffe, true},
-	{ 0x8000000000000000, (__int32)0xfffffffe, true},
-	{ 0x8000000000000001, (__int32)0xfffffffe, true},
-	{ 0xfffffffffffffffe, (__int32)0xfffffffe, true},
-	{ 0xffffffffffffffff, (__int32)0xfffffffe, true},
+	{ 0x0000000000000000, (std::int32_t)0xfffffffe, false},
+	{ 0x0000000000000001, (std::int32_t)0xfffffffe, false},
+	{ 0x0000000000000002, (std::int32_t)0xfffffffe, true},
+	{ 0x000000007ffffffe, (std::int32_t)0xfffffffe, true},
+	{ 0x000000007fffffff, (std::int32_t)0xfffffffe, true},
+	{ 0x0000000080000000, (std::int32_t)0xfffffffe, true},
+	{ 0x0000000080000001, (std::int32_t)0xfffffffe, true},
+	{ 0x00000000fffffffe, (std::int32_t)0xfffffffe, true},
+	{ 0x00000000ffffffff, (std::int32_t)0xfffffffe, true},
+	{ 0x0000000100000000, (std::int32_t)0xfffffffe, true},
+	{ 0x0000000200000000, (std::int32_t)0xfffffffe, true},
+	{ 0x7ffffffffffffffe, (std::int32_t)0xfffffffe, true},
+	{ 0x7fffffffffffffff, (std::int32_t)0xfffffffe, true},
+	{ 0x8000000000000000, (std::int32_t)0xfffffffe, true},
+	{ 0x8000000000000001, (std::int32_t)0xfffffffe, true},
+	{ 0xfffffffffffffffe, (std::int32_t)0xfffffffe, true},
+	{ 0xffffffffffffffff, (std::int32_t)0xfffffffe, true},
 
-	{ 0x0000000000000000, (__int32)0xffffffff, false},
-	{ 0x0000000000000001, (__int32)0xffffffff, true},
-	{ 0x0000000000000002, (__int32)0xffffffff, true},
-	{ 0x000000007ffffffe, (__int32)0xffffffff, true},
-	{ 0x000000007fffffff, (__int32)0xffffffff, true},
-	{ 0x0000000080000000, (__int32)0xffffffff, true},
-	{ 0x0000000080000001, (__int32)0xffffffff, true},
-	{ 0x00000000fffffffe, (__int32)0xffffffff, true},
-	{ 0x00000000ffffffff, (__int32)0xffffffff, true},
-	{ 0x0000000100000000, (__int32)0xffffffff, true},
-	{ 0x0000000200000000, (__int32)0xffffffff, true},
-	{ 0x7ffffffffffffffe, (__int32)0xffffffff, true},
-	{ 0x7fffffffffffffff, (__int32)0xffffffff, true},
-	{ 0x8000000000000000, (__int32)0xffffffff, true},
-	{ 0x8000000000000001, (__int32)0xffffffff, true},
-	{ 0xfffffffffffffffe, (__int32)0xffffffff, true},
-	{ 0xffffffffffffffff, (__int32)0xffffffff, true},
+	{ 0x0000000000000000, (std::int32_t)0xffffffff, false},
+	{ 0x0000000000000001, (std::int32_t)0xffffffff, true},
+	{ 0x0000000000000002, (std::int32_t)0xffffffff, true},
+	{ 0x000000007ffffffe, (std::int32_t)0xffffffff, true},
+	{ 0x000000007fffffff, (std::int32_t)0xffffffff, true},
+	{ 0x0000000080000000, (std::int32_t)0xffffffff, true},
+	{ 0x0000000080000001, (std::int32_t)0xffffffff, true},
+	{ 0x00000000fffffffe, (std::int32_t)0xffffffff, true},
+	{ 0x00000000ffffffff, (std::int32_t)0xffffffff, true},
+	{ 0x0000000100000000, (std::int32_t)0xffffffff, true},
+	{ 0x0000000200000000, (std::int32_t)0xffffffff, true},
+	{ 0x7ffffffffffffffe, (std::int32_t)0xffffffff, true},
+	{ 0x7fffffffffffffff, (std::int32_t)0xffffffff, true},
+	{ 0x8000000000000000, (std::int32_t)0xffffffff, true},
+	{ 0x8000000000000001, (std::int32_t)0xffffffff, true},
+	{ 0xfffffffffffffffe, (std::int32_t)0xffffffff, true},
+	{ 0xffffffffffffffff, (std::int32_t)0xffffffff, true},
 };
 
 void AddVerifyUint64Int32()
@@ -1588,7 +1588,7 @@ void AddVerifyUint64Int32()
 
     for( i = 0; i < COUNTOF(uint64_int32); ++i )
     {
-        unsigned __int64 ret;
+        std::uint64_t ret;
         if( SafeAdd(uint64_int32[i].x, uint64_int32[i].y, ret) != uint64_int32[i].fExpected )
         {
             cerr << "Error in case uint64_int32: ";
@@ -1601,7 +1601,7 @@ void AddVerifyUint64Int32()
         bool fSuccess = true;
         try
         {
-            SafeInt<unsigned __int64> si(uint64_int32[i].x);
+            SafeInt<std::uint64_t> si(uint64_int32[i].x);
             si += uint64_int32[i].y;
         }
         catch(...)
@@ -1622,8 +1622,8 @@ void AddVerifyUint64Int32()
         fSuccess = true;
         try
         {
-            unsigned __int64 x(uint64_int32[i].x);
-            x += SafeInt<__int32>(uint64_int32[i].y);
+            std::uint64_t x(uint64_int32[i].x);
+            x += SafeInt<std::int32_t>(uint64_int32[i].y);
         }
         catch(...)
         {
@@ -1640,7 +1640,7 @@ void AddVerifyUint64Int32()
     }
 }
 
-static const AddTest< unsigned __int64, __int16 > uint64_int16[] = 
+static const AddTest< std::uint64_t, std::int16_t > uint64_int16[] = 
 { 
 	{ 0x0000000000000000, 0x0000, true},
 	{ 0x0000000000000001, 0x0000, true},
@@ -1732,77 +1732,77 @@ static const AddTest< unsigned __int64, __int16 > uint64_int16[] =
 	{ 0xfffffffffffffffe, 0x7fff, false},
 	{ 0xffffffffffffffff, 0x7fff, false},
 
-	{ 0x0000000000000000, (__int16)0x8000, false},
-	{ 0x0000000000000001, (__int16)0x8000, false},
-	{ 0x0000000000000002, (__int16)0x8000, false},
-	{ 0x000000007ffffffe, (__int16)0x8000, true},
-	{ 0x000000007fffffff, (__int16)0x8000, true},
-	{ 0x0000000080000000, (__int16)0x8000, true},
-	{ 0x0000000080000001, (__int16)0x8000, true},
-	{ 0x00000000fffffffe, (__int16)0x8000, true},
-	{ 0x00000000ffffffff, (__int16)0x8000, true},
-	{ 0x0000000100000000, (__int16)0x8000, true},
-	{ 0x0000000200000000, (__int16)0x8000, true},
-	{ 0x7ffffffffffffffe, (__int16)0x8000, true},
-	{ 0x7fffffffffffffff, (__int16)0x8000, true},
-	{ 0x8000000000000000, (__int16)0x8000, true},
-	{ 0x8000000000000001, (__int16)0x8000, true},
-	{ 0xfffffffffffffffe, (__int16)0x8000, true},
-	{ 0xffffffffffffffff, (__int16)0x8000, true},
+	{ 0x0000000000000000, (std::int16_t)0x8000, false},
+	{ 0x0000000000000001, (std::int16_t)0x8000, false},
+	{ 0x0000000000000002, (std::int16_t)0x8000, false},
+	{ 0x000000007ffffffe, (std::int16_t)0x8000, true},
+	{ 0x000000007fffffff, (std::int16_t)0x8000, true},
+	{ 0x0000000080000000, (std::int16_t)0x8000, true},
+	{ 0x0000000080000001, (std::int16_t)0x8000, true},
+	{ 0x00000000fffffffe, (std::int16_t)0x8000, true},
+	{ 0x00000000ffffffff, (std::int16_t)0x8000, true},
+	{ 0x0000000100000000, (std::int16_t)0x8000, true},
+	{ 0x0000000200000000, (std::int16_t)0x8000, true},
+	{ 0x7ffffffffffffffe, (std::int16_t)0x8000, true},
+	{ 0x7fffffffffffffff, (std::int16_t)0x8000, true},
+	{ 0x8000000000000000, (std::int16_t)0x8000, true},
+	{ 0x8000000000000001, (std::int16_t)0x8000, true},
+	{ 0xfffffffffffffffe, (std::int16_t)0x8000, true},
+	{ 0xffffffffffffffff, (std::int16_t)0x8000, true},
 
-	{ 0x0000000000000000, (__int16)0x8001, false},
-	{ 0x0000000000000001, (__int16)0x8001, false},
-	{ 0x0000000000000002, (__int16)0x8001, false},
-	{ 0x000000007ffffffe, (__int16)0x8001, true},
-	{ 0x000000007fffffff, (__int16)0x8001, true},
-	{ 0x0000000080000000, (__int16)0x8001, true},
-	{ 0x0000000080000001, (__int16)0x8001, true},
-	{ 0x00000000fffffffe, (__int16)0x8001, true},
-	{ 0x00000000ffffffff, (__int16)0x8001, true},
-	{ 0x0000000100000000, (__int16)0x8001, true},
-	{ 0x0000000200000000, (__int16)0x8001, true},
-	{ 0x7ffffffffffffffe, (__int16)0x8001, true},
-	{ 0x7fffffffffffffff, (__int16)0x8001, true},
-	{ 0x8000000000000000, (__int16)0x8001, true},
-	{ 0x8000000000000001, (__int16)0x8001, true},
-	{ 0xfffffffffffffffe, (__int16)0x8001, true},
-	{ 0xffffffffffffffff, (__int16)0x8001, true},
+	{ 0x0000000000000000, (std::int16_t)0x8001, false},
+	{ 0x0000000000000001, (std::int16_t)0x8001, false},
+	{ 0x0000000000000002, (std::int16_t)0x8001, false},
+	{ 0x000000007ffffffe, (std::int16_t)0x8001, true},
+	{ 0x000000007fffffff, (std::int16_t)0x8001, true},
+	{ 0x0000000080000000, (std::int16_t)0x8001, true},
+	{ 0x0000000080000001, (std::int16_t)0x8001, true},
+	{ 0x00000000fffffffe, (std::int16_t)0x8001, true},
+	{ 0x00000000ffffffff, (std::int16_t)0x8001, true},
+	{ 0x0000000100000000, (std::int16_t)0x8001, true},
+	{ 0x0000000200000000, (std::int16_t)0x8001, true},
+	{ 0x7ffffffffffffffe, (std::int16_t)0x8001, true},
+	{ 0x7fffffffffffffff, (std::int16_t)0x8001, true},
+	{ 0x8000000000000000, (std::int16_t)0x8001, true},
+	{ 0x8000000000000001, (std::int16_t)0x8001, true},
+	{ 0xfffffffffffffffe, (std::int16_t)0x8001, true},
+	{ 0xffffffffffffffff, (std::int16_t)0x8001, true},
 
-	{ 0x0000000000000000, (__int16)0xfffe, false},
-	{ 0x0000000000000001, (__int16)0xfffe, false},
-	{ 0x0000000000000002, (__int16)0xfffe, true},
-	{ 0x000000007ffffffe, (__int16)0xfffe, true},
-	{ 0x000000007fffffff, (__int16)0xfffe, true},
-	{ 0x0000000080000000, (__int16)0xfffe, true},
-	{ 0x0000000080000001, (__int16)0xfffe, true},
-	{ 0x00000000fffffffe, (__int16)0xfffe, true},
-	{ 0x00000000ffffffff, (__int16)0xfffe, true},
-	{ 0x0000000100000000, (__int16)0xfffe, true},
-	{ 0x0000000200000000, (__int16)0xfffe, true},
-	{ 0x7ffffffffffffffe, (__int16)0xfffe, true},
-	{ 0x7fffffffffffffff, (__int16)0xfffe, true},
-	{ 0x8000000000000000, (__int16)0xfffe, true},
-	{ 0x8000000000000001, (__int16)0xfffe, true},
-	{ 0xfffffffffffffffe, (__int16)0xfffe, true},
-	{ 0xffffffffffffffff, (__int16)0xfffe, true},
+	{ 0x0000000000000000, (std::int16_t)0xfffe, false},
+	{ 0x0000000000000001, (std::int16_t)0xfffe, false},
+	{ 0x0000000000000002, (std::int16_t)0xfffe, true},
+	{ 0x000000007ffffffe, (std::int16_t)0xfffe, true},
+	{ 0x000000007fffffff, (std::int16_t)0xfffe, true},
+	{ 0x0000000080000000, (std::int16_t)0xfffe, true},
+	{ 0x0000000080000001, (std::int16_t)0xfffe, true},
+	{ 0x00000000fffffffe, (std::int16_t)0xfffe, true},
+	{ 0x00000000ffffffff, (std::int16_t)0xfffe, true},
+	{ 0x0000000100000000, (std::int16_t)0xfffe, true},
+	{ 0x0000000200000000, (std::int16_t)0xfffe, true},
+	{ 0x7ffffffffffffffe, (std::int16_t)0xfffe, true},
+	{ 0x7fffffffffffffff, (std::int16_t)0xfffe, true},
+	{ 0x8000000000000000, (std::int16_t)0xfffe, true},
+	{ 0x8000000000000001, (std::int16_t)0xfffe, true},
+	{ 0xfffffffffffffffe, (std::int16_t)0xfffe, true},
+	{ 0xffffffffffffffff, (std::int16_t)0xfffe, true},
 
-	{ 0x0000000000000000, (__int16)0xffff, false},
-	{ 0x0000000000000001, (__int16)0xffff, true},
-	{ 0x0000000000000002, (__int16)0xffff, true},
-	{ 0x000000007ffffffe, (__int16)0xffff, true},
-	{ 0x000000007fffffff, (__int16)0xffff, true},
-	{ 0x0000000080000000, (__int16)0xffff, true},
-	{ 0x0000000080000001, (__int16)0xffff, true},
-	{ 0x00000000fffffffe, (__int16)0xffff, true},
-	{ 0x00000000ffffffff, (__int16)0xffff, true},
-	{ 0x0000000100000000, (__int16)0xffff, true},
-	{ 0x0000000200000000, (__int16)0xffff, true},
-	{ 0x7ffffffffffffffe, (__int16)0xffff, true},
-	{ 0x7fffffffffffffff, (__int16)0xffff, true},
-	{ 0x8000000000000000, (__int16)0xffff, true},
-	{ 0x8000000000000001, (__int16)0xffff, true},
-	{ 0xfffffffffffffffe, (__int16)0xffff, true},
-	{ 0xffffffffffffffff, (__int16)0xffff, true},
+	{ 0x0000000000000000, (std::int16_t)0xffff, false},
+	{ 0x0000000000000001, (std::int16_t)0xffff, true},
+	{ 0x0000000000000002, (std::int16_t)0xffff, true},
+	{ 0x000000007ffffffe, (std::int16_t)0xffff, true},
+	{ 0x000000007fffffff, (std::int16_t)0xffff, true},
+	{ 0x0000000080000000, (std::int16_t)0xffff, true},
+	{ 0x0000000080000001, (std::int16_t)0xffff, true},
+	{ 0x00000000fffffffe, (std::int16_t)0xffff, true},
+	{ 0x00000000ffffffff, (std::int16_t)0xffff, true},
+	{ 0x0000000100000000, (std::int16_t)0xffff, true},
+	{ 0x0000000200000000, (std::int16_t)0xffff, true},
+	{ 0x7ffffffffffffffe, (std::int16_t)0xffff, true},
+	{ 0x7fffffffffffffff, (std::int16_t)0xffff, true},
+	{ 0x8000000000000000, (std::int16_t)0xffff, true},
+	{ 0x8000000000000001, (std::int16_t)0xffff, true},
+	{ 0xfffffffffffffffe, (std::int16_t)0xffff, true},
+	{ 0xffffffffffffffff, (std::int16_t)0xffff, true},
 };
 
 void AddVerifyUint64Int16()
@@ -1811,7 +1811,7 @@ void AddVerifyUint64Int16()
 
     for( i = 0; i < COUNTOF(uint64_int16); ++i )
     {
-        unsigned __int64 ret;
+        std::uint64_t ret;
         if( SafeAdd(uint64_int16[i].x, uint64_int16[i].y, ret) != uint64_int16[i].fExpected )
         {
             cerr << "Error in case uint64_int16: ";
@@ -1824,7 +1824,7 @@ void AddVerifyUint64Int16()
         bool fSuccess = true;
         try
         {
-            SafeInt<unsigned __int64> si(uint64_int16[i].x);
+            SafeInt<std::uint64_t> si(uint64_int16[i].x);
             si += uint64_int16[i].y;
         }
         catch(...)
@@ -1845,8 +1845,8 @@ void AddVerifyUint64Int16()
         fSuccess = true;
         try
         {
-            unsigned __int64 x(uint64_int16[i].x);
-            x += SafeInt<__int16>(uint64_int16[i].y);
+            std::uint64_t x(uint64_int16[i].x);
+            x += SafeInt<std::int16_t>(uint64_int16[i].y);
         }
         catch(...)
         {
@@ -1863,7 +1863,7 @@ void AddVerifyUint64Int16()
     }
 }
 
-static const AddTest< unsigned __int64, __int8 > uint64_int8[] = 
+static const AddTest< std::uint64_t, std::int8_t > uint64_int8[] = 
 { 
 	{ 0x0000000000000000, 0x00, true},
 	{ 0x0000000000000001, 0x00, true},
@@ -1955,77 +1955,77 @@ static const AddTest< unsigned __int64, __int8 > uint64_int8[] =
 	{ 0xfffffffffffffffe, 0x7f, false},
 	{ 0xffffffffffffffff, 0x7f, false},
 
-	{ 0x0000000000000000, (__int8)0x80, false},
-	{ 0x0000000000000001, (__int8)0x80, false},
-	{ 0x0000000000000002, (__int8)0x80, false},
-	{ 0x000000007ffffffe, (__int8)0x80, true},
-	{ 0x000000007fffffff, (__int8)0x80, true},
-	{ 0x0000000080000000, (__int8)0x80, true},
-	{ 0x0000000080000001, (__int8)0x80, true},
-	{ 0x00000000fffffffe, (__int8)0x80, true},
-	{ 0x00000000ffffffff, (__int8)0x80, true},
-	{ 0x0000000100000000, (__int8)0x80, true},
-	{ 0x0000000200000000, (__int8)0x80, true},
-	{ 0x7ffffffffffffffe, (__int8)0x80, true},
-	{ 0x7fffffffffffffff, (__int8)0x80, true},
-	{ 0x8000000000000000, (__int8)0x80, true},
-	{ 0x8000000000000001, (__int8)0x80, true},
-	{ 0xfffffffffffffffe, (__int8)0x80, true},
-	{ 0xffffffffffffffff, (__int8)0x80, true},
+	{ 0x0000000000000000, (std::int8_t)0x80, false},
+	{ 0x0000000000000001, (std::int8_t)0x80, false},
+	{ 0x0000000000000002, (std::int8_t)0x80, false},
+	{ 0x000000007ffffffe, (std::int8_t)0x80, true},
+	{ 0x000000007fffffff, (std::int8_t)0x80, true},
+	{ 0x0000000080000000, (std::int8_t)0x80, true},
+	{ 0x0000000080000001, (std::int8_t)0x80, true},
+	{ 0x00000000fffffffe, (std::int8_t)0x80, true},
+	{ 0x00000000ffffffff, (std::int8_t)0x80, true},
+	{ 0x0000000100000000, (std::int8_t)0x80, true},
+	{ 0x0000000200000000, (std::int8_t)0x80, true},
+	{ 0x7ffffffffffffffe, (std::int8_t)0x80, true},
+	{ 0x7fffffffffffffff, (std::int8_t)0x80, true},
+	{ 0x8000000000000000, (std::int8_t)0x80, true},
+	{ 0x8000000000000001, (std::int8_t)0x80, true},
+	{ 0xfffffffffffffffe, (std::int8_t)0x80, true},
+	{ 0xffffffffffffffff, (std::int8_t)0x80, true},
 
-	{ 0x0000000000000000, (__int8)0x81, false},
-	{ 0x0000000000000001, (__int8)0x81, false},
-	{ 0x0000000000000002, (__int8)0x81, false},
-	{ 0x000000007ffffffe, (__int8)0x81, true},
-	{ 0x000000007fffffff, (__int8)0x81, true},
-	{ 0x0000000080000000, (__int8)0x81, true},
-	{ 0x0000000080000001, (__int8)0x81, true},
-	{ 0x00000000fffffffe, (__int8)0x81, true},
-	{ 0x00000000ffffffff, (__int8)0x81, true},
-	{ 0x0000000100000000, (__int8)0x81, true},
-	{ 0x0000000200000000, (__int8)0x81, true},
-	{ 0x7ffffffffffffffe, (__int8)0x81, true},
-	{ 0x7fffffffffffffff, (__int8)0x81, true},
-	{ 0x8000000000000000, (__int8)0x81, true},
-	{ 0x8000000000000001, (__int8)0x81, true},
-	{ 0xfffffffffffffffe, (__int8)0x81, true},
-	{ 0xffffffffffffffff, (__int8)0x81, true},
+	{ 0x0000000000000000, (std::int8_t)0x81, false},
+	{ 0x0000000000000001, (std::int8_t)0x81, false},
+	{ 0x0000000000000002, (std::int8_t)0x81, false},
+	{ 0x000000007ffffffe, (std::int8_t)0x81, true},
+	{ 0x000000007fffffff, (std::int8_t)0x81, true},
+	{ 0x0000000080000000, (std::int8_t)0x81, true},
+	{ 0x0000000080000001, (std::int8_t)0x81, true},
+	{ 0x00000000fffffffe, (std::int8_t)0x81, true},
+	{ 0x00000000ffffffff, (std::int8_t)0x81, true},
+	{ 0x0000000100000000, (std::int8_t)0x81, true},
+	{ 0x0000000200000000, (std::int8_t)0x81, true},
+	{ 0x7ffffffffffffffe, (std::int8_t)0x81, true},
+	{ 0x7fffffffffffffff, (std::int8_t)0x81, true},
+	{ 0x8000000000000000, (std::int8_t)0x81, true},
+	{ 0x8000000000000001, (std::int8_t)0x81, true},
+	{ 0xfffffffffffffffe, (std::int8_t)0x81, true},
+	{ 0xffffffffffffffff, (std::int8_t)0x81, true},
 
-	{ 0x0000000000000000, (__int8)0xfe, false},
-	{ 0x0000000000000001, (__int8)0xfe, false},
-	{ 0x0000000000000002, (__int8)0xfe, true},
-	{ 0x000000007ffffffe, (__int8)0xfe, true},
-	{ 0x000000007fffffff, (__int8)0xfe, true},
-	{ 0x0000000080000000, (__int8)0xfe, true},
-	{ 0x0000000080000001, (__int8)0xfe, true},
-	{ 0x00000000fffffffe, (__int8)0xfe, true},
-	{ 0x00000000ffffffff, (__int8)0xfe, true},
-	{ 0x0000000100000000, (__int8)0xfe, true},
-	{ 0x0000000200000000, (__int8)0xfe, true},
-	{ 0x7ffffffffffffffe, (__int8)0xfe, true},
-	{ 0x7fffffffffffffff, (__int8)0xfe, true},
-	{ 0x8000000000000000, (__int8)0xfe, true},
-	{ 0x8000000000000001, (__int8)0xfe, true},
-	{ 0xfffffffffffffffe, (__int8)0xfe, true},
-	{ 0xffffffffffffffff, (__int8)0xfe, true},
+	{ 0x0000000000000000, (std::int8_t)0xfe, false},
+	{ 0x0000000000000001, (std::int8_t)0xfe, false},
+	{ 0x0000000000000002, (std::int8_t)0xfe, true},
+	{ 0x000000007ffffffe, (std::int8_t)0xfe, true},
+	{ 0x000000007fffffff, (std::int8_t)0xfe, true},
+	{ 0x0000000080000000, (std::int8_t)0xfe, true},
+	{ 0x0000000080000001, (std::int8_t)0xfe, true},
+	{ 0x00000000fffffffe, (std::int8_t)0xfe, true},
+	{ 0x00000000ffffffff, (std::int8_t)0xfe, true},
+	{ 0x0000000100000000, (std::int8_t)0xfe, true},
+	{ 0x0000000200000000, (std::int8_t)0xfe, true},
+	{ 0x7ffffffffffffffe, (std::int8_t)0xfe, true},
+	{ 0x7fffffffffffffff, (std::int8_t)0xfe, true},
+	{ 0x8000000000000000, (std::int8_t)0xfe, true},
+	{ 0x8000000000000001, (std::int8_t)0xfe, true},
+	{ 0xfffffffffffffffe, (std::int8_t)0xfe, true},
+	{ 0xffffffffffffffff, (std::int8_t)0xfe, true},
 
-	{ 0x0000000000000000, (__int8)0xff, false},
-	{ 0x0000000000000001, (__int8)0xff, true},
-	{ 0x0000000000000002, (__int8)0xff, true},
-	{ 0x000000007ffffffe, (__int8)0xff, true},
-	{ 0x000000007fffffff, (__int8)0xff, true},
-	{ 0x0000000080000000, (__int8)0xff, true},
-	{ 0x0000000080000001, (__int8)0xff, true},
-	{ 0x00000000fffffffe, (__int8)0xff, true},
-	{ 0x00000000ffffffff, (__int8)0xff, true},
-	{ 0x0000000100000000, (__int8)0xff, true},
-	{ 0x0000000200000000, (__int8)0xff, true},
-	{ 0x7ffffffffffffffe, (__int8)0xff, true},
-	{ 0x7fffffffffffffff, (__int8)0xff, true},
-	{ 0x8000000000000000, (__int8)0xff, true},
-	{ 0x8000000000000001, (__int8)0xff, true},
-	{ 0xfffffffffffffffe, (__int8)0xff, true},
-	{ 0xffffffffffffffff, (__int8)0xff, true},
+	{ 0x0000000000000000, (std::int8_t)0xff, false},
+	{ 0x0000000000000001, (std::int8_t)0xff, true},
+	{ 0x0000000000000002, (std::int8_t)0xff, true},
+	{ 0x000000007ffffffe, (std::int8_t)0xff, true},
+	{ 0x000000007fffffff, (std::int8_t)0xff, true},
+	{ 0x0000000080000000, (std::int8_t)0xff, true},
+	{ 0x0000000080000001, (std::int8_t)0xff, true},
+	{ 0x00000000fffffffe, (std::int8_t)0xff, true},
+	{ 0x00000000ffffffff, (std::int8_t)0xff, true},
+	{ 0x0000000100000000, (std::int8_t)0xff, true},
+	{ 0x0000000200000000, (std::int8_t)0xff, true},
+	{ 0x7ffffffffffffffe, (std::int8_t)0xff, true},
+	{ 0x7fffffffffffffff, (std::int8_t)0xff, true},
+	{ 0x8000000000000000, (std::int8_t)0xff, true},
+	{ 0x8000000000000001, (std::int8_t)0xff, true},
+	{ 0xfffffffffffffffe, (std::int8_t)0xff, true},
+	{ 0xffffffffffffffff, (std::int8_t)0xff, true},
 };
 
 void AddVerifyUint64Int8()
@@ -2034,7 +2034,7 @@ void AddVerifyUint64Int8()
 
     for( i = 0; i < COUNTOF(uint64_int8); ++i )
     {
-        unsigned __int64 ret;
+        std::uint64_t ret;
         if( SafeAdd(uint64_int8[i].x, uint64_int8[i].y, ret) != uint64_int8[i].fExpected )
         {
             cerr << "Error in case uint64_int8: ";
@@ -2047,7 +2047,7 @@ void AddVerifyUint64Int8()
         bool fSuccess = true;
         try
         {
-            SafeInt<unsigned __int64> si(uint64_int8[i].x);
+            SafeInt<std::uint64_t> si(uint64_int8[i].x);
             si += uint64_int8[i].y;
         }
         catch(...)
@@ -2068,8 +2068,8 @@ void AddVerifyUint64Int8()
         fSuccess = true;
         try
         {
-            unsigned __int64 x(uint64_int8[i].x);
-            x += SafeInt<__int8>(uint64_int8[i].y);
+            std::uint64_t x(uint64_int8[i].x);
+            x += SafeInt<std::int8_t>(uint64_int8[i].y);
         }
         catch(...)
         {
@@ -2086,7 +2086,7 @@ void AddVerifyUint64Int8()
     }
 }
 
-static const AddTest< __int64, unsigned __int64 > int64_uint64[] = 
+static const AddTest< std::int64_t, std::uint64_t > int64_uint64[] = 
 { 
 	{ 0x0000000000000000, 0x0000000000000000, true},
 	{ 0x0000000000000001, 0x0000000000000000, true},
@@ -2401,7 +2401,7 @@ void AddVerifyInt64Uint64()
 
     for( i = 0; i < COUNTOF(int64_uint64); ++i )
     {
-        __int64 ret;
+        std::int64_t ret;
         if( SafeAdd(int64_uint64[i].x, int64_uint64[i].y, ret) != int64_uint64[i].fExpected )
         {
             cerr << "Error in case int64_uint64: ";
@@ -2414,7 +2414,7 @@ void AddVerifyInt64Uint64()
         bool fSuccess = true;
         try
         {
-            SafeInt<__int64> si(int64_uint64[i].x);
+            SafeInt<std::int64_t> si(int64_uint64[i].x);
             si += int64_uint64[i].y;
         }
         catch(...)
@@ -2435,8 +2435,8 @@ void AddVerifyInt64Uint64()
         fSuccess = true;
         try
         {
-            __int64 x(int64_uint64[i].x);
-            x += SafeInt<unsigned __int64>(int64_uint64[i].y);
+            std::int64_t x(int64_uint64[i].x);
+            x += SafeInt<std::uint64_t>(int64_uint64[i].y);
         }
         catch(...)
         {
@@ -2453,7 +2453,7 @@ void AddVerifyInt64Uint64()
     }
 }
 
-static const AddTest< __int64, unsigned __int32 > int64_uint32[] = 
+static const AddTest< std::int64_t, std::uint32_t > int64_uint32[] = 
 { 
 	{ 0x0000000000000000, 0x00000000, true},
 	{ 0x0000000000000001, 0x00000000, true},
@@ -2624,7 +2624,7 @@ void AddVerifyInt64Uint32()
 
     for( i = 0; i < COUNTOF(int64_uint32); ++i )
     {
-        __int64 ret;
+        std::int64_t ret;
         if( SafeAdd(int64_uint32[i].x, int64_uint32[i].y, ret) != int64_uint32[i].fExpected )
         {
             cerr << "Error in case int64_uint32: ";
@@ -2637,7 +2637,7 @@ void AddVerifyInt64Uint32()
         bool fSuccess = true;
         try
         {
-            SafeInt<__int64> si(int64_uint32[i].x);
+            SafeInt<std::int64_t> si(int64_uint32[i].x);
             si += int64_uint32[i].y;
         }
         catch(...)
@@ -2658,8 +2658,8 @@ void AddVerifyInt64Uint32()
         fSuccess = true;
         try
         {
-            __int64 x(int64_uint32[i].x);
-            x += SafeInt<unsigned __int32>(int64_uint32[i].y);
+            std::int64_t x(int64_uint32[i].x);
+            x += SafeInt<std::uint32_t>(int64_uint32[i].y);
         }
         catch(...)
         {
@@ -2676,7 +2676,7 @@ void AddVerifyInt64Uint32()
     }
 }
 
-static const AddTest< __int64, unsigned __int16 > int64_uint16[] = 
+static const AddTest< std::int64_t, std::uint16_t > int64_uint16[] = 
 { 
 	{ 0x0000000000000000, 0x0000, true},
 	{ 0x0000000000000001, 0x0000, true},
@@ -2847,7 +2847,7 @@ void AddVerifyInt64Uint16()
 
     for( i = 0; i < COUNTOF(int64_uint16); ++i )
     {
-        __int64 ret;
+        std::int64_t ret;
         if( SafeAdd(int64_uint16[i].x, int64_uint16[i].y, ret) != int64_uint16[i].fExpected )
         {
             cerr << "Error in case int64_uint16: ";
@@ -2860,7 +2860,7 @@ void AddVerifyInt64Uint16()
         bool fSuccess = true;
         try
         {
-            SafeInt<__int64> si(int64_uint16[i].x);
+            SafeInt<std::int64_t> si(int64_uint16[i].x);
             si += int64_uint16[i].y;
         }
         catch(...)
@@ -2881,8 +2881,8 @@ void AddVerifyInt64Uint16()
         fSuccess = true;
         try
         {
-            __int64 x(int64_uint16[i].x);
-            x += SafeInt<unsigned __int16>(int64_uint16[i].y);
+            std::int64_t x(int64_uint16[i].x);
+            x += SafeInt<std::uint16_t>(int64_uint16[i].y);
         }
         catch(...)
         {
@@ -2899,7 +2899,7 @@ void AddVerifyInt64Uint16()
     }
 }
 
-static const AddTest< __int64, unsigned __int8 > int64_uint8[] = 
+static const AddTest< std::int64_t, std::uint8_t > int64_uint8[] = 
 { 
 	{ 0x0000000000000000, 0x00, true},
 	{ 0x0000000000000001, 0x00, true},
@@ -3070,7 +3070,7 @@ void AddVerifyInt64Uint8()
 
     for( i = 0; i < COUNTOF(int64_uint8); ++i )
     {
-        __int64 ret;
+        std::int64_t ret;
         if( SafeAdd(int64_uint8[i].x, int64_uint8[i].y, ret) != int64_uint8[i].fExpected )
         {
             cerr << "Error in case int64_uint8: ";
@@ -3083,7 +3083,7 @@ void AddVerifyInt64Uint8()
         bool fSuccess = true;
         try
         {
-            SafeInt<__int64> si(int64_uint8[i].x);
+            SafeInt<std::int64_t> si(int64_uint8[i].x);
             si += int64_uint8[i].y;
         }
         catch(...)
@@ -3104,8 +3104,8 @@ void AddVerifyInt64Uint8()
         fSuccess = true;
         try
         {
-            __int64 x(int64_uint8[i].x);
-            x += SafeInt<unsigned __int8>(int64_uint8[i].y);
+            std::int64_t x(int64_uint8[i].x);
+            x += SafeInt<std::uint8_t>(int64_uint8[i].y);
         }
         catch(...)
         {
@@ -3122,7 +3122,7 @@ void AddVerifyInt64Uint8()
     }
 }
 
-static const AddTest< __int64, __int64 > int64_int64[] = 
+static const AddTest< std::int64_t, std::int64_t > int64_int64[] = 
 { 
 	{ 0x0000000000000000, 0x0000000000000000, true},
 	{ 0x0000000000000001, 0x0000000000000000, true},
@@ -3437,7 +3437,7 @@ void AddVerifyInt64Int64()
 
     for( i = 0; i < COUNTOF(int64_int64); ++i )
     {
-        __int64 ret;
+        std::int64_t ret;
         if( SafeAdd(int64_int64[i].x, int64_int64[i].y, ret) != int64_int64[i].fExpected )
         {
             cerr << "Error in case int64_int64: ";
@@ -3450,7 +3450,7 @@ void AddVerifyInt64Int64()
         bool fSuccess = true;
         try
         {
-            SafeInt<__int64> si(int64_int64[i].x);
+            SafeInt<std::int64_t> si(int64_int64[i].x);
             si += int64_int64[i].y;
         }
         catch(...)
@@ -3471,8 +3471,8 @@ void AddVerifyInt64Int64()
         fSuccess = true;
         try
         {
-            __int64 x(int64_int64[i].x);
-            x += SafeInt<__int64>(int64_int64[i].y);
+            std::int64_t x(int64_int64[i].x);
+            x += SafeInt<std::int64_t>(int64_int64[i].y);
         }
         catch(...)
         {
@@ -3489,7 +3489,7 @@ void AddVerifyInt64Int64()
     }
 }
 
-static const AddTest< __int64, __int32 > int64_int32[] = 
+static const AddTest< std::int64_t, std::int32_t > int64_int32[] = 
 { 
 	{ 0x0000000000000000, 0x00000000, true},
 	{ 0x0000000000000001, 0x00000000, true},
@@ -3660,7 +3660,7 @@ void AddVerifyInt64Int32()
 
     for( i = 0; i < COUNTOF(int64_int32); ++i )
     {
-        __int64 ret;
+        std::int64_t ret;
         if( SafeAdd(int64_int32[i].x, int64_int32[i].y, ret) != int64_int32[i].fExpected )
         {
             cerr << "Error in case int64_int32: ";
@@ -3673,7 +3673,7 @@ void AddVerifyInt64Int32()
         bool fSuccess = true;
         try
         {
-            SafeInt<__int64> si(int64_int32[i].x);
+            SafeInt<std::int64_t> si(int64_int32[i].x);
             si += int64_int32[i].y;
         }
         catch(...)
@@ -3694,8 +3694,8 @@ void AddVerifyInt64Int32()
         fSuccess = true;
         try
         {
-            __int64 x(int64_int32[i].x);
-            x += SafeInt<__int32>(int64_int32[i].y);
+            std::int64_t x(int64_int32[i].x);
+            x += SafeInt<std::int32_t>(int64_int32[i].y);
         }
         catch(...)
         {
@@ -3712,7 +3712,7 @@ void AddVerifyInt64Int32()
     }
 }
 
-static const AddTest< __int64, __int16 > int64_int16[] = 
+static const AddTest< std::int64_t, std::int16_t > int64_int16[] = 
 { 
 	{ 0x0000000000000000, 0x0000, true},
 	{ 0x0000000000000001, 0x0000, true},
@@ -3883,7 +3883,7 @@ void AddVerifyInt64Int16()
 
     for( i = 0; i < COUNTOF(int64_int16); ++i )
     {
-        __int64 ret;
+        std::int64_t ret;
         if( SafeAdd(int64_int16[i].x, int64_int16[i].y, ret) != int64_int16[i].fExpected )
         {
             cerr << "Error in case int64_int16: ";
@@ -3896,7 +3896,7 @@ void AddVerifyInt64Int16()
         bool fSuccess = true;
         try
         {
-            SafeInt<__int64> si(int64_int16[i].x);
+            SafeInt<std::int64_t> si(int64_int16[i].x);
             si += int64_int16[i].y;
         }
         catch(...)
@@ -3917,8 +3917,8 @@ void AddVerifyInt64Int16()
         fSuccess = true;
         try
         {
-            __int64 x(int64_int16[i].x);
-            x += SafeInt<__int16>(int64_int16[i].y);
+            std::int64_t x(int64_int16[i].x);
+            x += SafeInt<std::int16_t>(int64_int16[i].y);
         }
         catch(...)
         {
@@ -3935,7 +3935,7 @@ void AddVerifyInt64Int16()
     }
 }
 
-static const AddTest< __int64, __int8 > int64_int8[] = 
+static const AddTest< std::int64_t, std::int8_t > int64_int8[] = 
 { 
 	{ 0x0000000000000000, 0x00, true},
 	{ 0x0000000000000001, 0x00, true},
@@ -4106,7 +4106,7 @@ void AddVerifyInt64Int8()
 
     for( i = 0; i < COUNTOF(int64_int8); ++i )
     {
-        __int64 ret;
+        std::int64_t ret;
         if( SafeAdd(int64_int8[i].x, int64_int8[i].y, ret) != int64_int8[i].fExpected )
         {
             cerr << "Error in case int64_int8: ";
@@ -4119,7 +4119,7 @@ void AddVerifyInt64Int8()
         bool fSuccess = true;
         try
         {
-            SafeInt<__int64> si(int64_int8[i].x);
+            SafeInt<std::int64_t> si(int64_int8[i].x);
             si += int64_int8[i].y;
         }
         catch(...)
@@ -4140,8 +4140,8 @@ void AddVerifyInt64Int8()
         fSuccess = true;
         try
         {
-            __int64 x(int64_int8[i].x);
-            x += SafeInt<__int8>(int64_int8[i].y);
+            std::int64_t x(int64_int8[i].x);
+            x += SafeInt<std::int8_t>(int64_int8[i].y);
         }
         catch(...)
         {
@@ -4158,7 +4158,7 @@ void AddVerifyInt64Int8()
     }
 }
 
-static const AddTest< unsigned __int8, unsigned __int64 > uint8_uint64[] = 
+static const AddTest< std::uint8_t, std::uint64_t > uint8_uint64[] = 
 { 
 	{ 0x00, 0x0000000000000000, true},
 	{ 0x01, 0x0000000000000000, true},
@@ -4337,7 +4337,7 @@ void AddVerifyUint8Uint64()
 
     for( i = 0; i < COUNTOF(uint8_uint64); ++i )
     {
-        unsigned __int8 ret;
+        std::uint8_t ret;
         if( SafeAdd(uint8_uint64[i].x, uint8_uint64[i].y, ret) != uint8_uint64[i].fExpected )
         {
             cerr << "Error in case uint8_uint64: ";
@@ -4350,7 +4350,7 @@ void AddVerifyUint8Uint64()
         bool fSuccess = true;
         try
         {
-            SafeInt<unsigned __int8> si(uint8_uint64[i].x);
+            SafeInt<std::uint8_t> si(uint8_uint64[i].x);
             si += uint8_uint64[i].y;
         }
         catch(...)
@@ -4371,8 +4371,8 @@ void AddVerifyUint8Uint64()
         fSuccess = true;
         try
         {
-            unsigned __int8 x(uint8_uint64[i].x);
-            x += SafeInt<unsigned __int64>(uint8_uint64[i].y);
+            std::uint8_t x(uint8_uint64[i].x);
+            x += SafeInt<std::uint64_t>(uint8_uint64[i].y);
         }
         catch(...)
         {
@@ -4389,7 +4389,7 @@ void AddVerifyUint8Uint64()
     }
 }
 
-static const AddTest< unsigned __int8, unsigned __int32 > uint8_uint32[] = 
+static const AddTest< std::uint8_t, std::uint32_t > uint8_uint32[] = 
 { 
 	{ 0x00, 0x00000000, true},
 	{ 0x01, 0x00000000, true},
@@ -4488,7 +4488,7 @@ void AddVerifyUint8Uint32()
 
     for( i = 0; i < COUNTOF(uint8_uint32); ++i )
     {
-        unsigned __int8 ret;
+        std::uint8_t ret;
         if( SafeAdd(uint8_uint32[i].x, uint8_uint32[i].y, ret) != uint8_uint32[i].fExpected )
         {
             cerr << "Error in case uint8_uint32: ";
@@ -4501,7 +4501,7 @@ void AddVerifyUint8Uint32()
         bool fSuccess = true;
         try
         {
-            SafeInt<unsigned __int8> si(uint8_uint32[i].x);
+            SafeInt<std::uint8_t> si(uint8_uint32[i].x);
             si += uint8_uint32[i].y;
         }
         catch(...)
@@ -4522,8 +4522,8 @@ void AddVerifyUint8Uint32()
         fSuccess = true;
         try
         {
-            unsigned __int8 x(uint8_uint32[i].x);
-            x += SafeInt<unsigned __int32>(uint8_uint32[i].y);
+            std::uint8_t x(uint8_uint32[i].x);
+            x += SafeInt<std::uint32_t>(uint8_uint32[i].y);
         }
         catch(...)
         {
@@ -4540,7 +4540,7 @@ void AddVerifyUint8Uint32()
     }
 }
 
-static const AddTest< unsigned __int8, unsigned __int16 > uint8_uint16[] = 
+static const AddTest< std::uint8_t, std::uint16_t > uint8_uint16[] = 
 { 
 	{ 0x00, 0x0000, true},
 	{ 0x01, 0x0000, true},
@@ -4639,7 +4639,7 @@ void AddVerifyUint8Uint16()
 
     for( i = 0; i < COUNTOF(uint8_uint16); ++i )
     {
-        unsigned __int8 ret;
+        std::uint8_t ret;
         if( SafeAdd(uint8_uint16[i].x, uint8_uint16[i].y, ret) != uint8_uint16[i].fExpected )
         {
             cerr << "Error in case uint8_uint16: ";
@@ -4652,7 +4652,7 @@ void AddVerifyUint8Uint16()
         bool fSuccess = true;
         try
         {
-            SafeInt<unsigned __int8> si(uint8_uint16[i].x);
+            SafeInt<std::uint8_t> si(uint8_uint16[i].x);
             si += uint8_uint16[i].y;
         }
         catch(...)
@@ -4673,8 +4673,8 @@ void AddVerifyUint8Uint16()
         fSuccess = true;
         try
         {
-            unsigned __int8 x(uint8_uint16[i].x);
-            x += SafeInt<unsigned __int16>(uint8_uint16[i].y);
+            std::uint8_t x(uint8_uint16[i].x);
+            x += SafeInt<std::uint16_t>(uint8_uint16[i].y);
         }
         catch(...)
         {
@@ -4691,7 +4691,7 @@ void AddVerifyUint8Uint16()
     }
 }
 
-static const AddTest< unsigned __int8, unsigned __int8 > uint8_uint8[] = 
+static const AddTest< std::uint8_t, std::uint8_t > uint8_uint8[] = 
 { 
 	{ 0x00, 0x00, true},
 	{ 0x01, 0x00, true},
@@ -4790,7 +4790,7 @@ void AddVerifyUint8Uint8()
 
     for( i = 0; i < COUNTOF(uint8_uint8); ++i )
     {
-        unsigned __int8 ret;
+        std::uint8_t ret;
         if( SafeAdd(uint8_uint8[i].x, uint8_uint8[i].y, ret) != uint8_uint8[i].fExpected )
         {
             cerr << "Error in case uint8_uint8: ";
@@ -4803,7 +4803,7 @@ void AddVerifyUint8Uint8()
         bool fSuccess = true;
         try
         {
-            SafeInt<unsigned __int8> si(uint8_uint8[i].x);
+            SafeInt<std::uint8_t> si(uint8_uint8[i].x);
             si += uint8_uint8[i].y;
         }
         catch(...)
@@ -4824,8 +4824,8 @@ void AddVerifyUint8Uint8()
         fSuccess = true;
         try
         {
-            unsigned __int8 x(uint8_uint8[i].x);
-            x += SafeInt<unsigned __int8>(uint8_uint8[i].y);
+            std::uint8_t x(uint8_uint8[i].x);
+            x += SafeInt<std::uint8_t>(uint8_uint8[i].y);
         }
         catch(...)
         {
@@ -4842,7 +4842,7 @@ void AddVerifyUint8Uint8()
     }
 }
 
-static const AddTest< unsigned __int8, __int64 > uint8_int64[] = 
+static const AddTest< std::uint8_t, std::int64_t > uint8_int64[] = 
 { 
 	{ 0x00, 0x0000000000000000, true},
 	{ 0x01, 0x0000000000000000, true},
@@ -5021,7 +5021,7 @@ void AddVerifyUint8Int64()
 
     for( i = 0; i < COUNTOF(uint8_int64); ++i )
     {
-        unsigned __int8 ret;
+        std::uint8_t ret;
         if( SafeAdd(uint8_int64[i].x, uint8_int64[i].y, ret) != uint8_int64[i].fExpected )
         {
             cerr << "Error in case uint8_int64: ";
@@ -5034,7 +5034,7 @@ void AddVerifyUint8Int64()
         bool fSuccess = true;
         try
         {
-            SafeInt<unsigned __int8> si(uint8_int64[i].x);
+            SafeInt<std::uint8_t> si(uint8_int64[i].x);
             si += uint8_int64[i].y;
         }
         catch(...)
@@ -5055,8 +5055,8 @@ void AddVerifyUint8Int64()
         fSuccess = true;
         try
         {
-            unsigned __int8 x(uint8_int64[i].x);
-            x += SafeInt<__int64>(uint8_int64[i].y);
+            std::uint8_t x(uint8_int64[i].x);
+            x += SafeInt<std::int64_t>(uint8_int64[i].y);
         }
         catch(...)
         {
@@ -5073,7 +5073,7 @@ void AddVerifyUint8Int64()
     }
 }
 
-static const AddTest< unsigned __int8, __int32 > uint8_int32[] = 
+static const AddTest< std::uint8_t, std::int32_t > uint8_int32[] = 
 { 
 	{ 0x00, 0x00000000, true},
 	{ 0x01, 0x00000000, true},
@@ -5172,7 +5172,7 @@ void AddVerifyUint8Int32()
 
     for( i = 0; i < COUNTOF(uint8_int32); ++i )
     {
-        unsigned __int8 ret;
+        std::uint8_t ret;
         if( SafeAdd(uint8_int32[i].x, uint8_int32[i].y, ret) != uint8_int32[i].fExpected )
         {
             cerr << "Error in case uint8_int32: ";
@@ -5185,7 +5185,7 @@ void AddVerifyUint8Int32()
         bool fSuccess = true;
         try
         {
-            SafeInt<unsigned __int8> si(uint8_int32[i].x);
+            SafeInt<std::uint8_t> si(uint8_int32[i].x);
             si += uint8_int32[i].y;
         }
         catch(...)
@@ -5206,8 +5206,8 @@ void AddVerifyUint8Int32()
         fSuccess = true;
         try
         {
-            unsigned __int8 x(uint8_int32[i].x);
-            x += SafeInt<__int32>(uint8_int32[i].y);
+            std::uint8_t x(uint8_int32[i].x);
+            x += SafeInt<std::int32_t>(uint8_int32[i].y);
         }
         catch(...)
         {
@@ -5224,7 +5224,7 @@ void AddVerifyUint8Int32()
     }
 }
 
-static const AddTest< unsigned __int8, __int16 > uint8_int16[] = 
+static const AddTest< std::uint8_t, std::int16_t > uint8_int16[] = 
 { 
 	{ 0x00, 0x0000, true},
 	{ 0x01, 0x0000, true},
@@ -5323,7 +5323,7 @@ void AddVerifyUint8Int16()
 
     for( i = 0; i < COUNTOF(uint8_int16); ++i )
     {
-        unsigned __int8 ret;
+        std::uint8_t ret;
         if( SafeAdd(uint8_int16[i].x, uint8_int16[i].y, ret) != uint8_int16[i].fExpected )
         {
             cerr << "Error in case uint8_int16: ";
@@ -5336,7 +5336,7 @@ void AddVerifyUint8Int16()
         bool fSuccess = true;
         try
         {
-            SafeInt<unsigned __int8> si(uint8_int16[i].x);
+            SafeInt<std::uint8_t> si(uint8_int16[i].x);
             si += uint8_int16[i].y;
         }
         catch(...)
@@ -5357,8 +5357,8 @@ void AddVerifyUint8Int16()
         fSuccess = true;
         try
         {
-            unsigned __int8 x(uint8_int16[i].x);
-            x += SafeInt<__int16>(uint8_int16[i].y);
+            std::uint8_t x(uint8_int16[i].x);
+            x += SafeInt<std::int16_t>(uint8_int16[i].y);
         }
         catch(...)
         {
@@ -5375,7 +5375,7 @@ void AddVerifyUint8Int16()
     }
 }
 
-static const AddTest< unsigned __int8, __int8 > uint8_int8[] = 
+static const AddTest< std::uint8_t, std::int8_t > uint8_int8[] = 
 { 
 	{ 0x00, 0x00, true},
 	{ 0x01, 0x00, true},
@@ -5474,7 +5474,7 @@ void AddVerifyUint8Int8()
 
     for( i = 0; i < COUNTOF(uint8_int8); ++i )
     {
-        unsigned __int8 ret;
+        std::uint8_t ret;
         if( SafeAdd(uint8_int8[i].x, uint8_int8[i].y, ret) != uint8_int8[i].fExpected )
         {
             cerr << "Error in case uint8_int8: ";
@@ -5487,7 +5487,7 @@ void AddVerifyUint8Int8()
         bool fSuccess = true;
         try
         {
-            SafeInt<unsigned __int8> si(uint8_int8[i].x);
+            SafeInt<std::uint8_t> si(uint8_int8[i].x);
             si += uint8_int8[i].y;
         }
         catch(...)
@@ -5508,8 +5508,8 @@ void AddVerifyUint8Int8()
         fSuccess = true;
         try
         {
-            unsigned __int8 x(uint8_int8[i].x);
-            x += SafeInt<__int8>(uint8_int8[i].y);
+            std::uint8_t x(uint8_int8[i].x);
+            x += SafeInt<std::int8_t>(uint8_int8[i].y);
         }
         catch(...)
         {
@@ -5526,7 +5526,7 @@ void AddVerifyUint8Int8()
     }
 }
 
-static const AddTest< __int8, unsigned __int64 > int8_uint64[] = 
+static const AddTest< std::int8_t, std::uint64_t > int8_uint64[] = 
 { 
 	{ 0x00, 0x0000000000000000, true},
 	{ 0x01, 0x0000000000000000, true},
@@ -5705,7 +5705,7 @@ void AddVerifyInt8Uint64()
 
     for( i = 0; i < COUNTOF(int8_uint64); ++i )
     {
-        __int8 ret;
+        std::int8_t ret;
         if( SafeAdd(int8_uint64[i].x, int8_uint64[i].y, ret) != int8_uint64[i].fExpected )
         {
             cerr << "Error in case int8_uint64: ";
@@ -5718,7 +5718,7 @@ void AddVerifyInt8Uint64()
         bool fSuccess = true;
         try
         {
-            SafeInt<__int8> si(int8_uint64[i].x);
+            SafeInt<std::int8_t> si(int8_uint64[i].x);
             si += int8_uint64[i].y;
         }
         catch(...)
@@ -5739,8 +5739,8 @@ void AddVerifyInt8Uint64()
         fSuccess = true;
         try
         {
-            __int8 x(int8_uint64[i].x);
-            x += SafeInt<unsigned __int64>(int8_uint64[i].y);
+            std::int8_t x(int8_uint64[i].x);
+            x += SafeInt<std::uint64_t>(int8_uint64[i].y);
         }
         catch(...)
         {
@@ -5757,7 +5757,7 @@ void AddVerifyInt8Uint64()
     }
 }
 
-static const AddTest< __int8, unsigned __int32 > int8_uint32[] = 
+static const AddTest< std::int8_t, std::uint32_t > int8_uint32[] = 
 { 
 	{ 0x00, 0x00000000, true},
 	{ 0x01, 0x00000000, true},
@@ -5856,7 +5856,7 @@ void AddVerifyInt8Uint32()
 
     for( i = 0; i < COUNTOF(int8_uint32); ++i )
     {
-        __int8 ret;
+        std::int8_t ret;
         if( SafeAdd(int8_uint32[i].x, int8_uint32[i].y, ret) != int8_uint32[i].fExpected )
         {
             cerr << "Error in case int8_uint32: ";
@@ -5869,7 +5869,7 @@ void AddVerifyInt8Uint32()
         bool fSuccess = true;
         try
         {
-            SafeInt<__int8> si(int8_uint32[i].x);
+            SafeInt<std::int8_t> si(int8_uint32[i].x);
             si += int8_uint32[i].y;
         }
         catch(...)
@@ -5890,8 +5890,8 @@ void AddVerifyInt8Uint32()
         fSuccess = true;
         try
         {
-            __int8 x(int8_uint32[i].x);
-            x += SafeInt<unsigned __int32>(int8_uint32[i].y);
+            std::int8_t x(int8_uint32[i].x);
+            x += SafeInt<std::uint32_t>(int8_uint32[i].y);
         }
         catch(...)
         {
@@ -5908,7 +5908,7 @@ void AddVerifyInt8Uint32()
     }
 }
 
-static const AddTest< __int8, unsigned __int16 > int8_uint16[] = 
+static const AddTest< std::int8_t, std::uint16_t > int8_uint16[] = 
 { 
 	{ 0x00, 0x0000, true},
 	{ 0x01, 0x0000, true},
@@ -6007,7 +6007,7 @@ void AddVerifyInt8Uint16()
 
     for( i = 0; i < COUNTOF(int8_uint16); ++i )
     {
-        __int8 ret;
+        std::int8_t ret;
         if( SafeAdd(int8_uint16[i].x, int8_uint16[i].y, ret) != int8_uint16[i].fExpected )
         {
             cerr << "Error in case int8_uint16: ";
@@ -6020,7 +6020,7 @@ void AddVerifyInt8Uint16()
         bool fSuccess = true;
         try
         {
-            SafeInt<__int8> si(int8_uint16[i].x);
+            SafeInt<std::int8_t> si(int8_uint16[i].x);
             si += int8_uint16[i].y;
         }
         catch(...)
@@ -6041,8 +6041,8 @@ void AddVerifyInt8Uint16()
         fSuccess = true;
         try
         {
-            __int8 x(int8_uint16[i].x);
-            x += SafeInt<unsigned __int16>(int8_uint16[i].y);
+            std::int8_t x(int8_uint16[i].x);
+            x += SafeInt<std::uint16_t>(int8_uint16[i].y);
         }
         catch(...)
         {
@@ -6059,7 +6059,7 @@ void AddVerifyInt8Uint16()
     }
 }
 
-static const AddTest< __int8, unsigned __int8 > int8_uint8[] = 
+static const AddTest< std::int8_t, std::uint8_t > int8_uint8[] = 
 { 
 	{ 0x00, 0x00, true},
 	{ 0x01, 0x00, true},
@@ -6158,7 +6158,7 @@ void AddVerifyInt8Uint8()
 
     for( i = 0; i < COUNTOF(int8_uint8); ++i )
     {
-        __int8 ret;
+        std::int8_t ret;
         if( SafeAdd(int8_uint8[i].x, int8_uint8[i].y, ret) != int8_uint8[i].fExpected )
         {
             cerr << "Error in case int8_uint8: ";
@@ -6171,7 +6171,7 @@ void AddVerifyInt8Uint8()
         bool fSuccess = true;
         try
         {
-            SafeInt<__int8> si(int8_uint8[i].x);
+            SafeInt<std::int8_t> si(int8_uint8[i].x);
             si += int8_uint8[i].y;
         }
         catch(...)
@@ -6192,8 +6192,8 @@ void AddVerifyInt8Uint8()
         fSuccess = true;
         try
         {
-            __int8 x(int8_uint8[i].x);
-            x += SafeInt<unsigned __int8>(int8_uint8[i].y);
+            std::int8_t x(int8_uint8[i].x);
+            x += SafeInt<std::uint8_t>(int8_uint8[i].y);
         }
         catch(...)
         {
@@ -6210,7 +6210,7 @@ void AddVerifyInt8Uint8()
     }
 }
 
-static const AddTest< __int8,  __int64 > int8_int64[] = 
+static const AddTest< std::int8_t,  std::int64_t > int8_int64[] = 
 { 
 	{ 0x00, 0x0000000000000000, true},
 	{ 0x01, 0x0000000000000000, true},
@@ -6389,7 +6389,7 @@ void AddVerifyInt8Int64()
 
     for( i = 0; i < COUNTOF(int8_int64); ++i )
     {
-        __int8 ret;
+        std::int8_t ret;
         if( SafeAdd(int8_int64[i].x, int8_int64[i].y, ret) != int8_int64[i].fExpected )
         {
             cerr << "Error in case int8_int64: ";
@@ -6402,7 +6402,7 @@ void AddVerifyInt8Int64()
         bool fSuccess = true;
         try
         {
-            SafeInt<__int8> si(int8_int64[i].x);
+            SafeInt<std::int8_t> si(int8_int64[i].x);
             si += int8_int64[i].y;
         }
         catch(...)
@@ -6423,8 +6423,8 @@ void AddVerifyInt8Int64()
         fSuccess = true;
         try
         {
-            __int8 x(int8_int64[i].x);
-            x += SafeInt<__int64>(int8_int64[i].y);
+            std::int8_t x(int8_int64[i].x);
+            x += SafeInt<std::int64_t>(int8_int64[i].y);
         }
         catch(...)
         {
@@ -6441,7 +6441,7 @@ void AddVerifyInt8Int64()
     }
 }
 
-static const AddTest< __int8,  __int32 > int8_int32[] = 
+static const AddTest< std::int8_t,  std::int32_t > int8_int32[] = 
 { 
 	{ 0x00, 0x00000000, true},
 	{ 0x01, 0x00000000, true},
@@ -6540,7 +6540,7 @@ void AddVerifyInt8Int32()
 
     for( i = 0; i < COUNTOF(int8_int32); ++i )
     {
-        __int8 ret;
+        std::int8_t ret;
         if( SafeAdd(int8_int32[i].x, int8_int32[i].y, ret) != int8_int32[i].fExpected )
         {
             cerr << "Error in case int8_int32: ";
@@ -6553,7 +6553,7 @@ void AddVerifyInt8Int32()
         bool fSuccess = true;
         try
         {
-            SafeInt<__int8> si(int8_int32[i].x);
+            SafeInt<std::int8_t> si(int8_int32[i].x);
             si += int8_int32[i].y;
         }
         catch(...)
@@ -6574,8 +6574,8 @@ void AddVerifyInt8Int32()
         fSuccess = true;
         try
         {
-            __int8 x(int8_int32[i].x);
-            x += SafeInt<__int32>(int8_int32[i].y);
+            std::int8_t x(int8_int32[i].x);
+            x += SafeInt<std::int32_t>(int8_int32[i].y);
         }
         catch(...)
         {
@@ -6592,7 +6592,7 @@ void AddVerifyInt8Int32()
     }
 }
 
-static const AddTest< __int8,  __int16 > int8_int16[] = 
+static const AddTest< std::int8_t,  std::int16_t > int8_int16[] = 
 { 
 	{ 0x00, 0x0000, true},
 	{ 0x01, 0x0000, true},
@@ -6691,7 +6691,7 @@ void AddVerifyInt8Int16()
 
     for( i = 0; i < COUNTOF(int8_int16); ++i )
     {
-        __int8 ret;
+        std::int8_t ret;
         if( SafeAdd(int8_int16[i].x, int8_int16[i].y, ret) != int8_int16[i].fExpected )
         {
             cerr << "Error in case int8_int16: ";
@@ -6704,7 +6704,7 @@ void AddVerifyInt8Int16()
         bool fSuccess = true;
         try
         {
-            SafeInt<__int8> si(int8_int16[i].x);
+            SafeInt<std::int8_t> si(int8_int16[i].x);
             si += int8_int16[i].y;
         }
         catch(...)
@@ -6725,8 +6725,8 @@ void AddVerifyInt8Int16()
         fSuccess = true;
         try
         {
-            __int8 x(int8_int16[i].x);
-            x += SafeInt<__int16>(int8_int16[i].y);
+            std::int8_t x(int8_int16[i].x);
+            x += SafeInt<std::int16_t>(int8_int16[i].y);
         }
         catch(...)
         {
@@ -6743,7 +6743,7 @@ void AddVerifyInt8Int16()
     }
 }
 
-static const AddTest< __int8,  __int8 > int8_int8[] = 
+static const AddTest< std::int8_t,  std::int8_t > int8_int8[] = 
 { 
 	{ 0x00, 0x00, true},
 	{ 0x01, 0x00, true},
@@ -6842,7 +6842,7 @@ void AddVerifyInt8Int8()
 
     for( i = 0; i < COUNTOF(int8_int8); ++i )
     {
-        __int8 ret;
+        std::int8_t ret;
         if( SafeAdd(int8_int8[i].x, int8_int8[i].y, ret) != int8_int8[i].fExpected )
         {
             cerr << "Error in case int8_int8: ";
@@ -6855,7 +6855,7 @@ void AddVerifyInt8Int8()
         bool fSuccess = true;
         try
         {
-            SafeInt<__int8> si(int8_int8[i].x);
+            SafeInt<std::int8_t> si(int8_int8[i].x);
             si += int8_int8[i].y;
         }
         catch(...)
@@ -6876,8 +6876,8 @@ void AddVerifyInt8Int8()
         fSuccess = true;
         try
         {
-            __int8 x(int8_int8[i].x);
-            x += SafeInt<__int8>(int8_int8[i].y);
+            std::int8_t x(int8_int8[i].x);
+            x += SafeInt<std::int8_t>(int8_int8[i].y);
         }
         catch(...)
         {

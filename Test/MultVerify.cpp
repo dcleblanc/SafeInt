@@ -6,11 +6,11 @@
 /*
 * Interesting numbers:
 *
-*  unsigned __int64
+*  std::uint64_t
 *  0, 1, 2, 0x7fffffff, 0x80000000, 0xffffffff, 0x100000000, 0x200000000, 0x7fffffffffffffff, 0x8000000000000000, 0xffffffffffffffff
-*  unsigned __int32
+*  std::uint32_t
 *  0, 1, 2, 0x7fffffff, 0x80000000, 0xffffffff
-*  signed __int64
+*  std::int64_t
 *  0, 1, 2, 0x7fffffff, 0x80000000, 0xffffffff, 0x100000000, 0x200000000, 0x7fffffffffffffff, 0x8000000000000000, 0xffffffffffffffff
 */
 
@@ -25,7 +25,7 @@ struct MultTest
 	bool fExpected;
 };
 
-static const MultTest< unsigned __int64, unsigned __int64 > uint64_uint64[] = 
+static const MultTest< std::uint64_t, std::uint64_t > uint64_uint64[] = 
 {
 	{ 0,                     0, true },
 	{ 1,                     0, true },
@@ -158,7 +158,7 @@ void MultVerifyUint64Uint64()
 
 	for( i = 0; i < COUNTOF(uint64_uint64); ++i )
 	{
-		unsigned __int64 ret;
+		std::uint64_t ret;
 		if( SafeMultiply(uint64_uint64[i].x, uint64_uint64[i].y, ret) != uint64_uint64[i].fExpected )
 		{
 			//assert(false);
@@ -174,7 +174,7 @@ void MultVerifyUint64Uint64()
 		bool fSuccess = true;
 		try
 		{
-			SafeInt<unsigned __int64> si(uint64_uint64[i].x);
+			SafeInt<std::uint64_t> si(uint64_uint64[i].x);
 			si *= uint64_uint64[i].y;
 		}
 		catch(...)
@@ -194,7 +194,7 @@ void MultVerifyUint64Uint64()
 	}
 }
 
-static const MultTest< unsigned __int64, unsigned __int32 > uint64_uint32[] = 
+static const MultTest< std::uint64_t, std::uint32_t > uint64_uint32[] = 
 {
 	{ 0,                     0, true },
 	{ 1,                     0, true },
@@ -270,7 +270,7 @@ void MultVerifyUint64Uint()
 
 	for( i = 0; i < COUNTOF(uint64_uint32); ++i )
 	{
-		unsigned __int64 ret;
+		std::uint64_t ret;
 		if( SafeMultiply(uint64_uint32[i].x, uint64_uint32[i].y, ret) != uint64_uint32[i].fExpected )
 		{
 			//assert(false);
@@ -285,7 +285,7 @@ void MultVerifyUint64Uint()
 		bool fSuccess = true;
 		try
 		{
-			SafeInt<unsigned __int64> si(uint64_uint32[i].x);
+			SafeInt<std::uint64_t> si(uint64_uint32[i].x);
 			si *= uint64_uint32[i].y;
 		}
 		catch(...)
@@ -305,7 +305,7 @@ void MultVerifyUint64Uint()
 	}
 }
 
-static const MultTest< unsigned __int32, unsigned __int64 > uint32_uint64[] = 
+static const MultTest< std::uint32_t, std::uint64_t > uint32_uint64[] = 
 {
 	{ 0,                     0, true },
 	{ 1,                     0, true },
@@ -381,7 +381,7 @@ void MultVerifyUintUint64()
 
 	for( i = 0; i < COUNTOF(uint32_uint64); ++i )
 	{
-		unsigned __int32 ret;
+		std::uint32_t ret;
 		if( SafeMultiply(uint32_uint64[i].x, uint32_uint64[i].y, ret) != uint32_uint64[i].fExpected )
 		{
 			//assert(false);
@@ -396,7 +396,7 @@ void MultVerifyUintUint64()
 		bool fSuccess = true;
 		try
 		{
-			SafeInt<unsigned __int32> si(uint32_uint64[i].x);
+			SafeInt<std::uint32_t> si(uint32_uint64[i].x);
 			si *= uint32_uint64[i].y;
 		}
 		catch(...)
@@ -416,7 +416,7 @@ void MultVerifyUintUint64()
 	}
 }
 
-static const MultTest< unsigned __int32, __int64 > uint32_int64[] = 
+static const MultTest< std::uint32_t, std::int64_t > uint32_int64[] = 
 {
 	{ 0,                     0, true },
 	{ 1,                     0, true },
@@ -492,7 +492,7 @@ void MultVerifyUintInt64()
 
 	for( i = 0; i < COUNTOF(uint32_int64); ++i )
 	{
-		unsigned __int32 ret;
+		std::uint32_t ret;
 		if( SafeMultiply(uint32_int64[i].x, uint32_int64[i].y, ret) != uint32_int64[i].fExpected )
 		{
 			//assert(false);
@@ -507,7 +507,7 @@ void MultVerifyUintInt64()
 		bool fSuccess = true;
 		try
 		{
-			SafeInt<unsigned __int32> si(uint32_int64[i].x);
+			SafeInt<std::uint32_t> si(uint32_int64[i].x);
 			si *= uint32_int64[i].y;
 		}
 		catch(...)
@@ -527,7 +527,7 @@ void MultVerifyUintInt64()
 	}
 }
 
-static const MultTest< unsigned __int64, __int64 > uint64_int64[] = 
+static const MultTest< std::uint64_t, std::int64_t > uint64_int64[] = 
 {
 	{ 0,                     0, true },
 	{ 1,                     0, true },
@@ -628,17 +628,17 @@ static const MultTest< unsigned __int64, __int64 > uint64_int64[] =
 	{ 0x7fffffffffffffff,    0x7fffffffffffffff, false },
 	{ 0x8000000000000000,    0x7fffffffffffffff, false },
 	{ 0xffffffffffffffff,    0x7fffffffffffffff, false },
-	{ 0,                     (__int64)0x8000000000000000, true },
-	{ 1,                     (__int64)0x8000000000000000, false },
-	{ 2,                     (__int64)0x8000000000000000, false },
-	{ 0x7fffffff,            (__int64)0x8000000000000000, false },
-	{ 0x80000000,            (__int64)0x8000000000000000, false },
-	{ 0xffffffff,            (__int64)0x8000000000000000, false },
-	{ 0x100000000,           (__int64)0x8000000000000000, false },
-	{ 0x200000000,           (__int64)0x8000000000000000, false },
-	{ 0x7fffffffffffffff,    (__int64)0x8000000000000000, false },
-	{ 0x8000000000000000,    (__int64)0x8000000000000000, false },
-	{ 0xffffffffffffffff,    (__int64)0x8000000000000000, false },
+	{ 0,                     (std::int64_t)0x8000000000000000, true },
+	{ 1,                     (std::int64_t)0x8000000000000000, false },
+	{ 2,                     (std::int64_t)0x8000000000000000, false },
+	{ 0x7fffffff,            (std::int64_t)0x8000000000000000, false },
+	{ 0x80000000,            (std::int64_t)0x8000000000000000, false },
+	{ 0xffffffff,            (std::int64_t)0x8000000000000000, false },
+	{ 0x100000000,           (std::int64_t)0x8000000000000000, false },
+	{ 0x200000000,           (std::int64_t)0x8000000000000000, false },
+	{ 0x7fffffffffffffff,    (std::int64_t)0x8000000000000000, false },
+	{ 0x8000000000000000,    (std::int64_t)0x8000000000000000, false },
+	{ 0xffffffffffffffff,    (std::int64_t)0x8000000000000000, false },
 	{ 0,                     0xffffffffffffffff, true },
 	{ 1,                     0xffffffffffffffff, false },
 	{ 2,                     0xffffffffffffffff, false },
@@ -658,7 +658,7 @@ void MultVerifyUint64Int64()
 
 	for( i = 0; i < COUNTOF(uint64_int64); ++i )
 	{
-		unsigned __int64 ret;
+		std::uint64_t ret;
 		if( SafeMultiply(uint64_int64[i].x, uint64_int64[i].y, ret) != uint64_int64[i].fExpected )
 		{
 			//assert(false);
@@ -673,7 +673,7 @@ void MultVerifyUint64Int64()
 		bool fSuccess = true;
 		try
 		{
-			SafeInt<unsigned __int64> si(uint64_int64[i].x);
+			SafeInt<std::uint64_t> si(uint64_int64[i].x);
 			si *= uint64_int64[i].y;
 		}
 		catch(...)
@@ -693,7 +693,7 @@ void MultVerifyUint64Int64()
 	}
 }
 
-static const MultTest< unsigned __int64, __int32 > uint64_int32[] = 
+static const MultTest< std::uint64_t, std::int32_t > uint64_int32[] = 
 {
 	{ 0,                     0, true },
 	{ 1,                     0, true },
@@ -769,7 +769,7 @@ void MultVerifyUint64Int()
 
 	for( i = 0; i < COUNTOF(uint64_int32); ++i )
 	{
-		unsigned __int64 ret;
+		std::uint64_t ret;
 		if( SafeMultiply(uint64_int32[i].x, uint64_int32[i].y, ret) != uint64_int32[i].fExpected )
 		{
 			//assert(false);
@@ -784,7 +784,7 @@ void MultVerifyUint64Int()
 		bool fSuccess = true;
 		try
 		{
-			SafeInt<unsigned __int64> si(uint64_int32[i].x);
+			SafeInt<std::uint64_t> si(uint64_int32[i].x);
 			si *= uint64_int32[i].y;
 		}
 		catch(...)
@@ -804,7 +804,7 @@ void MultVerifyUint64Int()
 	}
 }
 
-static const MultTest< __int64, __int64 > int64_int64[] = 
+static const MultTest< std::int64_t, std::int64_t > int64_int64[] = 
 {
 	{ 0,                     0, true },
 	{ 1,                     0, true },
@@ -937,7 +937,7 @@ void MultVerifyInt64Int64()
 
 	for( i = 0; i < COUNTOF(int64_int64); ++i )
 	{
-		__int64 ret;
+		std::int64_t ret;
 		if( SafeMultiply(int64_int64[i].x, int64_int64[i].y, ret) != int64_int64[i].fExpected )
 		{
 			//assert(false);
@@ -952,7 +952,7 @@ void MultVerifyInt64Int64()
 		bool fSuccess = true;
 		try
 		{
-			SafeInt<signed __int64> si(int64_int64[i].x);
+			SafeInt<std::int64_t> si(int64_int64[i].x);
 			si *= int64_int64[i].y;
 		}
 		catch(...)
@@ -972,7 +972,7 @@ void MultVerifyInt64Int64()
 	}
 }
 
-static const MultTest< __int64, unsigned __int64 > int64_uint64[] = 
+static const MultTest< std::int64_t, std::uint64_t > int64_uint64[] = 
 {
 	{ 0,                     0, true },
 	{ 1,                     0, true },
@@ -1105,7 +1105,7 @@ void MultVerifyInt64Uint64()
 
 	for( i = 0; i < COUNTOF(int64_uint64); ++i )
 	{
-		__int64 ret;
+		std::int64_t ret;
 		if( SafeMultiply(int64_uint64[i].x, int64_uint64[i].y, ret) != int64_uint64[i].fExpected )
 		{
 			//assert(false);
@@ -1120,7 +1120,7 @@ void MultVerifyInt64Uint64()
 		bool fSuccess = true;
 		try
 		{
-			SafeInt<signed __int64> si(int64_uint64[i].x);
+			SafeInt<std::int64_t> si(int64_uint64[i].x);
 			si *= int64_uint64[i].y;
 		}
 		catch(...)
@@ -1140,7 +1140,7 @@ void MultVerifyInt64Uint64()
 	}
 }
 
-static const MultTest< __int64, __int32 > int64_int[] = 
+static const MultTest< std::int64_t, std::int32_t > int64_int[] = 
 {
 	{ 0,                     0, true },
 	{ 1,                     0, true },
@@ -1216,7 +1216,7 @@ void MultVerifyInt64Int()
 
 	for( i = 0; i < COUNTOF(int64_int); ++i )
 	{
-		__int64 ret;
+		std::int64_t ret;
 		if( SafeMultiply(int64_int[i].x, int64_int[i].y, ret) != int64_int[i].fExpected )
 		{
 			//assert(false);
@@ -1231,7 +1231,7 @@ void MultVerifyInt64Int()
 		bool fSuccess = true;
 		try
 		{
-			SafeInt<signed __int64> si(int64_int[i].x);
+			SafeInt<std::int64_t> si(int64_int[i].x);
 			si *= int64_int[i].y;
 		}
 		catch(...)
@@ -1251,7 +1251,7 @@ void MultVerifyInt64Int()
 	}
 }
 
-static const MultTest< __int64, unsigned __int32 > int64_uint[] = 
+static const MultTest< std::int64_t, std::uint32_t > int64_uint[] = 
 {
 	{ 0,                     0, true },
 	{ 1,                     0, true },
@@ -1327,7 +1327,7 @@ void MultVerifyInt64Uint()
 
 	for( i = 0; i < COUNTOF(int64_uint); ++i )
 	{
-		__int64 ret;
+		std::int64_t ret;
 		if( SafeMultiply(int64_uint[i].x, int64_uint[i].y, ret) != int64_uint[i].fExpected )
 		{
 			//assert(false);
@@ -1342,7 +1342,7 @@ void MultVerifyInt64Uint()
 		bool fSuccess = true;
 		try
 		{
-			SafeInt<signed __int64> si(int64_uint[i].x);
+			SafeInt<std::int64_t> si(int64_uint[i].x);
 			si *= int64_uint[i].y;
 		}
 		catch(...)
@@ -1362,7 +1362,7 @@ void MultVerifyInt64Uint()
 	}
 }
 
-static const MultTest< __int32, __int64 > int_int64[] = 
+static const MultTest< std::int32_t, std::int64_t > int_int64[] = 
 {
 	{ 0,                     0, true },
 	{ 1,                     0, true },
@@ -1440,7 +1440,7 @@ void MultVerifyIntInt64()
 
 	for( i = 0; i < COUNTOF(int_int64); ++i )
 	{
-		__int32 ret;
+		std::int32_t ret;
 		if( SafeMultiply(int_int64[i].x, int_int64[i].y, ret) != int_int64[i].fExpected )
 		{
 			//assert(false);
@@ -1455,7 +1455,7 @@ void MultVerifyIntInt64()
 		bool fSuccess = true;
 		try
 		{
-			SafeInt<signed __int32> si(int_int64[i].x);
+			SafeInt<std::int32_t> si(int_int64[i].x);
 			si *= int_int64[i].y;
 		}
 		catch(...)
@@ -1475,7 +1475,7 @@ void MultVerifyIntInt64()
 	}
 }
 
-static const MultTest< __int32, unsigned __int64 > int_uint64[] = 
+static const MultTest< std::int32_t, std::uint64_t > int_uint64[] = 
 {
 	{ 0,                     0, true },
 	{ 1,                     0, true },
@@ -1553,7 +1553,7 @@ void MultVerifyIntUint64()
 
 	for( i = 0; i < COUNTOF(int_uint64); ++i )
 	{
-		__int32 ret;
+		std::int32_t ret;
 		if( SafeMultiply(int_uint64[i].x, int_uint64[i].y, ret) != int_uint64[i].fExpected )
 		{
 			//assert(false);
@@ -1568,7 +1568,7 @@ void MultVerifyIntUint64()
 		bool fSuccess = true;
 		try
 		{
-			SafeInt<signed __int32> si(int_uint64[i].x);
+			SafeInt<std::int32_t> si(int_uint64[i].x);
 			si *= int_uint64[i].y;
 		}
 		catch(...)
@@ -1588,7 +1588,7 @@ void MultVerifyIntUint64()
 	}
 }
 
-static const MultTest< unsigned __int8, unsigned __int8 > uint8_uint8[] = 
+static const MultTest< std::uint8_t, std::uint8_t > uint8_uint8[] = 
 {
 	{ 0,	0, true },
 	{ 1,	0, true },
@@ -1722,7 +1722,7 @@ void MultVerifyUint8Uint8()
 
 	for( i = 0; i < COUNTOF(uint8_uint8); ++i )
 	{
-		unsigned __int8 ret;
+		std::uint8_t ret;
 		if( SafeMultiply(uint8_uint8[i].x, uint8_uint8[i].y, ret) != uint8_uint8[i].fExpected )
 		{
 			//assert(false);
@@ -1738,7 +1738,7 @@ void MultVerifyUint8Uint8()
 		bool fSuccess = true;
 		try
 		{
-			SafeInt<unsigned __int8> si(uint8_uint8[i].x);
+			SafeInt<std::uint8_t> si(uint8_uint8[i].x);
 			si *= uint8_uint8[i].y;
 		}
 		catch(...)
@@ -1762,7 +1762,7 @@ void MultVerifyUint8Uint8()
 #pragma warning( disable: 4309 )
 #endif
 
-static const MultTest< __int8, __int8 > int8_int8[] = 
+static const MultTest< std::int8_t, std::int8_t > int8_int8[] = 
 {
 	{ 0,	0, true },
 	{ 1,	0, true },
@@ -1933,7 +1933,7 @@ void MultVerifyInt8Int8()
 
 	for( i = 0; i < COUNTOF(int8_int8); ++i )
 	{
-		__int8 ret;
+		std::int8_t ret;
 		if( SafeMultiply(int8_int8[i].x, int8_int8[i].y, ret) != int8_int8[i].fExpected )
 		{
 			//assert(false);
@@ -1949,7 +1949,7 @@ void MultVerifyInt8Int8()
 		bool fSuccess = true;
 		try
 		{
-			SafeInt<__int8> si(int8_int8[i].x);
+			SafeInt<std::int8_t> si(int8_int8[i].x);
 			si *= int8_int8[i].y;
 		}
 		catch(...)

@@ -22,7 +22,7 @@ struct DecTest
 	bool fExpected;	// false = overflow
 };
 
-static const IncTest< unsigned __int8 > inc_uint8[] =
+static const IncTest< std::uint8_t > inc_uint8[] =
 {
 	{ 0x00, 0x01, true},
 	{ 0x01, 0x02, true},
@@ -44,8 +44,8 @@ void PreIncTestUint8()
 		bool fSuccess = true;
 		try
 		{
-			SafeInt<unsigned __int8> si(inc_uint8[i].x);
-			SafeInt<unsigned __int8> vv = ++si;
+			SafeInt<std::uint8_t> si(inc_uint8[i].x);
+			SafeInt<std::uint8_t> vv = ++si;
 
 			if(vv != inc_uint8[i].y)
 			{
@@ -75,8 +75,8 @@ void PostIncTestUint8()
 		bool fSuccess = true;
 		try
 		{
-			SafeInt<unsigned __int8> si(inc_uint8[i].x);
-			SafeInt<unsigned __int8> vv = si++;
+			SafeInt<std::uint8_t> si(inc_uint8[i].x);
+			SafeInt<std::uint8_t> vv = si++;
 
 			if(vv != inc_uint8[i].x)
 			{
@@ -97,7 +97,7 @@ void PostIncTestUint8()
 	}
 }
 
-static const IncTest< unsigned __int16 > inc_uint16[] =
+static const IncTest< std::uint16_t > inc_uint16[] =
 {
 	{ 0x0000, 0x0001, true},
 	{ 0x0001, 0x0002, true},
@@ -119,8 +119,8 @@ void PreIncTestUint16()
 		bool fSuccess = true;
 		try
 		{
-			SafeInt<unsigned __int16> si(inc_uint16[i].x);
-			SafeInt<unsigned __int16> vv = ++si;
+			SafeInt<std::uint16_t> si(inc_uint16[i].x);
+			SafeInt<std::uint16_t> vv = ++si;
 
 			if(vv != inc_uint16[i].y)
 			{
@@ -150,8 +150,8 @@ void PostIncTestUint16()
 		bool fSuccess = true;
 		try
 		{
-			SafeInt<unsigned __int16> si(inc_uint16[i].x);
-			SafeInt<unsigned __int16> vv = si++;
+			SafeInt<std::uint16_t> si(inc_uint16[i].x);
+			SafeInt<std::uint16_t> vv = si++;
 
 			if(vv != inc_uint16[i].x)
 			{
@@ -172,7 +172,7 @@ void PostIncTestUint16()
 	}
 }
 
-static const IncTest< unsigned __int32 > inc_uint32[] =
+static const IncTest< std::uint32_t > inc_uint32[] =
 {
 	{ 0x00000000, 0x00000001, true},
 	{ 0x00000001, 0x00000002, true},
@@ -194,8 +194,8 @@ void PreIncTestUint32()
 		bool fSuccess = true;
 		try
 		{
-			SafeInt<unsigned __int32> si(inc_uint32[i].x);
-			SafeInt<unsigned __int32> vv = ++si;
+			SafeInt<std::uint32_t> si(inc_uint32[i].x);
+			SafeInt<std::uint32_t> vv = ++si;
 
 			if(vv != inc_uint32[i].y)
 			{
@@ -225,8 +225,8 @@ void PostIncTestUint32()
 		bool fSuccess = true;
 		try
 		{
-			SafeInt<unsigned __int32> si(inc_uint32[i].x);
-			SafeInt<unsigned __int32> vv = si++;
+			SafeInt<std::uint32_t> si(inc_uint32[i].x);
+			SafeInt<std::uint32_t> vv = si++;
 
 			if(vv != inc_uint32[i].x)
 			{
@@ -247,7 +247,7 @@ void PostIncTestUint32()
 	}
 }
 
-static const IncTest< unsigned __int64 > inc_uint64[] =
+static const IncTest< std::uint64_t > inc_uint64[] =
 {
 	{ 0x0000000000000000, 0x0000000000000001, true},
 	{ 0x0000000000000001, 0x0000000000000002, true},
@@ -277,8 +277,8 @@ void PreIncTestUint64()
 		bool fSuccess = true;
 		try
 		{
-			SafeInt<unsigned __int64> si(inc_uint64[i].x);
-			SafeInt<unsigned __int64> vv = ++si;
+			SafeInt<std::uint64_t> si(inc_uint64[i].x);
+			SafeInt<std::uint64_t> vv = ++si;
 
 			if(vv != inc_uint64[i].y)
 			{
@@ -308,8 +308,8 @@ void PostIncTestUint64()
 		bool fSuccess = true;
 		try
 		{
-			SafeInt<unsigned __int64> si(inc_uint64[i].x);
-			SafeInt<unsigned __int64> vv = si++;
+			SafeInt<std::uint64_t> si(inc_uint64[i].x);
+			SafeInt<std::uint64_t> vv = si++;
 
 			if(vv != inc_uint64[i].x)
 			{
@@ -330,7 +330,7 @@ void PostIncTestUint64()
 	}
 }
 
-static const IncTest< __int8 > inc_int8[] =
+static const IncTest< std::int8_t > inc_int8[] =
 {
 	{ 0x00, 0x01, true},
 	{ 0x01, 0x02, true},
@@ -352,8 +352,8 @@ void PreIncTestInt8()
 		bool fSuccess = true;
 		try
 		{
-			SafeInt< __int8 > si(inc_int8[i].x);
-			SafeInt< __int8 > vv = ++si;
+			SafeInt< std::int8_t > si(inc_int8[i].x);
+			SafeInt< std::int8_t > vv = ++si;
 
 			if(vv != inc_int8[i].y)
 			{
@@ -383,8 +383,8 @@ void PostIncTestInt8()
 		bool fSuccess = true;
 		try
 		{
-			SafeInt< __int8 > si(inc_int8[i].x);
-			SafeInt< __int8 > vv = si++;
+			SafeInt< std::int8_t > si(inc_int8[i].x);
+			SafeInt< std::int8_t > vv = si++;
 
 			if(vv != inc_int8[i].x)
 			{
@@ -405,7 +405,7 @@ void PostIncTestInt8()
 	}
 }
 
-static const IncTest< __int16 > inc_int16[] =
+static const IncTest< std::int16_t > inc_int16[] =
 {
 	{ 0x0000, 0x0001, true},
 	{ 0x0001, 0x0002, true},
@@ -427,8 +427,8 @@ void PreIncTestInt16()
 		bool fSuccess = true;
 		try
 		{
-			SafeInt< __int16 > si(inc_int16[i].x);
-			SafeInt< __int16 > vv = ++si;
+			SafeInt< std::int16_t > si(inc_int16[i].x);
+			SafeInt< std::int16_t > vv = ++si;
 
 			if(vv != inc_int16[i].y)
 			{
@@ -458,8 +458,8 @@ void PostIncTestInt16()
 		bool fSuccess = true;
 		try
 		{
-			SafeInt< __int16 > si(inc_int16[i].x);
-			SafeInt< __int16 > vv = si++;
+			SafeInt< std::int16_t > si(inc_int16[i].x);
+			SafeInt< std::int16_t > vv = si++;
 
 			if(vv != inc_int16[i].x)
 			{
@@ -480,7 +480,7 @@ void PostIncTestInt16()
 	}
 }
 
-static const IncTest< __int32 > inc_int32[] =
+static const IncTest< std::int32_t > inc_int32[] =
 {
 	{ 0x00000000, 0x00000001, true},
 	{ 0x00000001, 0x00000002, true},
@@ -502,8 +502,8 @@ void PreIncTestInt32()
 		bool fSuccess = true;
 		try
 		{
-			SafeInt< __int32 > si(inc_int32[i].x);
-			SafeInt< __int32 > vv = ++si;
+			SafeInt< std::int32_t > si(inc_int32[i].x);
+			SafeInt< std::int32_t > vv = ++si;
 
 			if(vv != inc_int32[i].y)
 			{
@@ -533,8 +533,8 @@ void PostIncTestInt32()
 		bool fSuccess = true;
 		try
 		{
-			SafeInt< __int32 > si(inc_int32[i].x);
-			SafeInt< __int32 > vv = si++;
+			SafeInt< std::int32_t > si(inc_int32[i].x);
+			SafeInt< std::int32_t > vv = si++;
 
 			if(vv != inc_int32[i].x)
 			{
@@ -555,7 +555,7 @@ void PostIncTestInt32()
 	}
 }
 
-static const IncTest< __int64 > inc_int64[] =
+static const IncTest< std::int64_t > inc_int64[] =
 {
 	{ 0x0000000000000000, 0x0000000000000001, true},
 	{ 0x0000000000000001, 0x0000000000000002, true},
@@ -585,8 +585,8 @@ void PreIncTestInt64()
 		bool fSuccess = true;
 		try
 		{
-			SafeInt< __int64 > si(inc_int64[i].x);
-			SafeInt< __int64 > vv = ++si;
+			SafeInt< std::int64_t > si(inc_int64[i].x);
+			SafeInt< std::int64_t > vv = ++si;
 
 			if(vv != inc_int64[i].y)
 			{
@@ -616,8 +616,8 @@ void PostIncTestInt64()
 		bool fSuccess = true;
 		try
 		{
-			SafeInt< __int64 > si(inc_int64[i].x);
-			SafeInt< __int64 > vv = si++;
+			SafeInt< std::int64_t > si(inc_int64[i].x);
+			SafeInt< std::int64_t > vv = si++;
 
 			if(vv != inc_int64[i].x)
 			{
@@ -638,7 +638,7 @@ void PostIncTestInt64()
 	}
 }
 
-static const DecTest< unsigned __int8 > dec_uint8[] =
+static const DecTest< std::uint8_t > dec_uint8[] =
 {
 	{ 0x00, 0xff, false},
 	{ 0x01, 0x00, true},
@@ -660,8 +660,8 @@ void PreDecTestUint8()
 		bool fSuccess = true;
 		try
 		{
-			SafeInt<unsigned __int8> si(dec_uint8[i].x);
-			SafeInt<unsigned __int8> vv = --si;
+			SafeInt<std::uint8_t> si(dec_uint8[i].x);
+			SafeInt<std::uint8_t> vv = --si;
 
 			if(vv != dec_uint8[i].y)
 			{
@@ -691,8 +691,8 @@ void PostDecTestUint8()
 		bool fSuccess = true;
 		try
 		{
-			SafeInt<unsigned __int8> si(dec_uint8[i].x);
-			SafeInt<unsigned __int8> vv = si--;
+			SafeInt<std::uint8_t> si(dec_uint8[i].x);
+			SafeInt<std::uint8_t> vv = si--;
 
 			if(vv != dec_uint8[i].x)
 			{
@@ -713,7 +713,7 @@ void PostDecTestUint8()
 	}
 }
 
-static const DecTest< unsigned __int16 > dec_uint16[] =
+static const DecTest< std::uint16_t > dec_uint16[] =
 {
 	{ 0x0000, 0xffff, false},
 	{ 0x0001, 0x0000, true},
@@ -735,8 +735,8 @@ void PreDecTestUint16()
 		bool fSuccess = true;
 		try
 		{
-			SafeInt<unsigned __int16> si(dec_uint16[i].x);
-			SafeInt<unsigned __int16> vv = --si;
+			SafeInt<std::uint16_t> si(dec_uint16[i].x);
+			SafeInt<std::uint16_t> vv = --si;
 
 			if(vv != dec_uint16[i].y)
 			{
@@ -766,8 +766,8 @@ void PostDecTestUint16()
 		bool fSuccess = true;
 		try
 		{
-			SafeInt<unsigned __int16> si(dec_uint16[i].x);
-			SafeInt<unsigned __int16> vv = si--;
+			SafeInt<std::uint16_t> si(dec_uint16[i].x);
+			SafeInt<std::uint16_t> vv = si--;
 
 			if(vv != dec_uint16[i].x)
 			{
@@ -788,7 +788,7 @@ void PostDecTestUint16()
 	}
 }
 
-static const DecTest< unsigned __int32 > dec_uint32[] =
+static const DecTest< std::uint32_t > dec_uint32[] =
 {
 	{ 0x00000000, 0xffffffff, false},
 	{ 0x00000001, 0x00000000, true},
@@ -810,8 +810,8 @@ void PreDecTestUint32()
 		bool fSuccess = true;
 		try
 		{
-			SafeInt<unsigned __int32> si(dec_uint32[i].x);
-			SafeInt<unsigned __int32> vv = --si;
+			SafeInt<std::uint32_t> si(dec_uint32[i].x);
+			SafeInt<std::uint32_t> vv = --si;
 
 			if(vv != dec_uint32[i].y)
 			{
@@ -841,8 +841,8 @@ void PostDecTestUint32()
 		bool fSuccess = true;
 		try
 		{
-			SafeInt<unsigned __int32> si(dec_uint32[i].x);
-			SafeInt<unsigned __int32> vv = si--;
+			SafeInt<std::uint32_t> si(dec_uint32[i].x);
+			SafeInt<std::uint32_t> vv = si--;
 
 			if(vv != dec_uint32[i].x)
 			{
@@ -863,7 +863,7 @@ void PostDecTestUint32()
 	}
 }
 
-static const DecTest< unsigned __int64 > dec_uint64[] =
+static const DecTest< std::uint64_t > dec_uint64[] =
 {
 	{ 0x0000000000000000, 0xffffffffffffffff, false},
 	{ 0x0000000000000001, 0x0000000000000000, true},
@@ -893,8 +893,8 @@ void PreDecTestUint64()
 		bool fSuccess = true;
 		try
 		{
-			SafeInt<unsigned __int64> si(dec_uint64[i].x);
-			SafeInt<unsigned __int64> vv = --si;
+			SafeInt<std::uint64_t> si(dec_uint64[i].x);
+			SafeInt<std::uint64_t> vv = --si;
 
 			if(vv != dec_uint64[i].y)
 			{
@@ -924,8 +924,8 @@ void PostDecTestUint64()
 		bool fSuccess = true;
 		try
 		{
-			SafeInt<unsigned __int64> si(dec_uint64[i].x);
-			SafeInt<unsigned __int64> vv = si--;
+			SafeInt<std::uint64_t> si(dec_uint64[i].x);
+			SafeInt<std::uint64_t> vv = si--;
 
 			if(vv != dec_uint64[i].x)
 			{
@@ -946,7 +946,7 @@ void PostDecTestUint64()
 	}
 }
 
-static const DecTest< __int8 > dec_int8[] =
+static const DecTest< std::int8_t > dec_int8[] =
 {
 	{ 0x00, 0xff, true},
 	{ 0x01, 0x00, true},
@@ -968,8 +968,8 @@ void PreDecTestInt8()
 		bool fSuccess = true;
 		try
 		{
-			SafeInt< __int8 > si(dec_int8[i].x);
-			SafeInt< __int8 > vv = --si;
+			SafeInt< std::int8_t > si(dec_int8[i].x);
+			SafeInt< std::int8_t > vv = --si;
 
 			if(vv != dec_int8[i].y)
 			{
@@ -999,8 +999,8 @@ void PostDecTestInt8()
 		bool fSuccess = true;
 		try
 		{
-			SafeInt< __int8 > si(dec_int8[i].x);
-			SafeInt< __int8 > vv = si--;
+			SafeInt< std::int8_t > si(dec_int8[i].x);
+			SafeInt< std::int8_t > vv = si--;
 
 			if(vv != dec_int8[i].x)
 			{
@@ -1021,7 +1021,7 @@ void PostDecTestInt8()
 	}
 }
 
-static const DecTest< __int16 > dec_int16[] =
+static const DecTest< std::int16_t > dec_int16[] =
 {
 	{ 0x0000, 0xffff, true},
 	{ 0x0001, 0x0000, true},
@@ -1043,8 +1043,8 @@ void PreDecTestInt16()
 		bool fSuccess = true;
 		try
 		{
-			SafeInt< __int16 > si(dec_int16[i].x);
-			SafeInt< __int16 > vv = --si;
+			SafeInt< std::int16_t > si(dec_int16[i].x);
+			SafeInt< std::int16_t > vv = --si;
 
 			if(vv != dec_int16[i].y)
 			{
@@ -1074,8 +1074,8 @@ void PostDecTestInt16()
 		bool fSuccess = true;
 		try
 		{
-			SafeInt< __int16 > si(dec_int16[i].x);
-			SafeInt< __int16 > vv = si--;
+			SafeInt< std::int16_t > si(dec_int16[i].x);
+			SafeInt< std::int16_t > vv = si--;
 
 			if(vv != dec_int16[i].x)
 			{
@@ -1096,7 +1096,7 @@ void PostDecTestInt16()
 	}
 }
 
-static const DecTest< __int32 > dec_int32[] =
+static const DecTest< std::int32_t > dec_int32[] =
 {
 	{ 0x00000000, 0xffffffff, true},
 	{ 0x00000001, 0x00000000, true},
@@ -1118,8 +1118,8 @@ void PreDecTestInt32()
 		bool fSuccess = true;
 		try
 		{
-			SafeInt< __int32 > si(dec_int32[i].x);
-			SafeInt< __int32 > vv = --si;
+			SafeInt< std::int32_t > si(dec_int32[i].x);
+			SafeInt< std::int32_t > vv = --si;
 
 			if(vv != dec_int32[i].y)
 			{
@@ -1149,8 +1149,8 @@ void PostDecTestInt32()
 		bool fSuccess = true;
 		try
 		{
-			SafeInt< __int32 > si(dec_int32[i].x);
-			SafeInt< __int32 > vv = si--;
+			SafeInt< std::int32_t > si(dec_int32[i].x);
+			SafeInt< std::int32_t > vv = si--;
 
 			if(vv != dec_int32[i].x)
 			{
@@ -1171,7 +1171,7 @@ void PostDecTestInt32()
 	}
 }
 
-static const DecTest< __int64 > dec_int64[] =
+static const DecTest< std::int64_t > dec_int64[] =
 {
 	{ 0x0000000000000000, 0xffffffffffffffff, true},
 	{ 0x0000000000000001, 0x0000000000000000, true},
@@ -1201,8 +1201,8 @@ void PreDecTestInt64()
 		bool fSuccess = true;
 		try
 		{
-			SafeInt< __int64 > si(dec_int64[i].x);
-			SafeInt< __int64 > vv = --si;
+			SafeInt< std::int64_t > si(dec_int64[i].x);
+			SafeInt< std::int64_t > vv = --si;
 
 			if(vv != dec_int64[i].y)
 			{
@@ -1232,8 +1232,8 @@ void PostDecTestInt64()
 		bool fSuccess = true;
 		try
 		{
-			SafeInt< __int64 > si(dec_int64[i].x);
-			SafeInt< __int64 > vv = si--;
+			SafeInt< std::int64_t > si(dec_int64[i].x);
+			SafeInt< std::int64_t > vv = si--;
 
 			if(vv != dec_int64[i].x)
 			{

@@ -8,11 +8,11 @@ namespace div_verify
 /*
 * Interesting numbers:
 *
-*  unsigned __int64
+*  std::uint64_t
 *  0, 1, 2, 0x7fffffff, 0x80000000, 0xffffffff, 0x100000000, 0x200000000, 0x7fffffffffffffff, 0x8000000000000000, 0xffffffffffffffff
-*  unsigned __int32
+*  std::uint32_t
 *  0, 1, 2, 0x7fffffff, 0x80000000, 0xffffffff
-*  signed __int64
+*  std::int64_t
 *  0, 1, 2, 0x7fffffff, 0x80000000, 0xffffffff, 0x100000000, 0x200000000, 0x7fffffffffffffff, 0x8000000000000000, 0xffffffffffffffff
 */
 
@@ -26,7 +26,7 @@ struct DivTest
 
 // For the most part, unsigned-unsigned combinations are not going to give us any problems
 // Only thing to verify is that 0/0 still throws
-DivTest< unsigned __int64, unsigned __int64 > uint64_uint64[] = 
+DivTest< std::uint64_t, std::uint64_t > uint64_uint64[] = 
 {
    { 0,                     0, false },
    { 1,                     0, false },
@@ -157,7 +157,7 @@ void DivVerifyUint64Uint64()
 
    for( i = 0; i < sizeof(uint64_uint64)/sizeof(uint64_uint64[0]); ++i )
    {
-      unsigned __int64 ret;
+      std::uint64_t ret;
       if( SafeDivide(uint64_uint64[i].x, uint64_uint64[i].y, ret) != uint64_uint64[i].fExpected )
       {
          //assert(false);
@@ -168,7 +168,7 @@ void DivVerifyUint64Uint64()
       bool fSuccess = true;
       try
       {
-         SafeInt<unsigned __int64> si(uint64_uint64[i].x);
+         SafeInt<std::uint64_t> si(uint64_uint64[i].x);
          si /= uint64_uint64[i].y;
       }
       catch(...)
@@ -186,8 +186,8 @@ void DivVerifyUint64Uint64()
       fSuccess = true;
       try
       {
-         unsigned __int64 x(uint64_uint64[i].x);
-         x /= SafeInt<unsigned __int64>(uint64_uint64[i].y);
+         std::uint64_t x(uint64_uint64[i].x);
+         x /= SafeInt<std::uint64_t>(uint64_uint64[i].y);
       }
       catch(...)
       {
@@ -201,7 +201,7 @@ void DivVerifyUint64Uint64()
    }
 }
 
-DivTest< unsigned __int64, unsigned __int32 > uint64_uint32[] = 
+DivTest< std::uint64_t, std::uint32_t > uint64_uint32[] = 
 {
    { 0,                     0, false },
    { 1,                     0, false },
@@ -277,7 +277,7 @@ void DivVerifyUint64Uint32()
 
    for( i = 0; i < sizeof(uint64_uint32)/sizeof(uint64_uint32[0]); ++i )
    {
-      unsigned __int64 ret;
+      std::uint64_t ret;
       if( SafeDivide(uint64_uint32[i].x, uint64_uint32[i].y, ret) != uint64_uint32[i].fExpected )
       {
          //assert(false);
@@ -288,7 +288,7 @@ void DivVerifyUint64Uint32()
       bool fSuccess = true;
       try
       {
-         SafeInt<unsigned __int64> si(uint64_uint32[i].x);
+         SafeInt<std::uint64_t> si(uint64_uint32[i].x);
          si /= uint64_uint32[i].y;
       }
       catch(...)
@@ -306,8 +306,8 @@ void DivVerifyUint64Uint32()
       fSuccess = true;
       try
       {
-         unsigned __int64 x(uint64_uint32[i].x);
-         x /= SafeInt<unsigned __int32>(uint64_uint32[i].y);
+         std::uint64_t x(uint64_uint32[i].x);
+         x /= SafeInt<std::uint32_t>(uint64_uint32[i].y);
       }
       catch(...)
       {
@@ -321,7 +321,7 @@ void DivVerifyUint64Uint32()
    }
 }
 
-DivTest< unsigned __int64, unsigned __int16 > uint64_uint16[] = 
+DivTest< std::uint64_t, std::uint16_t > uint64_uint16[] = 
 {
    { 0,                     0, false },
    { 1,                     0, false },
@@ -364,7 +364,7 @@ void DivVerifyUint64Uint16()
 
    for( i = 0; i < sizeof(uint64_uint16)/sizeof(uint64_uint16[0]); ++i )
    {
-      unsigned __int64 ret;
+      std::uint64_t ret;
       if( SafeDivide(uint64_uint16[i].x, uint64_uint16[i].y, ret) != uint64_uint16[i].fExpected )
       {
          //assert(false);
@@ -375,7 +375,7 @@ void DivVerifyUint64Uint16()
       bool fSuccess = true;
       try
       {
-         SafeInt<unsigned __int64> si(uint64_uint16[i].x);
+         SafeInt<std::uint64_t> si(uint64_uint16[i].x);
          si /= uint64_uint16[i].y;
       }
       catch(...)
@@ -393,8 +393,8 @@ void DivVerifyUint64Uint16()
       fSuccess = true;
       try
       {
-         unsigned __int64 x(uint64_uint16[i].x);
-         x /= SafeInt<unsigned __int16>(uint64_uint16[i].y);
+         std::uint64_t x(uint64_uint16[i].x);
+         x /= SafeInt<std::uint16_t>(uint64_uint16[i].y);
       }
       catch(...)
       {
@@ -408,7 +408,7 @@ void DivVerifyUint64Uint16()
    }
 }
 
-DivTest< unsigned __int64, unsigned __int8 > uint64_uint8[] = 
+DivTest< std::uint64_t, std::uint8_t > uint64_uint8[] = 
 {
    { 0,                     0, false },
    { 1,                     0, false },
@@ -451,7 +451,7 @@ void DivVerifyUint64Uint8()
 
    for( i = 0; i < sizeof(uint64_uint8)/sizeof(uint64_uint8[0]); ++i )
    {
-      unsigned __int64 ret;
+      std::uint64_t ret;
       if( SafeDivide(uint64_uint8[i].x, uint64_uint8[i].y, ret) != uint64_uint8[i].fExpected )
       {
          //assert(false);
@@ -462,7 +462,7 @@ void DivVerifyUint64Uint8()
       bool fSuccess = true;
       try
       {
-         SafeInt<unsigned __int64> si(uint64_uint8[i].x);
+         SafeInt<std::uint64_t> si(uint64_uint8[i].x);
          si /= uint64_uint8[i].y;
       }
       catch(...)
@@ -480,8 +480,8 @@ void DivVerifyUint64Uint8()
       fSuccess = true;
       try
       {
-         unsigned __int64 x(uint64_uint8[i].x);
-         x /= SafeInt<unsigned __int8>(uint64_uint8[i].y);
+         std::uint64_t x(uint64_uint8[i].x);
+         x /= SafeInt<std::uint8_t>(uint64_uint8[i].y);
       }
       catch(...)
       {
@@ -498,7 +498,7 @@ void DivVerifyUint64Uint8()
 // Same problem as unsigned-signed, but anything negative should now fail
 // There are corner cases in the U op SafeInt<T> path, which has to be tested
 // individually
-DivTest< unsigned __int64, __int64 > uint64_int64[] = 
+DivTest< std::uint64_t, std::int64_t > uint64_int64[] = 
 {
    { 0,                     0, false },
    { 1,                     0, false },
@@ -629,7 +629,7 @@ void DivVerifyUint64Int64()
 
    for( i = 0; i < sizeof(uint64_int64)/sizeof(uint64_int64[0]); ++i )
    {
-      unsigned __int64 ret;
+      std::uint64_t ret;
       if( SafeDivide(uint64_int64[i].x, uint64_int64[i].y, ret) != uint64_int64[i].fExpected )
       {
          //assert(false);
@@ -640,7 +640,7 @@ void DivVerifyUint64Int64()
       bool fSuccess = true;
       try
       {
-         SafeInt<unsigned __int64> si(uint64_int64[i].x);
+         SafeInt<std::uint64_t> si(uint64_int64[i].x);
          si /= uint64_int64[i].y;
       }
       catch(...)
@@ -658,8 +658,8 @@ void DivVerifyUint64Int64()
       fSuccess = true;
       try
       {
-         unsigned __int64 x(uint64_int64[i].x);
-         x /= SafeInt<__int64>(uint64_int64[i].y);
+         std::uint64_t x(uint64_int64[i].x);
+         x /= SafeInt<std::int64_t>(uint64_int64[i].y);
       }
       catch(...)
       {
@@ -673,7 +673,7 @@ void DivVerifyUint64Int64()
    }
 }
 
-DivTest< __int64, unsigned __int64 > int64_uint64_2[] = 
+DivTest< std::int64_t, std::uint64_t > int64_uint64_2[] = 
 {
    { 0,                     0, false },
    { 1,                     0, true },
@@ -808,8 +808,8 @@ void DivVerifyUint64Int64_2()
       bool fSuccess = true;
       try
       {
-         SafeInt<__int64> si(int64_uint64_2[i].x);
-         SafeInt<__int64> si2;
+         SafeInt<std::int64_t> si(int64_uint64_2[i].x);
+         SafeInt<std::int64_t> si2;
 
          si2 = int64_uint64_2[i].y / si;
       }
@@ -825,7 +825,7 @@ void DivVerifyUint64Int64_2()
    }
 }
 
-DivTest< unsigned __int64, __int32 > uint64_int32[] = 
+DivTest< std::uint64_t, std::int32_t > uint64_int32[] = 
 {
    { 0,                     0, false },
    { 1,                     0, false },
@@ -901,7 +901,7 @@ void DivVerifyUint64Int32()
 
    for( i = 0; i < sizeof(uint64_int32)/sizeof(uint64_int32[0]); ++i )
    {
-      unsigned __int64 ret;
+      std::uint64_t ret;
       if( SafeDivide(uint64_int32[i].x, uint64_int32[i].y, ret) != uint64_int32[i].fExpected )
       {
          //assert(false);
@@ -912,7 +912,7 @@ void DivVerifyUint64Int32()
       bool fSuccess = true;
       try
       {
-         SafeInt<unsigned __int64> si(uint64_int32[i].x);
+         SafeInt<std::uint64_t> si(uint64_int32[i].x);
          si /= uint64_int32[i].y;
       }
       catch(...)
@@ -930,8 +930,8 @@ void DivVerifyUint64Int32()
       fSuccess = true;
       try
       {
-         unsigned __int64 x(uint64_int32[i].x);
-         x /= SafeInt<__int64>(uint64_int32[i].y);
+         std::uint64_t x(uint64_int32[i].x);
+         x /= SafeInt<std::int64_t>(uint64_int32[i].y);
       }
       catch(...)
       {
@@ -945,7 +945,7 @@ void DivVerifyUint64Int32()
    }
 }
 
-DivTest< __int32, unsigned __int64 > int32_uint64_2[] = 
+DivTest< std::int32_t, std::uint64_t > int32_uint64_2[] = 
 {
    { 0,                     0, false },
    { 1,                     0, true },
@@ -1025,8 +1025,8 @@ void DivVerifyUint64Int32_2()
       bool fSuccess = true;
       try
       {
-         SafeInt<__int32> si(int32_uint64_2[i].x);
-         SafeInt<__int32> si2;
+         SafeInt<std::int32_t> si(int32_uint64_2[i].x);
+         SafeInt<std::int32_t> si2;
 
          si2 = int32_uint64_2[i].y / si;
       }
@@ -1042,7 +1042,7 @@ void DivVerifyUint64Int32_2()
    }
 }
 
-DivTest< unsigned __int64, __int16 > uint64_int16[] = 
+DivTest< std::uint64_t, std::int16_t > uint64_int16[] = 
 {
    { 0,                     0, false },
    { 1,                     0, false },
@@ -1096,7 +1096,7 @@ void DivVerifyUint64Int16()
 
    for( i = 0; i < sizeof(uint64_int16)/sizeof(uint64_int16[0]); ++i )
    {
-      unsigned __int64 ret;
+      std::uint64_t ret;
       if( SafeDivide(uint64_int16[i].x, uint64_int16[i].y, ret) != uint64_int16[i].fExpected )
       {
          //assert(false);
@@ -1107,7 +1107,7 @@ void DivVerifyUint64Int16()
       bool fSuccess = true;
       try
       {
-         SafeInt<unsigned __int64> si(uint64_int16[i].x);
+         SafeInt<std::uint64_t> si(uint64_int16[i].x);
          si /= uint64_int16[i].y;
       }
       catch(...)
@@ -1125,8 +1125,8 @@ void DivVerifyUint64Int16()
       fSuccess = true;
       try
       {
-         unsigned __int64 x(uint64_int16[i].x);
-         x /= SafeInt<__int64>(uint64_int16[i].y);
+         std::uint64_t x(uint64_int16[i].x);
+         x /= SafeInt<std::int64_t>(uint64_int16[i].y);
       }
       catch(...)
       {
@@ -1140,7 +1140,7 @@ void DivVerifyUint64Int16()
    }
 }
 
-DivTest< __int16, unsigned __int64 > int16_uint64_2[] = 
+DivTest< std::int16_t, std::uint64_t > int16_uint64_2[] = 
 {
    { 0,                     0, false },
    { 1,                     0, true },
@@ -1220,8 +1220,8 @@ void DivVerifyUint64Int16_2()
       bool fSuccess = true;
       try
       {
-         SafeInt<__int32> si(int16_uint64_2[i].x);
-         SafeInt<__int32> si2;
+         SafeInt<std::int32_t> si(int16_uint64_2[i].x);
+         SafeInt<std::int32_t> si2;
 
          si2 = int16_uint64_2[i].y / si;
       }
@@ -1237,7 +1237,7 @@ void DivVerifyUint64Int16_2()
    }
 }
 
-DivTest< unsigned __int64, __int8 > uint64_int8[] = 
+DivTest< std::uint64_t, std::int8_t > uint64_int8[] = 
 {
    { 0,                     0, false },
    { 1,                     0, false },
@@ -1291,7 +1291,7 @@ void DivVerifyUint64Int8()
 
    for( i = 0; i < sizeof(uint64_int8)/sizeof(uint64_int8[0]); ++i )
    {
-      unsigned __int64 ret;
+      std::uint64_t ret;
       if( SafeDivide(uint64_int8[i].x, uint64_int8[i].y, ret) != uint64_int8[i].fExpected )
       {
          //assert(false);
@@ -1302,7 +1302,7 @@ void DivVerifyUint64Int8()
       bool fSuccess = true;
       try
       {
-         SafeInt<unsigned __int64> si(uint64_int8[i].x);
+         SafeInt<std::uint64_t> si(uint64_int8[i].x);
          si /= uint64_int8[i].y;
       }
       catch(...)
@@ -1320,8 +1320,8 @@ void DivVerifyUint64Int8()
       fSuccess = true;
       try
       {
-         unsigned __int64 x(uint64_int8[i].x);
-         x /= SafeInt<__int64>(uint64_int8[i].y);
+         std::uint64_t x(uint64_int8[i].x);
+         x /= SafeInt<std::int64_t>(uint64_int8[i].y);
       }
       catch(...)
       {
@@ -1335,7 +1335,7 @@ void DivVerifyUint64Int8()
    }
 }
 
-DivTest< __int8, unsigned __int64 > int8_uint64_2[] = 
+DivTest< std::int8_t, std::uint64_t > int8_uint64_2[] = 
 {
    { 0,                     0, false },
    { 1,                     0, true },
@@ -1415,8 +1415,8 @@ void DivVerifyUint64Int8_2()
       bool fSuccess = true;
       try
       {
-         SafeInt<__int32> si(int8_uint64_2[i].x);
-         SafeInt<__int32> si2;
+         SafeInt<std::int32_t> si(int8_uint64_2[i].x);
+         SafeInt<std::int32_t> si2;
 
          si2 = int8_uint64_2[i].y / si;
       }
@@ -1432,7 +1432,7 @@ void DivVerifyUint64Int8_2()
    }
 }
 
-DivTest< __int64, __int64 > int64_int64[] = 
+DivTest< std::int64_t, std::int64_t > int64_int64[] = 
 {
    { 0,                     0, false },
    { 1,                     0, false },
@@ -1563,7 +1563,7 @@ void DivVerifyInt64Int64()
 
    for( i = 0; i < sizeof(int64_int64)/sizeof(int64_int64[0]); ++i )
    {
-      __int64 ret;
+      std::int64_t ret;
       if( SafeDivide(int64_int64[i].x, int64_int64[i].y, ret) != int64_int64[i].fExpected )
       {
          //assert(false);
@@ -1574,7 +1574,7 @@ void DivVerifyInt64Int64()
       bool fSuccess = true;
       try
       {
-         SafeInt<__int64> si(int64_int64[i].x);
+         SafeInt<std::int64_t> si(int64_int64[i].x);
          si /= int64_int64[i].y;
       }
       catch(...)
@@ -1592,8 +1592,8 @@ void DivVerifyInt64Int64()
       fSuccess = true;
       try
       {
-         __int64 x(int64_int64[i].x);
-         x /= SafeInt<__int64>(int64_int64[i].y);
+         std::int64_t x(int64_int64[i].x);
+         x /= SafeInt<std::int64_t>(int64_int64[i].y);
       }
       catch(...)
       {
@@ -1617,8 +1617,8 @@ void DivVerifyInt64Int64_2()
       bool fSuccess = true;
       try
       {
-         SafeInt<__int64> si(int64_int64[i].y);
-         SafeInt<__int64> si2;
+         SafeInt<std::int64_t> si(int64_int64[i].y);
+         SafeInt<std::int64_t> si2;
 
          si2 = int64_int64[i].x / si;
       }
@@ -1634,7 +1634,7 @@ void DivVerifyInt64Int64_2()
    }
 }
 
-DivTest< __int64, __int32 > int64_int32[] = 
+DivTest< std::int64_t, std::int32_t > int64_int32[] = 
 {
    { 0,                     0, false },
    { 1,                     0, false },
@@ -1710,7 +1710,7 @@ void DivVerifyInt64Int32()
 
    for( i = 0; i < sizeof(int64_int32)/sizeof(int64_int32[0]); ++i )
    {
-      __int64 ret;
+      std::int64_t ret;
       if( SafeDivide(int64_int32[i].x, int64_int32[i].y, ret) != int64_int32[i].fExpected )
       {
          //assert(false);
@@ -1721,7 +1721,7 @@ void DivVerifyInt64Int32()
       bool fSuccess = true;
       try
       {
-         SafeInt<__int64> si(int64_int32[i].x);
+         SafeInt<std::int64_t> si(int64_int32[i].x);
          si /= int64_int32[i].y;
       }
       catch(...)
@@ -1739,8 +1739,8 @@ void DivVerifyInt64Int32()
       fSuccess = true;
       try
       {
-         __int64 x(int64_int32[i].x);
-         x /= SafeInt<__int32>(int64_int32[i].y);
+         std::int64_t x(int64_int32[i].x);
+         x /= SafeInt<std::int32_t>(int64_int32[i].y);
       }
       catch(...)
       {
@@ -1754,7 +1754,7 @@ void DivVerifyInt64Int32()
    }
 }
 
-DivTest< __int64, __int32 > int64_int32_2[] = 
+DivTest< std::int64_t, std::int32_t > int64_int32_2[] = 
 {
    { 0,                     0, false },
    { 1,                     0, false },
@@ -1834,8 +1834,8 @@ void DivVerifyInt64Int32_2()
       bool fSuccess = true;
       try
       {
-         SafeInt<__int32> si(int64_int32_2[i].y);
-         SafeInt<__int32> si2;
+         SafeInt<std::int32_t> si(int64_int32_2[i].y);
+         SafeInt<std::int32_t> si2;
 
          si2 = int64_int32_2[i].x / si;
       }
@@ -1851,7 +1851,7 @@ void DivVerifyInt64Int32_2()
    }
 }
 
-DivTest< __int64, unsigned __int64 > int64_uint64[] = 
+DivTest< std::int64_t, std::uint64_t > int64_uint64[] = 
 {
    { 0,                     0, false },
    { 1,                     0, false },
@@ -1982,7 +1982,7 @@ void DivVerifyInt64Uint64()
 
    for( i = 0; i < sizeof(int64_uint64)/sizeof(int64_uint64[0]); ++i )
    {
-      __int64 ret;
+      std::int64_t ret;
       if( SafeDivide(int64_uint64[i].x, int64_uint64[i].y, ret) != int64_uint64[i].fExpected )
       {
          //assert(false);
@@ -1993,7 +1993,7 @@ void DivVerifyInt64Uint64()
       bool fSuccess = true;
       try
       {
-         SafeInt<__int64> si(int64_uint64[i].x);
+         SafeInt<std::int64_t> si(int64_uint64[i].x);
          si /= int64_uint64[i].y;
       }
       catch(...)
@@ -2011,8 +2011,8 @@ void DivVerifyInt64Uint64()
       fSuccess = true;
       try
       {
-         __int64 x(int64_uint64[i].x);
-         x /= SafeInt<unsigned __int64>(int64_uint64[i].y);
+         std::int64_t x(int64_uint64[i].x);
+         x /= SafeInt<std::uint64_t>(int64_uint64[i].y);
       }
       catch(...)
       {
@@ -2026,7 +2026,7 @@ void DivVerifyInt64Uint64()
    }
 }
 
-DivTest< __int64, unsigned __int64 > int64_uint64_3[] = 
+DivTest< std::int64_t, std::uint64_t > int64_uint64_3[] = 
 {
    { 0,                     0, false },
    { 1,                     0, false },
@@ -2161,8 +2161,8 @@ void DivVerifyInt64Uint64_2()
       bool fSuccess = true;
       try
       {
-         SafeInt<unsigned __int64> si(int64_uint64_3[i].y);
-         SafeInt<unsigned __int64> si2;
+         SafeInt<std::uint64_t> si(int64_uint64_3[i].y);
+         SafeInt<std::uint64_t> si2;
 
          si2 = int64_uint64_3[i].x / si;
       }
@@ -2178,7 +2178,7 @@ void DivVerifyInt64Uint64_2()
    }
 }
 
-DivTest< __int64, unsigned __int32 > int64_uint32[] = 
+DivTest< std::int64_t, std::uint32_t > int64_uint32[] = 
 {
    { 0,                     0, false },
    { 1,                     0, false },
@@ -2254,7 +2254,7 @@ void DivVerifyInt64Uint32()
 
    for( i = 0; i < sizeof(int64_uint32)/sizeof(int64_uint32[0]); ++i )
    {
-      __int64 ret;
+      std::int64_t ret;
       if( SafeDivide(int64_uint32[i].x, int64_uint32[i].y, ret) != int64_uint32[i].fExpected )
       {
          //assert(false);
@@ -2265,7 +2265,7 @@ void DivVerifyInt64Uint32()
       bool fSuccess = true;
       try
       {
-         SafeInt<__int64> si(int64_uint32[i].x);
+         SafeInt<std::int64_t> si(int64_uint32[i].x);
          si /= int64_uint32[i].y;
       }
       catch(...)
@@ -2283,8 +2283,8 @@ void DivVerifyInt64Uint32()
       fSuccess = true;
       try
       {
-         __int64 x(int64_uint32[i].x);
-         x /= SafeInt<unsigned __int32>(int64_uint32[i].y);
+         std::int64_t x(int64_uint32[i].x);
+         x /= SafeInt<std::uint32_t>(int64_uint32[i].y);
       }
       catch(...)
       {
@@ -2298,7 +2298,7 @@ void DivVerifyInt64Uint32()
    }
 }
 
-DivTest< __int64, unsigned __int32 > int64_uint32_2[] = 
+DivTest< std::int64_t, std::uint32_t > int64_uint32_2[] = 
 {
    { 0,                     0, false },
    { 1,                     0, false },
@@ -2378,8 +2378,8 @@ void DivVerifyInt64Uint32_2()
       bool fSuccess = true;
       try
       {
-         SafeInt<unsigned __int32> si(int64_uint32_2[i].y);
-         SafeInt<unsigned __int32> si2;
+         SafeInt<std::uint32_t> si(int64_uint32_2[i].y);
+         SafeInt<std::uint32_t> si2;
 
          si2 = int64_uint32_2[i].x / si;
       }

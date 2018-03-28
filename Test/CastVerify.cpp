@@ -60,7 +60,7 @@ namespace cast_verify
 
 		for (unsigned i = 0; i < _countof(tests); ++i)
 		{
-			SafeInt<unsigned __int64> test;
+			SafeInt<std::uint64_t> test;
 			bool fSuccess;
 
 			try
@@ -74,7 +74,7 @@ namespace cast_verify
 			}
 
 			if(fSuccess != tests[i].fExpected)
-				cerr << "Error in cast double to unsigned __int64 case " << i << endl;
+				cerr << "Error in cast double to std::uint64_t case " << i << endl;
 		}
 	}
 
@@ -86,7 +86,7 @@ namespace cast_verify
 
 		for (unsigned i = 0; i < _countof(tests); ++i)
 		{
-			SafeInt<unsigned __int64> test;
+			SafeInt<std::uint64_t> test;
 			bool fSuccess;
 
 			try
@@ -100,7 +100,7 @@ namespace cast_verify
 			}
 
 			if (fSuccess != tests[i].fExpected)
-				cerr << "Error in cast float to unsigned __int64 case " << i << endl;
+				cerr << "Error in cast float to std::uint64_t case " << i << endl;
 		}
 	}
 

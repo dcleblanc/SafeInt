@@ -27,7 +27,7 @@ struct ModVerifyTest1
 		const bool expected = true;
 
 		bool divzero;
-		SafeInt<T> x = (T)((unsigned __int64)1 << shift);
+		SafeInt<T> x = (T)((std::uint64_t)1 << shift);
 		SafeInt<T> m(0);
 
 		///////////////////////////////////////////////
@@ -120,7 +120,7 @@ struct ModVerifyTest2
 		const bool expected = false;
 
 		bool overflow;
-		SafeInt<T> x = (T)((unsigned __int64)1 << shift);
+		SafeInt<T> x = (T)((std::uint64_t)1 << shift);
 		SafeInt<T> m((T)-1);
 
 		///////////////////////////////////////////////
@@ -201,17 +201,17 @@ void ModVerify()
 {
 	cout << "Verifying Reduction:" << endl;
 
-	ModVerifyTest1<unsigned __int64, Unsigned> t11;
-	ModVerifyTest1<__int64, Signed> t12;
+	ModVerifyTest1<std::uint64_t, Unsigned> t11;
+	ModVerifyTest1<std::int64_t, Signed> t12;
 
-	ModVerifyTest1<unsigned __int32, Unsigned> t13;
-	ModVerifyTest1<__int32, Signed> t14;
+	ModVerifyTest1<std::uint32_t, Unsigned> t13;
+	ModVerifyTest1<std::int32_t, Signed> t14;
 
-	ModVerifyTest1<unsigned __int16, Unsigned> t15;
-	ModVerifyTest1<__int16, Signed> t16;
+	ModVerifyTest1<std::uint16_t, Unsigned> t15;
+	ModVerifyTest1<std::int16_t, Signed> t16;
 
-	ModVerifyTest1<unsigned __int8, Unsigned> t17;
-	ModVerifyTest1<__int8, Signed> t18;
+	ModVerifyTest1<std::uint8_t, Unsigned> t17;
+	ModVerifyTest1<std::int8_t, Signed> t18;
 
 #if defined(__GNUC__)
 	ModVerifyTest1<uint64_t, Unsigned> t31;
@@ -227,17 +227,17 @@ void ModVerify()
 	ModVerifyTest1<int8_t, Signed> t38;
 #endif
 
-	ModVerifyTest2<unsigned __int64, Unsigned> t21;
-	ModVerifyTest2<__int64, Signed> t22;
+	ModVerifyTest2<std::uint64_t, Unsigned> t21;
+	ModVerifyTest2<std::int64_t, Signed> t22;
 
-	ModVerifyTest2<unsigned __int32, Unsigned> t23;
-	ModVerifyTest2<__int32, Signed> t24;
+	ModVerifyTest2<std::uint32_t, Unsigned> t23;
+	ModVerifyTest2<std::int32_t, Signed> t24;
 
-	ModVerifyTest2<unsigned __int16, Unsigned> t25;
-	ModVerifyTest2<__int16, Signed> t26;
+	ModVerifyTest2<std::uint16_t, Unsigned> t25;
+	ModVerifyTest2<std::int16_t, Signed> t26;
 
-	ModVerifyTest2<unsigned __int8, Unsigned> t27;
-	ModVerifyTest2<__int8, Signed> t28;
+	ModVerifyTest2<std::uint8_t, Unsigned> t27;
+	ModVerifyTest2<std::int8_t, Signed> t28;
 
 #if defined(__GNUC__)
 	ModVerifyTest2<uint64_t, Unsigned> t41;
