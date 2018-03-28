@@ -194,10 +194,6 @@ Please read the leading comments before using the class.
 // Various things needed for GCC
 #if SAFEINT_COMPILER == GCC_COMPILER || SAFEINT_COMPILER == CLANG_COMPILER
 
-#if !defined NULL
-#define NULL 0
-#endif
-
 // GCC warning suppression
 #if SAFEINT_COMPILER == GCC_COMPILER
 #pragma GCC diagnostic push
@@ -207,10 +203,6 @@ Please read the leading comments before using the class.
 // clang only
 #if SAFEINT_COMPILER == CLANG_COMPILER
 
-#if __has_feature(cxx_nullptr)
-   #define NEEDS_NULLPTR_DEFINED 0
-#endif
-
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wc++11-long-long"
 #pragma clang diagnostic ignored "-Wold-style-cast"
@@ -218,40 +210,9 @@ Please read the leading comments before using the class.
 
 #endif
 
-// If the user made a choice, respect it #if !defined
-#if !defined NEEDS_NULLPTR_DEFINED
-    // Visual Studio 2010 and higher support this
-    #if SAFEINT_COMPILER == VISUAL_STUDIO_COMPILER
-        #if (_MSC_VER < 1600)
-        #define NEEDS_NULLPTR_DEFINED 1
-        #else
-        #define NEEDS_NULLPTR_DEFINED 0
-        #endif
-    #else
-    // Let everything else trigger based on whether we have nullptr_t
-    #if defined nullptr_t
-        #define NEEDS_NULLPTR_DEFINED 0
-        #else
-        #define NEEDS_NULLPTR_DEFINED 1
-        #endif
-    #endif
-#endif
-
-#if NEEDS_NULLPTR_DEFINED
-#define nullptr NULL
-#endif
-
-#if defined SAFEINT_USE_C_ASSERT
-#define SAFEINT_STATIC_ASSERT C_ASSERT
-
-#ifndef C_ASSERT
-#define C_ASSERT(e) typedef char __SAFEINT_STATIC_ASSERT__[(e)?1:-1]
-#endif
-
-#else
+// Static assert is always present
+// TBD, replace the existing uses with strings that give more context
 #define SAFEINT_STATIC_ASSERT(x) static_assert((x), "SafeInt static assert failed")
-#endif
-
 
 // Let's test some assumptions
 // We're assuming two's complement negative numbers
@@ -7067,7 +7028,7 @@ T*& operator *=( T*& lhs, SafeInt< U, E > ) SAFEINT_NOTHROW
 {
     // This operator explicitly not supported
     SAFEINT_STATIC_ASSERT( sizeof(T) == 0 );
-    return (lhs = NULL);
+    return (lhs = nullptr);
 }
 
 template < typename T, typename U, typename E >
@@ -7075,7 +7036,7 @@ T*& operator /=( T*& lhs, SafeInt< U, E > ) SAFEINT_NOTHROW
 {
     // This operator explicitly not supported
     SAFEINT_STATIC_ASSERT( sizeof(T) == 0 );
-    return (lhs = NULL);
+    return (lhs = nullptr);
 }
 
 template < typename T, typename U, typename E >
@@ -7083,7 +7044,7 @@ T*& operator %=( T*& lhs, SafeInt< U, E > ) SAFEINT_NOTHROW
 {
     // This operator explicitly not supported
     SAFEINT_STATIC_ASSERT( sizeof(T) == 0 );
-    return (lhs = NULL);
+    return (lhs = nullptr);
 }
 
 template < typename T, typename U, typename E >
@@ -7091,7 +7052,7 @@ T*& operator &=( T*& lhs, SafeInt< U, E > ) SAFEINT_NOTHROW
 {
     // This operator explicitly not supported
     SAFEINT_STATIC_ASSERT( sizeof(T) == 0 );
-    return (lhs = NULL);
+    return (lhs = nullptr);
 }
 
 template < typename T, typename U, typename E >
@@ -7099,7 +7060,7 @@ T*& operator ^=( T*& lhs, SafeInt< U, E > ) SAFEINT_NOTHROW
 {
     // This operator explicitly not supported
     SAFEINT_STATIC_ASSERT( sizeof(T) == 0 );
-    return (lhs = NULL);
+    return (lhs = nullptr);
 }
 
 template < typename T, typename U, typename E >
@@ -7107,7 +7068,7 @@ T*& operator |=( T*& lhs, SafeInt< U, E > ) SAFEINT_NOTHROW
 {
     // This operator explicitly not supported
     SAFEINT_STATIC_ASSERT( sizeof(T) == 0 );
-    return (lhs = NULL);
+    return (lhs = nullptr);
 }
 
 template < typename T, typename U, typename E >
@@ -7115,7 +7076,7 @@ _CONSTEXPR14 T*& operator <<=( T*& lhs, SafeInt< U, E > ) SAFEINT_NOTHROW
 {
     // This operator explicitly not supported
     SAFEINT_STATIC_ASSERT( sizeof(T) == 0 );
-    return (lhs = NULL);
+    return (lhs = nullptr);
 }
 
 template < typename T, typename U, typename E >
@@ -7123,7 +7084,7 @@ _CONSTEXPR14 T*& operator >>=( T*& lhs, SafeInt< U, E > ) SAFEINT_NOTHROW
 {
     // This operator explicitly not supported
     SAFEINT_STATIC_ASSERT( sizeof(T) == 0 );
-    return (lhs = NULL);
+    return (lhs = nullptr);
 }
 
 // Shift operators
