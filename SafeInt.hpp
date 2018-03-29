@@ -199,13 +199,9 @@ Please read the leading comments before using the class.
 #define _CRT_SECURE_INVALID_PARAMETER(msg) abort()
 #endif
 
-// Static assert is always present
-// TBD, replace the existing uses with strings that give more context
-#define SAFEINT_STATIC_ASSERT(x) static_assert((x), "SafeInt static assert failed")
-
 // Let's test some assumptions
 // We're assuming two's complement negative numbers
-SAFEINT_STATIC_ASSERT( -1 == static_cast<int>(0xffffffff) );
+static_assert( -1 == static_cast<int>(0xffffffff), "Two's complement signed numbers are required" );
 
 /************* Compiler Options *****************************************************************************************************
 
@@ -859,7 +855,8 @@ namespace safeint_internal
     template < typename T > class int_traits
     {
     public:
-        SAFEINT_STATIC_ASSERT(safeint_internal::numeric_type<T>::isInt);
+        static_assert(safeint_internal::numeric_type< T >::isInt, "Integer type required");
+
         enum
         {
             isSigned = std::numeric_limits<T>::is_signed,
@@ -1085,7 +1082,7 @@ public:
     _CONSTEXPR14 static T NegativeThrow( T t ) SAFEINT_CPP_THROW
     {
 #if defined SAFEINT_DISALLOW_UNSIGNED_NEGATION
-        SAFEINT_STATIC_ASSERT( sizeof(T) == 0 );
+        static_assert( sizeof(T) == 0, "Unsigned negation is unsupported" );
 #endif
 
 #if SAFEINT_COMPILER == VISUAL_STUDIO_COMPILER
@@ -1112,7 +1109,7 @@ public:
             SAFEINT_ASSERT( false );
         }
 #if defined SAFEINT_DISALLOW_UNSIGNED_NEGATION
-        SAFEINT_STATIC_ASSERT( sizeof(T) == 0 );
+        static_assert(sizeof(T) == 0, "Unsigned negation is unsupported");
 #endif
         // Do it this way to avoid warning
         ret = -t;
@@ -2959,7 +2956,7 @@ public:
     // T, U are std::uint64_t
     _CONSTEXPR14 static bool Multiply( const T& t, const U& u, T& ret ) SAFEINT_NOTHROW
     {
-        SAFEINT_STATIC_ASSERT( safeint_internal::int_traits<T>::isUint64 && safeint_internal::int_traits<U>::isUint64 );
+        static_assert( safeint_internal::int_traits<T>::isUint64 && safeint_internal::int_traits<U>::isUint64, "T, U must be Uint64" );
         std::uint64_t t1 = t;
         std::uint64_t u1 = u;
         std::uint64_t tmp = 0;
@@ -2971,7 +2968,7 @@ public:
     template < typename E >
     _CONSTEXPR14 static void MultiplyThrow(const std::uint64_t& t, const std::uint64_t& u, T& ret) SAFEINT_CPP_THROW
     {
-        SAFEINT_STATIC_ASSERT( safeint_internal::int_traits<T>::isUint64 && safeint_internal::int_traits<U>::isUint64 );
+        static_assert(safeint_internal::int_traits<T>::isUint64 && safeint_internal::int_traits<U>::isUint64, "T, U must be Uint64");
         std::uint64_t t1 = t;
         std::uint64_t u1 = u;
         std::uint64_t tmp = 0;
@@ -2987,7 +2984,7 @@ public:
     // U is any unsigned int 32-bit or less
     _CONSTEXPR14 static bool Multiply( const T& t, const U& u, T& ret ) SAFEINT_NOTHROW
     {
-        SAFEINT_STATIC_ASSERT( safeint_internal::int_traits<T>::isUint64 );
+        static_assert( safeint_internal::int_traits<T>::isUint64, "T must be Uint64" );
         std::uint64_t t1 = t;
         std::uint64_t tmp = 0;
         bool f = LargeIntRegMultiply< std::uint64_t, std::uint32_t >::RegMultiply( t1, (std::uint32_t)u, &tmp );
@@ -2998,7 +2995,7 @@ public:
     template < typename E >
     _CONSTEXPR14 static void MultiplyThrow( const T& t, const U& u, T& ret ) SAFEINT_CPP_THROW
     {
-        SAFEINT_STATIC_ASSERT( safeint_internal::int_traits<T>::isUint64 );
+        static_assert(safeint_internal::int_traits<T>::isUint64, "T must be Uint64");
         std::uint64_t t1 = t;
         std::uint64_t tmp = 0;
         LargeIntRegMultiply< std::uint64_t, std::uint32_t >::template RegMultiplyThrow< E >( t1, (std::uint32_t)u, &tmp );
@@ -3014,7 +3011,7 @@ public:
     // U is std::uint64_t
     _CONSTEXPR14 static bool Multiply(const T& t, const U& u, T& ret) SAFEINT_NOTHROW
     {
-        SAFEINT_STATIC_ASSERT( safeint_internal::int_traits<U>::isUint64 );
+        static_assert(safeint_internal::int_traits<U>::isUint64, "U must be Uint64");
         std::uint64_t u1 = u;
         std::uint32_t tmp = 0;
 
@@ -3030,7 +3027,7 @@ public:
     template < typename E >
     _CONSTEXPR14 static void MultiplyThrow(const T& t, const U& u, T& ret) SAFEINT_CPP_THROW
     {
-        SAFEINT_STATIC_ASSERT( safeint_internal::int_traits<U>::isUint64 );
+        static_assert(safeint_internal::int_traits<U>::isUint64, "U must be Uint64");
         std::uint64_t u1 = u;
         std::uint32_t tmp = 0;
 
@@ -3046,7 +3043,7 @@ public:
     // U is any signed int, up to 64-bit
     _CONSTEXPR14 static bool Multiply(const T& t, const U& u, T& ret) SAFEINT_NOTHROW
     {
-        SAFEINT_STATIC_ASSERT( safeint_internal::int_traits<T>::isUint64 );
+        static_assert(safeint_internal::int_traits<T>::isUint64, "T must be Uint64");
         std::uint64_t t1 = t;
         std::uint64_t tmp = 0;
         bool f = LargeIntRegMultiply< std::uint64_t, std::int32_t >::RegMultiply(t1, (std::int32_t)u, &tmp);
@@ -3057,7 +3054,7 @@ public:
     template < typename E >
     _CONSTEXPR14 static void MultiplyThrow(const T& t, const U& u, T& ret) SAFEINT_CPP_THROW
     {
-        SAFEINT_STATIC_ASSERT( safeint_internal::int_traits<T>::isUint64 );
+        static_assert(safeint_internal::int_traits<T>::isUint64, "T must be Uint64");
         std::uint64_t t1 = t;
         std::uint64_t tmp = 0;
         LargeIntRegMultiply< std::uint64_t, std::int32_t >::template RegMultiplyThrow< E >(t1, (std::int32_t)u, &tmp);
@@ -3072,7 +3069,7 @@ public:
     // U is std::int64_t
     _CONSTEXPR14 static bool Multiply(const T& t, const U& u, T& ret) SAFEINT_NOTHROW
     {
-        SAFEINT_STATIC_ASSERT( safeint_internal::int_traits<T>::isUint64 && safeint_internal::int_traits<U>::isInt64 );
+        static_assert( safeint_internal::int_traits<T>::isUint64 && safeint_internal::int_traits<U>::isInt64, "T must be Uint64, U Int64" );
         std::uint64_t t1 = t;
         std::int64_t          u1 = u;
         std::uint64_t tmp = 0;
@@ -3084,7 +3081,7 @@ public:
     template < typename E >
     _CONSTEXPR14 static void MultiplyThrow(const T& t, const U& u, T& ret) SAFEINT_CPP_THROW
     {
-        SAFEINT_STATIC_ASSERT( safeint_internal::int_traits<T>::isUint64 && safeint_internal::int_traits<U>::isInt64 );
+        static_assert(safeint_internal::int_traits<T>::isUint64 && safeint_internal::int_traits<U>::isInt64, "T must be Uint64, U Int64");
         std::uint64_t t1 = t;
         std::int64_t          u1 = u;
         std::uint64_t tmp = 0;
@@ -3100,7 +3097,7 @@ public:
     // U is std::int64_t
     _CONSTEXPR14 static bool Multiply(const T& t, const U& u, T& ret) SAFEINT_NOTHROW
     {
-        SAFEINT_STATIC_ASSERT( safeint_internal::int_traits<U>::isInt64 );
+        static_assert(safeint_internal::int_traits<U>::isInt64, "U must be Int64");
         std::int64_t          u1 = u;
         std::uint32_t tmp = 0;
 
@@ -3116,7 +3113,7 @@ public:
     template < typename E >
     _CONSTEXPR14 static void MultiplyThrow(const T& t, const U& u, T& ret) SAFEINT_CPP_THROW
     {
-        SAFEINT_STATIC_ASSERT( safeint_internal::int_traits<U>::isInt64 );
+        static_assert(safeint_internal::int_traits<U>::isInt64, "U must be Int64");
         std::int64_t          u1 = u;
         std::uint32_t tmp = 0;
 
@@ -3132,7 +3129,7 @@ public:
     // U is unsigned up to 32-bit
     _CONSTEXPR14 static bool Multiply( const T& t, const U& u, T& ret ) SAFEINT_NOTHROW
     {
-        SAFEINT_STATIC_ASSERT( safeint_internal::int_traits<T>::isInt64 );
+        static_assert(safeint_internal::int_traits<T>::isInt64, "T must be Int64");
         std::int64_t t1 = t;
         std::int64_t tmp = 0;
         bool f = LargeIntRegMultiply< std::int64_t, std::uint32_t >::RegMultiply( t1, (std::uint32_t)u, &tmp );
@@ -3143,7 +3140,7 @@ public:
     template < typename E >
     _CONSTEXPR14 static void MultiplyThrow( const T& t, const U& u, T& ret ) SAFEINT_CPP_THROW
     {
-        SAFEINT_STATIC_ASSERT( safeint_internal::int_traits<T>::isInt64 );
+        static_assert(safeint_internal::int_traits<T>::isInt64, "T must be Int64");
         std::int64_t          t1 = t;
         std::int64_t tmp = 0;
         LargeIntRegMultiply< std::int64_t, std::uint32_t >::template RegMultiplyThrow< E >( t1, (std::uint32_t)u, &tmp );
@@ -3157,7 +3154,7 @@ public:
     // T, U are std::int64_t
     _CONSTEXPR14 static bool Multiply( const T& t, const U& u, T& ret ) SAFEINT_NOTHROW
     {
-        SAFEINT_STATIC_ASSERT( safeint_internal::int_traits<T>::isInt64 && safeint_internal::int_traits<U>::isInt64 );
+        static_assert( safeint_internal::int_traits<T>::isInt64 && safeint_internal::int_traits<U>::isInt64, "T, U must be Int64" );
         std::int64_t  t1 = t;
         std::int64_t u1 = u;
         std::int64_t tmp = 0;
@@ -3169,7 +3166,7 @@ public:
     template < typename E >
     _CONSTEXPR14 static void MultiplyThrow( const T& t, const U& u, T& ret ) SAFEINT_CPP_THROW
     {
-        SAFEINT_STATIC_ASSERT( safeint_internal::int_traits<T>::isInt64 && safeint_internal::int_traits<U>::isInt64 );
+        static_assert(safeint_internal::int_traits<T>::isInt64 && safeint_internal::int_traits<U>::isInt64, "T, U must be Int64");
         std::int64_t t1 = t;
         std::int64_t u1 = u;
         std::int64_t tmp = 0;
@@ -3185,7 +3182,7 @@ public:
     // U is signed up to 32-bit
     _CONSTEXPR14 static bool Multiply( const T& t, U u, T& ret ) SAFEINT_NOTHROW
     {
-        SAFEINT_STATIC_ASSERT( safeint_internal::int_traits<T>::isInt64 );
+        static_assert(safeint_internal::int_traits<T>::isInt64, "T must be Int64");
         std::int64_t t1 = t;
         std::int64_t tmp = 0;
         bool f = LargeIntRegMultiply< std::int64_t, std::int32_t >::RegMultiply( t1, (std::int32_t)u, &tmp);
@@ -3196,7 +3193,7 @@ public:
     template < typename E >
     _CONSTEXPR14 static void MultiplyThrow( const std::int64_t& t, U u, T& ret ) SAFEINT_CPP_THROW
     {
-        SAFEINT_STATIC_ASSERT( safeint_internal::int_traits<T>::isInt64 );
+        static_assert(safeint_internal::int_traits<T>::isInt64, "T must be Int64");
         std::int64_t t1 = t;
         std::int64_t tmp = 0;
         LargeIntRegMultiply< std::int64_t, std::int32_t >::template RegMultiplyThrow< E >(t1, (std::int32_t)u, &tmp);
@@ -3211,7 +3208,7 @@ public:
     // U is std::uint64_t
     _CONSTEXPR14 static bool Multiply(T t, const U& u, T& ret) SAFEINT_NOTHROW
     {
-        SAFEINT_STATIC_ASSERT( safeint_internal::int_traits<U>::isUint64 );
+        static_assert(safeint_internal::int_traits<U>::isUint64, "U must be Uint64");
         std::uint64_t u1 = u;
         std::int32_t tmp = 0;
 
@@ -3227,7 +3224,7 @@ public:
     template < typename E >
     _CONSTEXPR14 static void MultiplyThrow(T t, const std::uint64_t& u, T& ret) SAFEINT_CPP_THROW
     {
-        SAFEINT_STATIC_ASSERT( safeint_internal::int_traits<U>::isUint64 );
+        static_assert(safeint_internal::int_traits<U>::isUint64, "U must be Uint64");
         std::uint64_t u1 = u;
         std::int32_t tmp = 0;
 
@@ -3243,8 +3240,8 @@ public:
     // U is std::uint64_t
     _CONSTEXPR14 static bool Multiply( const T& t, const U& u, T& ret ) SAFEINT_NOTHROW
     {
-        SAFEINT_STATIC_ASSERT( safeint_internal::int_traits<T>::isInt64 && safeint_internal::int_traits<U>::isUint64 );
-        std::int64_t          t1 = t;
+        static_assert( safeint_internal::int_traits<T>::isInt64 && safeint_internal::int_traits<U>::isUint64, "T must be Int64, U Uint64" );
+        std::int64_t t1 = t;
         std::uint64_t u1 = u;
         std::int64_t tmp = 0;
         bool f = LargeIntRegMultiply< std::int64_t, std::uint64_t >::RegMultiply( t1, u1, &tmp );
@@ -3255,8 +3252,8 @@ public:
     template < typename E >
     _CONSTEXPR14 static void MultiplyThrow( const std::int64_t& t, const std::uint64_t& u, T& ret ) SAFEINT_CPP_THROW
     {
-        SAFEINT_STATIC_ASSERT( safeint_internal::int_traits<T>::isInt64 && safeint_internal::int_traits<U>::isUint64 );
-        std::int64_t          t1 = t;
+        static_assert(safeint_internal::int_traits<T>::isInt64 && safeint_internal::int_traits<U>::isUint64, "T must be Int64, U Uint64");
+        std::int64_t t1 = t;
         std::uint64_t u1 = u;
         std::int64_t tmp = 0;
         LargeIntRegMultiply< std::int64_t, std::uint64_t >::template RegMultiplyThrow< E >( t1, u1, &tmp );
@@ -3271,7 +3268,7 @@ public:
     // U is std::int64_t
     _CONSTEXPR14 static bool Multiply( T t, const U& u, T& ret ) SAFEINT_NOTHROW
     {
-        SAFEINT_STATIC_ASSERT( safeint_internal::int_traits<U>::isInt64 );
+        static_assert( safeint_internal::int_traits<U>::isInt64, "U must be Int64" );
         std::int64_t u1 = u;
         std::int32_t tmp = 0;
 
@@ -3287,7 +3284,7 @@ public:
     template < typename E >
     _CONSTEXPR14 static void MultiplyThrow(T t, const U& u, T& ret) SAFEINT_CPP_THROW
     {
-        SAFEINT_STATIC_ASSERT( safeint_internal::int_traits<U>::isInt64 );
+        static_assert(safeint_internal::int_traits<U>::isInt64, "U must be Int64");
         std::int64_t u1 = u;
         std::int32_t tmp = 0;
 
@@ -3477,7 +3474,7 @@ template < typename T, typename U > class DivisionHelper< T, U, DivisionState_Si
 public:
     _CONSTEXPR14 static SafeIntError Divide( const T& t, const std::uint64_t& u, T& result ) SAFEINT_NOTHROW
     {
-        SAFEINT_STATIC_ASSERT( safeint_internal::int_traits< U >::isUint64 );
+        static_assert(safeint_internal::int_traits<U>::isUint64, "U must be Uint64");
 
         if( u == 0 )
         {
@@ -3514,7 +3511,7 @@ public:
     template < typename E >
     _CONSTEXPR14 static void DivideThrow( const T& t, const std::uint64_t& u, T& result ) SAFEINT_CPP_THROW
     {
-        SAFEINT_STATIC_ASSERT( safeint_internal::int_traits< U >::isUint64 );
+        static_assert(safeint_internal::int_traits<U>::isUint64, "U must be Uint64");
 
         if( u == 0 )
         {
@@ -4215,7 +4212,7 @@ template < typename T, typename U > class AdditionHelper < T, U, AdditionState_M
 public:
     _CONSTEXPR14 static bool Addition( const std::int64_t& lhs, const std::uint64_t& rhs, T& result ) SAFEINT_NOTHROW
     {
-        SAFEINT_STATIC_ASSERT( safeint_internal::int_traits< T >::isInt64 && safeint_internal::int_traits< U >::isUint64 );
+        static_assert( safeint_internal::int_traits< T >::isInt64 && safeint_internal::int_traits< U >::isUint64, "T must be Int64, U Uint64" );
         // rhs is std::uint64_t, lhs std::int64_t
         // cast everything to unsigned, perform addition, then
         // cast back for check - this is done to stop optimizers from removing the code
@@ -4234,7 +4231,7 @@ public:
     template < typename E >
     _CONSTEXPR14 static void AdditionThrow( const std::int64_t& lhs, const std::uint64_t& rhs, T& result ) SAFEINT_CPP_THROW
     {
-        SAFEINT_STATIC_ASSERT( safeint_internal::int_traits< T >::isInt64 && safeint_internal::int_traits< U >::isUint64 );
+        static_assert(safeint_internal::int_traits< T >::isInt64 && safeint_internal::int_traits< U >::isUint64, "T must be Int64, U Uint64");
         // rhs is std::uint64_t, lhs std::int64_t
         std::uint64_t tmp = (std::uint64_t)lhs + rhs;
 
@@ -5336,7 +5333,7 @@ template < typename T, typename U > class SubtractionHelper< T, U, SubtractionSt
 public:
     _CONSTEXPR14 static bool Subtract( const std::int64_t& lhs, const std::uint64_t& rhs, std::int64_t& result ) SAFEINT_NOTHROW
     {
-        SAFEINT_STATIC_ASSERT( safeint_internal::int_traits< T >::isInt64 && safeint_internal::int_traits< U >::isUint64 );
+        static_assert(safeint_internal::int_traits< T >::isInt64 && safeint_internal::int_traits< U >::isUint64, "T must be Int64, U Uint64");
         // if we subtract, and it gets larger, there's a problem
         // Perform test as unsigned to prevent unwanted optimizations
         std::uint64_t tmp = (std::uint64_t)lhs - rhs;
@@ -5352,7 +5349,7 @@ public:
     template < typename E >
     _CONSTEXPR14 static void SubtractThrow( const std::int64_t& lhs, const std::uint64_t& rhs, T& result ) SAFEINT_CPP_THROW
     {
-        SAFEINT_STATIC_ASSERT( safeint_internal::int_traits< T >::isInt64 && safeint_internal::int_traits< U >::isUint64 );
+        static_assert(safeint_internal::int_traits< T >::isInt64 && safeint_internal::int_traits< U >::isUint64, "T must be Int64, U Uint64");
         // if we subtract, and it gets larger, there's a problem
         // Perform test as unsigned to prevent unwanted optimizations
         std::uint64_t tmp = (std::uint64_t)lhs - rhs;
@@ -5375,7 +5372,7 @@ public:
     // get smaller. If rhs > lhs, then it would also go negative, which is the other case
     _CONSTEXPR14 static bool Subtract( const std::int64_t& lhs, const std::uint64_t& rhs, T& result ) SAFEINT_NOTHROW
     {
-        SAFEINT_STATIC_ASSERT( safeint_internal::int_traits< T >::isUint64 && safeint_internal::int_traits< U >::isInt64 );
+        static_assert( safeint_internal::int_traits< T >::isUint64 && safeint_internal::int_traits< U >::isInt64, "T must be Uint64, U Int64" );
         if( lhs >= 0 && (std::uint64_t)lhs >= rhs )
         {
             result = (std::uint64_t)lhs - rhs;
@@ -5388,7 +5385,7 @@ public:
     template < typename E >
     _CONSTEXPR14 static void SubtractThrow( const std::int64_t& lhs, const std::uint64_t& rhs, T& result ) SAFEINT_CPP_THROW
     {
-        SAFEINT_STATIC_ASSERT( safeint_internal::int_traits< T >::isUint64 && safeint_internal::int_traits< U >::isInt64 );
+        static_assert(safeint_internal::int_traits< T >::isUint64 && safeint_internal::int_traits< U >::isInt64, "T must be Uint64, U Int64");
         if( lhs >= 0 && (std::uint64_t)lhs >= rhs )
         {
             result = (std::uint64_t)lhs - rhs;
@@ -5641,7 +5638,7 @@ template < typename T, typename E = SafeIntDefaultExceptionHandler > class SafeI
 public:
     _CONSTEXPR11 SafeInt() SAFEINT_NOTHROW : m_int(0)
     {
-        SAFEINT_STATIC_ASSERT( safeint_internal::numeric_type< T >::isInt );
+        static_assert( safeint_internal::numeric_type< T >::isInt, "Integer type required" );
     }
 
     // Having a constructor for every type of int
@@ -5649,20 +5646,20 @@ public:
     // e.g., SafeInt<char> s = 0x7fffffff;
     _CONSTEXPR11 SafeInt( const T& i ) SAFEINT_NOTHROW : m_int(i)
     {
-        SAFEINT_STATIC_ASSERT( safeint_internal::numeric_type< T >::isInt );
+        static_assert(safeint_internal::numeric_type< T >::isInt, "Integer type required");
         //always safe
     }
 
     // provide explicit boolean converter
     _CONSTEXPR11 SafeInt( bool b ) SAFEINT_NOTHROW : m_int((T)(b ? 1 : 0))
     {
-        SAFEINT_STATIC_ASSERT( safeint_internal::numeric_type< T >::isInt );
+        static_assert(safeint_internal::numeric_type< T >::isInt, "Integer type required");
     }
 
     template < typename U >
     _CONSTEXPR14 SafeInt(const SafeInt< U, E >& u) SAFEINT_CPP_THROW : m_int(0)
     {
-        SAFEINT_STATIC_ASSERT( safeint_internal::numeric_type< T >::isInt );
+        static_assert(safeint_internal::numeric_type< T >::isInt, "Integer type required");
         m_int = (T)SafeInt< T, E >( (U)u );
     }
 
@@ -5670,7 +5667,7 @@ public:
     _CONSTEXPR14 SafeInt( const U& i ) SAFEINT_CPP_THROW : m_int(0)
     {
         // m_int must be initialized to something to work with constexpr, because if it throws, then m_int is unknown
-        SAFEINT_STATIC_ASSERT( safeint_internal::numeric_type< T >::isInt );
+        static_assert(safeint_internal::numeric_type< T >::isInt, "Integer type required");
         // SafeCast will throw exceptions if i won't fit in type T
         
         SafeCastHelper< T, U, GetCastMethod< T, U >::method >::template CastThrow< E >( i, m_int );
@@ -7003,7 +7000,7 @@ template < typename T, typename U, typename E >
 T*& operator *=( T*& lhs, SafeInt< U, E > ) SAFEINT_NOTHROW
 {
     // This operator explicitly not supported
-    SAFEINT_STATIC_ASSERT( sizeof(T) == 0 );
+    static_assert( sizeof(T) == 0, "Unsupported operator" );
     return (lhs = nullptr);
 }
 
@@ -7011,7 +7008,7 @@ template < typename T, typename U, typename E >
 T*& operator /=( T*& lhs, SafeInt< U, E > ) SAFEINT_NOTHROW
 {
     // This operator explicitly not supported
-    SAFEINT_STATIC_ASSERT( sizeof(T) == 0 );
+    static_assert(sizeof(T) == 0, "Unsupported operator");
     return (lhs = nullptr);
 }
 
@@ -7019,7 +7016,7 @@ template < typename T, typename U, typename E >
 T*& operator %=( T*& lhs, SafeInt< U, E > ) SAFEINT_NOTHROW
 {
     // This operator explicitly not supported
-    SAFEINT_STATIC_ASSERT( sizeof(T) == 0 );
+    static_assert(sizeof(T) == 0, "Unsupported operator");
     return (lhs = nullptr);
 }
 
@@ -7027,7 +7024,7 @@ template < typename T, typename U, typename E >
 T*& operator &=( T*& lhs, SafeInt< U, E > ) SAFEINT_NOTHROW
 {
     // This operator explicitly not supported
-    SAFEINT_STATIC_ASSERT( sizeof(T) == 0 );
+    static_assert(sizeof(T) == 0, "Unsupported operator");
     return (lhs = nullptr);
 }
 
@@ -7035,7 +7032,7 @@ template < typename T, typename U, typename E >
 T*& operator ^=( T*& lhs, SafeInt< U, E > ) SAFEINT_NOTHROW
 {
     // This operator explicitly not supported
-    SAFEINT_STATIC_ASSERT( sizeof(T) == 0 );
+    static_assert(sizeof(T) == 0, "Unsupported operator");
     return (lhs = nullptr);
 }
 
@@ -7043,7 +7040,7 @@ template < typename T, typename U, typename E >
 T*& operator |=( T*& lhs, SafeInt< U, E > ) SAFEINT_NOTHROW
 {
     // This operator explicitly not supported
-    SAFEINT_STATIC_ASSERT( sizeof(T) == 0 );
+    static_assert(sizeof(T) == 0, "Unsupported operator");
     return (lhs = nullptr);
 }
 
@@ -7051,7 +7048,7 @@ template < typename T, typename U, typename E >
 _CONSTEXPR14 T*& operator <<=( T*& lhs, SafeInt< U, E > ) SAFEINT_NOTHROW
 {
     // This operator explicitly not supported
-    SAFEINT_STATIC_ASSERT( sizeof(T) == 0 );
+    static_assert(sizeof(T) == 0, "Unsupported operator");
     return (lhs = nullptr);
 }
 
@@ -7059,7 +7056,7 @@ template < typename T, typename U, typename E >
 _CONSTEXPR14 T*& operator >>=( T*& lhs, SafeInt< U, E > ) SAFEINT_NOTHROW
 {
     // This operator explicitly not supported
-    SAFEINT_STATIC_ASSERT( sizeof(T) == 0 );
+    static_assert(sizeof(T) == 0, "Unsupported operator");
     return (lhs = nullptr);
 }
 
