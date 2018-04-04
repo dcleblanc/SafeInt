@@ -819,13 +819,6 @@ template < int method > class CompileConst;
 template <> class CompileConst<true> { public: _CONSTEXPR11 static bool Value() SAFEINT_NOTHROW { return true; } };
 template <> class CompileConst<false> { public: _CONSTEXPR11 static bool Value() SAFEINT_NOTHROW { return false; } };
 
-// The following template magic is because we're now not allowed
-// to cast a float to an enum. This means that if we happen to assign
-// an enum to a SafeInt of some type, it won't compile, unless we prevent
-//              isFloat = ( (T)( (float)1.1 ) > (T)1 )
-// from compiling in the case of an enum, which is the point of the specialization
-// that follows.
-
 #if !(defined _LIBCPP_TYPE_TRAITS || defined _TYPE_TRAITS_ || defined _GLIBCXX_TYPE_TRAITS)
 #error "type traits are now required in order to properly support initialization from an enum"
 #endif // type traits
@@ -836,14 +829,13 @@ namespace safeint_internal
     template < typename T > class numeric_type;
 
     // Continue to special case bool
-    template <> class numeric_type<bool> { public: enum { isBool = true, isFloat = false, isInt = false }; };
+    template <> class numeric_type<bool> { public: enum { isBool = true, isInt = false }; };
     template < typename T > class numeric_type
     {
     public:
         enum
         {
             isBool = false, // We specialized out a bool  
-            isFloat = std::is_floating_point<T>::value,
             // If it is an enum, then consider it an int type
             // This does allow someone to make a SafeInt from an enum type, which is not recommended,
             // but it also allows someone to add an enum value to a SafeInt, which is handy.
@@ -859,21 +851,20 @@ namespace safeint_internal
 
         enum
         {
-            isSigned = std::numeric_limits<T>::is_signed,
             is64Bit = (sizeof(T) == 8),
             is32Bit = (sizeof(T) == 4),
             is16Bit = (sizeof(T) == 2),
             is8Bit = (sizeof(T) == 1),
             isLT32Bit = (sizeof(T) < 4),
             isLT64Bit = (sizeof(T) < 8),
-            isInt8 = (sizeof(T) == 1 && isSigned),
-            isUint8 = (sizeof(T) == 1 && !isSigned),
-            isInt16 = (sizeof(T) == 2 && isSigned),
-            isUint16 = (sizeof(T) == 2 && !isSigned),
-            isInt32 = (sizeof(T) == 4 && isSigned),
-            isUint32 = (sizeof(T) == 4 && !isSigned),
-            isInt64 = (sizeof(T) == 8 && isSigned),
-            isUint64 = (sizeof(T) == 8 && !isSigned),
+            isInt8 = (sizeof(T) == 1 && std::numeric_limits<T>::is_signed),
+            isUint8 = (sizeof(T) == 1 && !std::numeric_limits<T>::is_signed),
+            isInt16 = (sizeof(T) == 2 && std::numeric_limits<T>::is_signed),
+            isUint16 = (sizeof(T) == 2 && !std::numeric_limits<T>::is_signed),
+            isInt32 = (sizeof(T) == 4 && std::numeric_limits<T>::is_signed),
+            isUint32 = (sizeof(T) == 4 && !std::numeric_limits<T>::is_signed),
+            isInt64 = (sizeof(T) == 8 && std::numeric_limits<T>::is_signed),
+            isUint64 = (sizeof(T) == 8 && !std::numeric_limits<T>::is_signed),
             bitCount = (sizeof(T) * 8),
             isBool = ((T)2 == (T)1)
         };
@@ -884,11 +875,11 @@ namespace safeint_internal
     public:
         enum
         {
-            isBothSigned = (safeint_internal::int_traits< T >::isSigned && safeint_internal::int_traits< U >::isSigned),
-            isBothUnsigned = (!safeint_internal::int_traits< T >::isSigned && !safeint_internal::int_traits< U >::isSigned),
-            isLikeSigned = ((bool)(safeint_internal::int_traits< T >::isSigned) == (bool)(safeint_internal::int_traits< U >::isSigned)),
+            isBothSigned = (std::numeric_limits< T >::is_signed && std::numeric_limits< U >::is_signed),
+            isBothUnsigned = (!std::numeric_limits< T >::is_signed && !std::numeric_limits< U >::is_signed),
+            isLikeSigned = ((bool)(std::numeric_limits< T >::is_signed) == (bool)(std::numeric_limits< U >::is_signed)),
             isCastOK = ((isLikeSigned && sizeof(T) >= sizeof(U)) ||
-            (safeint_internal::int_traits< T >::isSigned && sizeof(T) > sizeof(U))),
+            (std::numeric_limits< T >::is_signed && sizeof(T) > sizeof(U))),
             isBothLT32Bit = (safeint_internal::int_traits< T >::isLT32Bit && safeint_internal::int_traits< U >::isLT32Bit),
             isBothLT64Bit = (safeint_internal::int_traits< T >::isLT64Bit && safeint_internal::int_traits< U >::isLT64Bit)
         };
@@ -913,11 +904,11 @@ public:
         IntZone_Uint64_Uint       = safeint_internal::type_compare< T,U >::isBothUnsigned && safeint_internal::int_traits< T >::is64Bit,
         IntZone_UintLT64_Uint64    = safeint_internal::type_compare< T,U >::isBothUnsigned && safeint_internal::int_traits< T >::isLT64Bit && safeint_internal::int_traits< U >::is64Bit,
         //unsigned-signed
-        IntZone_UintLT32_IntLT32  = !safeint_internal::int_traits< T >::isSigned && safeint_internal::int_traits< U >::isSigned && safeint_internal::type_compare< T,U >::isBothLT32Bit,
-        IntZone_Uint32_IntLT64    = safeint_internal::int_traits< T >::isUint32 && safeint_internal::int_traits< U >::isSigned && safeint_internal::int_traits< U >::isLT64Bit,
-        IntZone_UintLT32_Int32    = !safeint_internal::int_traits< T >::isSigned && safeint_internal::int_traits< T >::isLT32Bit && safeint_internal::int_traits< U >::isInt32,
-        IntZone_Uint64_Int        = safeint_internal::int_traits< T >::isUint64 && safeint_internal::int_traits< U >::isSigned && safeint_internal::int_traits< U >::isLT64Bit,
-        IntZone_UintLT64_Int64    = !safeint_internal::int_traits< T >::isSigned && safeint_internal::int_traits< T >::isLT64Bit && safeint_internal::int_traits< U >::isInt64,
+        IntZone_UintLT32_IntLT32  = !std::numeric_limits< T >::is_signed && std::numeric_limits< U >::is_signed && safeint_internal::type_compare< T,U >::isBothLT32Bit,
+        IntZone_Uint32_IntLT64    = safeint_internal::int_traits< T >::isUint32 && std::numeric_limits< U >::is_signed && safeint_internal::int_traits< U >::isLT64Bit,
+        IntZone_UintLT32_Int32    = !std::numeric_limits< T >::is_signed && safeint_internal::int_traits< T >::isLT32Bit && safeint_internal::int_traits< U >::isInt32,
+        IntZone_Uint64_Int        = safeint_internal::int_traits< T >::isUint64 && std::numeric_limits< U >::is_signed && safeint_internal::int_traits< U >::isLT64Bit,
+        IntZone_UintLT64_Int64    = !std::numeric_limits< T >::is_signed && safeint_internal::int_traits< T >::isLT64Bit && safeint_internal::int_traits< U >::isInt64,
         IntZone_Uint64_Int64      = safeint_internal::int_traits< T >::isUint64 && safeint_internal::int_traits< U >::isInt64,
         //signed-signed
         IntZone_IntLT32_IntLT32   = safeint_internal::type_compare< T,U >::isBothSigned && safeint_internal::type_compare< T, U >::isBothLT32Bit,
@@ -927,11 +918,11 @@ public:
         IntZone_Int64_Int         = safeint_internal::type_compare< T,U >::isBothSigned && safeint_internal::int_traits< T >::is64Bit && safeint_internal::int_traits< U >::isLT64Bit,
         IntZone_IntLT64_Int64     = safeint_internal::type_compare< T,U >::isBothSigned && safeint_internal::int_traits< T >::isLT64Bit && safeint_internal::int_traits< U >::is64Bit,
         //signed-unsigned
-        IntZone_IntLT32_UintLT32  = safeint_internal::int_traits< T >::isSigned && !safeint_internal::int_traits< U >::isSigned && safeint_internal::type_compare< T,U >::isBothLT32Bit,
-        IntZone_Int32_UintLT32    = safeint_internal::int_traits< T >::isInt32 && !safeint_internal::int_traits< U >::isSigned && safeint_internal::int_traits< U >::isLT32Bit,
-        IntZone_IntLT64_Uint32    = safeint_internal::int_traits< T >::isSigned && safeint_internal::int_traits< T >::isLT64Bit && safeint_internal::int_traits< U >::isUint32,
-        IntZone_Int64_UintLT64    = safeint_internal::int_traits< T >::isInt64 && !safeint_internal::int_traits< U >::isSigned && safeint_internal::int_traits< U >::isLT64Bit,
-        IntZone_Int_Uint64        = safeint_internal::int_traits< T >::isSigned && safeint_internal::int_traits< U >::isUint64 && safeint_internal::int_traits< T >::isLT64Bit,
+        IntZone_IntLT32_UintLT32  = std::numeric_limits< T >::is_signed && !std::numeric_limits< U >::is_signed && safeint_internal::type_compare< T,U >::isBothLT32Bit,
+        IntZone_Int32_UintLT32    = safeint_internal::int_traits< T >::isInt32 && !std::numeric_limits< U >::is_signed && safeint_internal::int_traits< U >::isLT32Bit,
+        IntZone_IntLT64_Uint32    = std::numeric_limits< T >::is_signed && safeint_internal::int_traits< T >::isLT64Bit && safeint_internal::int_traits< U >::isUint32,
+        IntZone_Int64_UintLT64    = safeint_internal::int_traits< T >::isInt64 && !std::numeric_limits< U >::is_signed && safeint_internal::int_traits< U >::isLT64Bit,
+        IntZone_Int_Uint64        = std::numeric_limits< T >::is_signed && safeint_internal::int_traits< U >::isUint64 && safeint_internal::int_traits< T >::isLT64Bit,
         IntZone_Int64_Uint64      = safeint_internal::int_traits< T >::isInt64 && safeint_internal::int_traits< U >::isUint64
     };
 };
@@ -958,7 +949,7 @@ class GetAbsMethod
 public:
     enum
     {
-        method = safeint_internal::int_traits< T >::isLT64Bit && safeint_internal::int_traits< T >::isSigned ? AbsMethodInt :
+        method = safeint_internal::int_traits< T >::isLT64Bit && std::numeric_limits< T >::is_signed ? AbsMethodInt :
                  safeint_internal::int_traits< T >::isInt64 ? AbsMethodInt64 : AbsMethodNoop
     };
 };
@@ -1142,17 +1133,17 @@ public:
 
                  ( safeint_internal::type_compare< ToType, FromType >::isCastOK )      ? CastOK :
 
-                 ( ( safeint_internal::int_traits< ToType >::isSigned &&
-                        !safeint_internal::int_traits< FromType >::isSigned &&
+                 ( ( std::numeric_limits< ToType >::is_signed &&
+                        !std::numeric_limits< FromType >::is_signed &&
                         sizeof( FromType ) >= sizeof( ToType ) ) ||
                    ( safeint_internal::type_compare< ToType, FromType >::isBothUnsigned &&
                         sizeof( FromType ) > sizeof( ToType ) ) )      ? CastCheckGTMax :
 
-                 ( !safeint_internal::int_traits< ToType >::isSigned &&
-                     safeint_internal::int_traits< FromType >::isSigned &&
+                 ( !std::numeric_limits< ToType >::is_signed &&
+                     std::numeric_limits< FromType >::is_signed &&
                      sizeof( ToType ) >= sizeof( FromType ) )          ? CastCheckLTZero :
 
-                 ( !safeint_internal::int_traits< ToType >::isSigned )                    ? CastCheckSafeIntMinMaxUnsigned
+                 ( !std::numeric_limits< ToType >::is_signed )                    ? CastCheckSafeIntMinMaxUnsigned
                                                                        : CastCheckSafeIntMinMaxSigned
     };
 };
@@ -1242,7 +1233,7 @@ public:
             return false;
 
         // For the unsigned case
-        if (CompileConst< !safeint_internal::int_traits< T >::isSigned >::Value())
+        if (CompileConst< !std::numeric_limits< T >::is_signed >::Value())
         {
             // Anything larger than this either is larger than 2^64-1, or cannot be represented by a double
             const std::uint64_t maxUnsignedDouble = signifDouble << 11;
@@ -1269,7 +1260,7 @@ public:
 
             // And now cast to long long, and check against min and max for this type
             std::int64_t test = static_cast<std::int64_t>(d);
-            if (test < std::numeric_limits<T>::min() || test > std::numeric_limits<T>::max())
+            if ((std::int64_t)test < (std::int64_t)std::numeric_limits<T>::min() || (std::int64_t)test > (std::int64_t)std::numeric_limits<T>::max())
                 return false;
         }
         return true;
@@ -1476,11 +1467,11 @@ public:
         method = ComparisonMethod_Ok
 #else
         method = ( ( safeint_internal::type_compare< T, U >::isLikeSigned )                              ? ComparisonMethod_Ok :
-                 ( ( safeint_internal::int_traits< T >::isSigned && sizeof(T) < 8 && sizeof(U) < 4 ) ||
-                   ( safeint_internal::int_traits< U >::isSigned && sizeof(T) < 4 && sizeof(U) < 8 ) )  ? ComparisonMethod_CastInt :
-                 ( ( safeint_internal::int_traits< T >::isSigned && sizeof(U) < 8 ) ||
-                   ( safeint_internal::int_traits< U >::isSigned && sizeof(T) < 8 ) )                   ? ComparisonMethod_CastInt64 :
-                 ( !safeint_internal::int_traits< T >::isSigned )                                       ? ComparisonMethod_UnsignedT :
+                 ( ( std::numeric_limits< T >::is_signed && sizeof(T) < 8 && sizeof(U) < 4 ) ||
+                   ( std::numeric_limits< U >::is_signed && sizeof(T) < 4 && sizeof(U) < 8 ) )  ? ComparisonMethod_CastInt :
+                 ( ( std::numeric_limits< T >::is_signed && sizeof(U) < 8 ) ||
+                   ( std::numeric_limits< U >::is_signed && sizeof(T) < 8 ) )                   ? ComparisonMethod_CastInt64 :
+                 ( !std::numeric_limits< T >::is_signed )                                       ? ComparisonMethod_UnsignedT :
                                                                                        ComparisonMethod_UnsignedU )
 #endif
     };
@@ -1595,7 +1586,7 @@ public:
             return SafeIntDivideByZero;
 
         //trap corner case
-        if( CompileConst< safeint_internal::int_traits< U >::isSigned >::Value() )
+        if( CompileConst< std::numeric_limits< U >::is_signed >::Value() )
         {
             // Some compilers don't notice that this only compiles when u is signed
             // Add cast to make them happy
@@ -1617,7 +1608,7 @@ public:
             E::SafeIntOnDivZero();
 
         //trap corner case
-        if( CompileConst< safeint_internal::int_traits< U >::isSigned >::Value() )
+        if( CompileConst< std::numeric_limits< U >::is_signed >::Value() )
         {
             if( u == (U)-1 )
             {
@@ -1639,7 +1630,7 @@ public:
             return SafeIntDivideByZero;
 
         //trap corner case
-        if( CompileConst< safeint_internal::int_traits< U >::isSigned >::Value() )
+        if( CompileConst< std::numeric_limits< U >::is_signed >::Value() )
         {
             if( u == (U)-1 )
             {
@@ -1659,7 +1650,7 @@ public:
             E::SafeIntOnDivZero();
 
         //trap corner case
-        if( CompileConst< safeint_internal::int_traits< U >::isSigned >::Value() )
+        if( CompileConst< std::numeric_limits< U >::is_signed >::Value() )
         {
             if( u == (U)-1 )
             {
@@ -1681,7 +1672,7 @@ public:
             return SafeIntDivideByZero;
 
         //trap corner case
-        if( CompileConst< safeint_internal::int_traits< U >::isSigned >::Value() )
+        if( CompileConst< std::numeric_limits< U >::is_signed >::Value() )
         {
             if( u == (U)-1 )
             {
@@ -1700,7 +1691,7 @@ public:
         if(u == 0)
             E::SafeIntOnDivZero();
 
-        if( CompileConst< safeint_internal::int_traits< U >::isSigned >::Value() )
+        if( CompileConst< std::numeric_limits< U >::is_signed >::Value() )
         {
             if( u == (U)-1 )
             {
@@ -3303,12 +3294,12 @@ public:
     enum
     {
         method = (safeint_internal::type_compare< T, U >::isBothUnsigned                     ? DivisionState_OK :
-                 (!safeint_internal::int_traits< T >::isSigned && safeint_internal::int_traits< U >::isSigned) ? DivisionState_UnsignedSigned :
-                 (safeint_internal::int_traits< T >::isSigned &&
+                 (!std::numeric_limits< T >::is_signed && std::numeric_limits< U >::is_signed) ? DivisionState_UnsignedSigned :
+                 (std::numeric_limits< T >::is_signed &&
                     safeint_internal::int_traits< U >::isUint32 &&
                     safeint_internal::int_traits< T >::isLT64Bit)                           ? DivisionState_SignedUnsigned32 :
-                 (safeint_internal::int_traits< T >::isSigned && safeint_internal::int_traits< U >::isUint64)  ? DivisionState_SignedUnsigned64 :
-                 (safeint_internal::int_traits< T >::isSigned && !safeint_internal::int_traits< U >::isSigned) ? DivisionState_SignedUnsigned :
+                 (std::numeric_limits< T >::is_signed && safeint_internal::int_traits< U >::isUint64)  ? DivisionState_SignedUnsigned64 :
+                 (std::numeric_limits< T >::is_signed && !std::numeric_limits< U >::is_signed) ? DivisionState_SignedUnsigned :
                                                                            DivisionState_SignedSigned)
     };
 };
@@ -5410,7 +5401,7 @@ public:
         // Then binary operations won't produce unexpected results
         method = ( sizeof( T ) <= sizeof( U ) ||
                  safeint_internal::type_compare< T, U >::isBothUnsigned ||
-                 !safeint_internal::int_traits< U >::isSigned )          ? BinaryState_OK :
+                 !std::numeric_limits< U >::is_signed )          ? BinaryState_OK :
                  safeint_internal::int_traits< U >::isInt8               ? BinaryState_Int8 :
                  safeint_internal::int_traits< U >::isInt16              ? BinaryState_Int16
                                                       : BinaryState_Int32
@@ -5863,7 +5854,7 @@ public:
     {
         // Note - unsigned still performs the bitwise manipulation
         // will warn at level 2 or higher if the value is 32-bit or larger
-        return SafeInt<T, E>(NegationHelper<T, safeint_internal::int_traits<T>::isSigned>::template NegativeThrow<E>(m_int));
+        return SafeInt<T, E>(NegationHelper<T, std::numeric_limits< T >::is_signed>::template NegativeThrow<E>(m_int));
     }
 
     // prefix increment operator
@@ -6159,7 +6150,7 @@ public:
     template < typename U >
     _CONSTEXPR14 SafeInt< T, E > operator <<( U bits ) const SAFEINT_NOTHROW
     {
-        ShiftAssert( !safeint_internal::int_traits< U >::isSigned || bits >= 0 );
+        ShiftAssert( !std::numeric_limits< U >::is_signed || bits >= 0 );
         ShiftAssert( bits < (int)safeint_internal::int_traits< T >::bitCount );
 
         return SafeInt< T, E >( (T)( m_int << bits ) );
@@ -6168,7 +6159,7 @@ public:
     template < typename U >
     _CONSTEXPR14 SafeInt< T, E > operator <<( SafeInt< U, E > bits ) const SAFEINT_NOTHROW
     {
-        ShiftAssert( !safeint_internal::int_traits< U >::isSigned || (U)bits >= 0 );
+        ShiftAssert( !std::numeric_limits< U >::is_signed || (U)bits >= 0 );
         ShiftAssert( (U)bits < (int)safeint_internal::int_traits< T >::bitCount );
 
         return SafeInt< T, E >( (T)( m_int << (U)bits ) );
@@ -6179,7 +6170,7 @@ public:
     template < typename U >
     _CONSTEXPR14 SafeInt< T, E >& operator <<=( U bits ) SAFEINT_NOTHROW
     {
-        ShiftAssert( !safeint_internal::int_traits< U >::isSigned || bits >= 0 );
+        ShiftAssert( !std::numeric_limits< U >::is_signed || bits >= 0 );
         ShiftAssert( bits < (int)safeint_internal::int_traits< T >::bitCount );
 
         m_int <<= bits;
@@ -6189,7 +6180,7 @@ public:
     template < typename U >
     _CONSTEXPR14 SafeInt< T, E >& operator <<=( SafeInt< U, E > bits ) SAFEINT_NOTHROW
     {
-        ShiftAssert( !safeint_internal::int_traits< U >::isSigned || (U)bits >= 0 );
+        ShiftAssert( !std::numeric_limits< U >::is_signed || (U)bits >= 0 );
         ShiftAssert( (U)bits < (int)safeint_internal::int_traits< T >::bitCount );
 
         m_int <<= (U)bits;
@@ -6200,7 +6191,7 @@ public:
     template < typename U >
     _CONSTEXPR14 SafeInt< T, E > operator >>( U bits ) const SAFEINT_NOTHROW
     {
-        ShiftAssert( !safeint_internal::int_traits< U >::isSigned || bits >= 0 );
+        ShiftAssert( !std::numeric_limits< U >::is_signed || bits >= 0 );
         ShiftAssert( bits < (int)safeint_internal::int_traits< T >::bitCount );
 
         return SafeInt< T, E >( (T)( m_int >> bits ) );
@@ -6209,7 +6200,7 @@ public:
     template < typename U >
     _CONSTEXPR14 SafeInt< T, E > operator >>( SafeInt< U, E > bits ) const SAFEINT_NOTHROW
     {
-        ShiftAssert( !safeint_internal::int_traits< U >::isSigned || (U)bits >= 0 );
+        ShiftAssert( !std::numeric_limits< U >::is_signed || (U)bits >= 0 );
         ShiftAssert( (U)bits < (int)safeint_internal::int_traits< T >::bitCount );
 
         return SafeInt< T, E >( (T)(m_int >> (U)bits) );
@@ -6219,7 +6210,7 @@ public:
     template < typename U >
     _CONSTEXPR14 SafeInt< T, E >& operator >>=( U bits ) SAFEINT_NOTHROW
     {
-        ShiftAssert( !safeint_internal::int_traits< U >::isSigned || bits >= 0 );
+        ShiftAssert( !std::numeric_limits< U >::is_signed || bits >= 0 );
         ShiftAssert( bits < (int)safeint_internal::int_traits< T >::bitCount );
 
         m_int >>= bits;
@@ -6229,7 +6220,7 @@ public:
     template < typename U >
     _CONSTEXPR14 SafeInt< T, E >& operator >>=( SafeInt< U, E > bits ) SAFEINT_NOTHROW
     {
-        ShiftAssert( !safeint_internal::int_traits< U >::isSigned || (U)bits >= 0 );
+        ShiftAssert( !std::numeric_limits< U >::is_signed || (U)bits >= 0 );
         ShiftAssert( (U)bits < (int)safeint_internal::int_traits< T >::bitCount );
 
         m_int >>= (U)bits;
@@ -6409,9 +6400,9 @@ public:
         // or signed numbers on bitCount-1 (e.g., 7 bits = 128, signed char max = 127).
         // Also makes no sense to try to align on negative or no bits.
 
-        ShiftAssert( ( ( safeint_internal::int_traits<T>::isSigned && bits < (int)safeint_internal::int_traits< T >::bitCount - 1 )
-                    || ( !safeint_internal::int_traits<T>::isSigned && bits < (int)safeint_internal::int_traits< T >::bitCount ) ) &&
-                    bits >= 0 && ( !safeint_internal::int_traits<T>::isSigned || m_int > 0 ) );
+        ShiftAssert( ( ( std::numeric_limits< T >::is_signed && bits < (int)safeint_internal::int_traits< T >::bitCount - 1 )
+                    || ( !std::numeric_limits< T >::is_signed && bits < (int)safeint_internal::int_traits< T >::bitCount ) ) &&
+                    bits >= 0 && ( !std::numeric_limits< T >::is_signed || m_int > 0 ) );
 
         const T AlignValue = ( (T)1 << bits ) - 1;
 
@@ -6667,7 +6658,7 @@ public:
     {
         if( rhs != 0 )
         {
-            if( ModulusSignedCaseHelper< T, E, safeint_internal::int_traits< T >::isSigned >::SignedCase( rhs, result ) )
+            if( ModulusSignedCaseHelper< T, E, std::numeric_limits< T >::is_signed >::SignedCase( rhs, result ) )
             return true;
 
             result = (T)( lhs % (T)rhs );
@@ -6700,7 +6691,7 @@ _CONSTEXPR14 SafeInt< T, E > operator %( U lhs, SafeInt< T, E > rhs ) SAFEINT_CP
     // same size and same sign
     SafeInt< T, E > result;
 
-    if( ModulusSimpleCaseHelper< T, U, E, (sizeof(T) == sizeof(U)) && ((bool)safeint_internal::int_traits< T >::isSigned == (bool)safeint_internal::int_traits< U >::isSigned) >::ModulusSimpleCase( lhs, rhs, result ) )
+    if( ModulusSimpleCaseHelper< T, U, E, (sizeof(T) == sizeof(U)) && ((bool)std::numeric_limits< T >::is_signed == (bool)std::numeric_limits< U >::is_signed) >::ModulusSimpleCase( lhs, rhs, result ) )
         return result;
 
     result = (SafeInt< U, E >(lhs) % (T)rhs);
@@ -7061,7 +7052,7 @@ _CONSTEXPR14 T*& operator >>=( T*& lhs, SafeInt< U, E > ) SAFEINT_NOTHROW
 template < typename T, typename U, typename E >
 _CONSTEXPR14 SafeInt< U, E > operator <<( U lhs, SafeInt< T, E > bits ) SAFEINT_NOTHROW
 {
-    ShiftAssert( !safeint_internal::int_traits< T >::isSigned || (T)bits >= 0 );
+    ShiftAssert( !std::numeric_limits< T >::is_signed || (T)bits >= 0 );
     ShiftAssert( (T)bits < (int)safeint_internal::int_traits< U >::bitCount );
 
     return SafeInt< U, E >( (U)( lhs << (T)bits ) );
@@ -7071,7 +7062,7 @@ _CONSTEXPR14 SafeInt< U, E > operator <<( U lhs, SafeInt< T, E > bits ) SAFEINT_
 template < typename T, typename U, typename E >
 _CONSTEXPR14 SafeInt< U, E > operator >>( U lhs, SafeInt< T, E > bits ) SAFEINT_NOTHROW
 {
-    ShiftAssert( !safeint_internal::int_traits< T >::isSigned || (T)bits >= 0 );
+    ShiftAssert( !std::numeric_limits< T >::is_signed || (T)bits >= 0 );
     ShiftAssert( (T)bits < (int)safeint_internal::int_traits< U >::bitCount );
 
     return SafeInt< U, E >( (U)( lhs >> (T)bits ) );
