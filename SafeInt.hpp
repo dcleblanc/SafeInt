@@ -208,24 +208,18 @@ static_assert( -1 == static_cast<int>(0xffffffff), "Two's complement signed numb
 SafeInt supports several compile-time options that can change the behavior of the class.
 
 Compiler options:
-SAFEINT_WARN_64BIT_PORTABILITY     - this re-enables various warnings that happen when /Wp64 is used. Enabling this option is not
-                                     recommended.
 SAFEINT_ASSERT_ON_EXCEPTION        - it is often easier to stop on an assert and figure out a problem than to try and figure out
                                      how you landed in the catch block.
 SafeIntDefaultExceptionHandler     - if you'd like to replace the exception handlers SafeInt provides, define your replacement and
                                      define this. Note - two built in (Windows-specific) options exist:
                                      - SAFEINT_FAILFAST - bypasses all exception handlers, exits the app with an exception
                                      - SAFEINT_RAISE_EXCEPTION - throws Win32 exceptions, which can be caught
-SAFEINT_DISALLOW_UNSIGNED_NEGATION - Invoking the unary negation operator creates warnings, but if you'd like it to completely fail
+SAFEINT_DISALLOW_UNSIGNED_NEGATION - Invoking the unary negation operator may create warnings, but if you'd like it to completely fail
                                      to compile, define this.
-ANSI_CONVERSIONS                   - This changes the class to use default comparison behavior, which may be unsafe. Enabling this
-                                     option is not recommended.
 SAFEINT_DISABLE_BINARY_ASSERT      - binary AND, OR or XOR operations on mixed size types can produce unexpected results. If you do
                                      this, the default is to assert. Set this if you prefer not to assert under these conditions.
 SIZE_T_CAST_NEEDED                 - some compilers complain if there is not a cast to size_t, others complain if there is one.
                                      This lets you not have your compiler complain.
-SAFEINT_DISABLE_SHIFT_ASSERT       - Set this option if you don't want to assert when shifting more bits than the type has. Enabling
-                                     this option is not recommended.
 
 ************************************************************************************************************************************/
 
@@ -455,14 +449,6 @@ SAFEINT_DISABLE_SHIFT_ASSERT       - Set this option if you don't want to assert
 *
 *  Note that combinations with smaller integers won't display the problem - if you
 *  changed "unsigned int" above to "unsigned short", you'd get the right answer.
-*
-*  If you prefer to retain the ANSI standard behavior insert
-*  #define ANSI_CONVERSIONS
-*  into your source. Behavior differences occur in the following cases:
-*  8, 16, and 32-bit signed int, unsigned 32-bit int
-*  any signed int, unsigned 64-bit int
-*  Note - the signed int must be negative to show the problem
-*
 *
 *  Revision history:
 *
@@ -980,47 +966,6 @@ public:
     }
 };
 
-template < typename T, bool > class NegationHelper;
-// Previous versions had an assert that the type being negated was 32-bit or higher
-// In retrospect, this seems like something to just document
-// Negation will normally upcast to int
-// For example -(unsigned short)0xffff == (int)0xffff0001
-// This class will retain the type, and will truncate, which may not be what
-// you wanted
-// If you want normal operator casting behavior, do this:
-// SafeInt<unsigned short> ss = 0xffff;
-// then:
-// -(SafeInt<int>(ss))
-// will then emit a signed int with the correct value and bitfield
-
-template < typename T > class NegationHelper <T, true> // Signed
-{
-public:
-    template <typename E>
-    _CONSTEXPR14 static T NegativeThrow( T t ) SAFEINT_CPP_THROW
-    {
-        // corner case
-        if( t != std::numeric_limits<T>::min() )
-        {
-            // cast prevents unneeded checks in the case of small ints
-            return -t;
-        }
-        E::SafeIntOnOverflow();
-    }
-
-    _CONSTEXPR14 static bool Negative( T t, T& ret ) SAFEINT_NOTHROW
-    {
-        // corner case
-        if( t != std::numeric_limits<T>::min() )
-        {
-            // cast prevents unneeded checks in the case of small ints
-            ret = -t;
-            return true;
-        }
-        return false;
-    }
-};
-
 // Helper classes to work keep compilers from
 // optimizing away negation
 template < typename T > class SignedNegation;
@@ -1050,6 +995,38 @@ public:
     }
 };
 
+template < typename T, bool > class NegationHelper;
+// Previous versions had an assert that the type being negated was 32-bit or higher
+// In retrospect, this seems like something to just document
+// Negation will normally upcast to int
+// For example -(unsigned short)0xffff == (int)0xffff0001
+// This class will retain the type, and will truncate, which may not be what
+// you wanted
+// If you want normal operator casting behavior, do this:
+// SafeInt<unsigned short> ss = 0xffff;
+// then:
+// -(SafeInt<int>(ss))
+// will then emit a signed int with the correct value and bitfield
+
+// Note, unlike all of the other helper classes, the non-throwing negation
+// doesn't make sense, isn't exposed or tested, so omit it
+
+template < typename T > class NegationHelper <T, true> // Signed
+{
+public:
+    template <typename E>
+    _CONSTEXPR14 static T NegativeThrow( T t ) SAFEINT_CPP_THROW
+    {
+        // corner case
+        if( t != std::numeric_limits<T>::min() )
+        {
+            // cast prevents unneeded checks in the case of small ints
+            return -t;
+        }
+        E::SafeIntOnOverflow();
+    }
+};
+
 template < typename T > class NegationHelper <T, false> // unsigned
 {
 public:
@@ -1059,37 +1036,10 @@ public:
 #if defined SAFEINT_DISALLOW_UNSIGNED_NEGATION
         static_assert( sizeof(T) == 0, "Unsigned negation is unsupported" );
 #endif
-
-#if SAFEINT_COMPILER == VISUAL_STUDIO_COMPILER
-#pragma warning(push)
-//this avoids warnings from the unary '-' operator being applied to unsigned numbers
-#pragma warning(disable:4146)
-#endif
-        // Note - this could be quenched on gcc
-        // by doing something like:
-        // return (T)-((std::int64_t)t);
-        // but it seems like you would want a warning when doing this.
-        return (T)-t;
-
-#if SAFEINT_COMPILER == VISUAL_STUDIO_COMPILER
-#pragma warning(pop)
-#endif
+        // This may not be the most efficient approach, but you shouldn't be doing this
+        return (T)SignedNegation<std::int64_t>::Value(t);
     }
 
-    _CONSTEXPR14 static bool Negative( T t, T& ret ) SAFEINT_NOTHROW
-    {
-        if( safeint_internal::int_traits<T>::isLT32Bit )
-        {
-            // See above
-            SAFEINT_ASSERT( false );
-        }
-#if defined SAFEINT_DISALLOW_UNSIGNED_NEGATION
-        static_assert(sizeof(T) == 0, "Unsigned negation is unsupported");
-#endif
-        // Do it this way to avoid warning
-        ret = -t;
-        return true;
-    }
 };
 
 //core logic to determine casting behavior
@@ -1470,9 +1420,6 @@ class ValidComparison
 public:
     enum
     {
-#ifdef ANSI_CONVERSIONS
-        method = ComparisonMethod_Ok
-#else
         method = ( ( safeint_internal::type_compare< T, U >::isLikeSigned )                              ? ComparisonMethod_Ok :
                  ( ( std::numeric_limits< T >::is_signed && sizeof(T) < 8 && sizeof(U) < 4 ) ||
                    ( std::numeric_limits< U >::is_signed && sizeof(T) < 4 && sizeof(U) < 8 ) )  ? ComparisonMethod_CastInt :
@@ -1480,7 +1427,6 @@ public:
                    ( std::numeric_limits< U >::is_signed && sizeof(T) < 8 ) )                   ? ComparisonMethod_CastInt64 :
                  ( !std::numeric_limits< T >::is_signed )                                       ? ComparisonMethod_UnsignedT :
                                                                                        ComparisonMethod_UnsignedU )
-#endif
     };
 };
 
@@ -6179,11 +6125,7 @@ public:
 
     // Left shift
     // Also, shifting > bitcount is undefined - trap in debug
-#ifdef SAFEINT_DISABLE_SHIFT_ASSERT
-    #define ShiftAssert(x)
-#else
     #define ShiftAssert(x) SAFEINT_ASSERT(x)
-#endif
 
     template < typename U >
     _CONSTEXPR14 SafeInt< T, E > operator <<( U bits ) const SAFEINT_NOTHROW
