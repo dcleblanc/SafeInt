@@ -813,16 +813,6 @@ typedef SafeIntInternal::SafeIntWin32ExceptionHandler Win32ExceptionHandler;
 #define SAFEINT_CPP_THROW SAFEINT_NOTHROW
 #endif
 
-// Turns out we can fool the compiler into not seeing compile-time constants with
-// a simple template specialization
-template < int method > class CompileConst;
-template <> class CompileConst<true> { public: _CONSTEXPR11 static bool Value() SAFEINT_NOTHROW { return true; } };
-template <> class CompileConst<false> { public: _CONSTEXPR11 static bool Value() SAFEINT_NOTHROW { return false; } };
-
-#if !(defined _LIBCPP_TYPE_TRAITS || defined _TYPE_TRAITS_ || defined _GLIBCXX_TYPE_TRAITS)
-#error "type traits are now required in order to properly support initialization from an enum"
-#endif // type traits
-
 namespace safeint_internal
 {
     // If we have support for std<typetraits>, then we can do this easily, and detect enums as well
@@ -1202,6 +1192,55 @@ public:
     }
 };
 
+template <typename T, bool> class float_cast_helper;
+
+template <typename T> class float_cast_helper <T, true> // Unsigned case
+{
+public:
+    _CONSTEXPR14 static bool Test(double d)
+    {
+        const std::uint64_t signifDouble = 0x1fffffffffffff;
+
+        // Anything larger than this either is larger than 2^64-1, or cannot be represented by a double
+        const std::uint64_t maxUnsignedDouble = signifDouble << 11;
+
+        // There is the possibility of both negative and positive zero,
+        // but we'll allow either, since (-0.0 < 0) == false
+        // if we wanted to change that, then use the signbit() macro
+        if (d < 0 || d > static_cast<double>(maxUnsignedDouble))
+            return false;
+
+        // The input can now safely be cast to an unsigned long long
+        if (static_cast<std::uint64_t>(d) > std::numeric_limits<T>::max())
+            return false;
+
+        return true;
+    }
+};
+
+template <typename T> class float_cast_helper <T, false> // Signed case
+{
+public:
+    _CONSTEXPR14 static bool Test(double d)
+    {
+        const std::uint64_t signifDouble = 0x1fffffffffffff;
+        // This has to fit in 2^63-1
+        const std::uint64_t maxSignedDouble = signifDouble << 10;
+        // The smallest signed long long is easier
+        const std::int64_t minSignedDouble = static_cast<std::int64_t>(0x8000000000000000);
+
+        if (d < static_cast<double>(minSignedDouble) || d > static_cast<double>(maxSignedDouble))
+            return false;
+
+        // And now cast to long long, and check against min and max for this type
+        std::int64_t test = static_cast<std::int64_t>(d);
+        if ((std::int64_t)test < (std::int64_t)std::numeric_limits<T>::min() || (std::int64_t)test >(std::int64_t)std::numeric_limits<T>::max())
+            return false;
+
+        return true;
+    }
+};
+
 // special case floats and doubles
 template < typename T, typename U > class SafeCastHelper < T, U, CastFromFloat >
 {
@@ -1211,7 +1250,6 @@ public:
     {
         // A double can hold at most 53 bits of the value
         // 53 bits is:
-        const std::uint64_t signifDouble = 0x1fffffffffffff;
         bool fValid = false;
 
         switch (std::fpclassify(d))
@@ -1232,38 +1270,7 @@ public:
         if (!fValid)
             return false;
 
-        // For the unsigned case
-        if (CompileConst< !std::numeric_limits< T >::is_signed >::Value())
-        {
-            // Anything larger than this either is larger than 2^64-1, or cannot be represented by a double
-            const std::uint64_t maxUnsignedDouble = signifDouble << 11;
-
-            // There is the possibility of both negative and positive zero,
-            // but we'll allow either, since (-0.0 < 0) == false
-            // if we wanted to change that, then use the signbit() macro
-            if (d < 0 || d > static_cast<double>(maxUnsignedDouble))
-                return false;
-
-            // The input can now safely be cast to an unsigned long long
-            if (static_cast<std::uint64_t>(d) > std::numeric_limits<T>::max())
-                return false;
-        }
-        else
-        {
-            // This has to fit in 2^63-1
-            const std::uint64_t maxSignedDouble = signifDouble << 10;
-            // The smallest signed long long is easier
-            const std::int64_t minSignedDouble = static_cast<std::int64_t>(0x8000000000000000);
-
-            if (d < static_cast<double>(minSignedDouble) || d > static_cast<double>(maxSignedDouble))
-                return false;
-
-            // And now cast to long long, and check against min and max for this type
-            std::int64_t test = static_cast<std::int64_t>(d);
-            if ((std::int64_t)test < (std::int64_t)std::numeric_limits<T>::min() || (std::int64_t)test > (std::int64_t)std::numeric_limits<T>::max())
-                return false;
-        }
-        return true;
+        return float_cast_helper< T, !std::numeric_limits< T >::is_signed >::Test(d);
     }
 
     static bool Cast( U u, T& t ) SAFEINT_NOTHROW
@@ -1577,6 +1584,26 @@ public:
 // using this set of functions, it can't fail except in a div 0 situation
 template <typename T, typename U, int method > class ModulusHelper;
 
+template <typename U, bool> class mod_corner_case;
+
+template <typename U> class mod_corner_case <U, true> // signed
+{
+public:
+    _CONSTEXPR14 static bool is_undefined(U u)
+    {
+        return (u == -1);
+    }
+};
+
+template <typename U> class mod_corner_case <U, false> // unsigned
+{
+public:
+    _CONSTEXPR14 static bool is_undefined(U)
+    {
+        return false;
+    }
+};
+
 template <typename T, typename U> class ModulusHelper <T, U, ComparisonMethod_Ok>
 {
 public:
@@ -1586,15 +1613,10 @@ public:
             return SafeIntDivideByZero;
 
         //trap corner case
-        if( CompileConst< std::numeric_limits< U >::is_signed >::Value() )
+        if(mod_corner_case<U, std::numeric_limits< U >::is_signed >::is_undefined(u))
         {
-            // Some compilers don't notice that this only compiles when u is signed
-            // Add cast to make them happy
-            if( u == (U)-1 )
-            {
-                result = 0;
-                return SafeIntNoError;
-            }
+            result = 0;
+            return SafeIntNoError;
         }
 
         result = (T)(t % u);
@@ -1608,13 +1630,10 @@ public:
             E::SafeIntOnDivZero();
 
         //trap corner case
-        if( CompileConst< std::numeric_limits< U >::is_signed >::Value() )
+        if (mod_corner_case<U, std::numeric_limits< U >::is_signed >::is_undefined(u))
         {
-            if( u == (U)-1 )
-            {
-                result = 0;
-                return;
-            }
+            result = 0;
+            return;
         }
 
         result = (T)(t % u);
@@ -1630,13 +1649,10 @@ public:
             return SafeIntDivideByZero;
 
         //trap corner case
-        if( CompileConst< std::numeric_limits< U >::is_signed >::Value() )
+        if (mod_corner_case<U, std::numeric_limits< U >::is_signed >::is_undefined(u))
         {
-            if( u == (U)-1 )
-            {
-                result = 0;
-                return SafeIntNoError;
-            }
+            result = 0;
+            return SafeIntNoError;
         }
 
         result = (T)(t % u);
@@ -1650,13 +1666,10 @@ public:
             E::SafeIntOnDivZero();
 
         //trap corner case
-        if( CompileConst< std::numeric_limits< U >::is_signed >::Value() )
+        if (mod_corner_case<U, std::numeric_limits< U >::is_signed >::is_undefined(u))
         {
-            if( u == (U)-1 )
-            {
-                result = 0;
-                return;
-            }
+            result = 0;
+            return;
         }
 
         result = (T)(t % u);
@@ -1672,13 +1685,10 @@ public:
             return SafeIntDivideByZero;
 
         //trap corner case
-        if( CompileConst< std::numeric_limits< U >::is_signed >::Value() )
+        if (mod_corner_case<U, std::numeric_limits< U >::is_signed >::is_undefined(u))
         {
-            if( u == (U)-1 )
-            {
-                result = 0;
-                return SafeIntNoError;
-            }
+            result = 0;
+            return SafeIntNoError;
         }
 
         result = (T)((std::int64_t)t % (std::int64_t)u);
@@ -1691,13 +1701,10 @@ public:
         if(u == 0)
             E::SafeIntOnDivZero();
 
-        if( CompileConst< std::numeric_limits< U >::is_signed >::Value() )
+        if (mod_corner_case<U, std::numeric_limits< U >::is_signed >::is_undefined(u))
         {
-            if( u == (U)-1 )
-            {
-                result = 0;
-                return;
-            }
+            result = 0;
+            return;
         }
 
         result = (T)((std::int64_t)t % (std::int64_t)u);
@@ -3454,6 +3461,19 @@ public:
     }
 };
 
+template < typename T, typename U, bool > class div_signed_uint64;
+template < typename T, typename U> class div_signed_uint64 <T, U, true> // Value of u fits into an int32
+{
+public:
+    _CONSTEXPR14 static T divide(T t, U u) { return (T)((std::int32_t)t / (std::int32_t)u); }
+};
+
+template < typename T, typename U> class div_signed_uint64 <T, U, false>
+{
+public:
+    _CONSTEXPR14 static T divide(T t, U u) { return (T)((std::int64_t)t / (std::int64_t)u); }
+};
+
 template < typename T, typename U > class DivisionHelper< T, U, DivisionState_SignedUnsigned64 >
 {
 public:
@@ -3474,11 +3494,7 @@ public:
 
         if( u <= (std::uint64_t)std::numeric_limits<T>::max() )
         {
-            // Else u can safely be cast to T
-            if( CompileConst< sizeof( T ) < sizeof( std::int64_t )>::Value() )
-                result = (T)( (int)t/(int)u );
-            else
-                result = (T)((std::int64_t)t/(std::int64_t)u);
+            result = div_signed_uint64 < T, U, sizeof(T) < sizeof(std::int64_t) > ::divide(t, u);
         }
         else // Corner case
         if( t == std::numeric_limits<T>::min() && u == (std::uint64_t)std::numeric_limits<T>::min() )
@@ -3511,11 +3527,7 @@ public:
 
         if( u <= (std::uint64_t)std::numeric_limits<T>::max() )
         {
-            // Else u can safely be cast to T
-            if( CompileConst< sizeof( T ) < sizeof( std::int64_t ) >::Value() )
-                result = (T)( (int)t/(int)u );
-            else
-                result = (T)((std::int64_t)t/(std::int64_t)u);
+            result = div_signed_uint64 < T, U, sizeof(T) < sizeof(std::int64_t) > ::divide(t, u);
         }
         else // Corner case
         if( t == std::numeric_limits<T>::min() && u == (std::uint64_t)std::numeric_limits<T>::min() )
@@ -4916,6 +4928,36 @@ public:
     }
 };
 
+template < typename T, typename U, bool > class subtract_corner_case_max;
+
+template < typename T, typename U> class subtract_corner_case_max < T, U, true>
+{
+public:
+    _CONSTEXPR14 static bool isOverflowPositive(const T& rhs, const U& lhs, std::int64_t tmp)
+    {
+        return (tmp > std::numeric_limits<T>::max() || (rhs < 0 && tmp < lhs));
+    }
+
+    _CONSTEXPR14 static bool isOverflowNegative(const T& rhs, const U& lhs, std::int64_t tmp)
+    {
+         return (tmp < std::numeric_limits<T>::min() || (rhs >= 0 && tmp > lhs));
+    }
+};
+
+template < typename T, typename U> class subtract_corner_case_max < T, U, false>
+{
+public:
+    _CONSTEXPR14 static bool isOverflowPositive(const T& rhs, const U& lhs, std::int64_t tmp)
+    {
+        return (rhs < 0 && tmp < lhs);
+    }
+
+    _CONSTEXPR14 static bool isOverflowNegative(const T& rhs, const U& lhs, std::int64_t tmp)
+    {
+        return (rhs >= 0 && tmp > lhs);
+    }
+};
+
 template < typename U, typename T > class SubtractionHelper< U, T, SubtractionState_Int64Int2 >
 {
 public:
@@ -4935,8 +4977,7 @@ public:
         {
             // if both positive, overflow to negative not possible
             // which is why we'll explicitly check maxInt, and not call SafeCast
-            if( ( safeint_internal::int_traits< T >::isLT64Bit && tmp > std::numeric_limits<T>::max() ) ||
-                ( rhs < 0 && tmp < lhs ) )
+            if(subtract_corner_case_max< T, U, safeint_internal::int_traits< T >::isLT64Bit >::isOverflowPositive(rhs, lhs, tmp))
             {
                 return false;
             }
@@ -4944,8 +4985,7 @@ public:
         else
         {
             // lhs negative
-            if( ( safeint_internal::int_traits< T >::isLT64Bit && tmp < std::numeric_limits<T>::min()) ||
-                ( rhs >=0 && tmp > lhs ) )
+            if(subtract_corner_case_max< T, U, safeint_internal::int_traits< T >::isLT64Bit >::isOverflowNegative(rhs, lhs, tmp))
             {
                 return false;
             }
@@ -4972,8 +5012,7 @@ public:
         {
             // if both positive, overflow to negative not possible
             // which is why we'll explicitly check maxInt, and not call SafeCast
-            if( ( CompileConst< safeint_internal::int_traits< T >::isLT64Bit >::Value() && tmp > std::numeric_limits<T>::max() ) ||
-                ( rhs < 0 && tmp < lhs ) )
+            if (subtract_corner_case_max< T, U, safeint_internal::int_traits< T >::isLT64Bit>::isOverflowPositive(rhs, lhs, tmp))
             {
                 E::SafeIntOnOverflow();
             }
@@ -4981,8 +5020,7 @@ public:
         else
         {
             // lhs negative
-            if( ( CompileConst< safeint_internal::int_traits< T >::isLT64Bit >::Value() && tmp < std::numeric_limits<T>::min()) ||
-                ( rhs >=0 && tmp > lhs ) )
+            if (subtract_corner_case_max< T, U, safeint_internal::int_traits< T >::isLT64Bit >::isOverflowNegative(rhs, lhs, tmp))
             {
                 E::SafeIntOnOverflow();
             }
@@ -6709,6 +6747,21 @@ _CONSTEXPR14 SafeInt< T, E > operator *( U lhs, SafeInt< T, E > rhs ) SAFEINT_CP
 
 template < typename T, typename U, typename E, int method > class DivisionNegativeCornerCaseHelper;
 
+template < typename T, typename U, bool > class division_negative_negateU;
+
+template < typename T, typename U > class division_negative_negateU< T, U, true>
+{
+public:
+    // sizeof(T) == 4
+    _CONSTEXPR14 static U div(T rhs, U lhs) { return lhs / (U)(~(std::uint32_t)(T)rhs + 1); }
+};
+
+template < typename T, typename U > class division_negative_negateU< T, U, false>
+{
+public:
+    _CONSTEXPR14 static U div(T rhs, U lhs) { return lhs / (U)(~(std::uint64_t)(T)rhs + 1); }
+};
+
 template < typename T, typename U, typename E > class DivisionNegativeCornerCaseHelper< T, U, E, true >
 {
 public:
@@ -6717,12 +6770,7 @@ public:
         // Problem case - normal casting behavior changes meaning
         // flip rhs to positive
         // any operator casts now do the right thing
-        U tmp;
-
-        if( CompileConst< sizeof(T) == 4 >::Value() )
-            tmp = lhs/(U)( ~(std::uint32_t)(T)rhs + 1 );
-        else
-            tmp = lhs/(U)( ~(std::uint64_t)(T)rhs + 1 );
+        U tmp = division_negative_negateU< T, U, sizeof(T) == 4>::div(rhs, lhs);
 
         if( tmp <= (U)std::numeric_limits<T>::max() )
         {
@@ -6790,6 +6838,27 @@ public:
 
 template < typename T, typename U, typename E, int method > class DivisionCornerCaseHelper2;
 
+template < typename T, typename U, bool > class div_negate_min;
+
+template < typename T, typename U > class div_negate_min < T, U , true >
+{
+public:
+    _CONSTEXPR14 static bool Value(T& ret)
+    {
+        ret = (T)(-(T)std::numeric_limits< U >::min());
+        return true;
+    }
+};
+
+template < typename T, typename U > class div_negate_min < T, U, false >
+{
+public:
+    _CONSTEXPR14 static bool Value(T& )
+    {
+        return false;
+    }
+};
+
 template < typename T, typename U, typename E > class DivisionCornerCaseHelper2 < T, U, E, true >
 {
 public:
@@ -6801,21 +6870,12 @@ public:
             // but rhs is the return type, so in essence, we can return -lhs
             // if rhs is a larger type than lhs
             // If types are wrong, throws
+            T tmp = 0;
 
-#if SAFEINT_COMPILER == VISUAL_STUDIO_COMPILER
-#pragma warning(push)
-//cast truncates constant value
-#pragma warning(disable:4310)
-#endif
-
-            if( CompileConst<sizeof( U ) < sizeof( T )>::Value() )
-                result = SafeInt< T, E >( (T)( -(T)std::numeric_limits< U >::min() ) );
+            if (div_negate_min< T, U, sizeof(U) < sizeof(T) > ::Value(tmp))
+                result = tmp;
             else
                 E::SafeIntOnOverflow();
-
-#if SAFEINT_COMPILER == VISUAL_STUDIO_COMPILER
-#pragma warning(pop)
-#endif
 
             return true;
         }
