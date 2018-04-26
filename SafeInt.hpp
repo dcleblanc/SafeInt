@@ -57,7 +57,7 @@ Please read the leading comments before using the class.
 #if _MSC_VER < 1900 // Prior to VS 2015, need more testing to determine support
 #define CPLUSPLUS_STD CPLUSPLUS_98
 
-#elif _MSC_VER < 1912 // VS 2015
+#elif _MSC_VER < 1910 // VS 2015
 #define CPLUSPLUS_STD CPLUSPLUS_11
 
 #else // VS 2017 or later
