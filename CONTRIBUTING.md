@@ -1,0 +1,1 @@
+This code is maintained by David LeBlanc and Dan Jump. Community contributions to the test harness are welcome, but changes to the core library will be done by the core authors. For suggestions, bugs, and improvements to the main library header, please file issues to track what you'd like to see changed.
