@@ -136,12 +136,6 @@ Please read the leading comments before using the class.
 #pragma warning( push )
 // Disable warnings coming from headers
 #pragma warning( disable:4987 4820 4987 4820 )
-// Note - under /Wall, this also emits a lot of warnings such as 
-// warning C4711: function 'bool __cdecl operator!=<std::int64_t,std::int64_t,class SafeIntInternal::SafeIntExceptionHandler<class SafeIntException> 
-// >(class SafeInt<std::int64_t,class SafeIntInternal::SafeIntExceptionHandler<class SafeIntException> >,std::int64_t)' selected for automatic inline expansion
-// It apparently does not work to suppress this just within scope of the header, and it also comes from other headers
-// this warning is off by default, so if you choose to compile with /Wall, 
-
 #endif
 
 // More defines to accomodate compiler differences
