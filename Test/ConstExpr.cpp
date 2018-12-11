@@ -9,10 +9,6 @@
 #pragma GCC diagnostic ignored "-Wunused-variable"
 #endif
 
-// For testing - intrinsics can never be constexpr
-#undef SAFEINT_USE_INTRINSICS
-#define SAFEINT_USE_INTRINSICS 0
-
 #if !defined __clang__ && defined __GNUC__ && __cplusplus >= 201402L
 // The gcc compiler isn't smart enough to sort out that the constexpr exception functions
 // are never hit, so create a null exception handler. Nothing in this file is tested at runtime in any case.
@@ -397,14 +393,17 @@ namespace TestConstExpr
 		static_assert((T)3 % SafeInt<U>(2), "Modulus");
 
 		// Multiplication
+        // Multiplication must either use intrinsics OR constexpr, but not both because the intrinsics aren't marked constexpr
+#if !SAFEINT_USE_INTRINSICS
 		static_assert(SafeInt<T>((T)3) * (U)2, "Multiplication");
 		static_assert(SafeInt<T>((T)3) * SafeInt<T>(2), "Multiplication");
 		static_assert((SafeInt<T>((T)3) *= (U)2), "Multiplication");
 		static_assert((SafeInt<T>((T)3) *= SafeInt<U>(2)), "Multiplication");
 		static_assert((U)3 * SafeInt<T>(2), "Multiplication");
 		static_assert(((T)3 * SafeInt<U>(2)), "Multiplication");
+#endif
 
-		// Division
+        // Division
 		static_assert(SafeInt<T>((T)3) / (U)2, "Division");
 		static_assert(SafeInt<T>((T)3) / SafeInt<T>(2), "Division");
 		static_assert((SafeInt<T>((T)3) /= (U)2), "Division");
@@ -509,7 +508,9 @@ namespace TestConstExpr
 		static_assert(SafeLessThan((T)1, (U)2), "SafeLessThan");
 		static_assert(SafeLessThanEquals((T)1, (U)2), "SafeLessThanEquals");
 		static_assert(SafeModulusTest<T, U>(), "SafeModulus");
+#if !SAFEINT_USE_INTRINSICS
 		static_assert(SafeMultiplyTest<T, U>(), "SafeMultiply");
+#endif
 		static_assert(SafeDivideTest<T, U>(), "SafeDivide");
 		static_assert(SafeAddTest<T, U>(), "SafeAdd");
 	}

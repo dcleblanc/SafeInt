@@ -122,6 +122,7 @@
     <ClCompile Include="..\..\CleanCompile.cpp" />
     <ClCompile Include="..\..\CompileTest.cpp" />
     <ClCompile Include="..\..\ConstExpr.cpp" />
+    <ClCompile Include="..\..\ConstExpr_Intrinsics.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\SafeInt.hpp" />

@@ -24,6 +24,9 @@
     <ClCompile Include="..\..\CleanCompile.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\ConstExpr_Intrinsics.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\SafeInt.hpp">
