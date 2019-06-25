@@ -6955,3 +6955,65 @@ void SubVerify()
 }
 
 }
+
+namespace negation_verify
+{
+    template < typename T >
+    void NegationVerifyT()
+    {
+        T minInt = std::numeric_limits<T>::min();
+        T test = 2;
+        bool result = false;
+        T out = 0;
+
+        try
+        {
+            out = -SafeInt< T >(minInt);
+        }
+        catch (...)
+        {
+            result = true;
+        }
+
+        if (result == false)
+            cerr << "Error in NegationVerifyT throw (1): ";
+
+        try
+        {
+            out = -SafeInt< T >(test);
+        }
+        catch (...)
+        {
+            result = false;
+        }
+
+        if (result == false)
+            cerr << "Error in NegationVerifyT throw (2): ";
+
+        // Now try the non-throwing version
+
+        result = SafeNegation(minInt, out);
+
+        if (result != false)
+            cerr << "Error in NegationVerifyT nothrow (1): ";
+
+        result = SafeNegation(test, out);
+
+        if (result == false)
+            cerr << "Error in NegationVerifyT nothrow (2): ";
+    }
+
+    void NegationVerifyAll()
+    {
+        NegationVerifyT< std::int8_t>();
+        NegationVerifyT< std::int16_t>();
+        NegationVerifyT< std::int32_t>();
+        NegationVerifyT< std::int64_t>();
+    }
+
+    void NegationVerify()
+    {
+        cout << "Verifying Negation:" << endl;
+        NegationVerifyAll();
+    }
+}

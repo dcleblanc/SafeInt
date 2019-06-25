@@ -26,8 +26,8 @@ using std::dec;
 
 // Suppress warnings in test files, but not in source header
 #if SAFEINT_COMPILER == VISUAL_STUDIO_COMPILER
-
-#pragma warning(disable: 4838 4477 4310)
+// Disable Spectre mitigation warnings (5045)
+#pragma warning(disable: 4838 4477 4310 5045)
 #elif SAFEINT_COMPILER == CLANG_COMPILER 
 #pragma GCC diagnostic ignored "-Wc++11-narrowing"
 #pragma GCC diagnostic ignored "-Wformat"
@@ -52,4 +52,5 @@ namespace add_verify { void AddVerify(); }
 namespace mod_verify { void ModVerify(); }
 namespace incdec_verify { void IncDecVerify(); }
 namespace cast_verify { void CastVerify(); }
+namespace negation_verify { void NegationVerify(); }
 

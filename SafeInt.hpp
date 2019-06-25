@@ -1024,6 +1024,17 @@ public:
         }
         E::SafeIntOnOverflow();
     }
+
+    _CONSTEXPR14 static bool Negative(T t, T& out)
+    {
+        // corner case
+        if (t != std::numeric_limits<T>::min())
+        {
+            out = -t;
+            return true;
+        }
+        return false;
+    }
 };
 
 template < typename T > class NegationHelper <T, false> // unsigned
@@ -1039,6 +1050,11 @@ public:
         return (T)SignedNegation<std::int64_t>::Value(t);
     }
 
+    _CONSTEXPR14 static bool Negative(T t, T& /*out*/)
+    {
+        // This will only be used by the SafeNegation function
+        return false;
+    }
 };
 
 //core logic to determine casting behavior
@@ -5595,6 +5611,12 @@ template < typename T, typename U >
 _CONSTEXPR11 inline bool SafeSubtract( T t, U u, T& result ) SAFEINT_NOTHROW
 {
     return SubtractionHelper< T, U, SubtractionMethod< T, U >::method >::Subtract( t, u, result );
+}
+
+template < typename T >
+_CONSTEXPR11 inline bool SafeNegation(T t, T& result) SAFEINT_NOTHROW
+{
+    return NegationHelper< T, std::numeric_limits<T>::is_signed>::Negative(t, result);
 }
 
 /*****************  end external functions ************************************/
