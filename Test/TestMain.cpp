@@ -9,13 +9,13 @@
 
 int main(int, char**)
 {
-	cast_verify::CastVerify();
-	mult_verify::MultVerify();
-	div_verify::DivVerify();
-	sub_verify::SubVerify();
-	add_verify::AddVerify();
-	mod_verify::ModVerify();
-	incdec_verify::IncDecVerify();
-   
-	return 0;
+    cast_verify::CastVerify();
+    mult_verify::MultVerify();
+    div_verify::DivVerify();
+    sub_verify::SubVerify();
+    add_verify::AddVerify();
+    mod_verify::ModVerify();
+    incdec_verify::IncDecVerify();
+    negation_verify::NegationVerify();
+    return 0;
 }
