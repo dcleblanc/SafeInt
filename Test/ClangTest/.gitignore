@@ -1,3 +1,4 @@
+*.err
 SafeIntTest
 CompileTest
 CompileTest14
