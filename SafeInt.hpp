@@ -3,7 +3,7 @@
 
 /*-----------------------------------------------------------------------------------------------------------
 SafeInt.hpp
-Version 3.0.21p
+Version 3.0.22p
 
 This header implements an integer handling class designed to catch
 unsafe integer operations
@@ -1833,7 +1833,7 @@ public:
     //accepts unsigned, both less than 32-bit
     _CONSTEXPR14 static bool Multiply( const T& t, const U& u, T& ret ) SAFEINT_NOTHROW
     {
-        unsigned int tmp = (unsigned int)(t * u);
+        unsigned int tmp = (unsigned int)t * (unsigned int)u;
 
         if( tmp > std::numeric_limits<T>::max() )
             return false;
