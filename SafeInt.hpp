@@ -7116,10 +7116,9 @@ _CONSTEXPR11 SafeInt< T, E > operator |( U lhs, SafeInt< T, E > rhs ) SAFEINT_NO
     return SafeInt< T, E >( BinaryOrHelper< T, U, BinaryMethod< T, U >::method >::Or( (T)rhs, lhs ) );
 }
 
-#endif //SAFEINT_HPP
-
 #if defined VISUAL_STUDIO_SAFEINT_COMPAT
 } // utilities
 } // msl
 #endif
 
+#endif //SAFEINT_HPP
