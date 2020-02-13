@@ -247,6 +247,13 @@ void CompileType()
 	st--;
 	--st;
 	t = ~st;
+
+	// Get compile time coverage of negation
+	T x = 1;
+	T result;
+
+	SafeNegation(x, result);
+
 }
 
 void CompileMe()

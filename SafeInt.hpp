@@ -1051,7 +1051,7 @@ public:
         return (T)SignedNegation<std::int64_t>::Value(t);
     }
 
-    _CONSTEXPR14 static bool Negative(T t, T& /*out*/)
+    _CONSTEXPR14 static bool Negative(T , T& /*out*/)
     {
         // This will only be used by the SafeNegation function
         return false;

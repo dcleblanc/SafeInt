@@ -407,8 +407,11 @@ namespace TestConstExpr
 		static_assert(SafeInt<T>((T)3) / (U)2, "Division");
 		static_assert(SafeInt<T>((T)3) / SafeInt<T>(2), "Division");
 		static_assert((SafeInt<T>((T)3) /= (U)2), "Division");
+#if SAFEINT_COMPILER != GCC_COMPILER
+		// gcc is not happy with this one
 		static_assert((SafeInt<T>((T)3) /= SafeInt<U>(2)), "Division");
 		static_assert((U)3 / SafeInt<T>(2), "Division");
+#endif
 		static_assert(DivOperator<T,U>(), "Division");
 
 		// Addition
