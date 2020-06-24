@@ -3,7 +3,7 @@
 
 /*-----------------------------------------------------------------------------------------------------------
 SafeInt.hpp
-Version 3.0.23p
+Version 3.0.24p
 
 This header implements an integer handling class designed to catch
 unsafe integer operations
@@ -131,7 +131,8 @@ Please read the leading comments before using the class.
 #if SAFEINT_COMPILER == VISUAL_STUDIO_COMPILER
 // Off by default - unreferenced inline function has been removed
 // Note - this intentionally leaks from the header, doesn't quench the warnings otherwise
-#pragma warning( disable: 4514 )
+// Also disable Spectre mitigation warning
+#pragma warning( disable: 4514 5045 )
 
 #pragma warning( push )
 // Disable warnings coming from headers
@@ -578,7 +579,7 @@ namespace utilities
 // Currently implemented code values:
 // ERROR_ARITHMETIC_OVERFLOW
 // EXCEPTION_INT_DIVIDE_BY_ZERO
-enum SafeIntError
+enum class SafeIntError
 {
     SafeIntNoError = 0,
     SafeIntArithmeticOverflow,
@@ -679,7 +680,7 @@ namespace utilities
 class SAFEINT_VISIBLE SafeIntException
 {
 public:
-    _CONSTEXPR11 SafeIntException( SafeIntError code = SafeIntNoError) SAFEINT_NOTHROW  : m_code(code)
+    _CONSTEXPR11 SafeIntException( SafeIntError code = SafeIntError::SafeIntNoError) SAFEINT_NOTHROW  : m_code(code)
     {
     }
     SafeIntError m_code;
@@ -701,13 +702,13 @@ namespace SafeIntInternal
         static SAFEINT_NORETURN void SAFEINT_STDCALL SafeIntOnOverflow()
         {
             SafeIntExceptionAssert();
-            throw SafeIntException( SafeIntArithmeticOverflow );
+            throw SafeIntException(SafeIntError::SafeIntArithmeticOverflow );
         }
 
         static SAFEINT_NORETURN void SAFEINT_STDCALL SafeIntOnDivZero()
         {
             SafeIntExceptionAssert();
-            throw SafeIntException( SafeIntDivideByZero );
+            throw SafeIntException(SafeIntError::SafeIntDivideByZero );
         }
     };
 
@@ -1572,17 +1573,17 @@ public:
     _CONSTEXPR14 static SafeIntError Modulus( const T& t, const U& u, T& result ) SAFEINT_NOTHROW
     {
         if(u == 0)
-            return SafeIntDivideByZero;
+            return SafeIntError::SafeIntDivideByZero;
 
         //trap corner case
         if(mod_corner_case<U, std::numeric_limits< U >::is_signed >::is_undefined(u))
         {
             result = 0;
-            return SafeIntNoError;
+            return SafeIntError::SafeIntNoError;
         }
 
         result = (T)(t % u);
-        return SafeIntNoError;
+        return SafeIntError::SafeIntNoError;
     }
 
     template < typename E >
@@ -1608,17 +1609,17 @@ public:
     _CONSTEXPR14 static SafeIntError Modulus( const T& t, const U& u, T& result ) SAFEINT_NOTHROW
     {
         if(u == 0)
-            return SafeIntDivideByZero;
+            return SafeIntError::SafeIntDivideByZero;
 
         //trap corner case
         if (mod_corner_case<U, std::numeric_limits< U >::is_signed >::is_undefined(u))
         {
             result = 0;
-            return SafeIntNoError;
+            return SafeIntError::SafeIntNoError;
         }
 
         result = (T)(t % u);
-        return SafeIntNoError;
+        return SafeIntError::SafeIntNoError;
     }
 
     template < typename E >
@@ -1644,17 +1645,17 @@ public:
     _CONSTEXPR14 static SafeIntError Modulus( const T& t, const U& u, T& result ) SAFEINT_NOTHROW
     {
         if(u == 0)
-            return SafeIntDivideByZero;
+            return SafeIntError::SafeIntDivideByZero;
 
         //trap corner case
         if (mod_corner_case<U, std::numeric_limits< U >::is_signed >::is_undefined(u))
         {
             result = 0;
-            return SafeIntNoError;
+            return SafeIntError::SafeIntNoError;
         }
 
         result = (T)((std::int64_t)t % (std::int64_t)u);
-        return SafeIntNoError;
+        return SafeIntError::SafeIntNoError;
     }
 
     template < typename E >
@@ -1680,7 +1681,7 @@ public:
     _CONSTEXPR14 static SafeIntError Modulus( const T& t, const U& u, T& result ) SAFEINT_NOTHROW
     {
         if(u == 0)
-            return SafeIntDivideByZero;
+            return SafeIntError::SafeIntDivideByZero;
 
         // u could be negative - if so, need to convert to positive
         // casts below are always safe due to the way modulus works
@@ -1689,7 +1690,7 @@ public:
         else
             result = (T)(t % u);
 
-        return SafeIntNoError;
+        return SafeIntError::SafeIntNoError;
     }
 
     template < typename E >
@@ -1713,7 +1714,7 @@ public:
     _CONSTEXPR14 static SafeIntError Modulus( const T& t, const U& u, T& result ) SAFEINT_NOTHROW
     {
         if(u == 0)
-            return SafeIntDivideByZero;
+            return SafeIntError::SafeIntDivideByZero;
 
         //t could be negative - if so, need to convert to positive
         if(t < 0)
@@ -1721,7 +1722,7 @@ public:
         else
             result = (T)((T)t % u);
 
-        return SafeIntNoError;
+        return SafeIntError::SafeIntNoError;
     }
 
     template < typename E >
@@ -3281,16 +3282,16 @@ public:
     _CONSTEXPR14 static SafeIntError Divide( const T& t, const U& u, T& result ) SAFEINT_NOTHROW
     {
         if( u == 0 )
-            return SafeIntDivideByZero;
+            return SafeIntError::SafeIntDivideByZero;
 
         if( t == 0 )
         {
             result = 0;
-            return SafeIntNoError;
+            return SafeIntError::SafeIntNoError;
         }
 
         result = (T)( t/u );
-        return SafeIntNoError;
+        return SafeIntError::SafeIntNoError;
     }
 
     template < typename E >
@@ -3316,18 +3317,18 @@ public:
     {
 
         if( u == 0 )
-            return SafeIntDivideByZero;
+            return SafeIntError::SafeIntDivideByZero;
 
         if( t == 0 )
         {
             result = 0;
-            return SafeIntNoError;
+            return SafeIntError::SafeIntNoError;
         }
 
         if( u > 0 )
         {
             result = (T)( t/u );
-            return SafeIntNoError;
+            return SafeIntError::SafeIntNoError;
         }
 
         // it is always an error to try and divide an unsigned number by a negative signed number
@@ -3335,10 +3336,10 @@ public:
         if( AbsValueHelper< U, GetAbsMethod< U >::method >::Abs( u ) > t )
         {
             result = 0;
-            return SafeIntNoError;
+            return SafeIntError::SafeIntNoError;
         }
 
-        return SafeIntArithmeticOverflow;
+        return SafeIntError::SafeIntArithmeticOverflow;
     }
 
     template < typename E >
@@ -3378,12 +3379,12 @@ public:
     _CONSTEXPR14 static SafeIntError Divide( const T& t, const U& u, T& result ) SAFEINT_NOTHROW
     {
         if( u == 0 )
-            return SafeIntDivideByZero;
+            return SafeIntError::SafeIntDivideByZero;
 
         if( t == 0 )
         {
             result = 0;
-            return SafeIntNoError;
+            return SafeIntError::SafeIntNoError;
         }
 
         // Test for t > 0
@@ -3395,7 +3396,7 @@ public:
         else
             result = (T)( (std::int64_t)t/(std::int64_t)u );
 
-        return SafeIntNoError;
+        return SafeIntError::SafeIntNoError;
     }
 
     template < typename E >
@@ -3445,13 +3446,13 @@ public:
 
         if( u == 0 )
         {
-            return SafeIntDivideByZero;
+            return SafeIntError::SafeIntDivideByZero;
         }
 
         if( t == 0 )
         {
             result = 0;
-            return SafeIntNoError;
+            return SafeIntError::SafeIntNoError;
         }
 
         if( u <= (std::uint64_t)std::numeric_limits<T>::max() )
@@ -3468,7 +3469,7 @@ public:
         {
             result = 0;
         }
-        return SafeIntNoError;
+        return SafeIntError::SafeIntNoError;
     }
 
     template < typename E >
@@ -3513,17 +3514,17 @@ public:
     {
         if( u == 0 )
         {
-            return SafeIntDivideByZero;
+            return SafeIntError::SafeIntDivideByZero;
         }
 
         if( t == 0 )
         {
             result = 0;
-            return SafeIntNoError;
+            return SafeIntError::SafeIntNoError;
         }
 
         result = (T)( t/u );
-        return SafeIntNoError;
+        return SafeIntError::SafeIntNoError;
     }
 
     template < typename E >
@@ -3551,21 +3552,21 @@ public:
     {
         if( u == 0 )
         {
-            return SafeIntDivideByZero;
+            return SafeIntError::SafeIntDivideByZero;
         }
 
         if( t == 0 )
         {
             result = 0;
-            return SafeIntNoError;
+            return SafeIntError::SafeIntNoError;
         }
 
         // Must test for corner case
         if( t == std::numeric_limits<T>::min() && u == (U)-1 )
-            return SafeIntArithmeticOverflow;
+            return SafeIntError::SafeIntArithmeticOverflow;
 
         result = (T)( t/u );
-        return SafeIntNoError;
+        return SafeIntError::SafeIntNoError;
     }
 
     template < typename E >
@@ -5587,7 +5588,7 @@ _CONSTEXPR11 inline bool SafeLessThanEquals( const T t, const U u ) SAFEINT_NOTH
 template < typename T, typename U >
 _CONSTEXPR11 inline bool SafeModulus( const T& t, const U& u, T& result ) SAFEINT_NOTHROW
 {
-    return ( ModulusHelper< T, U, ValidComparison< T, U >::method >::Modulus( t, u, result ) == SafeIntNoError );
+    return ( ModulusHelper< T, U, ValidComparison< T, U >::method >::Modulus( t, u, result ) == SafeIntError::SafeIntNoError );
 }
 
 template < typename T, typename U >
@@ -5599,7 +5600,7 @@ _CONSTEXPR14_MULTIPLY inline bool SafeMultiply( T t, U u, T& result ) SAFEINT_NO
 template < typename T, typename U >
 _CONSTEXPR11 inline bool SafeDivide( T t, U u, T& result ) SAFEINT_NOTHROW
 {
-    return ( DivisionHelper< T, U, DivisionMethod< T, U >::method >::Divide( t, u, result ) == SafeIntNoError );
+    return ( DivisionHelper< T, U, DivisionMethod< T, U >::method >::Divide( t, u, result ) == SafeIntError::SafeIntNoError );
 }
 
 template < typename T, typename U >
