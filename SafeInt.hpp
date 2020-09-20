@@ -3,7 +3,7 @@
 
 /*-----------------------------------------------------------------------------------------------------------
 SafeInt.hpp
-Version 3.0.24p
+Version 3.0.25p
 
 This header implements an integer handling class designed to catch
 unsafe integer operations
