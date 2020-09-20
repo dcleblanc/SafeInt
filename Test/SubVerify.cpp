@@ -333,10 +333,7 @@ void SubVerifyUint64Uint64()
         std::uint64_t ret;
         if( SafeSubtract(uint64_uint64[i].x, uint64_uint64[i].y, ret) != uint64_uint64[i].fExpected )
         {
-            cerr << "Error in case uint64_uint64: ";
-            cerr << hex << setw(16) << setfill('0') << uint64_uint64[i].x << ", ";
-            cerr << hex << setw(16) << setfill('0') << uint64_uint64[i].y << ", ";
-            cerr << "expected = " << uint64_uint64[i].fExpected << endl;
+            err_msg( "Error in case uint64_uint64: ", uint64_uint64[i].x, uint64_uint64[i].y, uint64_uint64[i].fExpected );
         }
 
         // Now test throwing version
@@ -353,10 +350,7 @@ void SubVerifyUint64Uint64()
 
         if( fSuccess != uint64_uint64[i].fExpected )
         {
-            cerr << "Error in case uint64_uint64 throw (1): ";
-            cerr << hex << setw(16) << setfill('0') << uint64_uint64[i].x << ", ";
-            cerr << hex << setw(16) << setfill('0') << uint64_uint64[i].y << ", ";
-            cerr << "expected = " << uint64_uint64[i].fExpected << endl;
+            err_msg( "Error in case uint64_uint64 throw (1): ", uint64_uint64[i].x, uint64_uint64[i].y, uint64_uint64[i].fExpected );
         }
 
         // Also need to test the version that assigns back out
@@ -374,10 +368,7 @@ void SubVerifyUint64Uint64()
 
         if( fSuccess != uint64_uint64[i].fExpected )
         {
-            cerr << "Error in case uint64_uint64 throw (2): ";
-            cerr << hex << setw(16) << setfill('0') << uint64_uint64[i].x << ", ";
-            cerr << hex << setw(16) << setfill('0') << uint64_uint64[i].y << ", ";
-            cerr << "expected = " << uint64_uint64[i].fExpected << endl;
+            err_msg( "Error in case uint64_uint64 throw (2): ", uint64_uint64[i].x, uint64_uint64[i].y, uint64_uint64[i].fExpected );
         }
     }
 }
@@ -556,10 +547,7 @@ void SubVerifyUint64Uint32()
         std::uint64_t ret;
         if( SafeSubtract(uint64_uint32[i].x, uint64_uint32[i].y, ret) != uint64_uint32[i].fExpected )
         {
-            cerr << "Error in case uint64_uint32: ";
-            cerr << hex << setw(16) << setfill('0') << uint64_uint32[i].x << ", ";
-            cerr << hex << setw(8) << setfill('0') << uint64_uint32[i].y << ", ";
-            cerr << "expected = " << uint64_uint32[i].fExpected << endl;
+            err_msg( "Error in case uint64_uint32: ", uint64_uint32[i].x, uint64_uint32[i].y, uint64_uint32[i].fExpected );
         }
 
         // Now test throwing version
@@ -576,10 +564,7 @@ void SubVerifyUint64Uint32()
 
         if( fSuccess != uint64_uint32[i].fExpected )
         {
-            cerr << "Error in case uint64_uint32 throw (1): ";
-            cerr << hex << setw(16) << setfill('0') << uint64_uint32[i].x << ", ";
-            cerr << hex << setw(8) << setfill('0') << uint64_uint32[i].y << ", ";
-            cerr << "expected = " << uint64_uint32[i].fExpected << endl;
+            err_msg( "Error in case uint64_uint32 throw (1): ", uint64_uint32[i].x, uint64_uint32[i].y, uint64_uint32[i].fExpected );
         }
 
         // Also need to test the version that assigns back out
@@ -597,10 +582,7 @@ void SubVerifyUint64Uint32()
 
         if( fSuccess != uint64_uint32[i].fExpected )
         {
-            cerr << "Error in case uint64_uint32 throw (2): ";
-            cerr << hex << setw(16) << setfill('0') << uint64_uint32[i].x << ", ";
-            cerr << hex << setw(8) << setfill('0') << uint64_uint32[i].y << ", ";
-            cerr << "expected = " << uint64_uint32[i].fExpected << endl;
+            err_msg( "Error in case uint64_uint32 throw (2): ", uint64_uint32[i].x, uint64_uint32[i].y, uint64_uint32[i].fExpected );
         }
     }
 }
@@ -779,10 +761,7 @@ void SubVerifyUint64Uint16()
         std::uint64_t ret;
         if( SafeSubtract(uint64_uint16[i].x, uint64_uint16[i].y, ret) != uint64_uint16[i].fExpected )
         {
-            cerr << "Error in case uint64_uint16: ";
-            cerr << hex << setw(16) << setfill('0') << uint64_uint16[i].x << ", ";
-            cerr << hex << setw(4) << setfill('0') << uint64_uint16[i].y << ", ";
-            cerr << "expected = " << uint64_uint16[i].fExpected << endl;
+            err_msg( "Error in case uint64_uint16: ", uint64_uint16[i].x, uint64_uint16[i].y, uint64_uint16[i].fExpected );
         }
 
         // Now test throwing version
@@ -799,10 +778,7 @@ void SubVerifyUint64Uint16()
 
         if( fSuccess != uint64_uint16[i].fExpected )
         {
-            cerr << "Error in case uint64_uint16 throw (1): ";
-            cerr << hex << setw(16) << setfill('0') << uint64_uint16[i].x << ", ";
-            cerr << hex << setw(4) << setfill('0') << uint64_uint16[i].y << ", ";
-            cerr << "expected = " << uint64_uint16[i].fExpected << endl;
+            err_msg( "Error in case uint64_uint16 throw (1): ", uint64_uint16[i].x, uint64_uint16[i].y, uint64_uint16[i].fExpected );
         }
 
         // Also need to test the version that assigns back out
@@ -820,10 +796,7 @@ void SubVerifyUint64Uint16()
 
         if( fSuccess != uint64_uint16[i].fExpected )
         {
-            cerr << "Error in case uint64_uint16 throw (2): ";
-            cerr << hex << setw(16) << setfill('0') << uint64_uint16[i].x << ", ";
-            cerr << hex << setw(4) << setfill('0') << uint64_uint16[i].y << ", ";
-            cerr << "expected = " << uint64_uint16[i].fExpected << endl;
+            err_msg( "Error in case uint64_uint16 throw (2): ", uint64_uint16[i].x, uint64_uint16[i].y, uint64_uint16[i].fExpected );
         }
     }
 }
@@ -1002,10 +975,7 @@ void SubVerifyUint64Uint8()
         std::uint64_t ret;
         if( SafeSubtract(uint64_uint8[i].x, uint64_uint8[i].y, ret) != uint64_uint8[i].fExpected )
         {
-            cerr << "Error in case uint64_uint8: ";
-            cerr << hex << setw(16) << setfill('0') << uint64_uint8[i].x << ", ";
-            cerr << hex << setw(2) << setfill('0') << (0xFF & (int)uint64_uint8[i].y) << ", ";
-            cerr << "expected = " << uint64_uint8[i].fExpected << endl;
+            err_msg( "Error in case uint64_uint8: ", uint64_uint8[i].x, uint64_uint8[i].y, uint64_uint8[i].fExpected );
         }
 
         // Now test throwing version
@@ -1022,10 +992,7 @@ void SubVerifyUint64Uint8()
 
         if( fSuccess != uint64_uint8[i].fExpected )
         {
-            cerr << "Error in case uint64_uint8 throw (1): ";
-            cerr << hex << setw(16) << setfill('0') << uint64_uint8[i].x << ", ";
-            cerr << hex << setw(2) << setfill('0') << (0xFF & (int)uint64_uint8[i].y) << ", ";
-            cerr << "expected = " << uint64_uint8[i].fExpected << endl;
+            err_msg( "Error in case uint64_uint8 throw (1): ", uint64_uint8[i].x, uint64_uint8[i].y, uint64_uint8[i].fExpected );
         }
 
         // Also need to test the version that assigns back out
@@ -1043,10 +1010,7 @@ void SubVerifyUint64Uint8()
 
         if( fSuccess != uint64_uint8[i].fExpected )
         {
-            cerr << "Error in case uint64_uint8 throw (2): ";
-            cerr << hex << setw(16) << setfill('0') << uint64_uint8[i].x << ", ";
-            cerr << hex << setw(2) << setfill('0') << (0xFF & (int)uint64_uint8[i].y) << ", ";
-            cerr << "expected = " << uint64_uint8[i].fExpected << endl;
+            err_msg( "Error in case uint64_uint8 throw (2): ", uint64_uint8[i].x, uint64_uint8[i].y, uint64_uint8[i].fExpected );
         }
     }
 }
@@ -1233,10 +1197,7 @@ void SubVerifyUint8Uint64()
         std::uint8_t ret;
         if( SafeSubtract(uint8_uint64[i].x, uint8_uint64[i].y, ret) != uint8_uint64[i].fExpected )
         {
-            cerr << "Error in case uint8_uint64: ";
-            cerr << hex << setw(2) << setfill('0') << (0xFF & (int)uint8_uint64[i].x) << ", ";
-            cerr << hex << setw(16) << setfill('0') << uint8_uint64[i].y << ", ";
-            cerr << "expected = " << uint8_uint64[i].fExpected << endl;
+            err_msg( "Error in case uint8_uint64: ", uint8_uint64[i].x, uint8_uint64[i].y, uint8_uint64[i].fExpected );
         }
 
         // Now test throwing version
@@ -1253,10 +1214,7 @@ void SubVerifyUint8Uint64()
 
         if( fSuccess != uint8_uint64[i].fExpected )
         {
-            cerr << "Error in case uint8_uint64 throw (1): ";
-            cerr << hex << setw(2) << setfill('0') << (0xFF & (int)uint8_uint64[i].x) << ", ";
-            cerr << hex << setw(16) << setfill('0') << uint8_uint64[i].y << ", ";
-            cerr << "expected = " << uint8_uint64[i].fExpected << endl;
+            err_msg( "Error in case uint8_uint64 throw (1): ", uint8_uint64[i].x, uint8_uint64[i].y, uint8_uint64[i].fExpected );
         }
 
         // Also need to test the version that assigns back out
@@ -1274,10 +1232,7 @@ void SubVerifyUint8Uint64()
 
         if( fSuccess != uint8_uint64[i].fExpected )
         {
-            cerr << "Error in case uint8_uint64 throw (2): ";
-            cerr << hex << setw(2) << setfill('0') << (0xFF & (int)uint8_uint64[i].x) << ", ";
-            cerr << hex << setw(16) << setfill('0') << uint8_uint64[i].y << ", ";
-            cerr << "expected = " << uint8_uint64[i].fExpected << endl;
+            err_msg( "Error in case uint8_uint64 throw (2): ", uint8_uint64[i].x, uint8_uint64[i].y, uint8_uint64[i].fExpected );
         }
     }
 }
@@ -1384,10 +1339,7 @@ void SubVerifyUint8Uint32()
         std::uint8_t ret;
         if( SafeSubtract(uint8_uint32[i].x, uint8_uint32[i].y, ret) != uint8_uint32[i].fExpected )
         {
-            cerr << "Error in case uint8_uint32: ";
-            cerr << hex << setw(2) << setfill('0') << (0xFF & (int)uint8_uint32[i].x) << ", ";
-            cerr << hex << setw(8) << setfill('0') << uint8_uint32[i].y << ", ";
-            cerr << "expected = " << uint8_uint32[i].fExpected << endl;
+            err_msg( "Error in case uint8_uint32: ", uint8_uint32[i].x, uint8_uint32[i].y, uint8_uint32[i].fExpected );
         }
 
         // Now test throwing version
@@ -1404,10 +1356,7 @@ void SubVerifyUint8Uint32()
 
         if( fSuccess != uint8_uint32[i].fExpected )
         {
-            cerr << "Error in case uint8_uint32 throw (1): ";
-            cerr << hex << setw(2) << setfill('0') << (0xFF & (int)uint8_uint32[i].x) << ", ";
-            cerr << hex << setw(8) << setfill('0') << uint8_uint32[i].y << ", ";
-            cerr << "expected = " << uint8_uint32[i].fExpected << endl;
+            err_msg( "Error in case uint8_uint32 throw (1): ", uint8_uint32[i].x, uint8_uint32[i].y, uint8_uint32[i].fExpected );
         }
 
         // Also need to test the version that assigns back out
@@ -1425,10 +1374,7 @@ void SubVerifyUint8Uint32()
 
         if( fSuccess != uint8_uint32[i].fExpected )
         {
-            cerr << "Error in case uint8_uint32 throw (2): ";
-            cerr << hex << setw(2) << setfill('0') << (0xFF & (int)uint8_uint32[i].x) << ", ";
-            cerr << hex << setw(8) << setfill('0') << uint8_uint32[i].y << ", ";
-            cerr << "expected = " << uint8_uint32[i].fExpected << endl;
+            err_msg( "Error in case uint8_uint32 throw (2): ", uint8_uint32[i].x, uint8_uint32[i].y, uint8_uint32[i].fExpected );
         }
     }
 }
@@ -1535,10 +1481,7 @@ void SubVerifyUint8Uint16()
         std::uint8_t ret;
         if( SafeSubtract(uint8_uint16[i].x, uint8_uint16[i].y, ret) != uint8_uint16[i].fExpected )
         {
-            cerr << "Error in case uint8_uint16: ";
-            cerr << hex << setw(2) << setfill('0') << (0xFF & (int)uint8_uint16[i].x) << ", ";
-            cerr << hex << setw(4) << setfill('0') << uint8_uint16[i].y << ", ";
-            cerr << "expected = " << uint8_uint16[i].fExpected << endl;
+            err_msg( "Error in case uint8_uint16: ", uint8_uint16[i].x, uint8_uint16[i].y, uint8_uint16[i].fExpected );
         }
 
         // Now test throwing version
@@ -1555,10 +1498,7 @@ void SubVerifyUint8Uint16()
 
         if( fSuccess != uint8_uint16[i].fExpected )
         {
-            cerr << "Error in case uint8_uint16 throw (1): ";
-            cerr << hex << setw(2) << setfill('0') << (0xFF & (int)uint8_uint16[i].x) << ", ";
-            cerr << hex << setw(4) << setfill('0') << uint8_uint16[i].y << ", ";
-            cerr << "expected = " << uint8_uint16[i].fExpected << endl;
+            err_msg( "Error in case uint8_uint16 throw (1): ", uint8_uint16[i].x, uint8_uint16[i].y, uint8_uint16[i].fExpected );
         }
 
         // Also need to test the version that assigns back out
@@ -1576,10 +1516,7 @@ void SubVerifyUint8Uint16()
 
         if( fSuccess != uint8_uint16[i].fExpected )
         {
-            cerr << "Error in case uint8_uint16 throw (2): ";
-            cerr << hex << setw(2) << setfill('0') << (0xFF & (int)uint8_uint16[i].x) << ", ";
-            cerr << hex << setw(4) << setfill('0') << uint8_uint16[i].y << ", ";
-            cerr << "expected = " << uint8_uint16[i].fExpected << endl;
+            err_msg( "Error in case uint8_uint16 throw (2): ", uint8_uint16[i].x, uint8_uint16[i].y, uint8_uint16[i].fExpected );
         }
     }
 }
@@ -1686,10 +1623,7 @@ void SubVerifyUint8Uint8()
         std::uint8_t ret;
         if( SafeSubtract(uint8_uint8[i].x, uint8_uint8[i].y, ret) != uint8_uint8[i].fExpected )
         {
-            cerr << "Error in case uint8_uint8: ";
-            cerr << hex << setw(2) << setfill('0') << (0xFF & (int)uint8_uint8[i].x) << ", ";
-            cerr << hex << setw(2) << setfill('0') << (0xFF & (int)uint8_uint8[i].y) << ", ";
-            cerr << "expected = " << uint8_uint8[i].fExpected << endl;
+            err_msg( "Error in case uint8_uint8: ", uint8_uint8[i].x, uint8_uint8[i].y, uint8_uint8[i].fExpected );
         }
 
         // Now test throwing version
@@ -1706,10 +1640,7 @@ void SubVerifyUint8Uint8()
 
         if( fSuccess != uint8_uint8[i].fExpected )
         {
-            cerr << "Error in case uint8_uint8 throw (1): ";
-            cerr << hex << setw(2) << setfill('0') << (0xFF & (int)uint8_uint8[i].x) << ", ";
-            cerr << hex << setw(2) << setfill('0') << (0xFF & (int)uint8_uint8[i].y) << ", ";
-            cerr << "expected = " << uint8_uint8[i].fExpected << endl;
+            err_msg( "Error in case uint8_uint8 throw (1): ", uint8_uint8[i].x, uint8_uint8[i].y, uint8_uint8[i].fExpected );
         }
 
         // Also need to test the version that assigns back out
@@ -1727,10 +1658,7 @@ void SubVerifyUint8Uint8()
 
         if( fSuccess != uint8_uint8[i].fExpected )
         {
-            cerr << "Error in case uint8_uint8 throw (2): ";
-            cerr << hex << setw(2) << setfill('0') << (0xFF & (int)uint8_uint8[i].x) << ", ";
-            cerr << hex << setw(2) << setfill('0') << (0xFF & (int)uint8_uint8[i].y) << ", ";
-            cerr << "expected = " << uint8_uint8[i].fExpected << endl;
+            err_msg( "Error in case uint8_uint8 throw (2): ", uint8_uint8[i].x, uint8_uint8[i].y, uint8_uint8[i].fExpected );
         }
     }
 }
@@ -2053,10 +1981,7 @@ void SubVerifyInt64Int64()
         std::int64_t ret;
         if( SafeSubtract(int64_int64[i].x, int64_int64[i].y, ret) != int64_int64[i].fExpected )
         {
-            cerr << "Error in case int64_int64: ";
-            cerr << hex << setw(16) << setfill('0') << int64_int64[i].x << ", ";
-            cerr << hex << setw(16) << setfill('0') << int64_int64[i].y << ", ";
-            cerr << "expected = " << int64_int64[i].fExpected << endl;
+            err_msg( "Error in case int64_int64: ", int64_int64[i].x, int64_int64[i].y, int64_int64[i].fExpected );
         }
 
         // Now test throwing version
@@ -2073,10 +1998,7 @@ void SubVerifyInt64Int64()
 
         if( fSuccess != int64_int64[i].fExpected )
         {
-            cerr << "Error in case int64_int64 throw (1): ";
-            cerr << hex << setw(16) << setfill('0') << int64_int64[i].x << ", ";
-            cerr << hex << setw(16) << setfill('0') << int64_int64[i].y << ", ";
-            cerr << "expected = " << int64_int64[i].fExpected << endl;
+            err_msg( "Error in case int64_int64 throw (1): ", int64_int64[i].x, int64_int64[i].y, int64_int64[i].fExpected );
         }
 
         // Also need to test the version that assigns back out
@@ -2094,10 +2016,7 @@ void SubVerifyInt64Int64()
 
         if( fSuccess != int64_int64[i].fExpected )
         {
-            cerr << "Error in case int64_int64 throw (2): ";
-            cerr << hex << setw(16) << setfill('0') << int64_int64[i].x << ", ";
-            cerr << hex << setw(16) << setfill('0') << int64_int64[i].y << ", ";
-            cerr << "expected = " << int64_int64[i].fExpected << endl;
+            err_msg( "Error in case int64_int64 throw (2): ", int64_int64[i].x, int64_int64[i].y, int64_int64[i].fExpected );
         }
     }
 }
@@ -2276,10 +2195,7 @@ void SubVerifyInt64Int32()
         std::int64_t ret;
         if( SafeSubtract(int64_int32[i].x, int64_int32[i].y, ret) != int64_int32[i].fExpected )
         {
-            cerr << "Error in case int64_int32: ";
-            cerr << hex << setw(16) << setfill('0') << int64_int32[i].x << ", ";
-            cerr << hex << setw(8) << setfill('0') << int64_int32[i].y << ", ";
-            cerr << "expected = " << int64_int32[i].fExpected << endl;
+            err_msg( "Error in case int64_int32: ", int64_int32[i].x, int64_int32[i].y, int64_int32[i].fExpected );
         }
 
         // Now test throwing version
@@ -2296,10 +2212,7 @@ void SubVerifyInt64Int32()
 
         if( fSuccess != int64_int32[i].fExpected )
         {
-            cerr << "Error in case int64_int32 throw (1): ";
-            cerr << hex << setw(16) << setfill('0') << int64_int32[i].x << ", ";
-            cerr << hex << setw(8) << setfill('0') << int64_int32[i].y << ", ";
-            cerr << "expected = " << int64_int32[i].fExpected << endl;
+            err_msg( "Error in case int64_int32 throw (1): ", int64_int32[i].x, int64_int32[i].y, int64_int32[i].fExpected );
         }
 
         // Also need to test the version that assigns back out
@@ -2317,10 +2230,7 @@ void SubVerifyInt64Int32()
 
         if( fSuccess != int64_int32[i].fExpected )
         {
-            cerr << "Error in case int64_int32 throw (2): ";
-            cerr << hex << setw(16) << setfill('0') << int64_int32[i].x << ", ";
-            cerr << hex << setw(8) << setfill('0') << int64_int32[i].y << ", ";
-            cerr << "expected = " << int64_int32[i].fExpected << endl;
+            err_msg( "Error in case int64_int32 throw (2): ", int64_int32[i].x, int64_int32[i].y, int64_int32[i].fExpected );
         }
     }
 }
@@ -2499,10 +2409,7 @@ void SubVerifyInt64Int16()
         std::int64_t ret;
         if( SafeSubtract(int64_int16[i].x, int64_int16[i].y, ret) != int64_int16[i].fExpected )
         {
-            cerr << "Error in case int64_int16: ";
-            cerr << hex << setw(16) << setfill('0') << int64_int16[i].x << ", ";
-            cerr << hex << setw(4) << setfill('0') << int64_int16[i].y << ", ";
-            cerr << "expected = " << int64_int16[i].fExpected << endl;
+            err_msg( "Error in case int64_int16: ", int64_int16[i].x, int64_int16[i].y, int64_int16[i].fExpected );
         }
 
         // Now test throwing version
@@ -2519,10 +2426,7 @@ void SubVerifyInt64Int16()
 
         if( fSuccess != int64_int16[i].fExpected )
         {
-            cerr << "Error in case int64_int16 throw (1): ";
-            cerr << hex << setw(16) << setfill('0') << int64_int16[i].x << ", ";
-            cerr << hex << setw(4) << setfill('0') << int64_int16[i].y << ", ";
-            cerr << "expected = " << int64_int16[i].fExpected << endl;
+            err_msg( "Error in case int64_int16 throw (1): ", int64_int16[i].x, int64_int16[i].y, int64_int16[i].fExpected );
         }
 
         // Also need to test the version that assigns back out
@@ -2540,10 +2444,7 @@ void SubVerifyInt64Int16()
 
         if( fSuccess != int64_int16[i].fExpected )
         {
-            cerr << "Error in case int64_int16 throw (2): ";
-            cerr << hex << setw(16) << setfill('0') << int64_int16[i].x << ", ";
-            cerr << hex << setw(4) << setfill('0') << int64_int16[i].y << ", ";
-            cerr << "expected = " << int64_int16[i].fExpected << endl;
+            err_msg( "Error in case int64_int16 throw (2): ", int64_int16[i].x, int64_int16[i].y, int64_int16[i].fExpected );
         }
     }
 }
@@ -2722,10 +2623,7 @@ void SubVerifyInt64Int8()
         std::int64_t ret;
         if( SafeSubtract(int64_int8[i].x, int64_int8[i].y, ret) != int64_int8[i].fExpected )
         {
-            cerr << "Error in case int64_int8: ";
-            cerr << hex << setw(16) << setfill('0') << int64_int8[i].x << ", ";
-            cerr << hex << setw(2) << setfill('0') << (0xFF & (int)int64_int8[i].y) << ", ";
-            cerr << "expected = " << int64_int8[i].fExpected << endl;
+            err_msg( "Error in case int64_int8: ", int64_int8[i].x, int64_int8[i].y, int64_int8[i].fExpected );
         }
 
         // Now test throwing version
@@ -2742,10 +2640,7 @@ void SubVerifyInt64Int8()
 
         if( fSuccess != int64_int8[i].fExpected )
         {
-            cerr << "Error in case int64_int8 throw (1): ";
-            cerr << hex << setw(16) << setfill('0') << int64_int8[i].x << ", ";
-            cerr << hex << setw(2) << setfill('0') << (0xFF & (int)int64_int8[i].y) << ", ";
-            cerr << "expected = " << int64_int8[i].fExpected << endl;
+            err_msg( "Error in case int64_int8 throw (1): ", int64_int8[i].x, int64_int8[i].y, int64_int8[i].fExpected );
         }
 
         // Also need to test the version that assigns back out
@@ -2763,10 +2658,7 @@ void SubVerifyInt64Int8()
 
         if( fSuccess != int64_int8[i].fExpected )
         {
-            cerr << "Error in case int64_int8 throw (2): ";
-            cerr << hex << setw(16) << setfill('0') << int64_int8[i].x << ", ";
-            cerr << hex << setw(2) << setfill('0') << (0xFF & (int)int64_int8[i].y) << ", ";
-            cerr << "expected = " << int64_int8[i].fExpected << endl;
+            err_msg( "Error in case int64_int8 throw (2): ", int64_int8[i].x, int64_int8[i].y, int64_int8[i].fExpected );
         }
     }
 }
@@ -2953,10 +2845,7 @@ void SubVerifyInt8Int64()
         std::int8_t ret;
         if( SafeSubtract(int8_int64[i].x, int8_int64[i].y, ret) != int8_int64[i].fExpected )
         {
-            cerr << "Error in case int8_int64: ";
-            cerr << hex << setw(2) << setfill('0') << (0xFF & (int)int8_int64[i].x) << ", ";
-            cerr << hex << setw(16) << setfill('0') << int8_int64[i].y << ", ";
-            cerr << "expected = " << int8_int64[i].fExpected << endl;
+            err_msg( "Error in case int8_int64: ", int8_int64[i].x, int8_int64[i].y, int8_int64[i].fExpected );
         }
 
         // Now test throwing version
@@ -2973,10 +2862,7 @@ void SubVerifyInt8Int64()
 
         if( fSuccess != int8_int64[i].fExpected )
         {
-            cerr << "Error in case int8_int64 throw (1): ";
-            cerr << hex << setw(2) << setfill('0') << (0xFF & (int)int8_int64[i].x) << ", ";
-            cerr << hex << setw(16) << setfill('0') << int8_int64[i].y << ", ";
-            cerr << "expected = " << int8_int64[i].fExpected << endl;
+            err_msg( "Error in case int8_int64 throw (1): ", int8_int64[i].x, int8_int64[i].y, int8_int64[i].fExpected );
         }
 
         // Also need to test the version that assigns back out
@@ -2994,10 +2880,7 @@ void SubVerifyInt8Int64()
 
         if( fSuccess != int8_int64[i].fExpected )
         {
-            cerr << "Error in case int8_int64 throw (2): ";
-            cerr << hex << setw(2) << setfill('0') << (0xFF & (int)int8_int64[i].x) << ", ";
-            cerr << hex << setw(16) << setfill('0') << int8_int64[i].y << ", ";
-            cerr << "expected = " << int8_int64[i].fExpected << endl;
+            err_msg( "Error in case int8_int64 throw (2): ", int8_int64[i].x, int8_int64[i].y, int8_int64[i].fExpected );
         }
     }
 }
@@ -3104,10 +2987,7 @@ void SubVerifyInt8Int32()
         std::int8_t ret;
         if( SafeSubtract(int8_int32[i].x, int8_int32[i].y, ret) != int8_int32[i].fExpected )
         {
-            cerr << "Error in case int8_int32: ";
-            cerr << hex << setw(2) << setfill('0') << (0xFF & (int)int8_int32[i].x) << ", ";
-            cerr << hex << setw(8) << setfill('0') << int8_int32[i].y << ", ";
-            cerr << "expected = " << int8_int32[i].fExpected << endl;
+            err_msg( "Error in case int8_int32: ", int8_int32[i].x, int8_int32[i].y, int8_int32[i].fExpected );
         }
 
         // Now test throwing version
@@ -3124,10 +3004,8 @@ void SubVerifyInt8Int32()
 
         if( fSuccess != int8_int32[i].fExpected )
         {
-            cerr << "Error in case int8_int32 throw (1): ";
-            cerr << hex << setw(2) << setfill('0') << (0xFF & (int)int8_int32[i].x) << ", ";
-            cerr << hex << setw(8) << setfill('0') << int8_int32[i].y << ", ";
-            cerr << "expected = " << int8_int32[i].fExpected << endl;
+            err_msg( "Error in case int8_int32 throw (1): ", int8_int32[i].x, int8_int32[i].y,
+            int8_int32[i].fExpected );
         }
 
         // Also need to test the version that assigns back out
@@ -3145,10 +3023,7 @@ void SubVerifyInt8Int32()
 
         if( fSuccess != int8_int32[i].fExpected )
         {
-            cerr << "Error in case int8_int32 throw (2): ";
-            cerr << hex << setw(2) << setfill('0') << (0xFF & (int)int8_int32[i].x) << ", ";
-            cerr << hex << setw(8) << setfill('0') << int8_int32[i].y << ", ";
-            cerr << "expected = " << int8_int32[i].fExpected << endl;
+            err_msg( "Error in case int8_int32 throw (2): ", int8_int32[i].x, int8_int32[i].y, int8_int32[i].fExpected );
         }
     }
 }
@@ -3255,10 +3130,7 @@ void SubVerifyInt8Int16()
         std::int8_t ret;
         if( SafeSubtract(int8_int16[i].x, int8_int16[i].y, ret) != int8_int16[i].fExpected )
         {
-            cerr << "Error in case int8_int16: ";
-            cerr << hex << setw(2) << setfill('0') << (0xFF & (int)int8_int16[i].x) << ", ";
-            cerr << hex << setw(4) << setfill('0') << int8_int16[i].y << ", ";
-            cerr << "expected = " << int8_int16[i].fExpected << endl;
+            err_msg( "Error in case int8_int16: ", int8_int16[i].x, int8_int16[i].y, int8_int16[i].fExpected );
         }
 
         // Now test throwing version
@@ -3275,10 +3147,7 @@ void SubVerifyInt8Int16()
 
         if( fSuccess != int8_int16[i].fExpected )
         {
-            cerr << "Error in case int8_int16 throw (1): ";
-            cerr << hex << setw(2) << setfill('0') << (0xFF & (int)int8_int16[i].x) << ", ";
-            cerr << hex << setw(4) << setfill('0') << int8_int16[i].y << ", ";
-            cerr << "expected = " << int8_int16[i].fExpected << endl;
+            err_msg( "Error in case int8_int16 throw (1): ", int8_int16[i].x, int8_int16[i].y, int8_int16[i].fExpected );
         }
 
         // Also need to test the version that assigns back out
@@ -3296,10 +3165,7 @@ void SubVerifyInt8Int16()
 
         if( fSuccess != int8_int16[i].fExpected )
         {
-            cerr << "Error in case int8_int16 throw (2): ";
-            cerr << hex << setw(2) << setfill('0') << (0xFF & (int)int8_int16[i].x) << ", ";
-            cerr << hex << setw(4) << setfill('0') << int8_int16[i].y << ", ";
-            cerr << "expected = " << int8_int16[i].fExpected << endl;
+            err_msg( "Error in case int8_int16 throw (2): ", int8_int16[i].x, int8_int16[i].y, int8_int16[i].fExpected );
         }
     }
 }
@@ -3406,10 +3272,7 @@ void SubVerifyInt8Int8()
         std::int8_t ret;
         if( SafeSubtract(int8_int8[i].x, int8_int8[i].y, ret) != int8_int8[i].fExpected )
         {
-            cerr << "Error in case int8_int8: ";
-            cerr << hex << setw(2) << setfill('0') << (0xFF & (int)int8_int8[i].x) << ", ";
-            cerr << hex << setw(2) << setfill('0') << (0xFF & (int)int8_int8[i].y) << ", ";
-            cerr << "expected = " << int8_int8[i].fExpected << endl;
+            err_msg( "Error in case int8_int8: ", int8_int8[i].x, int8_int8[i].y, int8_int8[i].fExpected );
         }
 
         // Now test throwing version
@@ -3426,10 +3289,7 @@ void SubVerifyInt8Int8()
 
         if( fSuccess != int8_int8[i].fExpected )
         {
-            cerr << "Error in case int8_int8 throw (1): ";
-            cerr << hex << setw(2) << setfill('0') << (0xFF & (int)int8_int8[i].x) << ", ";
-            cerr << hex << setw(2) << setfill('0') << (0xFF & (int)int8_int8[i].y) << ", ";
-            cerr << "expected = " << int8_int8[i].fExpected << endl;
+            err_msg( "Error in case int8_int8 throw (1): ", int8_int8[i].x, int8_int8[i].y, int8_int8[i].fExpected );
         }
 
         // Also need to test the version that assigns back out
@@ -3447,10 +3307,7 @@ void SubVerifyInt8Int8()
 
         if( fSuccess != int8_int8[i].fExpected )
         {
-            cerr << "Error in case int8_int8 throw (2): ";
-            cerr << hex << setw(2) << setfill('0') << (0xFF & (int)int8_int8[i].x) << ", ";
-            cerr << hex << setw(2) << setfill('0') << (0xFF & (int)int8_int8[i].y) << ", ";
-            cerr << "expected = " << int8_int8[i].fExpected << endl;
+            err_msg( "Error in case int8_int8 throw (2): ", int8_int8[i].x, int8_int8[i].y, int8_int8[i].fExpected );
         }
     }
 }
@@ -3773,10 +3630,7 @@ void SubVerifyUint64Int64()
         std::uint64_t ret;
         if( SafeSubtract(uint64_int64[i].x, uint64_int64[i].y, ret) != uint64_int64[i].fExpected )
         {
-            cerr << "Error in case uint64_int64: ";
-            cerr << hex << setw(16) << setfill('0') << uint64_int64[i].x << ", ";
-            cerr << hex << setw(16) << setfill('0') << uint64_int64[i].y << ", ";
-            cerr << "expected = " << uint64_int64[i].fExpected << endl;
+            err_msg( "Error in case uint64_int64: ", uint64_int64[i].x, uint64_int64[i].y, uint64_int64[i].fExpected );
         }
 
         // Now test throwing version
@@ -3793,10 +3647,7 @@ void SubVerifyUint64Int64()
 
         if( fSuccess != uint64_int64[i].fExpected )
         {
-            cerr << "Error in case uint64_int64 throw (1): ";
-            cerr << hex << setw(16) << setfill('0') << uint64_int64[i].x << ", ";
-            cerr << hex << setw(16) << setfill('0') << uint64_int64[i].y << ", ";
-            cerr << "expected = " << uint64_int64[i].fExpected << endl;
+            err_msg( "Error in case uint64_int64 throw (1): ", uint64_int64[i].x, uint64_int64[i].y, uint64_int64[i].fExpected );
         }
 
         // Also need to test the version that assigns back out
@@ -3814,10 +3665,7 @@ void SubVerifyUint64Int64()
 
         if( fSuccess != uint64_int64[i].fExpected )
         {
-            cerr << "Error in case uint64_int64 throw (2): ";
-            cerr << hex << setw(16) << setfill('0') << uint64_int64[i].x << ", ";
-            cerr << hex << setw(16) << setfill('0') << uint64_int64[i].y << ", ";
-            cerr << "expected = " << uint64_int64[i].fExpected << endl;
+            err_msg( "Error in case uint64_int64 throw (2): ", uint64_int64[i].x, uint64_int64[i].y, uint64_int64[i].fExpected );
         }
     }
 }
@@ -3996,10 +3844,7 @@ void SubVerifyUint64Int32()
         std::uint64_t ret;
         if( SafeSubtract(uint64_int32[i].x, uint64_int32[i].y, ret) != uint64_int32[i].fExpected )
         {
-            cerr << "Error in case uint64_int32: ";
-            cerr << hex << setw(16) << setfill('0') << uint64_int32[i].x << ", ";
-            cerr << hex << setw(8) << setfill('0') << uint64_int32[i].y << ", ";
-            cerr << "expected = " << uint64_int32[i].fExpected << endl;
+            err_msg( "Error in case uint64_int32: ", uint64_int32[i].x, uint64_int32[i].y, uint64_int32[i].fExpected );
         }
 
         // Now test throwing version
@@ -4016,10 +3861,7 @@ void SubVerifyUint64Int32()
 
         if( fSuccess != uint64_int32[i].fExpected )
         {
-            cerr << "Error in case uint64_int32 throw (1): ";
-            cerr << hex << setw(16) << setfill('0') << uint64_int32[i].x << ", ";
-            cerr << hex << setw(8) << setfill('0') << uint64_int32[i].y << ", ";
-            cerr << "expected = " << uint64_int32[i].fExpected << endl;
+            err_msg( "Error in case uint64_int32 throw (1): ", uint64_int32[i].x, uint64_int32[i].y, uint64_int32[i].fExpected );
         }
 
         // Also need to test the version that assigns back out
@@ -4037,10 +3879,7 @@ void SubVerifyUint64Int32()
 
         if( fSuccess != uint64_int32[i].fExpected )
         {
-            cerr << "Error in case uint64_int32 throw (2): ";
-            cerr << hex << setw(16) << setfill('0') << uint64_int32[i].x << ", ";
-            cerr << hex << setw(8) << setfill('0') << uint64_int32[i].y << ", ";
-            cerr << "expected = " << uint64_int32[i].fExpected << endl;
+            err_msg( "Error in case uint64_int32 throw (2): ", uint64_int32[i].x, uint64_int32[i].y, uint64_int32[i].fExpected );
         }
     }
 }
@@ -4219,10 +4058,7 @@ void SubVerifyUint64Int16()
         std::uint64_t ret;
         if( SafeSubtract(uint64_int16[i].x, uint64_int16[i].y, ret) != uint64_int16[i].fExpected )
         {
-            cerr << "Error in case uint64_int16: ";
-            cerr << hex << setw(16) << setfill('0') << uint64_int16[i].x << ", ";
-            cerr << hex << setw(4) << setfill('0') << uint64_int16[i].y << ", ";
-            cerr << "expected = " << uint64_int16[i].fExpected << endl;
+            err_msg( "Error in case uint64_int16: ", uint64_int16[i].x, uint64_int16[i].y, uint64_int16[i].fExpected );
         }
 
         // Now test throwing version
@@ -4239,10 +4075,7 @@ void SubVerifyUint64Int16()
 
         if( fSuccess != uint64_int16[i].fExpected )
         {
-            cerr << "Error in case uint64_int16 throw (1): ";
-            cerr << hex << setw(16) << setfill('0') << uint64_int16[i].x << ", ";
-            cerr << hex << setw(4) << setfill('0') << uint64_int16[i].y << ", ";
-            cerr << "expected = " << uint64_int16[i].fExpected << endl;
+            err_msg( "Error in case uint64_int16 throw (1): ", uint64_int16[i].x, uint64_int16[i].y, uint64_int16[i].fExpected );
         }
 
         // Also need to test the version that assigns back out
@@ -4260,10 +4093,7 @@ void SubVerifyUint64Int16()
 
         if( fSuccess != uint64_int16[i].fExpected )
         {
-            cerr << "Error in case uint64_int16 throw (2): ";
-            cerr << hex << setw(16) << setfill('0') << uint64_int16[i].x << ", ";
-            cerr << hex << setw(4) << setfill('0') << uint64_int16[i].y << ", ";
-            cerr << "expected = " << uint64_int16[i].fExpected << endl;
+            err_msg( "Error in case uint64_int16 throw (2): ", uint64_int16[i].x, uint64_int16[i].y, uint64_int16[i].fExpected );
         }
     }
 }
@@ -4442,10 +4272,7 @@ void SubVerifyUint64Int8()
         std::uint64_t ret;
         if( SafeSubtract(uint64_int8[i].x, uint64_int8[i].y, ret) != uint64_int8[i].fExpected )
         {
-            cerr << "Error in case uint64_int8: ";
-            cerr << hex << setw(16) << setfill('0') << uint64_int8[i].x << ", ";
-            cerr << hex << setw(2) << setfill('0') << (0xFF & (int)uint64_int8[i].y) << ", ";
-            cerr << "expected = " << uint64_int8[i].fExpected << endl;
+            err_msg( "Error in case uint64_int8: ", uint64_int8[i].x, uint64_int8[i].y, uint64_int8[i].fExpected );
         }
 
         // Now test throwing version
@@ -4462,10 +4289,7 @@ void SubVerifyUint64Int8()
 
         if( fSuccess != uint64_int8[i].fExpected )
         {
-            cerr << "Error in case uint64_int8 throw (1): ";
-            cerr << hex << setw(16) << setfill('0') << uint64_int8[i].x << ", ";
-            cerr << hex << setw(2) << setfill('0') << (0xFF & (int)uint64_int8[i].y) << ", ";
-            cerr << "expected = " << uint64_int8[i].fExpected << endl;
+            err_msg( "Error in case uint64_int8 throw (1): ", uint64_int8[i].x, uint64_int8[i].y, uint64_int8[i].fExpected );
         }
 
         // Also need to test the version that assigns back out
@@ -4483,10 +4307,7 @@ void SubVerifyUint64Int8()
 
         if( fSuccess != uint64_int8[i].fExpected )
         {
-            cerr << "Error in case uint64_int8 throw (2): ";
-            cerr << hex << setw(16) << setfill('0') << uint64_int8[i].x << ", ";
-            cerr << hex << setw(2) << setfill('0') << (0xFF & (int)uint64_int8[i].y) << ", ";
-            cerr << "expected = " << uint64_int8[i].fExpected << endl;
+            err_msg( "Error in case uint64_int8 throw (2): ", uint64_int8[i].x, uint64_int8[i].y, uint64_int8[i].fExpected );
         }
     }
 }
@@ -4673,10 +4494,7 @@ void SubVerifyUint8Int64()
         std::uint8_t ret;
         if( SafeSubtract(uint8_int64[i].x, uint8_int64[i].y, ret) != uint8_int64[i].fExpected )
         {
-            cerr << "Error in case uint8_int64: ";
-            cerr << hex << setw(2) << setfill('0') << (0xFF & (int)uint8_int64[i].x) << ", ";
-            cerr << hex << setw(16) << setfill('0') << uint8_int64[i].y << ", ";
-            cerr << "expected = " << uint8_int64[i].fExpected << endl;
+            err_msg( "Error in case uint8_int64: ", uint8_int64[i].x, uint8_int64[i].y, uint8_int64[i].fExpected );
         }
 
         // Now test throwing version
@@ -4693,10 +4511,7 @@ void SubVerifyUint8Int64()
 
         if( fSuccess != uint8_int64[i].fExpected )
         {
-            cerr << "Error in case uint8_int64 throw (1): ";
-            cerr << hex << setw(2) << setfill('0') << (0xFF & (int)uint8_int64[i].x) << ", ";
-            cerr << hex << setw(16) << setfill('0') << uint8_int64[i].y << ", ";
-            cerr << "expected = " << uint8_int64[i].fExpected << endl;
+            err_msg( "Error in case uint8_int64 throw (1): ", uint8_int64[i].x, uint8_int64[i].y, uint8_int64[i].fExpected );
         }
 
         // Also need to test the version that assigns back out
@@ -4714,10 +4529,7 @@ void SubVerifyUint8Int64()
 
         if( fSuccess != uint8_int64[i].fExpected )
         {
-            cerr << "Error in case uint8_int64 throw (2): ";
-            cerr << hex << setw(2) << setfill('0') << (0xFF & (int)uint8_int64[i].x) << ", ";
-            cerr << hex << setw(16) << setfill('0') << uint8_int64[i].y << ", ";
-            cerr << "expected = " << uint8_int64[i].fExpected << endl;
+            err_msg( "Error in case uint8_int64 throw (2): ", uint8_int64[i].x, uint8_int64[i].y, uint8_int64[i].fExpected );
         }
     }
 }
@@ -4824,10 +4636,7 @@ void SubVerifyUint8Int32()
         std::uint8_t ret;
         if( SafeSubtract(uint8_int32[i].x, uint8_int32[i].y, ret) != uint8_int32[i].fExpected )
         {
-            cerr << "Error in case uint8_int32: ";
-            cerr << hex << setw(2) << setfill('0') << (0xFF & (int)uint8_int32[i].x) << ", ";
-            cerr << hex << setw(8) << setfill('0') << uint8_int32[i].y << ", ";
-            cerr << "expected = " << uint8_int32[i].fExpected << endl;
+            err_msg( "Error in case uint8_int32: ", uint8_int32[i].x, uint8_int32[i].y, uint8_int32[i].fExpected );
         }
 
         // Now test throwing version
@@ -4844,10 +4653,8 @@ void SubVerifyUint8Int32()
 
         if( fSuccess != uint8_int32[i].fExpected )
         {
-            cerr << "Error in case uint8_int32 throw (1): ";
-            cerr << hex << setw(2) << setfill('0') << (0xFF & (int)uint8_int32[i].x) << ", ";
-            cerr << hex << setw(8) << setfill('0') << uint8_int32[i].y << ", ";
-            cerr << "expected = " << uint8_int32[i].fExpected << endl;
+            err_msg( "Error in case uint8_int32 throw (1): ", uint8_int32[i].x, uint8_int32[i].y,
+            uint8_int32[i].fExpected );
         }
 
         // Also need to test the version that assigns back out
@@ -4865,10 +4672,7 @@ void SubVerifyUint8Int32()
 
         if( fSuccess != uint8_int32[i].fExpected )
         {
-            cerr << "Error in case uint8_int32 throw (2): ";
-            cerr << hex << setw(2) << setfill('0') << (0xFF & (int)uint8_int32[i].x) << ", ";
-            cerr << hex << setw(8) << setfill('0') << uint8_int32[i].y << ", ";
-            cerr << "expected = " << uint8_int32[i].fExpected << endl;
+            err_msg( "Error in case uint8_int32 throw (2): ", uint8_int32[i].x, uint8_int32[i].y, uint8_int32[i].fExpected );
         }
     }
 }
@@ -4975,10 +4779,7 @@ void SubVerifyUint8Int16()
         std::uint8_t ret;
         if( SafeSubtract(uint8_int16[i].x, uint8_int16[i].y, ret) != uint8_int16[i].fExpected )
         {
-            cerr << "Error in case uint8_int16: ";
-            cerr << hex << setw(2) << setfill('0') << (0xFF & (int)uint8_int16[i].x) << ", ";
-            cerr << hex << setw(4) << setfill('0') << uint8_int16[i].y << ", ";
-            cerr << "expected = " << uint8_int16[i].fExpected << endl;
+            err_msg( "Error in case uint8_int16: ", uint8_int16[i].x, uint8_int16[i].y, uint8_int16[i].fExpected );
         }
 
         // Now test throwing version
@@ -4995,10 +4796,7 @@ void SubVerifyUint8Int16()
 
         if( fSuccess != uint8_int16[i].fExpected )
         {
-            cerr << "Error in case uint8_int16 throw (1): ";
-            cerr << hex << setw(2) << setfill('0') << (0xFF & (int)uint8_int16[i].x) << ", ";
-            cerr << hex << setw(4) << setfill('0') << uint8_int16[i].y << ", ";
-            cerr << "expected = " << uint8_int16[i].fExpected << endl;
+            err_msg( "Error in case uint8_int16 throw (1): ", uint8_int16[i].x, uint8_int16[i].y, uint8_int16[i].fExpected );
         }
 
         // Also need to test the version that assigns back out
@@ -5016,10 +4814,7 @@ void SubVerifyUint8Int16()
 
         if( fSuccess != uint8_int16[i].fExpected )
         {
-            cerr << "Error in case uint8_int16 throw (2): ";
-            cerr << hex << setw(2) << setfill('0') << (0xFF & (int)uint8_int16[i].x) << ", ";
-            cerr << hex << setw(4) << setfill('0') << uint8_int16[i].y << ", ";
-            cerr << "expected = " << uint8_int16[i].fExpected << endl;
+            err_msg( "Error in case uint8_int16 throw (2): ", uint8_int16[i].x, uint8_int16[i].y, uint8_int16[i].fExpected );
         }
     }
 }
@@ -5126,10 +4921,7 @@ void SubVerifyUint8Int8()
         std::uint8_t ret;
         if( SafeSubtract(uint8_int8[i].x, uint8_int8[i].y, ret) != uint8_int8[i].fExpected )
         {
-            cerr << "Error in case uint8_int8: ";
-            cerr << hex << setw(2) << setfill('0') << (0xFF & (int)uint8_int8[i].x) << ", ";
-            cerr << hex << setw(2) << setfill('0') << (0xFF & (int)uint8_int8[i].y) << ", ";
-            cerr << "expected = " << uint8_int8[i].fExpected << endl;
+            err_msg( "Error in case uint8_int8: ", uint8_int8[i].x, uint8_int8[i].y, uint8_int8[i].fExpected );
         }
 
         // Now test throwing version
@@ -5146,10 +4938,7 @@ void SubVerifyUint8Int8()
 
         if( fSuccess != uint8_int8[i].fExpected )
         {
-            cerr << "Error in case uint8_int8 throw (1): ";
-            cerr << hex << setw(2) << setfill('0') << (0xFF & (int)uint8_int8[i].x) << ", ";
-            cerr << hex << setw(2) << setfill('0') << (0xFF & (int)uint8_int8[i].y) << ", ";
-            cerr << "expected = " << uint8_int8[i].fExpected << endl;
+            err_msg( "Error in case uint8_int8 throw (1): ", uint8_int8[i].x, uint8_int8[i].y, uint8_int8[i].fExpected );
         }
 
         // Also need to test the version that assigns back out
@@ -5167,10 +4956,7 @@ void SubVerifyUint8Int8()
 
         if( fSuccess != uint8_int8[i].fExpected )
         {
-            cerr << "Error in case uint8_int8 throw (2): ";
-            cerr << hex << setw(2) << setfill('0') << (0xFF & (int)uint8_int8[i].x) << ", ";
-            cerr << hex << setw(2) << setfill('0') << (0xFF & (int)uint8_int8[i].y) << ", ";
-            cerr << "expected = " << uint8_int8[i].fExpected << endl;
+            err_msg( "Error in case uint8_int8 throw (2): ", uint8_int8[i].x, uint8_int8[i].y, uint8_int8[i].fExpected );
         }
     }
 }
@@ -5493,10 +5279,7 @@ void SubVerifyInt64Uint64()
         std::int64_t ret;
         if( SafeSubtract(int64_uint64[i].x, int64_uint64[i].y, ret) != int64_uint64[i].fExpected )
         {
-            cerr << "Error in case int64_uint64: ";
-            cerr << hex << setw(16) << setfill('0') << int64_uint64[i].x << ", ";
-            cerr << hex << setw(16) << setfill('0') << int64_uint64[i].y << ", ";
-            cerr << "expected = " << int64_uint64[i].fExpected << endl;
+            err_msg( "Error in case int64_uint64: ", int64_uint64[i].x, int64_uint64[i].y, int64_uint64[i].fExpected );
         }
 
         // Now test throwing version
@@ -5513,10 +5296,7 @@ void SubVerifyInt64Uint64()
 
         if( fSuccess != int64_uint64[i].fExpected )
         {
-            cerr << "Error in case int64_uint64 throw (1): ";
-            cerr << hex << setw(16) << setfill('0') << int64_uint64[i].x << ", ";
-            cerr << hex << setw(16) << setfill('0') << int64_uint64[i].y << ", ";
-            cerr << "expected = " << int64_uint64[i].fExpected << endl;
+            err_msg( "Error in case int64_uint64 throw (1): ", int64_uint64[i].x, int64_uint64[i].y, int64_uint64[i].fExpected ); 
         }
 
         // Also need to test the version that assigns back out
@@ -5534,10 +5314,7 @@ void SubVerifyInt64Uint64()
 
         if( fSuccess != int64_uint64[i].fExpected )
         {
-            cerr << "Error in case int64_uint64 throw (2): ";
-            cerr << hex << setw(16) << setfill('0') << int64_uint64[i].x << ", ";
-            cerr << hex << setw(16) << setfill('0') << int64_uint64[i].y << ", ";
-            cerr << "expected = " << int64_uint64[i].fExpected << endl;
+            err_msg( "Error in case int64_uint64 throw (2): ", int64_uint64[i].x, int64_uint64[i].y, int64_uint64[i].fExpected );
         }
     }
 }
@@ -5716,10 +5493,7 @@ void SubVerifyInt64Uint32()
         std::int64_t ret;
         if( SafeSubtract(int64_uint32[i].x, int64_uint32[i].y, ret) != int64_uint32[i].fExpected )
         {
-            cerr << "Error in case int64_uint32: ";
-            cerr << hex << setw(16) << setfill('0') << int64_uint32[i].x << ", ";
-            cerr << hex << setw(8) << setfill('0') << int64_uint32[i].y << ", ";
-            cerr << "expected = " << int64_uint32[i].fExpected << endl;
+            err_msg( "Error in case int64_uint32: ", int64_uint32[i].x, int64_uint32[i].y, int64_uint32[i].fExpected );
         }
 
         // Now test throwing version
@@ -5736,10 +5510,7 @@ void SubVerifyInt64Uint32()
 
         if( fSuccess != int64_uint32[i].fExpected )
         {
-            cerr << "Error in case int64_uint32 throw (1): ";
-            cerr << hex << setw(16) << setfill('0') << int64_uint32[i].x << ", ";
-            cerr << hex << setw(8) << setfill('0') << int64_uint32[i].y << ", ";
-            cerr << "expected = " << int64_uint32[i].fExpected << endl;
+            err_msg( "Error in case int64_uint32 throw (1): ", int64_uint32[i].x, int64_uint32[i].y, int64_uint32[i].fExpected );
         }
 
         // Also need to test the version that assigns back out
@@ -5757,10 +5528,7 @@ void SubVerifyInt64Uint32()
 
         if( fSuccess != int64_uint32[i].fExpected )
         {
-            cerr << "Error in case int64_uint32 throw (2): ";
-            cerr << hex << setw(16) << setfill('0') << int64_uint32[i].x << ", ";
-            cerr << hex << setw(8) << setfill('0') << int64_uint32[i].y << ", ";
-            cerr << "expected = " << int64_uint32[i].fExpected << endl;
+            err_msg( "Error in case int64_uint32 throw (2): ", int64_uint32[i].x, int64_uint32[i].y, int64_uint32[i].fExpected );
         }
     }
 }
@@ -5939,10 +5707,7 @@ void SubVerifyInt64Uint16()
         std::int64_t ret;
         if( SafeSubtract(int64_uint16[i].x, int64_uint16[i].y, ret) != int64_uint16[i].fExpected )
         {
-            cerr << "Error in case int64_uint16: ";
-            cerr << hex << setw(16) << setfill('0') << int64_uint16[i].x << ", ";
-            cerr << hex << setw(4) << setfill('0') << int64_uint16[i].y << ", ";
-            cerr << "expected = " << int64_uint16[i].fExpected << endl;
+            err_msg( "Error in case int64_uint16: ", int64_uint16[i].x, int64_uint16[i].y, int64_uint16[i].fExpected );
         }
 
         // Now test throwing version
@@ -5959,10 +5724,7 @@ void SubVerifyInt64Uint16()
 
         if( fSuccess != int64_uint16[i].fExpected )
         {
-            cerr << "Error in case int64_uint16 throw (1): ";
-            cerr << hex << setw(16) << setfill('0') << int64_uint16[i].x << ", ";
-            cerr << hex << setw(4) << setfill('0') << int64_uint16[i].y << ", ";
-            cerr << "expected = " << int64_uint16[i].fExpected << endl;
+            err_msg( "Error in case int64_uint16 throw (1): ", int64_uint16[i].x, int64_uint16[i].y, int64_uint16[i].fExpected );
         }
 
         // Also need to test the version that assigns back out
@@ -5980,10 +5742,7 @@ void SubVerifyInt64Uint16()
 
         if( fSuccess != int64_uint16[i].fExpected )
         {
-            cerr << "Error in case int64_uint16 throw (2): ";
-            cerr << hex << setw(16) << setfill('0') << int64_uint16[i].x << ", ";
-            cerr << hex << setw(4) << setfill('0') << int64_uint16[i].y << ", ";
-            cerr << "expected = " << int64_uint16[i].fExpected << endl;
+            err_msg( "Error in case int64_uint16 throw (2): ", int64_uint16[i].x, int64_uint16[i].y, int64_uint16[i].fExpected );
         }
     }
 }
@@ -6162,10 +5921,7 @@ void SubVerifyInt64Uint8()
         std::int64_t ret;
         if( SafeSubtract(int64_uint8[i].x, int64_uint8[i].y, ret) != int64_uint8[i].fExpected )
         {
-            cerr << "Error in case int64_uint8: ";
-            cerr << hex << setw(16) << setfill('0') << int64_uint8[i].x << ", ";
-            cerr << hex << setw(2) << setfill('0') << (0xFF & (int)int64_uint8[i].y) << ", ";
-            cerr << "expected = " << int64_uint8[i].fExpected << endl;
+            err_msg( "Error in case int64_uint8: ", int64_uint8[i].x, int64_uint8[i].y, int64_uint8[i].fExpected );
         }
 
         // Now test throwing version
@@ -6182,10 +5938,7 @@ void SubVerifyInt64Uint8()
 
         if( fSuccess != int64_uint8[i].fExpected )
         {
-            cerr << "Error in case int64_uint8 throw (1): ";
-            cerr << hex << setw(16) << setfill('0') << int64_uint8[i].x << ", ";
-            cerr << hex << setw(2) << setfill('0') << (0xFF & (int)int64_uint8[i].y) << ", ";
-            cerr << "expected = " << int64_uint8[i].fExpected << endl;
+            err_msg( "Error in case int64_uint8 throw (1): ", int64_uint8[i].x, int64_uint8[i].y, int64_uint8[i].fExpected );
         }
 
         // Also need to test the version that assigns back out
@@ -6203,10 +5956,7 @@ void SubVerifyInt64Uint8()
 
         if( fSuccess != int64_uint8[i].fExpected )
         {
-            cerr << "Error in case int64_uint8 throw (2): ";
-            cerr << hex << setw(16) << setfill('0') << int64_uint8[i].x << ", ";
-            cerr << hex << setw(2) << setfill('0') << (0xFF & (int)int64_uint8[i].y) << ", ";
-            cerr << "expected = " << int64_uint8[i].fExpected << endl;
+            err_msg( "Error in case int64_uint8 throw (2): ", int64_uint8[i].x, int64_uint8[i].y, int64_uint8[i].fExpected );
         }
     }
 }
@@ -6393,10 +6143,7 @@ void SubVerifyInt8Uint64()
         std::int8_t ret;
         if( SafeSubtract(int8_uint64[i].x, int8_uint64[i].y, ret) != int8_uint64[i].fExpected )
         {
-            cerr << "Error in case int8_uint64: ";
-            cerr << hex << setw(2) << setfill('0') << (0xFF & (int)int8_uint64[i].x) << ", ";
-            cerr << hex << setw(16) << setfill('0') << int8_uint64[i].y << ", ";
-            cerr << "expected = " << int8_uint64[i].fExpected << endl;
+            err_msg( "Error in case int8_uint64: ", int8_uint64[i].x, int8_uint64[i].y, int8_uint64[i].fExpected );
         }
 
         // Now test throwing version
@@ -6413,10 +6160,7 @@ void SubVerifyInt8Uint64()
 
         if( fSuccess != int8_uint64[i].fExpected )
         {
-            cerr << "Error in case int8_uint64 throw (1): ";
-            cerr << hex << setw(2) << setfill('0') << (0xFF & (int)int8_uint64[i].x) << ", ";
-            cerr << hex << setw(16) << setfill('0') << int8_uint64[i].y << ", ";
-            cerr << "expected = " << int8_uint64[i].fExpected << endl;
+            err_msg( "Error in case int8_uint64 throw (1): ", int8_uint64[i].x, int8_uint64[i].y, int8_uint64[i].fExpected );
         }
 
         // Also need to test the version that assigns back out
@@ -6434,10 +6178,7 @@ void SubVerifyInt8Uint64()
 
         if( fSuccess != int8_uint64[i].fExpected )
         {
-            cerr << "Error in case int8_uint64 throw (2): ";
-            cerr << hex << setw(2) << setfill('0') << (0xFF & (int)int8_uint64[i].x) << ", ";
-            cerr << hex << setw(16) << setfill('0') << int8_uint64[i].y << ", ";
-            cerr << "expected = " << int8_uint64[i].fExpected << endl;
+            err_msg( "Error in case int8_uint64 throw (2): ", int8_uint64[i].x, int8_uint64[i].y, int8_uint64[i].fExpected );
         }
     }
 }
@@ -6544,10 +6285,7 @@ void SubVerifyInt8Uint32()
         std::int8_t ret;
         if( SafeSubtract(int8_uint32[i].x, int8_uint32[i].y, ret) != int8_uint32[i].fExpected )
         {
-            cerr << "Error in case int8_uint32: ";
-            cerr << hex << setw(2) << setfill('0') << (0xFF & (int)int8_uint32[i].x) << ", ";
-            cerr << hex << setw(8) << setfill('0') << int8_uint32[i].y << ", ";
-            cerr << "expected = " << int8_uint32[i].fExpected << endl;
+            err_msg( "Error in case int8_uint32: ", int8_uint32[i].x, int8_uint32[i].y, int8_uint32[i].fExpected );
         }
 
         // Now test throwing version
@@ -6564,10 +6302,7 @@ void SubVerifyInt8Uint32()
 
         if( fSuccess != int8_uint32[i].fExpected )
         {
-            cerr << "Error in case int8_uint32 throw (1): ";
-            cerr << hex << setw(2) << setfill('0') << (0xFF & (int)int8_uint32[i].x) << ", ";
-            cerr << hex << setw(8) << setfill('0') << int8_uint32[i].y << ", ";
-            cerr << "expected = " << int8_uint32[i].fExpected << endl;
+            err_msg( "Error in case int8_uint32 throw (1): ", int8_uint32[i].x, int8_uint32[i].y, int8_uint32[i].fExpected );
         }
 
         // Also need to test the version that assigns back out
@@ -6585,10 +6320,7 @@ void SubVerifyInt8Uint32()
 
         if( fSuccess != int8_uint32[i].fExpected )
         {
-            cerr << "Error in case int8_uint32 throw (2): ";
-            cerr << hex << setw(2) << setfill('0') << (0xFF & (int)int8_uint32[i].x) << ", ";
-            cerr << hex << setw(8) << setfill('0') << int8_uint32[i].y << ", ";
-            cerr << "expected = " << int8_uint32[i].fExpected << endl;
+            err_msg( "Error in case int8_uint32 throw (2): ", int8_uint32[i].x, int8_uint32[i].y, int8_uint32[i].fExpected );
         }
     }
 }
@@ -6695,10 +6427,7 @@ void SubVerifyInt8Uint16()
         std::int8_t ret;
         if( SafeSubtract(int8_uint16[i].x, int8_uint16[i].y, ret) != int8_uint16[i].fExpected )
         {
-            cerr << "Error in case int8_uint16: ";
-            cerr << hex << setw(2) << setfill('0') << (0xFF & (int)int8_uint16[i].x) << ", ";
-            cerr << hex << setw(4) << setfill('0') << int8_uint16[i].y << ", ";
-            cerr << "expected = " << int8_uint16[i].fExpected << endl;
+            err_msg( "Error in case int8_uint16: ", int8_uint16[i].x, int8_uint16[i].y, int8_uint16[i].fExpected );
         }
 
         // Now test throwing version
@@ -6715,10 +6444,7 @@ void SubVerifyInt8Uint16()
 
         if( fSuccess != int8_uint16[i].fExpected )
         {
-            cerr << "Error in case int8_uint16 throw (1): ";
-            cerr << hex << setw(2) << setfill('0') << (0xFF & (int)int8_uint16[i].x) << ", ";
-            cerr << hex << setw(4) << setfill('0') << int8_uint16[i].y << ", ";
-            cerr << "expected = " << int8_uint16[i].fExpected << endl;
+            err_msg( "Error in case int8_uint16 throw (1): ", int8_uint16[i].x, int8_uint16[i].y, int8_uint16[i].fExpected );
         }
 
         // Also need to test the version that assigns back out
@@ -6736,10 +6462,7 @@ void SubVerifyInt8Uint16()
 
         if( fSuccess != int8_uint16[i].fExpected )
         {
-            cerr << "Error in case int8_uint16 throw (2): ";
-            cerr << hex << setw(2) << setfill('0') << (0xFF & (int)int8_uint16[i].x) << ", ";
-            cerr << hex << setw(4) << setfill('0') << int8_uint16[i].y << ", ";
-            cerr << "expected = " << int8_uint16[i].fExpected << endl;
+            err_msg( "Error in case int8_uint16 throw (2): ", int8_uint16[i].x, int8_uint16[i].y, int8_uint16[i].fExpected );
         }
     }
 }
@@ -6846,10 +6569,7 @@ void SubVerifyInt8Uint8()
         std::int8_t ret;
         if( SafeSubtract(int8_uint8[i].x, int8_uint8[i].y, ret) != int8_uint8[i].fExpected )
         {
-            cerr << "Error in case int8_uint8: ";
-            cerr << hex << setw(2) << setfill('0') << (0xFF & (int)int8_uint8[i].x) << ", ";
-            cerr << hex << setw(2) << setfill('0') << (0xFF & (int)int8_uint8[i].y) << ", ";
-            cerr << "expected = " << int8_uint8[i].fExpected << endl;
+            err_msg( "Error in case int8_uint8: ", int8_uint8[i].x, int8_uint8[i].y, int8_uint8[i].fExpected );
         }
 
         // Now test throwing version
@@ -6866,10 +6586,7 @@ void SubVerifyInt8Uint8()
 
         if( fSuccess != int8_uint8[i].fExpected )
         {
-            cerr << "Error in case int8_uint8 throw (1): ";
-            cerr << hex << setw(2) << setfill('0') << (0xFF & (int)int8_uint8[i].x) << ", ";
-            cerr << hex << setw(2) << setfill('0') << (0xFF & (int)int8_uint8[i].y) << ", ";
-            cerr << "expected = " << int8_uint8[i].fExpected << endl;
+            err_msg( "Error in case int8_uint8 throw (1): ", int8_uint8[i].x, int8_uint8[i].y, int8_uint8[i].fExpected );
         }
 
         // Also need to test the version that assigns back out
@@ -6887,17 +6604,14 @@ void SubVerifyInt8Uint8()
 
         if( fSuccess != int8_uint8[i].fExpected )
         {
-            cerr << "Error in case int8_uint8 throw (2): ";
-            cerr << hex << setw(2) << setfill('0') << (0xFF & (int)int8_uint8[i].x) << ", ";
-            cerr << hex << setw(2) << setfill('0') << (0xFF & (int)int8_uint8[i].y) << ", ";
-            cerr << "expected = " << int8_uint8[i].fExpected << endl;
+            err_msg( "Error in case int8_uint8 throw (2): ", int8_uint8[i].x, int8_uint8[i].y, int8_uint8[i].fExpected );
         }
     }
 }
 
 void SubVerify()
 {
-    cout << "Verifying Subtraction:" << endl;
+    std::cout << "Verifying Subtraction:" << std::endl;
 
     // Unsigned int64, unsigned cases
     SubVerifyUint64Uint64();
@@ -6976,7 +6690,7 @@ namespace negation_verify
         }
 
         if (result == false)
-            cerr << "Error in NegationVerifyT throw (1): ";
+            std::cerr << "Error in NegationVerifyT throw (1): " << std::endl;
 
         try
         {
@@ -6988,19 +6702,19 @@ namespace negation_verify
         }
 
         if (result == false)
-            cerr << "Error in NegationVerifyT throw (2): ";
+            std::cerr << "Error in NegationVerifyT throw (2): " << std::endl;
 
         // Now try the non-throwing version
 
         result = SafeNegation(minInt, out);
 
         if (result != false)
-            cerr << "Error in NegationVerifyT nothrow (1): ";
+            std::cerr << "Error in NegationVerifyT nothrow (1): " << std::endl;
 
         result = SafeNegation(test, out);
 
         if (result == false)
-            cerr << "Error in NegationVerifyT nothrow (2): ";
+            std::cerr << "Error in NegationVerifyT nothrow (2): " << std::endl;
     }
 
     void NegationVerifyAll()
@@ -7013,7 +6727,7 @@ namespace negation_verify
 
     void NegationVerify()
     {
-        cout << "Verifying Negation:" << endl;
+        std::cout << "Verifying Negation:" << std::endl;
         NegationVerifyAll();
     }
 }
