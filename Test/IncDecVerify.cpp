@@ -59,9 +59,7 @@ void PreIncTestUint8()
 
 		if( fSuccess != inc_uint8[i].fExpected )
 		{
-			cerr << "Error in case inc_uint8 throw (1): ";
-			cerr << HEX(2) << (0xFF & (int)inc_uint8[i].x) << ", ";
-			cerr << "expected = " << inc_uint8[i].fExpected << endl;
+			err_msg( "Error in case inc_uint8 throw (1): ", inc_uint8[i].x, inc_uint8[i].fExpected );
 		}
 	}
 }
@@ -90,9 +88,7 @@ void PostIncTestUint8()
 
 		if( fSuccess != inc_uint8[i].fExpected )
 		{
-			cerr << "Error in case inc_uint8 throw (2): ";
-			cerr << HEX(2) << (0xFF & (int)inc_uint8[i].x) << ", ";
-			cerr << "expected = " << inc_uint8[i].fExpected << endl;
+			err_msg( "Error in case inc_uint8 throw (2): ", inc_uint8[i].x, inc_uint8[i].fExpected );
 		}
 	}
 }
@@ -134,9 +130,7 @@ void PreIncTestUint16()
 
 		if( fSuccess != inc_uint16[i].fExpected )
 		{
-			cerr << "Error in case inc_uint16 throw (1): ";
-			cerr << HEX(4) << inc_uint16[i].x << ", ";
-			cerr << "expected = " << inc_uint16[i].fExpected << endl;
+			err_msg( "Error in case inc_uint16 throw (1): ", inc_uint16[i].x, inc_uint16[i].fExpected );
 		}
 	}
 }
@@ -165,9 +159,7 @@ void PostIncTestUint16()
 
 		if( fSuccess != inc_uint16[i].fExpected )
 		{
-			cerr << "Error in case inc_uint16 throw (2): ";
-			cerr << HEX(4) << inc_uint16[i].x << ", ";
-			cerr << "expected = " << inc_uint16[i].fExpected << endl;
+			err_msg( "Error in case inc_uint16 throw (2): ", inc_uint16[i].x, inc_uint16[i].fExpected );
 		}
 	}
 }
@@ -209,9 +201,7 @@ void PreIncTestUint32()
 
 		if( fSuccess != inc_uint32[i].fExpected )
 		{
-			cerr << "Error in case inc_uint32 throw (1): ";
-			cerr << HEX(8) << inc_uint32[i].x << ", ";
-			cerr << "expected = " << inc_uint32[i].fExpected << endl;
+			err_msg( "Error in case inc_uint32 throw (1): ", inc_uint32[i].x, inc_uint32[i].fExpected );
 		}
 	}
 }
@@ -240,9 +230,7 @@ void PostIncTestUint32()
 
 		if( fSuccess != inc_uint32[i].fExpected )
 		{
-			cerr << "Error in case inc_uint32 throw (2): ";
-			cerr << HEX(8) << inc_uint32[i].x << ", ";
-			cerr << "expected = " << inc_uint32[i].fExpected << endl;
+			err_msg( "Error in case inc_uint32 throw (2): ", inc_uint32[i].x, inc_uint32[i].fExpected );
 		}
 	}
 }
@@ -292,9 +280,9 @@ void PreIncTestUint64()
 
 		if( fSuccess != inc_uint64[i].fExpected )
 		{
-			cerr << "Error in case inc_uint64 throw (1): ";
-			cerr << HEX(16) << inc_uint64[i].x << ", ";
-			cerr << "expected = " << inc_uint64[i].fExpected << endl;
+			err_msg( "Error in case inc_uint64 throw (1): ",
+			inc_uint64[i].x,
+			inc_uint64[i].fExpected );
 		}
 	}
 }
@@ -323,9 +311,9 @@ void PostIncTestUint64()
 
 		if( fSuccess != inc_uint64[i].fExpected )
 		{
-			cerr << "Error in case inc_uint64 throw (2): ";
-			cerr << HEX(16) << inc_uint64[i].x << ", ";
-			cerr << "expected = " << inc_uint64[i].fExpected << endl;
+			err_msg( "Error in case inc_uint64 throw (2): ",
+			inc_uint64[i].x,
+			inc_uint64[i].fExpected );
 		}
 	}
 }
@@ -367,9 +355,7 @@ void PreIncTestInt8()
 
 		if( fSuccess != inc_int8[i].fExpected )
 		{
-			cerr << "Error in case inc_int8 throw (1): ";
-			cerr << HEX(2) << (0xFF & (int)inc_int8[i].x) << ", ";
-			cerr << "expected = " << inc_int8[i].fExpected << endl;
+			err_msg( "Error in case inc_int8 throw (1): ", inc_int8[i].x, inc_int8[i].fExpected );
 		}
 	}
 }
@@ -398,9 +384,7 @@ void PostIncTestInt8()
 
 		if( fSuccess != inc_int8[i].fExpected )
 		{
-			cerr << "Error in case inc_int8 throw (2): ";
-			cerr << HEX(2) << (0xFF & (int)inc_int8[i].x) << ", ";
-			cerr << "expected = " << inc_int8[i].fExpected << endl;
+			err_msg( "Error in case inc_int8 throw (2): ", inc_int8[i].x, inc_int8[i].fExpected );
 		}
 	}
 }
@@ -442,9 +426,7 @@ void PreIncTestInt16()
 
 		if( fSuccess != inc_int16[i].fExpected )
 		{
-			cerr << "Error in case inc_int16 throw (1): ";
-			cerr << HEX(4) << inc_int16[i].x << ", ";
-			cerr << "expected = " << inc_int16[i].fExpected << endl;
+			err_msg( "Error in case inc_int16 throw (1): ", inc_int16[i].x, inc_int16[i].fExpected );
 		}
 	}
 }
@@ -473,9 +455,7 @@ void PostIncTestInt16()
 
 		if( fSuccess != inc_int16[i].fExpected )
 		{
-			cerr << "Error in case inc_int16 throw (2): ";
-			cerr << HEX(4) << inc_int16[i].x << ", ";
-			cerr << "expected = " << inc_int16[i].fExpected << endl;
+			err_msg( "Error in case inc_int16 throw (2): ", inc_int16[i].x, inc_int16[i].fExpected );
 		}
 	}
 }
@@ -517,9 +497,7 @@ void PreIncTestInt32()
 
 		if( fSuccess != inc_int32[i].fExpected )
 		{
-			cerr << "Error in case inc_int32 throw (1): ";
-			cerr << HEX(8) << inc_int32[i].x << ", ";
-			cerr << "expected = " << inc_int32[i].fExpected << endl;
+			err_msg( "Error in case inc_int32 throw (1): ", inc_int32[i].x, inc_int32[i].fExpected );
 		}
 	}
 }
@@ -548,9 +526,7 @@ void PostIncTestInt32()
 
 		if( fSuccess != inc_int32[i].fExpected )
 		{
-			cerr << "Error in case inc_int32 throw (2): ";
-			cerr << HEX(8) << inc_int32[i].x << ", ";
-			cerr << "expected = " << inc_int32[i].fExpected << endl;
+			err_msg( "Error in case inc_int32 throw (2): ", inc_int32[i].x, inc_int32[i].fExpected );
 		}
 	}
 }
@@ -600,9 +576,7 @@ void PreIncTestInt64()
 
 		if( fSuccess != inc_int64[i].fExpected )
 		{
-			cerr << "Error in case inc_int64 throw (1): ";
-			cerr << HEX(8) << inc_int64[i].x << ", ";
-			cerr << "expected = " << inc_int64[i].fExpected << endl;
+			err_msg( "Error in case inc_int64 throw (1): ", inc_int64[i].x, inc_int64[i].fExpected );
 		}
 	}
 }
@@ -631,9 +605,7 @@ void PostIncTestInt64()
 
 		if( fSuccess != inc_int64[i].fExpected )
 		{
-			cerr << "Error in case inc_int64 throw (2): ";
-			cerr << HEX(8) << inc_int64[i].x << ", ";
-			cerr << "expected = " << inc_int64[i].fExpected << endl;
+			err_msg( "Error in case inc_int64 throw (2): ", inc_int64[i].x, inc_int64[i].fExpected );
 		}
 	}
 }
@@ -675,9 +647,7 @@ void PreDecTestUint8()
 
 		if( fSuccess != dec_uint8[i].fExpected )
 		{
-			cerr << "Error in case dec_uint8 throw (1): ";
-			cerr << HEX(2) << (0xFF & (int)dec_uint8[i].x) << ", ";
-			cerr << "expected = " << dec_uint8[i].fExpected << endl;
+			err_msg( "Error in case dec_uint8 throw (1): ", dec_uint8[i].x, dec_uint8[i].fExpected );
 		}
 	}
 }
@@ -706,9 +676,7 @@ void PostDecTestUint8()
 
 		if( fSuccess != dec_uint8[i].fExpected )
 		{
-			cerr << "Error in case dec_uint8 throw (2): ";
-			cerr << HEX(2) << (0xFF & (int)dec_uint8[i].x) << ", ";
-			cerr << "expected = " << dec_uint8[i].fExpected << endl;
+			err_msg( "Error in case dec_uint8 throw (2): ", dec_uint8[i].x, dec_uint8[i].fExpected );
 		}
 	}
 }
@@ -750,9 +718,7 @@ void PreDecTestUint16()
 
 		if( fSuccess != dec_uint16[i].fExpected )
 		{
-			cerr << "Error in case dec_uint16 throw (1): ";
-			cerr << HEX(4) << dec_uint16[i].x << ", ";
-			cerr << "expected = " << dec_uint16[i].fExpected << endl;
+			err_msg( "Error in case dec_uint16 throw (1): ", dec_uint16[i].x, dec_uint16[i].fExpected );
 		}
 	}
 }
@@ -781,9 +747,7 @@ void PostDecTestUint16()
 
 		if( fSuccess != dec_uint16[i].fExpected )
 		{
-			cerr << "Error in case dec_uint16 throw (2): ";
-			cerr << HEX(4) << dec_uint16[i].x << ", ";
-			cerr << "expected = " << dec_uint16[i].fExpected << endl;
+			err_msg( "Error in case dec_uint16 throw (2): ", dec_uint16[i].x, dec_uint16[i].fExpected );
 		}
 	}
 }
@@ -825,9 +789,7 @@ void PreDecTestUint32()
 
 		if( fSuccess != dec_uint32[i].fExpected )
 		{
-			cerr << "Error in case dec_uint32 throw (1): ";
-			cerr << HEX(8) << dec_uint32[i].x << ", ";
-			cerr << "expected = " << dec_uint32[i].fExpected << endl;
+			err_msg( "Error in case dec_uint32 throw (1): ", dec_uint32[i].x, dec_uint32[i].fExpected );
 		}
 	}
 }
@@ -856,9 +818,7 @@ void PostDecTestUint32()
 
 		if( fSuccess != dec_uint32[i].fExpected )
 		{
-			cerr << "Error in case dec_uint32 throw (2): ";
-			cerr << HEX(8) << dec_uint32[i].x << ", ";
-			cerr << "expected = " << dec_uint32[i].fExpected << endl;
+			err_msg( "Error in case dec_uint32 throw (2): ", dec_uint32[i].x, dec_uint32[i].fExpected );
 		}
 	}
 }
@@ -908,9 +868,9 @@ void PreDecTestUint64()
 
 		if( fSuccess != dec_uint64[i].fExpected )
 		{
-			cerr << "Error in case dec_uint64 throw (1): ";
-			cerr << HEX(16) << dec_uint64[i].x << ", ";
-			cerr << "expected = " << dec_uint64[i].fExpected << endl;
+			err_msg( "Error in case dec_uint64 throw (1): ",
+			dec_uint64[i].x,
+			dec_uint64[i].fExpected );
 		}
 	}
 }
@@ -939,9 +899,9 @@ void PostDecTestUint64()
 
 		if( fSuccess != dec_uint64[i].fExpected )
 		{
-			cerr << "Error in case dec_uint64 throw (2): ";
-			cerr << HEX(16) << dec_uint64[i].x << ", ";
-			cerr << "expected = " << dec_uint64[i].fExpected << endl;
+			err_msg( "Error in case dec_uint64 throw (2): ",
+			dec_uint64[i].x,
+			dec_uint64[i].fExpected );
 		}
 	}
 }
@@ -983,9 +943,7 @@ void PreDecTestInt8()
 
 		if( fSuccess != dec_int8[i].fExpected )
 		{
-			cerr << "Error in case dec_int8 throw (1): ";
-			cerr << HEX(2) << (0xFF & (int)dec_int8[i].x) << ", ";
-			cerr << "expected = " << dec_int8[i].fExpected << endl;
+			err_msg( "Error in case dec_int8 throw (1): ", dec_int8[i].x, dec_int8[i].fExpected );
 		}
 	}
 }
@@ -1014,9 +972,7 @@ void PostDecTestInt8()
 
 		if( fSuccess != dec_int8[i].fExpected )
 		{
-			cerr << "Error in case dec_int8 throw (2): ";
-			cerr << HEX(2) << (0xFF & (int)dec_int8[i].x) << ", ";
-			cerr << "expected = " << dec_int8[i].fExpected << endl;
+			err_msg( "Error in case dec_int8 throw (2): ", dec_int8[i].x, dec_int8[i].fExpected );
 		}
 	}
 }
@@ -1058,9 +1014,7 @@ void PreDecTestInt16()
 
 		if( fSuccess != dec_int16[i].fExpected )
 		{
-			cerr << "Error in case dec_int16 throw (1): ";
-			cerr << HEX(4) << dec_int16[i].x << ", ";
-			cerr << "expected = " << dec_int16[i].fExpected << endl;
+			err_msg( "Error in case dec_int16 throw (1): ", dec_int16[i].x, dec_int16[i].fExpected );
 		}
 	}
 }
@@ -1089,9 +1043,7 @@ void PostDecTestInt16()
 
 		if( fSuccess != dec_int16[i].fExpected )
 		{
-			cerr << "Error in case dec_int16 throw (2): ";
-			cerr << HEX(4) << dec_int16[i].x << ", ";
-			cerr << "expected = " << dec_int16[i].fExpected << endl;
+			err_msg( "Error in case dec_int16 throw (2): ", dec_int16[i].x, dec_int16[i].fExpected );
 		}
 	}
 }
@@ -1133,9 +1085,7 @@ void PreDecTestInt32()
 
 		if( fSuccess != dec_int32[i].fExpected )
 		{
-			cerr << "Error in case dec_int32 throw (1): ";
-			cerr << HEX(8) << dec_int32[i].x << ", ";
-			cerr << "expected = " << dec_int32[i].fExpected << endl;
+			err_msg( "Error in case dec_int32 throw (1): ", dec_int32[i].x, dec_int32[i].fExpected );
 		}
 	}
 }
@@ -1164,9 +1114,7 @@ void PostDecTestInt32()
 
 		if( fSuccess != dec_int32[i].fExpected )
 		{
-			cerr << "Error in case dec_int32 throw (2): ";
-			cerr << HEX(8) << dec_int32[i].x << ", ";
-			cerr << "expected = " << dec_int32[i].fExpected << endl;
+			err_msg( "Error in case dec_int32 throw (2): ", dec_int32[i].x, dec_int32[i].fExpected );
 		}
 	}
 }
@@ -1216,9 +1164,7 @@ void PreDecTestInt64()
 
 		if( fSuccess != dec_int64[i].fExpected )
 		{
-			cerr << "Error in case dec_int64 throw (1): ";
-			cerr << HEX(16) << dec_int64[i].x << ", ";
-			cerr << "expected = " << dec_int64[i].fExpected << endl;
+			err_msg( "Error in case dec_int64 throw (1): ", dec_int64[i].x, dec_int64[i].fExpected );
 		}
 	}
 }
@@ -1247,16 +1193,14 @@ void PostDecTestInt64()
 
 		if( fSuccess != dec_int64[i].fExpected )
 		{
-			cerr << "Error in case dec_int64 throw (2): ";
-			cerr << HEX(16) << dec_int64[i].x << ", ";
-			cerr << "expected = " << dec_int64[i].fExpected << endl;
+			err_msg( "Error in case dec_int64 throw (2): ", dec_int64[i].x, dec_int64[i].fExpected );
 		}
 	}
 }
 
 void IncDecVerify()
 {
-   cout << "Verifying Increment-decrement:" << endl;
+   std::cout << "Verifying Increment-decrement:" << std::endl;
 	PreIncTestUint8();
 	PostIncTestUint8();
 	PreIncTestUint16();
