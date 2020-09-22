@@ -218,6 +218,7 @@ SAFEINT_DISALLOW_UNSIGNED_NEGATION - Invoking the unary negation operator may cr
                                      to compile, define this.
 SAFEINT_DISABLE_BINARY_ASSERT      - binary AND, OR or XOR operations on mixed size types can produce unexpected results. If you do
                                      this, the default is to assert. Set this if you prefer not to assert under these conditions.
+SAFEINT_DISABLE_ADDRESS_OPERATOR   - Do not overload operator&.
 SIZE_T_CAST_NEEDED                 - some compilers complain if there is not a cast to size_t, others complain if there is one.
                                      This lets you not have your compiler complain.
 
@@ -5856,6 +5857,7 @@ public:
     const T* Ptr() const SAFEINT_NOTHROW { return &m_int; }
     _CONSTEXPR14 const T& Ref() const SAFEINT_NOTHROW { return m_int; }
 
+#ifndef SAFEINT_DISABLE_ADDRESS_OPERATOR
     // Or if SafeInt< T, E >::Ptr() is inconvenient, use the overload
     // operator &
     // This allows you to do unsafe things!
@@ -5863,6 +5865,7 @@ public:
     // pass a SafeInt into things like ReadFile
     T* operator &() SAFEINT_NOTHROW { return &m_int; }
     const T* operator &() const SAFEINT_NOTHROW { return &m_int; }
+#endif
 
     // Unary operators
     _CONSTEXPR11 bool operator !() const SAFEINT_NOTHROW { return (!m_int) ? true : false; }
