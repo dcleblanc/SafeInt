@@ -3,7 +3,7 @@
 
 /*-----------------------------------------------------------------------------------------------------------
 SafeInt.hpp
-Version 3.0.24p
+Version 3.0.25p
 
 This header implements an integer handling class designed to catch
 unsafe integer operations
@@ -210,16 +210,35 @@ SafeInt supports several compile-time options that can change the behavior of th
 Compiler options:
 SAFEINT_ASSERT_ON_EXCEPTION        - it is often easier to stop on an assert and figure out a problem than to try and figure out
                                      how you landed in the catch block.
+
 SafeIntDefaultExceptionHandler     - if you'd like to replace the exception handlers SafeInt provides, define your replacement and
-                                     define this. Note - two built in (Windows-specific) options exist:
-                                     - SAFEINT_FAILFAST - bypasses all exception handlers, exits the app with an exception
-                                     - SAFEINT_RAISE_EXCEPTION - throws Win32 exceptions, which can be caught
+                                     define this. There are three current options:
+
+                                     SAFEINT_RAISE_EXCEPTION - Windows specific, throws a structured exception. This is legacy.
+                                     SAFEINT_FAILFAST        - On Windows, calls __failfast, else calls abort()
+                                     Default                 - Uses the SafeIntExceptionHandler class, throws a SafeIntException.
+
+                                     If you do replace the exception handler, then make sure you define:
+                                     
+                                     SafeIntOnOverflow
+                                     SafeIntOnDivZero
+
 SAFEINT_DISALLOW_UNSIGNED_NEGATION - Invoking the unary negation operator may create warnings, but if you'd like it to completely fail
                                      to compile, define this.
+
 SAFEINT_DISABLE_BINARY_ASSERT      - binary AND, OR or XOR operations on mixed size types can produce unexpected results. If you do
                                      this, the default is to assert. Set this if you prefer not to assert under these conditions.
+
 SIZE_T_CAST_NEEDED                 - some compilers complain if there is not a cast to size_t, others complain if there is one.
-                                     This lets you not have your compiler complain.
+                                     This lets you not have your compiler complain. Default is not to have an overload, and it 
+                                     appears that no recent compilers need this.
+
+SAFEINT_DISABLE_ADDRESS_OPERATOR   - Disables the overload of the & operator, which results in a raw pointer to the underlying type. This has
+                                     been a debated feature for the entire life of the project - the benefit is that it makes it easier to just
+                                     change a declaration from uint32_t to SafeInt<uint32_t>, and the downstream code is less likely to need
+                                     modification, which is especially handy in legacy code bases. The drawback is that it breaks good C++
+                                     practice, and breaks some libraries that auto-generate code. In the future, I expect to make disabling this the 
+                                     default.
 
 ************************************************************************************************************************************/
 
@@ -5837,7 +5856,20 @@ public:
     // also see overloaded address-of operator below
     T* Ptr() SAFEINT_NOTHROW { return &m_int; }
     const T* Ptr() const SAFEINT_NOTHROW { return &m_int; }
+
+    // The above are not modern naming conventions, introducing these
+    // to move forward with:
+    T* data_ptr() SAFEINT_NOTHROW { return &m_int; }
+    const T* data_ptr() const SAFEINT_NOTHROW { return &m_int; }
+
+    // This method is antiquated, and really only makes sense with 
+    // 64-bit values on a 32-bit processor. Leaving it for now, in case
+    // someone is using it. A better approach is to just unbox it by casting
+    // it back to the base type as static_cast<T>( my_safeint )
     _CONSTEXPR14 const T& Ref() const SAFEINT_NOTHROW { return m_int; }
+
+#if !defined SAFEINT_DISABLE_ADDRESS_OPERATOR
+    // Note - in the future, this is slated for deprecation
 
     // Or if SafeInt< T, E >::Ptr() is inconvenient, use the overload
     // operator &
@@ -5846,6 +5878,7 @@ public:
     // pass a SafeInt into things like ReadFile
     T* operator &() SAFEINT_NOTHROW { return &m_int; }
     const T* operator &() const SAFEINT_NOTHROW { return &m_int; }
+#endif
 
     // Unary operators
     _CONSTEXPR11 bool operator !() const SAFEINT_NOTHROW { return (!m_int) ? true : false; }
