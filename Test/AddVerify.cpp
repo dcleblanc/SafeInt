@@ -332,10 +332,10 @@ void AddVerifyUint64Uint64()
         std::uint64_t ret;
         if( SafeAdd(uint64_uint64[i].x, uint64_uint64[i].y, ret) != uint64_uint64[i].fExpected )
         {
-            cerr << "Error in case uint64_uint64: ";
-            cerr << HEX(16) << uint64_uint64[i].x << ", ";
-            cerr << HEX(16) << uint64_uint64[i].y << ", ";
-            cerr << "expected = " << uint64_uint64[i].fExpected << endl;
+            err_msg( "Error in case uint64_uint64: ",
+            uint64_uint64[i].x, 
+            uint64_uint64[i].y, 
+            uint64_uint64[i].fExpected );
         }
 
         // Now test throwing version
@@ -352,10 +352,7 @@ void AddVerifyUint64Uint64()
 
         if( fSuccess != uint64_uint64[i].fExpected )
         {
-            cerr << "Error in case uint64_uint64 throw (1): ";
-            cerr << HEX(16) << uint64_uint64[i].x << ", ";
-            cerr << HEX(16) << uint64_uint64[i].y << ", ";
-            cerr << "expected = " << uint64_uint64[i].fExpected << endl;
+            err_msg( "Error in case uint64_uint64 throw (1): ", uint64_uint64[i].x, uint64_uint64[i].y, uint64_uint64[i].fExpected );
         }
 
         // Also need to test the version that assigns back out
@@ -373,10 +370,7 @@ void AddVerifyUint64Uint64()
 
         if( fSuccess != uint64_uint64[i].fExpected )
         {
-            cerr << "Error in case uint64_uint64 throw (2): ";
-            cerr << HEX(16) << uint64_uint64[i].x << ", ";
-            cerr << HEX(16) << uint64_uint64[i].y << ", ";
-            cerr << "expected = " << uint64_uint64[i].fExpected << endl;
+            err_msg( "Error in case uint64_uint64 throw (2): ", uint64_uint64[i].x, uint64_uint64[i].y, uint64_uint64[i].fExpected );
         }
     }
 }
@@ -555,10 +549,7 @@ void AddVerifyUint64Uint32()
         std::uint64_t ret;
         if( SafeAdd(uint64_uint32[i].x, uint64_uint32[i].y, ret) != uint64_uint32[i].fExpected )
         {
-            cerr << "Error in case uint64_uint32: ";
-            cerr << HEX(16) << uint64_uint32[i].x << ", ";
-            cerr << HEX(8) << uint64_uint32[i].y << ", ";
-            cerr << "expected = " << uint64_uint32[i].fExpected << endl;
+            err_msg( "Error in case uint64_uint32: ", uint64_uint32[i].x, uint64_uint32[i].y, uint64_uint32[i].fExpected );
         }
 
         // Now test throwing version
@@ -575,10 +566,7 @@ void AddVerifyUint64Uint32()
 
         if( fSuccess != uint64_uint32[i].fExpected )
         {
-            cerr << "Error in case uint64_uint32 throw (1): ";
-            cerr << HEX(16) << uint64_uint32[i].x << ", ";
-            cerr << HEX(8) << uint64_uint32[i].y << ", ";
-            cerr << "expected = " << uint64_uint32[i].fExpected << endl;
+            err_msg( "Error in case uint64_uint32 throw (1): ", uint64_uint32[i].x, uint64_uint32[i].y, uint64_uint32[i].fExpected );
         }
 
         // Also need to test the version that assigns back out
@@ -596,10 +584,7 @@ void AddVerifyUint64Uint32()
 
         if( fSuccess != uint64_uint32[i].fExpected )
         {
-            cerr << "Error in case uint64_uint32 throw (2): ";
-            cerr << HEX(16) << uint64_uint32[i].x << ", ";
-            cerr << HEX(8) << uint64_uint32[i].y << ", ";
-            cerr << "expected = " << uint64_uint32[i].fExpected << endl;
+            err_msg( "Error in case uint64_uint32 throw (2): ", uint64_uint32[i].x, uint64_uint32[i].y, uint64_uint32[i].fExpected );
         }
     }
 }
@@ -778,10 +763,7 @@ void AddVerifyUint64Uint16()
         std::uint64_t ret;
         if( SafeAdd(uint64_uint16[i].x, uint64_uint16[i].y, ret) != uint64_uint16[i].fExpected )
         {
-            cerr << "Error in case uint64_uint16: ";
-            cerr << HEX(16) << uint64_uint16[i].x << ", ";
-            cerr << HEX(4) << uint64_uint16[i].y << ", ";
-            cerr << "expected = " << uint64_uint16[i].fExpected << endl;
+            err_msg( "Error in case uint64_uint16: ", uint64_uint16[i].x, uint64_uint16[i].y, uint64_uint16[i].fExpected );
         }
 
         // Now test throwing version
@@ -798,10 +780,7 @@ void AddVerifyUint64Uint16()
 
         if( fSuccess != uint64_uint16[i].fExpected )
         {
-            cerr << "Error in case uint64_uint16 throw (1): ";
-            cerr << HEX(16) << uint64_uint16[i].x << ", ";
-            cerr << HEX(4) << uint64_uint16[i].y << ", ";
-            cerr << "expected = " << uint64_uint16[i].fExpected << endl;
+            err_msg( "Error in case uint64_uint16 throw (1): ", uint64_uint16[i].x, uint64_uint16[i].y, uint64_uint16[i].fExpected );
         }
 
         // Also need to test the version that assigns back out
@@ -819,10 +798,7 @@ void AddVerifyUint64Uint16()
 
         if( fSuccess != uint64_uint16[i].fExpected )
         {
-            cerr << "Error in case uint64_uint16 throw (2): ";
-            cerr << HEX(16) << uint64_uint16[i].x << ", ";
-            cerr << HEX(4) << uint64_uint16[i].y << ", ";
-            cerr << "expected = " << uint64_uint16[i].fExpected << endl;
+            err_msg( "Error in case uint64_uint16 throw (2): ", uint64_uint16[i].x, uint64_uint16[i].y, uint64_uint16[i].fExpected );
         }
     }
 }
@@ -1001,10 +977,7 @@ void AddVerifyUint64Uint8()
         std::uint64_t ret;
         if( SafeAdd(uint64_uint8[i].x, uint64_uint8[i].y, ret) != uint64_uint8[i].fExpected )
         {
-            cerr << "Error in case uint64_uint8: ";
-            cerr << HEX(16) << uint64_uint8[i].x << ", ";
-            cerr << HEX(2) << (0xFF & (unsigned int)uint64_uint8[i].y) << ", ";
-            cerr << "expected = " << uint64_uint8[i].fExpected << endl;
+            err_msg( "Error in case uint64_uint8: ", uint64_uint8[i].x, uint64_uint8[i].y, uint64_uint8[i].fExpected );
         }
 
         // Now test throwing version
@@ -1021,10 +994,7 @@ void AddVerifyUint64Uint8()
 
         if( fSuccess != uint64_uint8[i].fExpected )
         {
-            cerr << "Error in case uint64_uint8 throw (1): ";
-            cerr << HEX(16) << uint64_uint8[i].x << ", ";
-            cerr << HEX(2) << (0xFF & (unsigned int)uint64_uint8[i].y) << ", ";
-            cerr << "expected = " << uint64_uint8[i].fExpected << endl;
+            err_msg( "Error in case uint64_uint8 throw (1): ", uint64_uint8[i].x, uint64_uint8[i].y, uint64_uint8[i].fExpected );
         }
 
         // Also need to test the version that assigns back out
@@ -1042,10 +1012,7 @@ void AddVerifyUint64Uint8()
 
         if( fSuccess != uint64_uint8[i].fExpected )
         {
-            cerr << "Error in case uint64_uint8 throw (2): ";
-            cerr << HEX(16) << uint64_uint8[i].x << ", ";
-            cerr << HEX(2) << (0xFF & (unsigned int)uint64_uint8[i].y) << ", ";
-            cerr << "expected = " << uint64_uint8[i].fExpected << endl;
+            err_msg( "Error in case uint64_uint8 throw (2): ", uint64_uint8[i].x, uint64_uint8[i].y, uint64_uint8[i].fExpected );
         }
     }
 }
@@ -1368,10 +1335,7 @@ void AddVerifyUint64Int64()
         std::uint64_t ret;
         if( SafeAdd(uint64_int64[i].x, uint64_int64[i].y, ret) != uint64_int64[i].fExpected )
         {
-            cerr << "Error in case uint64_int64: ";
-            cerr << HEX(16) << uint64_int64[i].x << ", ";
-            cerr << HEX(16) << uint64_int64[i].y << ", ";
-            cerr << "expected = " << uint64_int64[i].fExpected << endl;
+            err_msg( "Error in case uint64_int64: ", uint64_int64[i].x, uint64_int64[i].y, uint64_int64[i].fExpected );
         }
 
         // Now test throwing version
@@ -1388,10 +1352,7 @@ void AddVerifyUint64Int64()
 
         if( fSuccess != uint64_int64[i].fExpected )
         {
-            cerr << "Error in case uint64_int64 throw (1): ";
-            cerr << HEX(16) << uint64_int64[i].x << ", ";
-            cerr << HEX(16) << uint64_int64[i].y << ", ";
-            cerr << "expected = " << uint64_int64[i].fExpected << endl;
+            err_msg( "Error in case uint64_int64 throw (1): ", uint64_int64[i].x, uint64_int64[i].y, uint64_int64[i].fExpected );
         }
 
         // Also need to test the version that assigns back out
@@ -1409,10 +1370,7 @@ void AddVerifyUint64Int64()
 
         if( fSuccess != uint64_int64[i].fExpected )
         {
-            cerr << "Error in case uint64_int64 throw (2): ";
-            cerr << HEX(16) << uint64_int64[i].x << ", ";
-            cerr << HEX(16) << uint64_int64[i].y << ", ";
-            cerr << "expected = " << uint64_int64[i].fExpected << endl;
+            err_msg( "Error in case uint64_int64 throw (2): ", uint64_int64[i].x, uint64_int64[i].y, uint64_int64[i].fExpected );
         }
     }
 }
@@ -1591,10 +1549,7 @@ void AddVerifyUint64Int32()
         std::uint64_t ret;
         if( SafeAdd(uint64_int32[i].x, uint64_int32[i].y, ret) != uint64_int32[i].fExpected )
         {
-            cerr << "Error in case uint64_int32: ";
-            cerr << HEX(16) << uint64_int32[i].x << ", ";
-            cerr << HEX(8) << uint64_int32[i].y << ", ";
-            cerr << "expected = " << uint64_int32[i].fExpected << endl;
+            err_msg( "Error in case uint64_int32: ", uint64_int32[i].x, uint64_int32[i].y, uint64_int32[i].fExpected );
         }
 
         // Now test throwing version
@@ -1611,10 +1566,7 @@ void AddVerifyUint64Int32()
 
         if( fSuccess != uint64_int32[i].fExpected )
         {
-            cerr << "Error in case uint64_int32 throw (1): ";
-            cerr << HEX(16) << uint64_int32[i].x << ", ";
-            cerr << HEX(8) << uint64_int32[i].y << ", ";
-            cerr << "expected = " << uint64_int32[i].fExpected << endl;
+            err_msg( "Error in case uint64_int32 throw (1): ", uint64_int32[i].x, uint64_int32[i].y, uint64_int32[i].fExpected );
         }
 
         // Also need to test the version that assigns back out
@@ -1632,10 +1584,7 @@ void AddVerifyUint64Int32()
 
         if( fSuccess != uint64_int32[i].fExpected )
         {
-            cerr << "Error in case uint64_int32 throw (2): ";
-            cerr << HEX(16) << uint64_int32[i].x << ", ";
-            cerr << HEX(8) << uint64_int32[i].y << ", ";
-            cerr << "expected = " << uint64_int32[i].fExpected << endl;
+            err_msg( "Error in case uint64_int32 throw (2): ", uint64_int32[i].x, uint64_int32[i].y, uint64_int32[i].fExpected );
         }
     }
 }
@@ -1814,10 +1763,7 @@ void AddVerifyUint64Int16()
         std::uint64_t ret;
         if( SafeAdd(uint64_int16[i].x, uint64_int16[i].y, ret) != uint64_int16[i].fExpected )
         {
-            cerr << "Error in case uint64_int16: ";
-            cerr << HEX(16) << uint64_int16[i].x << ", ";
-            cerr << HEX(4) << uint64_int16[i].y << ", ";
-            cerr << "expected = " << uint64_int16[i].fExpected << endl;
+            err_msg( "Error in case uint64_int16: ", uint64_int16[i].x, uint64_int16[i].y, uint64_int16[i].fExpected );
         }
 
         // Now test throwing version
@@ -1834,10 +1780,7 @@ void AddVerifyUint64Int16()
 
         if( fSuccess != uint64_int16[i].fExpected )
         {
-            cerr << "Error in case uint64_int16 throw (1): ";
-            cerr << HEX(16) << uint64_int16[i].x << ", ";
-            cerr << HEX(4) << uint64_int16[i].y << ", ";
-            cerr << "expected = " << uint64_int16[i].fExpected << endl;
+            err_msg( "Error in case uint64_int16 throw (1): ", uint64_int16[i].x, uint64_int16[i].y, uint64_int16[i].fExpected );
         }
 
         // Also need to test the version that assigns back out
@@ -1855,10 +1798,7 @@ void AddVerifyUint64Int16()
 
         if( fSuccess != uint64_int16[i].fExpected )
         {
-            cerr << "Error in case uint64_int16 throw (2): ";
-            cerr << HEX(16) << uint64_int16[i].x << ", ";
-            cerr << HEX(4) << uint64_int16[i].y << ", ";
-            cerr << "expected = " << uint64_int16[i].fExpected << endl;
+            err_msg( "Error in case uint64_int16 throw (2): ", uint64_int16[i].x, uint64_int16[i].y, uint64_int16[i].fExpected );
         }
     }
 }
@@ -2037,10 +1977,7 @@ void AddVerifyUint64Int8()
         std::uint64_t ret;
         if( SafeAdd(uint64_int8[i].x, uint64_int8[i].y, ret) != uint64_int8[i].fExpected )
         {
-            cerr << "Error in case uint64_int8: ";
-            cerr << HEX(16) << uint64_int8[i].x << ", ";
-            cerr << HEX(2) << (0xFF & (int)uint64_int8[i].y) << ", ";
-            cerr << "expected = " << uint64_int8[i].fExpected << endl;
+            err_msg( "Error in case uint64_int8: ", uint64_int8[i].x, uint64_int8[i].y, uint64_int8[i].fExpected );
         }
 
         // Now test throwing version
@@ -2057,10 +1994,7 @@ void AddVerifyUint64Int8()
 
         if( fSuccess != uint64_int8[i].fExpected )
         {
-            cerr << "Error in case uint64_int8 throw (1): ";
-            cerr << HEX(16) << uint64_int8[i].x << ", ";
-            cerr << HEX(2) << (0xFF & (int)uint64_int8[i].y) << ", ";
-            cerr << "expected = " << uint64_int8[i].fExpected << endl;
+            err_msg( "Error in case uint64_int8 throw (1): ", uint64_int8[i].x, uint64_int8[i].y, uint64_int8[i].fExpected );
         }
 
         // Also need to test the version that assigns back out
@@ -2078,10 +2012,7 @@ void AddVerifyUint64Int8()
 
         if( fSuccess != uint64_int8[i].fExpected )
         {
-            cerr << "Error in case uint64_int8 throw (2): ";
-            cerr << HEX(16) << uint64_int8[i].x << ", ";
-            cerr << HEX(2) << (0xFF & (int)uint64_int8[i].y) << ", ";
-            cerr << "expected = " << uint64_int8[i].fExpected << endl;
+            err_msg( "Error in case uint64_int8 throw (2): ", uint64_int8[i].x, uint64_int8[i].y, uint64_int8[i].fExpected );
         }
     }
 }
@@ -2404,10 +2335,7 @@ void AddVerifyInt64Uint64()
         std::int64_t ret;
         if( SafeAdd(int64_uint64[i].x, int64_uint64[i].y, ret) != int64_uint64[i].fExpected )
         {
-            cerr << "Error in case int64_uint64: ";
-            cerr << HEX(16) << int64_uint64[i].x << ", ";
-            cerr << HEX(16) << int64_uint64[i].y << ", ";
-            cerr << "expected = " << int64_uint64[i].fExpected << endl;
+            err_msg( "Error in case int64_uint64: ", int64_uint64[i].x, int64_uint64[i].y, int64_uint64[i].fExpected );
         }
 
         // Now test throwing version
@@ -2424,10 +2352,7 @@ void AddVerifyInt64Uint64()
 
         if( fSuccess != int64_uint64[i].fExpected )
         {
-            cerr << "Error in case int64_uint64 throw (1): ";
-            cerr << HEX(16) << int64_uint64[i].x << ", ";
-            cerr << HEX(16) << int64_uint64[i].y << ", ";
-            cerr << "expected = " << int64_uint64[i].fExpected << endl;
+            err_msg( "Error in case int64_uint64 throw (1): ", int64_uint64[i].x, int64_uint64[i].y, int64_uint64[i].fExpected );
         }
 
         // Also need to test the version that assigns back out
@@ -2445,10 +2370,7 @@ void AddVerifyInt64Uint64()
 
         if( fSuccess != int64_uint64[i].fExpected )
         {
-            cerr << "Error in case int64_uint64 throw (2): ";
-            cerr << HEX(16) << int64_uint64[i].x << ", ";
-            cerr << HEX(16) << int64_uint64[i].y << ", ";
-            cerr << "expected = " << int64_uint64[i].fExpected << endl;
+            err_msg( "Error in case int64_uint64 throw (2): ", int64_uint64[i].x, int64_uint64[i].y, int64_uint64[i].fExpected );
         }
     }
 }
@@ -2627,10 +2549,7 @@ void AddVerifyInt64Uint32()
         std::int64_t ret;
         if( SafeAdd(int64_uint32[i].x, int64_uint32[i].y, ret) != int64_uint32[i].fExpected )
         {
-            cerr << "Error in case int64_uint32: ";
-            cerr << HEX(16) << int64_uint32[i].x << ", ";
-            cerr << HEX(8) << int64_uint32[i].y << ", ";
-            cerr << "expected = " << int64_uint32[i].fExpected << endl;
+            err_msg( "Error in case int64_uint32: ", int64_uint32[i].x, int64_uint32[i].y, int64_uint32[i].fExpected );
         }
 
         // Now test throwing version
@@ -2647,10 +2566,7 @@ void AddVerifyInt64Uint32()
 
         if( fSuccess != int64_uint32[i].fExpected )
         {
-            cerr << "Error in case int64_uint32 throw (1): ";
-            cerr << HEX(16) << int64_uint32[i].x << ", ";
-            cerr << HEX(8) << int64_uint32[i].y << ", ";
-            cerr << "expected = " << int64_uint32[i].fExpected << endl;
+            err_msg( "Error in case int64_uint32 throw (1): ", int64_uint32[i].x, int64_uint32[i].y, int64_uint32[i].fExpected );
         }
 
         // Also need to test the version that assigns back out
@@ -2668,10 +2584,7 @@ void AddVerifyInt64Uint32()
 
         if( fSuccess != int64_uint32[i].fExpected )
         {
-            cerr << "Error in case int64_uint32 throw (2): ";
-            cerr << HEX(16) << int64_uint32[i].x << ", ";
-            cerr << HEX(8) << int64_uint32[i].y << ", ";
-            cerr << "expected = " << int64_uint32[i].fExpected << endl;
+            err_msg( "Error in case int64_uint32 throw (2): ", int64_uint32[i].x, int64_uint32[i].y, int64_uint32[i].fExpected );
         }
     }
 }
@@ -2850,10 +2763,7 @@ void AddVerifyInt64Uint16()
         std::int64_t ret;
         if( SafeAdd(int64_uint16[i].x, int64_uint16[i].y, ret) != int64_uint16[i].fExpected )
         {
-            cerr << "Error in case int64_uint16: ";
-            cerr << HEX(16) << int64_uint16[i].x << ", ";
-            cerr << HEX(4) << int64_uint16[i].y << ", ";
-            cerr << "expected = " << int64_uint16[i].fExpected << endl;
+            err_msg( "Error in case int64_uint16: ", int64_uint16[i].x, int64_uint16[i].y, int64_uint16[i].fExpected );
         }
 
         // Now test throwing version
@@ -2870,10 +2780,7 @@ void AddVerifyInt64Uint16()
 
         if( fSuccess != int64_uint16[i].fExpected )
         {
-            cerr << "Error in case int64_uint16 throw (1): ";
-            cerr << HEX(16) << int64_uint16[i].x << ", ";
-            cerr << HEX(4) << int64_uint16[i].y << ", ";
-            cerr << "expected = " << int64_uint16[i].fExpected << endl;
+            err_msg( "Error in case int64_uint16 throw (1): ", int64_uint16[i].x, int64_uint16[i].y, int64_uint16[i].fExpected );
         }
 
         // Also need to test the version that assigns back out
@@ -2891,10 +2798,7 @@ void AddVerifyInt64Uint16()
 
         if( fSuccess != int64_uint16[i].fExpected )
         {
-            cerr << "Error in case int64_uint16 throw (2): ";
-            cerr << HEX(16) << int64_uint16[i].x << ", ";
-            cerr << HEX(4) << int64_uint16[i].y << ", ";
-            cerr << "expected = " << int64_uint16[i].fExpected << endl;
+            err_msg( "Error in case int64_uint16 throw (2): ", int64_uint16[i].x, int64_uint16[i].y, int64_uint16[i].fExpected );
         }
     }
 }
@@ -3073,10 +2977,7 @@ void AddVerifyInt64Uint8()
         std::int64_t ret;
         if( SafeAdd(int64_uint8[i].x, int64_uint8[i].y, ret) != int64_uint8[i].fExpected )
         {
-            cerr << "Error in case int64_uint8: ";
-            cerr << HEX(16) << int64_uint8[i].x << ", ";
-            cerr << HEX(2) << (0xFF & (unsigned int)int64_uint8[i].y) << ", ";
-            cerr << "expected = " << int64_uint8[i].fExpected << endl;
+            err_msg( "Error in case int64_uint8: ", int64_uint8[i].x, int64_uint8[i].y, int64_uint8[i].fExpected );
         }
 
         // Now test throwing version
@@ -3093,10 +2994,7 @@ void AddVerifyInt64Uint8()
 
         if( fSuccess != int64_uint8[i].fExpected )
         {
-            cerr << "Error in case int64_uint8 throw (1): ";
-            cerr << HEX(16) << int64_uint8[i].x << ", ";
-            cerr << HEX(2) << (0xFF & (unsigned int)int64_uint8[i].y) << ", ";
-            cerr << "expected = " << int64_uint8[i].fExpected << endl;
+            err_msg( "Error in case int64_uint8 throw (1): ", int64_uint8[i].x, int64_uint8[i].y, int64_uint8[i].fExpected );
         }
 
         // Also need to test the version that assigns back out
@@ -3114,10 +3012,7 @@ void AddVerifyInt64Uint8()
 
         if( fSuccess != int64_uint8[i].fExpected )
         {
-            cerr << "Error in case int64_uint8 throw (2): ";
-            cerr << HEX(16) << int64_uint8[i].x << ", ";
-            cerr << HEX(2) << (0xFF & (unsigned int)int64_uint8[i].y) << ", ";
-            cerr << "expected = " << int64_uint8[i].fExpected << endl;
+            err_msg( "Error in case int64_uint8 throw (2): ", int64_uint8[i].x, int64_uint8[i].y, int64_uint8[i].fExpected );
         }
     }
 }
@@ -3440,10 +3335,7 @@ void AddVerifyInt64Int64()
         std::int64_t ret;
         if( SafeAdd(int64_int64[i].x, int64_int64[i].y, ret) != int64_int64[i].fExpected )
         {
-            cerr << "Error in case int64_int64: ";
-            cerr << HEX(16) << int64_int64[i].x << ", ";
-            cerr << HEX(16) << int64_int64[i].y << ", ";
-            cerr << "expected = " << int64_int64[i].fExpected << endl;
+            err_msg( "Error in case int64_int64: ", int64_int64[i].x, int64_int64[i].y, int64_int64[i].fExpected );
         }
 
         // Now test throwing version
@@ -3460,10 +3352,7 @@ void AddVerifyInt64Int64()
 
         if( fSuccess != int64_int64[i].fExpected )
         {
-            cerr << "Error in case int64_int64 throw (1): ";
-            cerr << HEX(16) << int64_int64[i].x << ", ";
-            cerr << HEX(16) << int64_int64[i].y << ", ";
-            cerr << "expected = " << int64_int64[i].fExpected << endl;
+            err_msg( "Error in case int64_int64 throw (1): ", int64_int64[i].x, int64_int64[i].y, int64_int64[i].fExpected );
         }
 
         // Also need to test the version that assigns back out
@@ -3481,10 +3370,7 @@ void AddVerifyInt64Int64()
 
         if( fSuccess != int64_int64[i].fExpected )
         {
-            cerr << "Error in case int64_int64 throw (2): ";
-            cerr << HEX(16) << int64_int64[i].x << ", ";
-            cerr << HEX(16) << int64_int64[i].y << ", ";
-            cerr << "expected = " << int64_int64[i].fExpected << endl;
+            err_msg( "Error in case int64_int64 throw (2): ", int64_int64[i].x, int64_int64[i].y, int64_int64[i].fExpected );
         }
     }
 }
@@ -3663,10 +3549,7 @@ void AddVerifyInt64Int32()
         std::int64_t ret;
         if( SafeAdd(int64_int32[i].x, int64_int32[i].y, ret) != int64_int32[i].fExpected )
         {
-            cerr << "Error in case int64_int32: ";
-            cerr << HEX(16) << int64_int32[i].x << ", ";
-            cerr << HEX(8) << int64_int32[i].y << ", ";
-            cerr << "expected = " << int64_int32[i].fExpected << endl;
+            err_msg( "Error in case int64_int32: ", int64_int32[i].x, int64_int32[i].y, int64_int32[i].fExpected );
         }
 
         // Now test throwing version
@@ -3683,10 +3566,7 @@ void AddVerifyInt64Int32()
 
         if( fSuccess != int64_int32[i].fExpected )
         {
-            cerr << "Error in case int64_int32 throw (1): ";
-            cerr << HEX(16) << int64_int32[i].x << ", ";
-            cerr << HEX(8) << int64_int32[i].y << ", ";
-            cerr << "expected = " << int64_int32[i].fExpected << endl;
+            err_msg( "Error in case int64_int32 throw (1): ", int64_int32[i].x, int64_int32[i].y, int64_int32[i].fExpected );
         }
 
         // Also need to test the version that assigns back out
@@ -3704,10 +3584,7 @@ void AddVerifyInt64Int32()
 
         if( fSuccess != int64_int32[i].fExpected )
         {
-            cerr << "Error in case int64_int32 throw (2): ";
-            cerr << HEX(16) << int64_int32[i].x << ", ";
-            cerr << HEX(8) << int64_int32[i].y << ", ";
-            cerr << "expected = " << int64_int32[i].fExpected << endl;
+            err_msg( "Error in case int64_int32 throw (2): ", int64_int32[i].x, int64_int32[i].y, int64_int32[i].fExpected );
         }
     }
 }
@@ -3886,10 +3763,7 @@ void AddVerifyInt64Int16()
         std::int64_t ret;
         if( SafeAdd(int64_int16[i].x, int64_int16[i].y, ret) != int64_int16[i].fExpected )
         {
-            cerr << "Error in case int64_int16: ";
-            cerr << HEX(16) << int64_int16[i].x << ", ";
-            cerr << HEX(4) << int64_int16[i].y << ", ";
-            cerr << "expected = " << int64_int16[i].fExpected << endl;
+            err_msg( "Error in case int64_int16: ", int64_int16[i].x, int64_int16[i].y, int64_int16[i].fExpected );
         }
 
         // Now test throwing version
@@ -3906,10 +3780,7 @@ void AddVerifyInt64Int16()
 
         if( fSuccess != int64_int16[i].fExpected )
         {
-            cerr << "Error in case int64_int16 throw (1): ";
-            cerr << HEX(16) << int64_int16[i].x << ", ";
-            cerr << HEX(4) << int64_int16[i].y << ", ";
-            cerr << "expected = " << int64_int16[i].fExpected << endl;
+            err_msg( "Error in case int64_int16 throw (1): ", int64_int16[i].x, int64_int16[i].y, int64_int16[i].fExpected );
         }
 
         // Also need to test the version that assigns back out
@@ -3927,10 +3798,7 @@ void AddVerifyInt64Int16()
 
         if( fSuccess != int64_int16[i].fExpected )
         {
-            cerr << "Error in case int64_int16 throw (2): ";
-            cerr << HEX(16) << int64_int16[i].x << ", ";
-            cerr << HEX(4) << int64_int16[i].y << ", ";
-            cerr << "expected = " << int64_int16[i].fExpected << endl;
+            err_msg( "Error in case int64_int16 throw (2): ", int64_int16[i].x, int64_int16[i].y, int64_int16[i].fExpected );
         }
     }
 }
@@ -4109,10 +3977,7 @@ void AddVerifyInt64Int8()
         std::int64_t ret;
         if( SafeAdd(int64_int8[i].x, int64_int8[i].y, ret) != int64_int8[i].fExpected )
         {
-            cerr << "Error in case int64_int8: ";
-            cerr << HEX(16) << int64_int8[i].x << ", ";
-            cerr << HEX(2) << (0xFF & (int)int64_int8[i].y) << ", ";
-            cerr << "expected = " << int64_int8[i].fExpected << endl;
+            err_msg( "Error in case int64_int8: ", int64_int8[i].x, int64_int8[i].y, int64_int8[i].fExpected );
         }
 
         // Now test throwing version
@@ -4129,10 +3994,7 @@ void AddVerifyInt64Int8()
 
         if( fSuccess != int64_int8[i].fExpected )
         {
-            cerr << "Error in case int64_int8 throw (1): ";
-            cerr << HEX(16) << int64_int8[i].x << ", ";
-            cerr << HEX(2) << (0xFF & (int)int64_int8[i].y) << ", ";
-            cerr << "expected = " << int64_int8[i].fExpected << endl;
+            err_msg( "Error in case int64_int8 throw (1): ", int64_int8[i].x, int64_int8[i].y, int64_int8[i].fExpected );
         }
 
         // Also need to test the version that assigns back out
@@ -4150,10 +4012,7 @@ void AddVerifyInt64Int8()
 
         if( fSuccess != int64_int8[i].fExpected )
         {
-            cerr << "Error in case int64_int8 throw (2): ";
-            cerr << HEX(16) << int64_int8[i].x << ", ";
-            cerr << HEX(2) << (0xFF & (int)int64_int8[i].y) << ", ";
-            cerr << "expected = " << int64_int8[i].fExpected << endl;
+            err_msg( "Error in case int64_int8 throw (2): ", int64_int8[i].x, int64_int8[i].y, int64_int8[i].fExpected );
         }
     }
 }
@@ -4340,10 +4199,7 @@ void AddVerifyUint8Uint64()
         std::uint8_t ret;
         if( SafeAdd(uint8_uint64[i].x, uint8_uint64[i].y, ret) != uint8_uint64[i].fExpected )
         {
-            cerr << "Error in case uint8_uint64: ";
-            cerr << HEX(2) << (0xFF & (unsigned int)uint8_uint64[i].x) << ", ";
-            cerr << HEX(16) << uint8_uint64[i].y << ", ";
-            cerr << "expected = " << uint8_uint64[i].fExpected << endl;
+            err_msg( "Error in case uint8_uint64: ", uint8_uint64[i].x, uint8_uint64[i].y, uint8_uint64[i].fExpected );
         }
 
         // Now test throwing version
@@ -4360,10 +4216,7 @@ void AddVerifyUint8Uint64()
 
         if( fSuccess != uint8_uint64[i].fExpected )
         {
-            cerr << "Error in case uint8_uint64 throw (1): ";
-            cerr << HEX(2) << (0xFF & (unsigned int)uint8_uint64[i].x) << ", ";
-            cerr << HEX(16) << uint8_uint64[i].y << ", ";
-            cerr << "expected = " << uint8_uint64[i].fExpected << endl;
+            err_msg( "Error in case uint8_uint64 throw (1): ", uint8_uint64[i].x, uint8_uint64[i].y, uint8_uint64[i].fExpected );
         }
 
         // Also need to test the version that assigns back out
@@ -4381,10 +4234,7 @@ void AddVerifyUint8Uint64()
 
         if( fSuccess != uint8_uint64[i].fExpected )
         {
-            cerr << "Error in case uint8_uint64 throw (2): ";
-            cerr << HEX(2) << (0xFF & (unsigned int)uint8_uint64[i].x) << ", ";
-            cerr << HEX(16) << uint8_uint64[i].y << ", ";
-            cerr << "expected = " << uint8_uint64[i].fExpected << endl;
+            err_msg( "Error in case uint8_uint64 throw (2): ", uint8_uint64[i].x, uint8_uint64[i].y, uint8_uint64[i].fExpected );
         }
     }
 }
@@ -4491,10 +4341,7 @@ void AddVerifyUint8Uint32()
         std::uint8_t ret;
         if( SafeAdd(uint8_uint32[i].x, uint8_uint32[i].y, ret) != uint8_uint32[i].fExpected )
         {
-            cerr << "Error in case uint8_uint32: ";
-            cerr << HEX(2) << (0xFF & (unsigned int)uint8_uint32[i].x) << ", ";
-            cerr << HEX(8) << uint8_uint32[i].y << ", ";
-            cerr << "expected = " << uint8_uint32[i].fExpected << endl;
+            err_msg( "Error in case uint8_uint32: ", uint8_uint32[i].x, uint8_uint32[i].y, uint8_uint32[i].fExpected );
         }
 
         // Now test throwing version
@@ -4511,10 +4358,7 @@ void AddVerifyUint8Uint32()
 
         if( fSuccess != uint8_uint32[i].fExpected )
         {
-            cerr << "Error in case uint8_uint32 throw (1): ";
-            cerr << HEX(2) << (0xFF & (unsigned int)uint8_uint32[i].x) << ", ";
-            cerr << HEX(8) << uint8_uint32[i].y << ", ";
-            cerr << "expected = " << uint8_uint32[i].fExpected << endl;
+            err_msg( "Error in case uint8_uint32 throw (1): ", uint8_uint32[i].x, uint8_uint32[i].y, uint8_uint32[i].fExpected );
         }
 
         // Also need to test the version that assigns back out
@@ -4532,10 +4376,7 @@ void AddVerifyUint8Uint32()
 
         if( fSuccess != uint8_uint32[i].fExpected )
         {
-            cerr << "Error in case uint8_uint32 throw (2): ";
-            cerr << HEX(2) << (0xFF & (unsigned int)uint8_uint32[i].x) << ", ";
-            cerr << HEX(8) << uint8_uint32[i].y << ", ";
-            cerr << "expected = " << uint8_uint32[i].fExpected << endl;
+            err_msg( "Error in case uint8_uint32 throw (2): ", uint8_uint32[i].x, uint8_uint32[i].y, uint8_uint32[i].fExpected );
         }
     }
 }
@@ -4642,10 +4483,7 @@ void AddVerifyUint8Uint16()
         std::uint8_t ret;
         if( SafeAdd(uint8_uint16[i].x, uint8_uint16[i].y, ret) != uint8_uint16[i].fExpected )
         {
-            cerr << "Error in case uint8_uint16: ";
-            cerr << HEX(2) << (0xFF & (unsigned int)uint8_uint16[i].x) << ", ";
-            cerr << HEX(4) << uint8_uint16[i].y << ", ";
-            cerr << "expected = " << uint8_uint16[i].fExpected << endl;
+            err_msg( "Error in case uint8_uint16: ", uint8_uint16[i].x, uint8_uint16[i].y, uint8_uint16[i].fExpected );
         }
 
         // Now test throwing version
@@ -4662,10 +4500,7 @@ void AddVerifyUint8Uint16()
 
         if( fSuccess != uint8_uint16[i].fExpected )
         {
-            cerr << "Error in case uint8_uint16 throw (1): ";
-            cerr << HEX(2) << (0xFF & (unsigned int)uint8_uint16[i].x) << ", ";
-            cerr << HEX(4) << uint8_uint16[i].y << ", ";
-            cerr << "expected = " << uint8_uint16[i].fExpected << endl;
+            err_msg( "Error in case uint8_uint16 throw (1): ", uint8_uint16[i].x, uint8_uint16[i].y, uint8_uint16[i].fExpected );
         }
 
         // Also need to test the version that assigns back out
@@ -4683,10 +4518,7 @@ void AddVerifyUint8Uint16()
 
         if( fSuccess != uint8_uint16[i].fExpected )
         {
-            cerr << "Error in case uint8_uint16 throw (2): ";
-            cerr << HEX(2) << (0xFF & (unsigned int)uint8_uint16[i].x) << ", ";
-            cerr << HEX(4) << uint8_uint16[i].y << ", ";
-            cerr << "expected = " << uint8_uint16[i].fExpected << endl;
+            err_msg( "Error in case uint8_uint16 throw (2): ", uint8_uint16[i].x, uint8_uint16[i].y, uint8_uint16[i].fExpected );
         }
     }
 }
@@ -4793,10 +4625,7 @@ void AddVerifyUint8Uint8()
         std::uint8_t ret;
         if( SafeAdd(uint8_uint8[i].x, uint8_uint8[i].y, ret) != uint8_uint8[i].fExpected )
         {
-            cerr << "Error in case uint8_uint8: ";
-            cerr << HEX(2) << (0xFF & (unsigned int)uint8_uint8[i].x) << ", ";
-            cerr << HEX(2) << (0xFF & (unsigned int)uint8_uint8[i].y) << ", ";
-            cerr << "expected = " << uint8_uint8[i].fExpected << endl;
+            err_msg( "Error in case uint8_uint8: ", uint8_uint8[i].x, uint8_uint8[i].y, uint8_uint8[i].fExpected );
         }
 
         // Now test throwing version
@@ -4813,10 +4642,7 @@ void AddVerifyUint8Uint8()
 
         if( fSuccess != uint8_uint8[i].fExpected )
         {
-            cerr << "Error in case uint8_uint8 throw (1): ";
-            cerr << HEX(2) << (0xFF & (unsigned int)uint8_uint8[i].x) << ", ";
-            cerr << HEX(2) << (0xFF & (unsigned int)uint8_uint8[i].y) << ", ";
-            cerr << "expected = " << uint8_uint8[i].fExpected << endl;
+            err_msg( "Error in case uint8_uint8 throw (1): ", uint8_uint8[i].x, uint8_uint8[i].y, uint8_uint8[i].fExpected );
         }
 
         // Also need to test the version that assigns back out
@@ -4834,10 +4660,7 @@ void AddVerifyUint8Uint8()
 
         if( fSuccess != uint8_uint8[i].fExpected )
         {
-            cerr << "Error in case uint8_uint8 throw (2): ";
-            cerr << HEX(2) << (0xFF & (unsigned int)uint8_uint8[i].x) << ", ";
-            cerr << HEX(2) << (0xFF & (unsigned int)uint8_uint8[i].y) << ", ";
-            cerr << "expected = " << uint8_uint8[i].fExpected << endl;
+            err_msg( "Error in case uint8_uint8 throw (2): ", uint8_uint8[i].x, uint8_uint8[i].y, uint8_uint8[i].fExpected );
         }
     }
 }
@@ -5024,10 +4847,7 @@ void AddVerifyUint8Int64()
         std::uint8_t ret;
         if( SafeAdd(uint8_int64[i].x, uint8_int64[i].y, ret) != uint8_int64[i].fExpected )
         {
-            cerr << "Error in case uint8_int64: ";
-            cerr << HEX(2) << (0xFF & (unsigned int)uint8_int64[i].x) << ", ";
-            cerr << HEX(16) << uint8_int64[i].y << ", ";
-            cerr << "expected = " << uint8_int64[i].fExpected << endl;
+            err_msg( "Error in case uint8_int64: ", uint8_int64[i].x, uint8_int64[i].y, uint8_int64[i].fExpected );
         }
 
         // Now test throwing version
@@ -5044,10 +4864,7 @@ void AddVerifyUint8Int64()
 
         if( fSuccess != uint8_int64[i].fExpected )
         {
-            cerr << "Error in case uint8_int64 throw (1): ";
-            cerr << HEX(2) << (0xFF & (unsigned int)uint8_int64[i].x) << ", ";
-            cerr << HEX(16) << uint8_int64[i].y << ", ";
-            cerr << "expected = " << uint8_int64[i].fExpected << endl;
+            err_msg( "Error in case uint8_int64 throw (1): ", uint8_int64[i].x, uint8_int64[i].y, uint8_int64[i].fExpected );
         }
 
         // Also need to test the version that assigns back out
@@ -5065,10 +4882,7 @@ void AddVerifyUint8Int64()
 
         if( fSuccess != uint8_int64[i].fExpected )
         {
-            cerr << "Error in case uint8_int64 throw (2): ";
-            cerr << HEX(2) << (0xFF & (unsigned int)uint8_int64[i].x) << ", ";
-            cerr << HEX(16) << uint8_int64[i].y << ", ";
-            cerr << "expected = " << uint8_int64[i].fExpected << endl;
+            err_msg( "Error in case uint8_int64 throw (2): ", uint8_int64[i].x, uint8_int64[i].y, uint8_int64[i].fExpected );
         }
     }
 }
@@ -5175,10 +4989,7 @@ void AddVerifyUint8Int32()
         std::uint8_t ret;
         if( SafeAdd(uint8_int32[i].x, uint8_int32[i].y, ret) != uint8_int32[i].fExpected )
         {
-            cerr << "Error in case uint8_int32: ";
-            cerr << HEX(2) << (0xFF & (unsigned int)uint8_int32[i].x) << ", ";
-            cerr << HEX(8) << uint8_int32[i].y << ", ";
-            cerr << "expected = " << uint8_int32[i].fExpected << endl;
+            err_msg( "Error in case uint8_int32: ", uint8_int32[i].x, uint8_int32[i].y, uint8_int32[i].fExpected );
         }
 
         // Now test throwing version
@@ -5195,10 +5006,7 @@ void AddVerifyUint8Int32()
 
         if( fSuccess != uint8_int32[i].fExpected )
         {
-            cerr << "Error in case uint8_int32 throw (1): ";
-            cerr << HEX(2) << (0xFF & (unsigned int)uint8_int32[i].x) << ", ";
-            cerr << HEX(8) << uint8_int32[i].y << ", ";
-            cerr << "expected = " << uint8_int32[i].fExpected << endl;
+            err_msg( "Error in case uint8_int32 throw (1): ", uint8_int32[i].x, uint8_int32[i].y, uint8_int32[i].fExpected );
         }
 
         // Also need to test the version that assigns back out
@@ -5216,10 +5024,7 @@ void AddVerifyUint8Int32()
 
         if( fSuccess != uint8_int32[i].fExpected )
         {
-            cerr << "Error in case uint8_int32 throw (2): ";
-            cerr << HEX(2) << (0xFF & (unsigned int)uint8_int32[i].x) << ", ";
-            cerr << HEX(8) << uint8_int32[i].y << ", ";
-            cerr << "expected = " << uint8_int32[i].fExpected << endl;
+            err_msg( "Error in case uint8_int32 throw (2): ", uint8_int32[i].x, uint8_int32[i].y, uint8_int32[i].fExpected );
         }
     }
 }
@@ -5326,10 +5131,7 @@ void AddVerifyUint8Int16()
         std::uint8_t ret;
         if( SafeAdd(uint8_int16[i].x, uint8_int16[i].y, ret) != uint8_int16[i].fExpected )
         {
-            cerr << "Error in case uint8_int16: ";
-            cerr << HEX(2) << (0xFF & (unsigned int)uint8_int16[i].x) << ", ";
-            cerr << HEX(4) << uint8_int16[i].y << ", ";
-            cerr << "expected = " << uint8_int16[i].fExpected << endl;
+            err_msg( "Error in case uint8_int16: ", uint8_int16[i].x, uint8_int16[i].y, uint8_int16[i].fExpected );
         }
 
         // Now test throwing version
@@ -5346,10 +5148,7 @@ void AddVerifyUint8Int16()
 
         if( fSuccess != uint8_int16[i].fExpected )
         {
-            cerr << "Error in case uint8_int16 throw (1): ";
-            cerr << HEX(2) << (0xFF & (unsigned int)uint8_int16[i].x) << ", ";
-            cerr << HEX(4) << uint8_int16[i].y << ", ";
-            cerr << "expected = " << uint8_int16[i].fExpected << endl;
+            err_msg( "Error in case uint8_int16 throw (1): ", uint8_int16[i].x, uint8_int16[i].y, uint8_int16[i].fExpected );
         }
 
         // Also need to test the version that assigns back out
@@ -5367,10 +5166,7 @@ void AddVerifyUint8Int16()
 
         if( fSuccess != uint8_int16[i].fExpected )
         {
-            cerr << "Error in case uint8_int16 throw (2): ";
-            cerr << HEX(2) << (0xFF & (unsigned int)uint8_int16[i].x) << ", ";
-            cerr << HEX(4) << uint8_int16[i].y << ", ";
-            cerr << "expected = " << uint8_int16[i].fExpected << endl;
+            err_msg( "Error in case uint8_int16 throw (2): ", uint8_int16[i].x, uint8_int16[i].y, uint8_int16[i].fExpected );
         }
     }
 }
@@ -5477,10 +5273,7 @@ void AddVerifyUint8Int8()
         std::uint8_t ret;
         if( SafeAdd(uint8_int8[i].x, uint8_int8[i].y, ret) != uint8_int8[i].fExpected )
         {
-            cerr << "Error in case uint8_int8: ";
-            cerr << HEX(2) << (0xFF & (unsigned int)uint8_int8[i].x) << ", ";
-            cerr << HEX(2) << (0xFF & (int)uint8_int8[i].y) << ", ";
-            cerr << "expected = " << uint8_int8[i].fExpected << endl;
+            err_msg( "Error in case uint8_int8: ", uint8_int8[i].x, uint8_int8[i].y, uint8_int8[i].fExpected );
         }
 
         // Now test throwing version
@@ -5497,10 +5290,7 @@ void AddVerifyUint8Int8()
 
         if( fSuccess != uint8_int8[i].fExpected )
         {
-            cerr << "Error in case uint8_int8 throw (1): ";
-            cerr << HEX(2) << (0xFF & (unsigned int)uint8_int8[i].x) << ", ";
-            cerr << HEX(2) << (0xFF & (int)uint8_int8[i].y) << ", ";
-            cerr << "expected = " << uint8_int8[i].fExpected << endl;
+            err_msg( "Error in case uint8_int8 throw (1): ", uint8_int8[i].x, uint8_int8[i].y, uint8_int8[i].fExpected );
         }
 
         // Also need to test the version that assigns back out
@@ -5518,10 +5308,7 @@ void AddVerifyUint8Int8()
 
         if( fSuccess != uint8_int8[i].fExpected )
         {
-            cerr << "Error in case uint8_int8 throw (2): ";
-            cerr << HEX(2) << (0xFF & (unsigned int)uint8_int8[i].x) << ", ";
-            cerr << HEX(2) << (0xFF & (int)uint8_int8[i].y) << ", ";
-            cerr << "expected = " << uint8_int8[i].fExpected << endl;
+            err_msg( "Error in case uint8_int8 throw (2): ", uint8_int8[i].x, uint8_int8[i].y, uint8_int8[i].fExpected );
         }
     }
 }
@@ -5708,10 +5495,7 @@ void AddVerifyInt8Uint64()
         std::int8_t ret;
         if( SafeAdd(int8_uint64[i].x, int8_uint64[i].y, ret) != int8_uint64[i].fExpected )
         {
-            cerr << "Error in case int8_uint64: ";
-            cerr << HEX(2) << (0xFF & (int)int8_uint64[i].x) << ", ";
-            cerr << HEX(16) << int8_uint64[i].y << ", ";
-            cerr << "expected = " << int8_uint64[i].fExpected << endl;
+            err_msg( "Error in case int8_uint64: ", int8_uint64[i].x, int8_uint64[i].y, int8_uint64[i].fExpected );
         }
 
         // Now test throwing version
@@ -5728,10 +5512,7 @@ void AddVerifyInt8Uint64()
 
         if( fSuccess != int8_uint64[i].fExpected )
         {
-            cerr << "Error in case int8_uint64 throw (1): ";
-            cerr << HEX(2) << (0xFF & (int)int8_uint64[i].x) << ", ";
-            cerr << HEX(16) << int8_uint64[i].y << ", ";
-            cerr << "expected = " << int8_uint64[i].fExpected << endl;
+            err_msg( "Error in case int8_uint64 throw (1): ", int8_uint64[i].x, int8_uint64[i].y, int8_uint64[i].fExpected );
         }
 
         // Also need to test the version that assigns back out
@@ -5749,10 +5530,7 @@ void AddVerifyInt8Uint64()
 
         if( fSuccess != int8_uint64[i].fExpected )
         {
-            cerr << "Error in case int8_uint64 throw (2): ";
-            cerr << HEX(2) << (0xFF & (int)int8_uint64[i].x) << ", ";
-            cerr << HEX(16) << int8_uint64[i].y << ", ";
-            cerr << "expected = " << int8_uint64[i].fExpected << endl;
+            err_msg( "Error in case int8_uint64 throw (2): ", int8_uint64[i].x, int8_uint64[i].y, int8_uint64[i].fExpected );
         }
     }
 }
@@ -5859,10 +5637,7 @@ void AddVerifyInt8Uint32()
         std::int8_t ret;
         if( SafeAdd(int8_uint32[i].x, int8_uint32[i].y, ret) != int8_uint32[i].fExpected )
         {
-            cerr << "Error in case int8_uint32: ";
-            cerr << HEX(2) << (0xFF & (int)int8_uint32[i].x) << ", ";
-            cerr << HEX(8) << int8_uint32[i].y << ", ";
-            cerr << "expected = " << int8_uint32[i].fExpected << endl;
+            err_msg( "Error in case int8_uint32: ", int8_uint32[i].x, int8_uint32[i].y, int8_uint32[i].fExpected );
         }
 
         // Now test throwing version
@@ -5879,10 +5654,7 @@ void AddVerifyInt8Uint32()
 
         if( fSuccess != int8_uint32[i].fExpected )
         {
-            cerr << "Error in case int8_uint32 throw (1): ";
-            cerr << HEX(2) << (0xFF & (int)int8_uint32[i].x) << ", ";
-            cerr << HEX(8) << int8_uint32[i].y << ", ";
-            cerr << "expected = " << int8_uint32[i].fExpected << endl;
+            err_msg( "Error in case int8_uint32 throw (1): ", int8_uint32[i].x, int8_uint32[i].y, int8_uint32[i].fExpected );
         }
 
         // Also need to test the version that assigns back out
@@ -5900,10 +5672,7 @@ void AddVerifyInt8Uint32()
 
         if( fSuccess != int8_uint32[i].fExpected )
         {
-            cerr << "Error in case int8_uint32 throw (2): ";
-            cerr << HEX(2) << (0xFF & (int)int8_uint32[i].x) << ", ";
-            cerr << HEX(8) << int8_uint32[i].y << ", ";
-            cerr << "expected = " << int8_uint32[i].fExpected << endl;
+            err_msg( "Error in case int8_uint32 throw (2): ", int8_uint32[i].x, int8_uint32[i].y, int8_uint32[i].fExpected );
         }
     }
 }
@@ -6010,10 +5779,7 @@ void AddVerifyInt8Uint16()
         std::int8_t ret;
         if( SafeAdd(int8_uint16[i].x, int8_uint16[i].y, ret) != int8_uint16[i].fExpected )
         {
-            cerr << "Error in case int8_uint16: ";
-            cerr << HEX(2) << (0xFF & (int)int8_uint16[i].x) << ", ";
-            cerr << HEX(4) << int8_uint16[i].y << ", ";
-            cerr << "expected = " << int8_uint16[i].fExpected << endl;
+            err_msg( "Error in case int8_uint16: ", int8_uint16[i].x, int8_uint16[i].y, int8_uint16[i].fExpected );
         }
 
         // Now test throwing version
@@ -6030,10 +5796,7 @@ void AddVerifyInt8Uint16()
 
         if( fSuccess != int8_uint16[i].fExpected )
         {
-            cerr << "Error in case int8_uint16 throw (1): ";
-            cerr << HEX(2) << (0xFF & (int)int8_uint16[i].x) << ", ";
-            cerr << HEX(4) << int8_uint16[i].y << ", ";
-            cerr << "expected = " << int8_uint16[i].fExpected << endl;
+            err_msg( "Error in case int8_uint16 throw (1): ", int8_uint16[i].x, int8_uint16[i].y, int8_uint16[i].fExpected );
         }
 
         // Also need to test the version that assigns back out
@@ -6051,10 +5814,7 @@ void AddVerifyInt8Uint16()
 
         if( fSuccess != int8_uint16[i].fExpected )
         {
-            cerr << "Error in case int8_uint16 throw (2): ";
-            cerr << HEX(2) << (0xFF & (int)int8_uint16[i].x) << ", ";
-            cerr << HEX(4) << int8_uint16[i].y << ", ";
-            cerr << "expected = " << int8_uint16[i].fExpected << endl;
+            err_msg( "Error in case int8_uint16 throw (2): ", int8_uint16[i].x, int8_uint16[i].y, int8_uint16[i].fExpected );
         }
     }
 }
@@ -6161,10 +5921,7 @@ void AddVerifyInt8Uint8()
         std::int8_t ret;
         if( SafeAdd(int8_uint8[i].x, int8_uint8[i].y, ret) != int8_uint8[i].fExpected )
         {
-            cerr << "Error in case int8_uint8: ";
-            cerr << HEX(2) << (0xFF & (int)int8_uint8[i].x) << ", ";
-            cerr << HEX(2) << (0xFF & (int)int8_uint8[i].y) << ", ";
-            cerr << "expected = " << int8_uint8[i].fExpected << endl;
+            err_msg( "Error in case int8_uint8: ", int8_uint8[i].x, int8_uint8[i].y, int8_uint8[i].fExpected );
         }
 
         // Now test throwing version
@@ -6181,10 +5938,7 @@ void AddVerifyInt8Uint8()
 
         if( fSuccess != int8_uint8[i].fExpected )
         {
-            cerr << "Error in case int8_uint8 throw (1): ";
-            cerr << HEX(2) << (0xFF & (int)int8_uint8[i].x) << ", ";
-            cerr << HEX(2) << (0xFF & (int)int8_uint8[i].y) << ", ";
-            cerr << "expected = " << int8_uint8[i].fExpected << endl;
+            err_msg( "Error in case int8_uint8 throw (1): ", int8_uint8[i].x, int8_uint8[i].y, int8_uint8[i].fExpected );
         }
 
         // Also need to test the version that assigns back out
@@ -6202,10 +5956,7 @@ void AddVerifyInt8Uint8()
 
         if( fSuccess != int8_uint8[i].fExpected )
         {
-            cerr << "Error in case int8_uint8 throw (2): ";
-            cerr << HEX(2) << (0xFF & (int)int8_uint8[i].x) << ", ";
-            cerr << HEX(2) << (0xFF & (int)int8_uint8[i].y) << ", ";
-            cerr << "expected = " << int8_uint8[i].fExpected << endl;
+            err_msg( "Error in case int8_uint8 throw (2): ", int8_uint8[i].x, int8_uint8[i].y, int8_uint8[i].fExpected );
         }
     }
 }
@@ -6392,10 +6143,7 @@ void AddVerifyInt8Int64()
         std::int8_t ret;
         if( SafeAdd(int8_int64[i].x, int8_int64[i].y, ret) != int8_int64[i].fExpected )
         {
-            cerr << "Error in case int8_int64: ";
-            cerr << HEX(2) << (0xFF & (int)int8_int64[i].x) << ", ";
-            cerr << HEX(16) << int8_int64[i].y << ", ";
-            cerr << "expected = " << int8_int64[i].fExpected << endl;
+            err_msg( "Error in case int8_int64: ", int8_int64[i].x, int8_int64[i].y, int8_int64[i].fExpected );
         }
 
         // Now test throwing version
@@ -6412,10 +6160,7 @@ void AddVerifyInt8Int64()
 
         if( fSuccess != int8_int64[i].fExpected )
         {
-            cerr << "Error in case int8_int64 throw (1): ";
-            cerr << HEX(2) << (0xFF & (int)int8_int64[i].x) << ", ";
-            cerr << HEX(16) << int8_int64[i].y << ", ";
-            cerr << "expected = " << int8_int64[i].fExpected << endl;
+            err_msg( "Error in case int8_int64 throw (1): ", int8_int64[i].x, int8_int64[i].y, int8_int64[i].fExpected );
         }
 
         // Also need to test the version that assigns back out
@@ -6433,10 +6178,7 @@ void AddVerifyInt8Int64()
 
         if( fSuccess != int8_int64[i].fExpected )
         {
-            cerr << "Error in case int8_int64 throw (2): ";
-            cerr << HEX(2) << (0xFF & (int)int8_int64[i].x) << ", ";
-            cerr << HEX(16) << int8_int64[i].y << ", ";
-            cerr << "expected = " << int8_int64[i].fExpected << endl;
+            err_msg( "Error in case int8_int64 throw (2): ", int8_int64[i].x, int8_int64[i].y, int8_int64[i].fExpected );
         }
     }
 }
@@ -6543,10 +6285,7 @@ void AddVerifyInt8Int32()
         std::int8_t ret;
         if( SafeAdd(int8_int32[i].x, int8_int32[i].y, ret) != int8_int32[i].fExpected )
         {
-            cerr << "Error in case int8_int32: ";
-            cerr << HEX(2) << (0xFF & (int)int8_int32[i].x) << ", ";
-            cerr << HEX(8) << int8_int32[i].y << ", ";
-            cerr << "expected = " << int8_int32[i].fExpected << endl;
+            err_msg( "Error in case int8_int32: ", int8_int32[i].x, int8_int32[i].y, int8_int32[i].fExpected );
         }
 
         // Now test throwing version
@@ -6563,10 +6302,7 @@ void AddVerifyInt8Int32()
 
         if( fSuccess != int8_int32[i].fExpected )
         {
-            cerr << "Error in case int8_int32 throw (1): ";
-            cerr << HEX(2) << (0xFF & (int)int8_int32[i].x) << ", ";
-            cerr << HEX(8) << int8_int32[i].y << ", ";
-            cerr << "expected = " << int8_int32[i].fExpected << endl;
+            err_msg( "Error in case int8_int32 throw (1): ", int8_int32[i].x, int8_int32[i].y, int8_int32[i].fExpected );
         }
 
         // Also need to test the version that assigns back out
@@ -6584,10 +6320,7 @@ void AddVerifyInt8Int32()
 
         if( fSuccess != int8_int32[i].fExpected )
         {
-            cerr << "Error in case int8_int32 throw (2): ";
-            cerr << HEX(2) << (0xFF & (int)int8_int32[i].x) << ", ";
-            cerr << HEX(8) << int8_int32[i].y << ", ";
-            cerr << "expected = " << int8_int32[i].fExpected << endl;
+            err_msg( "Error in case int8_int32 throw (2): ", int8_int32[i].x, int8_int32[i].y, int8_int32[i].fExpected );
         }
     }
 }
@@ -6694,10 +6427,7 @@ void AddVerifyInt8Int16()
         std::int8_t ret;
         if( SafeAdd(int8_int16[i].x, int8_int16[i].y, ret) != int8_int16[i].fExpected )
         {
-            cerr << "Error in case int8_int16: ";
-            cerr << HEX(2) << (0xFF & (int)int8_int16[i].x) << ", ";
-            cerr << HEX(4) << int8_int16[i].y << ", ";
-            cerr << "expected = " << int8_int16[i].fExpected << endl;
+            err_msg( "Error in case int8_int16: ", int8_int16[i].x, int8_int16[i].y, int8_int16[i].fExpected );
         }
 
         // Now test throwing version
@@ -6714,10 +6444,7 @@ void AddVerifyInt8Int16()
 
         if( fSuccess != int8_int16[i].fExpected )
         {
-            cerr << "Error in case int8_int16 throw (1): ";
-            cerr << HEX(2) << (0xFF & (int)int8_int16[i].x) << ", ";
-            cerr << HEX(4) << int8_int16[i].y << ", ";
-            cerr << "expected = " << int8_int16[i].fExpected << endl;
+            err_msg( "Error in case int8_int16 throw (1): ", int8_int16[i].x, int8_int16[i].y, int8_int16[i].fExpected );
         }
 
         // Also need to test the version that assigns back out
@@ -6735,10 +6462,7 @@ void AddVerifyInt8Int16()
 
         if( fSuccess != int8_int16[i].fExpected )
         {
-            cerr << "Error in case int8_int16 throw (2): ";
-            cerr << HEX(2) << (0xFF & (int)int8_int16[i].x) << ", ";
-            cerr << HEX(4) << int8_int16[i].y << ", ";
-            cerr << "expected = " << int8_int16[i].fExpected << endl;
+            err_msg( "Error in case int8_int16 throw (2): ", int8_int16[i].x, int8_int16[i].y, int8_int16[i].fExpected );
         }
     }
 }
@@ -6845,10 +6569,7 @@ void AddVerifyInt8Int8()
         std::int8_t ret;
         if( SafeAdd(int8_int8[i].x, int8_int8[i].y, ret) != int8_int8[i].fExpected )
         {
-            cerr << "Error in case int8_int8: ";
-            cerr << HEX(2) << (0xFF & (int)int8_int8[i].x) << ", ";
-            cerr << HEX(2) << (0xFF & (int)int8_int8[i].y) << ", ";
-            cerr << "expected = " << int8_int8[i].fExpected << endl;
+            err_msg( "Error in case int8_int8: ", int8_int8[i].x, int8_int8[i].y, int8_int8[i].fExpected );
         }
 
         // Now test throwing version
@@ -6865,10 +6586,7 @@ void AddVerifyInt8Int8()
 
         if( fSuccess != int8_int8[i].fExpected )
         {
-            cerr << "Error in case int8_int8 throw (1): ";
-            cerr << HEX(2) << (0xFF & (int)int8_int8[i].x) << ", ";
-            cerr << HEX(2) << (0xFF & (int)int8_int8[i].y) << ", ";
-            cerr << "expected = " << int8_int8[i].fExpected << endl;
+            err_msg( "Error in case int8_int8 throw (1): ", int8_int8[i].x, int8_int8[i].y, int8_int8[i].fExpected );
         }
 
         // Also need to test the version that assigns back out
@@ -6886,17 +6604,14 @@ void AddVerifyInt8Int8()
 
         if( fSuccess != int8_int8[i].fExpected )
         {
-            cerr << "Error in case int8_int8 throw (2): ";
-            cerr << HEX(2) << (0xFF & (int)int8_int8[i].x) << ", ";
-            cerr << HEX(2) << (0xFF & (int)int8_int8[i].y) << ", ";
-            cerr << "expected = " << int8_int8[i].fExpected << endl;
+            err_msg( "Error in case int8_int8 throw (2): ", int8_int8[i].x, int8_int8[i].y, int8_int8[i].fExpected );
         }
     }
 }
 
 void AddVerify()
 {
-    cout << "Verifying Addition:" << endl;
+    std::cout << "Verifying Addition:" << std::endl;
 
     // Unsigned int64, unsigned cases
     AddVerifyUint64Uint64();

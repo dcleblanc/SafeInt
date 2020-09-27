@@ -74,7 +74,7 @@ namespace cast_verify
 			}
 
 			if(fSuccess != tests[i].fExpected)
-				cerr << "Error in cast double to std::uint64_t case " << i << endl;
+				std::cerr << "Error in cast double to std::uint64_t case " << i << std::endl;
 		}
 	}
 
@@ -100,13 +100,13 @@ namespace cast_verify
 			}
 
 			if (fSuccess != tests[i].fExpected)
-				cerr << "Error in cast float to std::uint64_t case " << i << endl;
+				std::cerr << "Error in cast float to std::uint64_t case " << i << std::endl;
 		}
 	}
 
 	void CastVerify()
 	{
-		cout << "Verifying Casting:" << endl;
+		std::cout << "Verifying Casting:" << std::endl;
 		TestDouble();
 	}
 }

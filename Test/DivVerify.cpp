@@ -161,7 +161,7 @@ void DivVerifyUint64Uint64()
       if( SafeDivide(uint64_uint64[i].x, uint64_uint64[i].y, ret) != uint64_uint64[i].fExpected )
       {
          //assert(false);
-         printf("Error in case uint64_uint64: %I64X, %I64X, expected = %s\n", uint64_uint64[i].x, uint64_uint64[i].y, uint64_uint64[i].fExpected ? "true" : "false");
+          err_msg( "Error in case uint64_uint64: ", uint64_uint64[i].x, uint64_uint64[i].y, uint64_uint64[i].fExpected );
       }
 
       // Now test throwing version
@@ -178,7 +178,7 @@ void DivVerifyUint64Uint64()
 
       if( fSuccess != uint64_uint64[i].fExpected )
       {
-         printf("Error in case uint64_uint64 throw: %I64X, %I64X, expected = %s\n", uint64_uint64[i].x, uint64_uint64[i].y, uint64_uint64[i].fExpected ? "true" : "false");
+          err_msg( "Error in case uint64_uint64 throw: ", uint64_uint64[i].x, uint64_uint64[i].y, uint64_uint64[i].fExpected );
       }
 
       // Also need to test the version that assigns back out
@@ -196,7 +196,7 @@ void DivVerifyUint64Uint64()
 
       if( fSuccess != uint64_uint64[i].fExpected )
       {
-         printf("Error in case uint64_uint64 throw: %I64X, %I64X, expected = %s\n", uint64_uint64[i].x, uint64_uint64[i].y, uint64_uint64[i].fExpected ? "true" : "false");
+          err_msg( "Error in case uint64_uint64 throw: ", uint64_uint64[i].x, uint64_uint64[i].y, uint64_uint64[i].fExpected );
       }
    }
 }
@@ -281,7 +281,7 @@ void DivVerifyUint64Uint32()
       if( SafeDivide(uint64_uint32[i].x, uint64_uint32[i].y, ret) != uint64_uint32[i].fExpected )
       {
          //assert(false);
-         printf("Error in case uint64_uint32: %I64X, %X, expected = %s\n", uint64_uint32[i].x, uint64_uint32[i].y, uint64_uint32[i].fExpected ? "true" : "false");
+         err_msg( "Error in case uint64_uint32: ", uint64_uint32[i].x, uint64_uint32[i].y, uint64_uint32[i].fExpected );
       }
 
       // Now test throwing version
@@ -298,7 +298,7 @@ void DivVerifyUint64Uint32()
 
       if( fSuccess != uint64_uint32[i].fExpected )
       {
-         printf("Error in case uint64_uint32 throw: %I64X, %X, expected = %s\n", uint64_uint32[i].x, uint64_uint32[i].y, uint64_uint32[i].fExpected ? "true" : "false");
+          err_msg( "Error in case uint64_uint32 throw: ", uint64_uint32[i].x, uint64_uint32[i].y, uint64_uint32[i].fExpected );
       }
 
       // Also need to test the version that assigns back out
@@ -316,7 +316,7 @@ void DivVerifyUint64Uint32()
 
       if( fSuccess != uint64_uint32[i].fExpected )
       {
-         printf("Error in case uint64_uint32 throw: %I64X, %X, expected = %s\n", uint64_uint32[i].x, uint64_uint32[i].y, uint64_uint32[i].fExpected ? "true" : "false");
+          err_msg( "Error in case uint64_uint32 throw: ", uint64_uint32[i].x, uint64_uint32[i].y, uint64_uint32[i].fExpected );
       }
    }
 }
@@ -368,7 +368,7 @@ void DivVerifyUint64Uint16()
       if( SafeDivide(uint64_uint16[i].x, uint64_uint16[i].y, ret) != uint64_uint16[i].fExpected )
       {
          //assert(false);
-         printf("Error in case uint64_uint16: %I64X, %X, expected = %s\n", uint64_uint16[i].x, uint64_uint16[i].y, uint64_uint16[i].fExpected ? "true" : "false");
+          err_msg( "Error in case uint64_uint16: ", uint64_uint16[i].x, uint64_uint16[i].y, uint64_uint16[i].fExpected );
       }
 
       // Now test throwing version
@@ -385,7 +385,7 @@ void DivVerifyUint64Uint16()
 
       if( fSuccess != uint64_uint16[i].fExpected )
       {
-         printf("Error in case uint64_uint16 throw: %I64X, %X, expected = %s\n", uint64_uint16[i].x, uint64_uint16[i].y, uint64_uint16[i].fExpected ? "true" : "false");
+          err_msg( "Error in case uint64_uint16 throw: ", uint64_uint16[i].x, uint64_uint16[i].y, uint64_uint16[i].fExpected );
       }
 
       // Also need to test the version that assigns back out
@@ -403,7 +403,7 @@ void DivVerifyUint64Uint16()
 
       if( fSuccess != uint64_uint16[i].fExpected )
       {
-         printf("Error in case uint64_uint16 throw: %I64X, %X, expected = %s\n", uint64_uint16[i].x, uint64_uint16[i].y, uint64_uint16[i].fExpected ? "true" : "false");
+          err_msg( "Error in case uint64_uint16 throw: ", uint64_uint16[i].x, uint64_uint16[i].y, uint64_uint16[i].fExpected );
       }
    }
 }
@@ -455,7 +455,7 @@ void DivVerifyUint64Uint8()
       if( SafeDivide(uint64_uint8[i].x, uint64_uint8[i].y, ret) != uint64_uint8[i].fExpected )
       {
          //assert(false);
-         printf("Error in case uint64_uint8: %I64X, %X, expected = %s\n", uint64_uint8[i].x, uint64_uint8[i].y, uint64_uint8[i].fExpected ? "true" : "false");
+          err_msg( "Error in case uint64_uint8: ", uint64_uint8[i].x, uint64_uint8[i].y, uint64_uint8[i].fExpected );
       }
 
       // Now test throwing version
@@ -472,7 +472,7 @@ void DivVerifyUint64Uint8()
 
       if( fSuccess != uint64_uint8[i].fExpected )
       {
-         printf("Error in case uint64_uint8 throw: %I64X, %X, expected = %s\n", uint64_uint8[i].x, uint64_uint8[i].y, uint64_uint8[i].fExpected ? "true" : "false");
+          err_msg( "Error in case uint64_uint8 throw: ", uint64_uint8[i].x, uint64_uint8[i].y, uint64_uint8[i].fExpected );
       }
 
       // Also need to test the version that assigns back out
@@ -490,7 +490,7 @@ void DivVerifyUint64Uint8()
 
       if( fSuccess != uint64_uint8[i].fExpected )
       {
-         printf("Error in case uint64_uint8 throw: %I64X, %X, expected = %s\n", uint64_uint8[i].x, uint64_uint8[i].y, uint64_uint8[i].fExpected ? "true" : "false");
+          err_msg( "Error in case uint64_uint8 throw: ", uint64_uint8[i].x, uint64_uint8[i].y, uint64_uint8[i].fExpected );
       }
    }
 }
@@ -633,7 +633,7 @@ void DivVerifyUint64Int64()
       if( SafeDivide(uint64_int64[i].x, uint64_int64[i].y, ret) != uint64_int64[i].fExpected )
       {
          //assert(false);
-         printf("Error in case uint64_int64: %I64X, %I64X, expected = %s\n", uint64_int64[i].x, uint64_int64[i].y, uint64_int64[i].fExpected ? "true" : "false");
+          err_msg( "Error in case uint64_int64: ", uint64_int64[i].x, uint64_int64[i].y, uint64_int64[i].fExpected );
       }
 
       // Now test throwing version
@@ -650,7 +650,7 @@ void DivVerifyUint64Int64()
 
       if( fSuccess != uint64_int64[i].fExpected )
       {
-         printf("Error in case uint64_int64 throw: %I64X, %I64X, expected = %s\n", uint64_int64[i].x, uint64_int64[i].y, uint64_int64[i].fExpected ? "true" : "false");
+          err_msg( "Error in case uint64_int64 throw: ", uint64_int64[i].x, uint64_int64[i].y, uint64_int64[i].fExpected );
       }
 
       // Also need to test the version that assigns back out
@@ -668,7 +668,7 @@ void DivVerifyUint64Int64()
 
       if( fSuccess != uint64_int64[i].fExpected )
       {
-         printf("Error in case uint64_int64 throw: %I64X, %I64X, expected = %s\n", uint64_int64[i].x, uint64_int64[i].y, uint64_int64[i].fExpected ? "true" : "false");
+          err_msg( "Error in case uint64_int64 throw: ", uint64_int64[i].x, uint64_int64[i].y, uint64_int64[i].fExpected );
       }
    }
 }
@@ -820,7 +820,7 @@ void DivVerifyUint64Int64_2()
 
       if( fSuccess != int64_uint64_2[i].fExpected )
       {
-         printf("Error in case int64_uint64_2 throw: %I64X, %I64X, expected = %s\n", int64_uint64_2[i].x, int64_uint64_2[i].y, int64_uint64_2[i].fExpected ? "true" : "false");
+          err_msg( "Error in case int64_uint64_2 throw: ", int64_uint64_2[i].x, int64_uint64_2[i].y, int64_uint64_2[i].fExpected );
       }
    }
 }
@@ -905,7 +905,7 @@ void DivVerifyUint64Int32()
       if( SafeDivide(uint64_int32[i].x, uint64_int32[i].y, ret) != uint64_int32[i].fExpected )
       {
          //assert(false);
-         printf("Error in case uint64_int64: %I64X, %I64X, expected = %s\n", uint64_int32[i].x, uint64_int32[i].y, uint64_int32[i].fExpected ? "true" : "false");
+          err_msg( "Error in case uint64_int64: ", uint64_int32[i].x, uint64_int32[i].y, uint64_int32[i].fExpected );
       }
 
       // Now test throwing version
@@ -922,7 +922,7 @@ void DivVerifyUint64Int32()
 
       if( fSuccess != uint64_int32[i].fExpected )
       {
-         printf("Error in case uint64_int32 throw: %I64X, %X, expected = %s\n", uint64_int32[i].x, uint64_int32[i].y, uint64_int32[i].fExpected ? "true" : "false");
+          err_msg( "Error in case uint64_int32 throw: ", uint64_int32[i].x, uint64_int32[i].y, uint64_int32[i].fExpected );
       }
 
       // Also need to test the version that assigns back out
@@ -940,7 +940,7 @@ void DivVerifyUint64Int32()
 
       if( fSuccess != uint64_int32[i].fExpected )
       {
-         printf("Error in case uint64_int64 throw: %I64X, %X, expected = %s\n", uint64_int32[i].x, uint64_int32[i].y, uint64_int32[i].fExpected ? "true" : "false");
+          err_msg( "Error in case uint64_int64 throw: ", uint64_int32[i].x, uint64_int32[i].y, uint64_int32[i].fExpected );
       }
    }
 }
@@ -1037,7 +1037,7 @@ void DivVerifyUint64Int32_2()
 
       if( fSuccess != int32_uint64_2[i].fExpected )
       {
-         printf("Error in case int32_uint64_2 throw: %X, %I64X, expected = %s\n", int32_uint64_2[i].x, int32_uint64_2[i].y, int32_uint64_2[i].fExpected ? "true" : "false");
+          err_msg( "Error in case int32_uint64_2 throw: ", int32_uint64_2[i].x, int32_uint64_2[i].y, int32_uint64_2[i].fExpected );
       }
    }
 }
@@ -1100,7 +1100,7 @@ void DivVerifyUint64Int16()
       if( SafeDivide(uint64_int16[i].x, uint64_int16[i].y, ret) != uint64_int16[i].fExpected )
       {
          //assert(false);
-         printf("Error in case uint64_int64: %I64X, %I64X, expected = %s\n", uint64_int16[i].x, uint64_int16[i].y, uint64_int16[i].fExpected ? "true" : "false");
+          err_msg( "Error in case uint64_int64: ", uint64_int16[i].x, uint64_int16[i].y, uint64_int16[i].fExpected );
       }
 
       // Now test throwing version
@@ -1117,7 +1117,7 @@ void DivVerifyUint64Int16()
 
       if( fSuccess != uint64_int16[i].fExpected )
       {
-         printf("Error in case uint64_int32 throw: %I64X, %X, expected = %s\n", uint64_int16[i].x, uint64_int16[i].y, uint64_int16[i].fExpected ? "true" : "false");
+          err_msg( "Error in case uint64_int32 throw: ", uint64_int16[i].x, uint64_int16[i].y, uint64_int16[i].fExpected );
       }
 
       // Also need to test the version that assigns back out
@@ -1135,7 +1135,7 @@ void DivVerifyUint64Int16()
 
       if( fSuccess != uint64_int16[i].fExpected )
       {
-         printf("Error in case uint64_int16 throw: %I64X, %X, expected = %s\n", uint64_int16[i].x, uint64_int16[i].y, uint64_int16[i].fExpected ? "true" : "false");
+          err_msg( "Error in case uint64_int16 throw: ", uint64_int16[i].x, uint64_int16[i].y, uint64_int16[i].fExpected );
       }
    }
 }
@@ -1232,7 +1232,7 @@ void DivVerifyUint64Int16_2()
 
       if( fSuccess != int16_uint64_2[i].fExpected )
       {
-         printf("Error in case int16_uint64_2 throw: %X, %I64X, expected = %s\n", int16_uint64_2[i].x, int16_uint64_2[i].y, int16_uint64_2[i].fExpected ? "true" : "false");
+          err_msg( "Error in case int16_uint64_2 throw: ", int16_uint64_2[i].x, int16_uint64_2[i].y, int16_uint64_2[i].fExpected );
       }
    }
 }
@@ -1295,7 +1295,7 @@ void DivVerifyUint64Int8()
       if( SafeDivide(uint64_int8[i].x, uint64_int8[i].y, ret) != uint64_int8[i].fExpected )
       {
          //assert(false);
-         printf("Error in case uint64_int64: %I64X, %I64X, expected = %s\n", uint64_int8[i].x, uint64_int8[i].y, uint64_int8[i].fExpected ? "true" : "false");
+          err_msg( "Error in case uint64_int64: ", uint64_int8[i].x, uint64_int8[i].y, uint64_int8[i].fExpected );
       }
 
       // Now test throwing version
@@ -1312,7 +1312,7 @@ void DivVerifyUint64Int8()
 
       if( fSuccess != uint64_int8[i].fExpected )
       {
-         printf("Error in case uint64_int32 throw: %I64X, %X, expected = %s\n", uint64_int8[i].x, uint64_int8[i].y, uint64_int8[i].fExpected ? "true" : "false");
+          err_msg( "Error in case uint64_int32 throw: ", uint64_int8[i].x, uint64_int8[i].y, uint64_int8[i].fExpected );
       }
 
       // Also need to test the version that assigns back out
@@ -1330,7 +1330,7 @@ void DivVerifyUint64Int8()
 
       if( fSuccess != uint64_int8[i].fExpected )
       {
-         printf("Error in case uint64_int8 throw: %I64X, %X, expected = %s\n", uint64_int8[i].x, uint64_int8[i].y, uint64_int8[i].fExpected ? "true" : "false");
+          err_msg( "Error in case uint64_int8 throw: ", uint64_int8[i].x, uint64_int8[i].y, uint64_int8[i].fExpected );
       }
    }
 }
@@ -1427,7 +1427,7 @@ void DivVerifyUint64Int8_2()
 
       if( fSuccess != int8_uint64_2[i].fExpected )
       {
-         printf("Error in case int8_uint64_2 throw: %X, %I64X, expected = %s\n", int8_uint64_2[i].x, int8_uint64_2[i].y, int8_uint64_2[i].fExpected ? "true" : "false");
+          err_msg( "Error in case int8_uint64_2 throw: ", int8_uint64_2[i].x, int8_uint64_2[i].y, int8_uint64_2[i].fExpected );
       }
    }
 }
@@ -1567,7 +1567,7 @@ void DivVerifyInt64Int64()
       if( SafeDivide(int64_int64[i].x, int64_int64[i].y, ret) != int64_int64[i].fExpected )
       {
          //assert(false);
-         printf("Error in case int64_int64: %I64X, %I64X, expected = %s\n", int64_int64[i].x, int64_int64[i].y, int64_int64[i].fExpected ? "true" : "false");
+          err_msg( "Error in case int64_int64: ", int64_int64[i].x, int64_int64[i].y, int64_int64[i].fExpected );
       }
 
       // Now test throwing version
@@ -1584,7 +1584,7 @@ void DivVerifyInt64Int64()
 
       if( fSuccess != int64_int64[i].fExpected )
       {
-         printf("Error in case int64_int64 throw: %I64X, %I64X, expected = %s\n", int64_int64[i].x, int64_int64[i].y, int64_int64[i].fExpected ? "true" : "false");
+         err_msg( "Error in case int64_int64 throw: ", int64_int64[i].x, int64_int64[i].y, int64_int64[i].fExpected );
       }
 
       // Also need to test the version that assigns back out
@@ -1602,7 +1602,7 @@ void DivVerifyInt64Int64()
 
       if( fSuccess != int64_int64[i].fExpected )
       {
-         printf("Error in case int64_int64 throw: %I64X, %I64X, expected = %s\n", int64_int64[i].x, int64_int64[i].y, int64_int64[i].fExpected ? "true" : "false");
+          err_msg( "Error in case int64_int64 throw: ", int64_int64[i].x, int64_int64[i].y, int64_int64[i].fExpected );
       }
    }
 }
@@ -1629,7 +1629,7 @@ void DivVerifyInt64Int64_2()
 
       if( fSuccess != int64_int64[i].fExpected )
       {
-         printf("Error in case int64_int64 throw: %X, %I64X, expected = %s\n", int64_int64[i].x, int64_int64[i].y, int64_int64[i].fExpected ? "true" : "false");
+          err_msg( "Error in case int64_int64 throw: ", int64_int64[i].x, int64_int64[i].y, int64_int64[i].fExpected );
       }
    }
 }
@@ -1714,7 +1714,7 @@ void DivVerifyInt64Int32()
       if( SafeDivide(int64_int32[i].x, int64_int32[i].y, ret) != int64_int32[i].fExpected )
       {
          //assert(false);
-         printf("Error in case int64_int32: %I64X, %I64X, expected = %s\n", int64_int32[i].x, int64_int32[i].y, int64_int32[i].fExpected ? "true" : "false");
+          err_msg( "Error in case int64_int32: ", int64_int32[i].x, int64_int32[i].y, int64_int32[i].fExpected );
       }
 
       // Now test throwing version
@@ -1731,7 +1731,7 @@ void DivVerifyInt64Int32()
 
       if( fSuccess != int64_int32[i].fExpected )
       {
-         printf("Error in case int64_int32 throw: %I64X, %I64X, expected = %s\n", int64_int32[i].x, int64_int32[i].y, int64_int32[i].fExpected ? "true" : "false");
+          err_msg( "Error in case int64_int32 throw: ", int64_int32[i].x, int64_int32[i].y, int64_int32[i].fExpected );
       }
 
       // Also need to test the version that assigns back out
@@ -1749,7 +1749,7 @@ void DivVerifyInt64Int32()
 
       if( fSuccess != int64_int32[i].fExpected )
       {
-         printf("Error in case int64_int32 throw: %I64X, %I64X, expected = %s\n", int64_int32[i].x, int64_int32[i].y, int64_int32[i].fExpected ? "true" : "false");
+          err_msg( "Error in case int64_int32 throw: ", int64_int32[i].x, int64_int32[i].y, int64_int32[i].fExpected );
       }
    }
 }
@@ -1846,7 +1846,7 @@ void DivVerifyInt64Int32_2()
 
       if( fSuccess != int64_int32_2[i].fExpected )
       {
-         printf("Error in case int64_int32_2 throw: %X, %I64X, expected = %s\n", int64_int32_2[i].x, int64_int32_2[i].y, int64_int32_2[i].fExpected ? "true" : "false");
+          err_msg( "Error in case int64_int32_2 throw: ", int64_int32_2[i].x, int64_int32_2[i].y, int64_int32_2[i].fExpected );
       }
    }
 }
@@ -1986,7 +1986,7 @@ void DivVerifyInt64Uint64()
       if( SafeDivide(int64_uint64[i].x, int64_uint64[i].y, ret) != int64_uint64[i].fExpected )
       {
          //assert(false);
-         printf("Error in case int64_uint64: %I64X, %I64X, expected = %s\n", int64_uint64[i].x, int64_uint64[i].y, int64_uint64[i].fExpected ? "true" : "false");
+          err_msg( "Error in case int64_uint64: ", int64_uint64[i].x, int64_uint64[i].y, int64_uint64[i].fExpected );
       }
 
       // Now test throwing version
@@ -2003,7 +2003,7 @@ void DivVerifyInt64Uint64()
 
       if( fSuccess != int64_uint64[i].fExpected )
       {
-         printf("Error in case int64_uint64 throw: %I64X, %I64X, expected = %s\n", int64_uint64[i].x, int64_uint64[i].y, int64_uint64[i].fExpected ? "true" : "false");
+          err_msg( "Error in case int64_uint64 throw: ", int64_uint64[i].x, int64_uint64[i].y, int64_uint64[i].fExpected );
       }
 
       // Also need to test the version that assigns back out
@@ -2021,7 +2021,7 @@ void DivVerifyInt64Uint64()
 
       if( fSuccess != int64_uint64[i].fExpected )
       {
-         printf("Error in case int64_uint64 throw: %I64X, %I64X, expected = %s\n", int64_uint64[i].x, int64_uint64[i].y, int64_uint64[i].fExpected ? "true" : "false");
+         err_msg( "Error in case int64_uint64 throw: ", int64_uint64[i].x, int64_uint64[i].y, int64_uint64[i].fExpected );
       }
    }
 }
@@ -2173,7 +2173,7 @@ void DivVerifyInt64Uint64_2()
 
       if( fSuccess != int64_uint64_3[i].fExpected )
       {
-         printf("Error in case int64_uint64_3 throw: %X, %I64X, expected = %s\n", int64_uint64_3[i].x, int64_uint64_3[i].y, int64_uint64_3[i].fExpected ? "true" : "false");
+         err_msg( "Error in case int64_uint64_3 throw: ", int64_uint64_3[i].x, int64_uint64_3[i].y, int64_uint64_3[i].fExpected );
       }
    }
 }
@@ -2258,7 +2258,7 @@ void DivVerifyInt64Uint32()
       if( SafeDivide(int64_uint32[i].x, int64_uint32[i].y, ret) != int64_uint32[i].fExpected )
       {
          //assert(false);
-         printf("Error in case int64_uint32: %I64X, %I64X, expected = %s\n", int64_uint32[i].x, int64_uint32[i].y, int64_uint32[i].fExpected ? "true" : "false");
+         err_msg( "Error in case int64_uint32: ", int64_uint32[i].x, int64_uint32[i].y, int64_uint32[i].fExpected );
       }
 
       // Now test throwing version
@@ -2275,7 +2275,7 @@ void DivVerifyInt64Uint32()
 
       if( fSuccess != int64_uint32[i].fExpected )
       {
-         printf("Error in case int64_uint32 throw: %I64X, %I64X, expected = %s\n", int64_uint32[i].x, int64_uint32[i].y, int64_uint32[i].fExpected ? "true" : "false");
+         err_msg( "Error in case int64_uint32 throw: ", int64_uint32[i].x, int64_uint32[i].y, int64_uint32[i].fExpected );
       }
 
       // Also need to test the version that assigns back out
@@ -2293,7 +2293,7 @@ void DivVerifyInt64Uint32()
 
       if( fSuccess != int64_uint32[i].fExpected )
       {
-         printf("Error in case int64_uint32 throw: %I64X, %I64X, expected = %s\n", int64_uint32[i].x, int64_uint32[i].y, int64_uint32[i].fExpected ? "true" : "false");
+         err_msg( "Error in case int64_uint32 throw: ", int64_uint32[i].x, int64_uint32[i].y, int64_uint32[i].fExpected );
       }
    }
 }
@@ -2390,14 +2390,14 @@ void DivVerifyInt64Uint32_2()
 
       if( fSuccess != int64_uint32_2[i].fExpected )
       {
-         printf("Error in case int64_uint32_2 throw: %X, %I64X, expected = %s\n", int64_uint32_2[i].x, int64_uint32_2[i].y, int64_uint32_2[i].fExpected ? "true" : "false");
+         err_msg( "Error in case int64_uint32_2 throw: ", int64_uint32_2[i].x, int64_uint32_2[i].y, int64_uint32_2[i].fExpected );
       }
    }
 }
 
 void DivVerify()
 {
-   printf( "Verifying Division:\n" );
+    std::cout << "Verifying Division:" << std::endl;
 
    // Unsigned int64, unsigned cases
    DivVerifyUint64Uint64();

@@ -11,16 +11,9 @@
 #endif
 
 #include <iostream>
+#include <ios>
 #include <iomanip>
-
-using std::cout;
-using std::cerr;
-using std::endl;
-
-using std::hex;
-using std::setw;
-using std::setfill;
-using std::dec;
+#include <sstream>
 
 #include "../SafeInt.hpp"
 
@@ -30,7 +23,6 @@ using std::dec;
 #pragma warning(disable: 4838 4477 4310 5045)
 #elif SAFEINT_COMPILER == CLANG_COMPILER 
 #pragma GCC diagnostic ignored "-Wc++11-narrowing"
-#pragma GCC diagnostic ignored "-Wformat"
 #elif SAFEINT_COMPILER == GCC_COMPILER
 #pragma GCC diagnostic ignored "-Wnarrowing"
 #endif
@@ -43,7 +35,41 @@ using std::dec;
 # endif
 #endif
 
-#define HEX(x) hex << setw(x) << setfill('0')
+template <typename T>
+std::string to_hex(T t)
+{
+	std::ostringstream ostm;
+	ostm << "0x" << std::setfill('0') << std::hex << std::setw(sizeof(t) <= 4 ? 8 : 16) << t;
+	return ostm.str();
+}
+
+template <>
+inline std::string to_hex< uint8_t >(uint8_t t)
+{
+	std::ostringstream ostm;
+	ostm << "0x" << std::setfill('0') << std::hex << std::setw(2) << static_cast<uint16_t>( t ) ;
+	return ostm.str();
+}
+
+template <>
+inline std::string to_hex< int8_t >(int8_t t)
+{
+	std::ostringstream ostm;
+	ostm << "0x" << std::setfill('0') << std::hex << std::setw(2) << static_cast<uint16_t>( t );
+	return ostm.str();
+}
+
+template <typename T, typename U>
+void err_msg(const std::string& msg, T t, U u, bool expected)
+{
+	std::cerr << msg << to_hex(t) << ", " << to_hex(u) << ", expected = " << expected << std::endl;
+}
+
+template <typename T>
+void err_msg(const std::string& msg, T t, bool expected)
+{
+	std::cerr << msg << to_hex(t) << ", expected = " << expected << std::endl;
+}
 
 namespace mult_verify { void MultVerify(); }
 namespace div_verify { void DivVerify(); }

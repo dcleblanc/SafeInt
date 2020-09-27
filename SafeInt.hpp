@@ -714,6 +714,13 @@ namespace SafeIntInternal
     //                                       exits the app with a crash
     template < typename E > class SafeIntExceptionHandler;
 
+#if __cpp_exceptions >= 199711L
+
+    // Some users may have applications that do not use C++ exceptions
+    // and cannot compile the following class. If that is the case,
+    // either SafeInt_InvalidParameter must be defined as the default,
+    // or a custom, user-supplied exception handler must be provided.
+
     template <> class SafeIntExceptionHandler < SafeIntException >
     {
     public:
@@ -721,15 +728,17 @@ namespace SafeIntInternal
         static SAFEINT_NORETURN void SAFEINT_STDCALL SafeIntOnOverflow()
         {
             SafeIntExceptionAssert();
-            throw SafeIntException(SafeIntError::SafeIntArithmeticOverflow );
+            throw SafeIntException( SafeIntError::SafeIntArithmeticOverflow );
         }
 
         static SAFEINT_NORETURN void SAFEINT_STDCALL SafeIntOnDivZero()
         {
             SafeIntExceptionAssert();
-            throw SafeIntException(SafeIntError::SafeIntDivideByZero );
+            throw SafeIntException( SafeIntError::SafeIntDivideByZero );
         }
     };
+
+#endif
 
    class SafeInt_InvalidParameter
    {
@@ -770,7 +779,10 @@ namespace SafeIntInternal
 } // namespace SafeIntInternal
 
 // both of these have cross-platform support
+#if __cpp_exceptions >= 199711L
 typedef SafeIntInternal::SafeIntExceptionHandler < SafeIntException > CPlusPlusExceptionHandler;
+#endif
+
 typedef SafeIntInternal::SafeInt_InvalidParameter InvalidParameterExceptionHandler;
 
 // This exception handler is no longer recommended, but is left here in order not to break existing users
@@ -799,7 +811,12 @@ typedef SafeIntInternal::SafeIntWin32ExceptionHandler Win32ExceptionHandler;
     #elif defined SAFEINT_FAILFAST
         #define SafeIntDefaultExceptionHandler InvalidParameterExceptionHandler
     #else
-        #define SafeIntDefaultExceptionHandler CPlusPlusExceptionHandler
+        #if __cpp_exceptions >= 199711L
+            #define SafeIntDefaultExceptionHandler CPlusPlusExceptionHandler
+        #else
+            #define SafeIntDefaultExceptionHandler InvalidParameterExceptionHandler
+        #endif
+
         #if !defined SAFEINT_EXCEPTION_HANDLER_CPP
         #define SAFEINT_EXCEPTION_HANDLER_CPP 1
         #endif

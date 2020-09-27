@@ -162,12 +162,7 @@ void MultVerifyUint64Uint64()
 		if( SafeMultiply(uint64_uint64[i].x, uint64_uint64[i].y, ret) != uint64_uint64[i].fExpected )
 		{
 			//assert(false);
-			// printf("Error in case uint64_uint64: %I64X, %I64X, expected = %s\n",
-			// uint64_uint64[i].x, uint64_uint64[i].y, uint64_uint64[i].fExpected ? "true" : "false");
-			cerr << "Error in case uint64_uint64: ";
-			cerr << hex << setw(16) << setfill('0') << uint64_uint64[i].x << ", ";
-			cerr << hex << setw(16) << setfill('0') << uint64_uint64[i].y << ", ";
-			cerr << "expected = " << uint64_uint64[i].fExpected << endl;
+			err_msg( "Error in case uint64_uint64: ", uint64_uint64[i].x, uint64_uint64[i].y, uint64_uint64[i].fExpected );
 		}
 
 		// Now test throwing version
@@ -184,12 +179,7 @@ void MultVerifyUint64Uint64()
 
 		if( fSuccess != uint64_uint64[i].fExpected )
 		{
-			// printf("Error in case uint64_uint64 throw: %I64X, %I64X, expected = %s\n",
-			// uint64_uint64[i].x, uint64_uint64[i].y, uint64_uint64[i].fExpected ? "true" : "false");
-			cerr << "Error in case uint64_uint64 throw: ";
-			cerr << hex << setw(16) << setfill('0') << uint64_uint64[i].x << ", ";
-			cerr << hex << setw(16) << setfill('0') << uint64_uint64[i].y << ", ";
-			cerr << "expected = " << uint64_uint64[i].fExpected << endl;
+			err_msg( "Error in case uint64_uint64 throw: ", uint64_uint64[i].x, uint64_uint64[i].y, uint64_uint64[i].fExpected );
 		}
 	}
 }
@@ -274,12 +264,7 @@ void MultVerifyUint64Uint()
 		if( SafeMultiply(uint64_uint32[i].x, uint64_uint32[i].y, ret) != uint64_uint32[i].fExpected )
 		{
 			//assert(false);
-			// printf("Error in case %I64X, %I64X, expected = %s\n",
-			// uint64_uint32[i].x, uint64_uint32[i].y, uint64_uint32[i].fExpected ? "true" : "false");
-			cerr << "Error in case uint64_uint32: ";
-			cerr << hex << setw(16) << setfill('0') << uint64_uint32[i].x << ", ";
-			cerr << hex << setw(16) << setfill('0') << uint64_uint32[i].y << ", ";
-			cerr << "expected = " << uint64_uint32[i].fExpected << endl;
+			err_msg( "Error in case uint64_uint32: ", uint64_uint32[i].x, uint64_uint32[i].y, uint64_uint32[i].fExpected );
 		}
 
 		bool fSuccess = true;
@@ -295,12 +280,7 @@ void MultVerifyUint64Uint()
 
 		if( fSuccess != uint64_uint32[i].fExpected )
 		{
-			// printf("Error in case uint64_uint32 throw: %I64X, %I64X, expected = %s\n",
-			// uint64_uint32[i].x, uint64_uint32[i].y, uint64_uint32[i].fExpected ? "true" : "false");
-			cerr << "Error in case uint64_uint32 throw: ";
-			cerr << hex << setw(16) << setfill('0') << uint64_uint32[i].x << ", ";
-			cerr << hex << setw(16) << setfill('0') << uint64_uint32[i].y << ", ";
-			cerr << "expected = " << uint64_uint32[i].fExpected << endl;
+			err_msg( "Error in case uint64_uint32 throw: ", uint64_uint32[i].x, uint64_uint32[i].y, uint64_uint32[i].fExpected );
 		}
 	}
 }
@@ -385,12 +365,7 @@ void MultVerifyUintUint64()
 		if( SafeMultiply(uint32_uint64[i].x, uint32_uint64[i].y, ret) != uint32_uint64[i].fExpected )
 		{
 			//assert(false);
-			// printf("Error in case %I64X, %I64X, expected = %s\n",
-			// uint32_uint64[i].x, uint32_uint64[i].y, uint32_uint64[i].fExpected ? "true" : "false");
-			cerr << "Error in case uint32_uint64: ";
-			cerr << hex << setw(16) << setfill('0') << uint32_uint64[i].x << ", ";
-			cerr << hex << setw(16) << setfill('0') << uint32_uint64[i].y << ", ";
-			cerr << "expected = " << uint32_uint64[i].fExpected << endl;
+			err_msg( "Error in case uint32_uint64: ", uint32_uint64[i].x, uint32_uint64[i].y, uint32_uint64[i].fExpected );
 		}
 
 		bool fSuccess = true;
@@ -406,12 +381,7 @@ void MultVerifyUintUint64()
 
 		if( fSuccess != uint32_uint64[i].fExpected )
 		{
-			// printf("Error in case uint32_uint64 throw: %I64X, %I64X, expected = %s\n",
-			// uint32_uint64[i].x, uint32_uint64[i].y, uint32_uint64[i].fExpected ? "true" : "false");
-			cerr << "Error in case uint32_uint64 throw: ";
-			cerr << hex << setw(16) << setfill('0') << uint32_uint64[i].x << ", ";
-			cerr << hex << setw(16) << setfill('0') << uint32_uint64[i].y << ", ";
-			cerr << "expected = " << uint32_uint64[i].fExpected << endl;
+			err_msg( "Error in case uint32_uint64 throw: ", uint32_uint64[i].x, uint32_uint64[i].y, uint32_uint64[i].fExpected );
 		}
 	}
 }
@@ -496,12 +466,7 @@ void MultVerifyUintInt64()
 		if( SafeMultiply(uint32_int64[i].x, uint32_int64[i].y, ret) != uint32_int64[i].fExpected )
 		{
 			//assert(false);
-			// printf("Error in case %I64X, %I64X, expected = %s\n",
-			// uint32_int64[i].x, uint32_int64[i].y, uint32_int64[i].fExpected ? "true" : "false");
-			cerr << "Error in case uint32_int64: ";
-			cerr << hex << setw(16) << setfill('0') << uint32_int64[i].x << ", ";
-			cerr << hex << setw(16) << setfill('0') << uint32_int64[i].y << ", ";
-			cerr << "expected = " << uint32_int64[i].fExpected << endl;
+			err_msg( "Error in case uint32_int64: ", uint32_int64[i].x, uint32_int64[i].y, uint32_int64[i].fExpected ); 
 		}
 
 		bool fSuccess = true;
@@ -517,12 +482,7 @@ void MultVerifyUintInt64()
 
 		if( fSuccess != uint32_int64[i].fExpected )
 		{
-			// printf("Error in case uint32_int64 throw: %I64X, %I64X, expected = %s\n",
-			// uint32_int64[i].x, uint32_int64[i].y, uint32_int64[i].fExpected ? "true" : "false");
-			cerr << "Error in case uint32_int64 throw: ";
-			cerr << hex << setw(16) << setfill('0') << uint32_int64[i].x << ", ";
-			cerr << hex << setw(16) << setfill('0') << uint32_int64[i].y << ", ";
-			cerr << "expected = " << uint32_int64[i].fExpected << endl;
+			err_msg( "Error in case uint32_int64 throw: ", uint32_int64[i].x, uint32_int64[i].y, uint32_int64[i].fExpected );
 		}
 	}
 }
@@ -662,12 +622,7 @@ void MultVerifyUint64Int64()
 		if( SafeMultiply(uint64_int64[i].x, uint64_int64[i].y, ret) != uint64_int64[i].fExpected )
 		{
 			//assert(false);
-			// printf("Error in case %I64X, %I64X, expected = %s\n",
-			// uint64_int64[i].x, uint64_int64[i].y, uint64_int64[i].fExpected ? "true" : "false");
-			cerr << "Error in case uint64_int64: ";
-			cerr << hex << setw(16) << setfill('0') << uint64_int64[i].x << ", ";
-			cerr << hex << setw(16) << setfill('0') << uint64_int64[i].y << ", ";
-			cerr << "expected = " << uint64_int64[i].fExpected << endl;
+			err_msg( "Error in case uint64_int64: ", uint64_int64[i].x, uint64_int64[i].y, uint64_int64[i].fExpected );
 		}
 
 		bool fSuccess = true;
@@ -683,12 +638,7 @@ void MultVerifyUint64Int64()
 
 		if( fSuccess != uint64_int64[i].fExpected )
 		{
-			// printf("Error in case uint64_int64 throw: %I64X, %I64X, expected = %s\n",
-			// uint64_int64[i].x, uint64_int64[i].y, uint64_int64[i].fExpected ? "true" : "false");
-			cerr << "Error in case uint64_int64 throw: ";
-			cerr << hex << setw(16) << setfill('0') << uint64_int64[i].x << ", ";
-			cerr << hex << setw(16) << setfill('0') << uint64_int64[i].y << ", ";
-			cerr << "expected = " << uint64_int64[i].fExpected << endl;
+			err_msg( "Error in case uint64_int64 throw: ", uint64_int64[i].x, uint64_int64[i].y, uint64_int64[i].fExpected );
 		}
 	}
 }
@@ -773,12 +723,7 @@ void MultVerifyUint64Int()
 		if( SafeMultiply(uint64_int32[i].x, uint64_int32[i].y, ret) != uint64_int32[i].fExpected )
 		{
 			//assert(false);
-			// printf("Error in case %I64X, %I64X, expected = %s\n",
-			// uint64_int32[i].x, uint64_int32[i].y, uint64_int32[i].fExpected ? "true" : "false");
-			cerr << "Error in case uint64_int32: ";
-			cerr << hex << setw(16) << setfill('0') << uint64_int32[i].x << ", ";
-			cerr << hex << setw(16) << setfill('0') << uint64_int32[i].y << ", ";
-			cerr << "expected = " << uint64_int32[i].fExpected << endl;
+			err_msg( "Error in case uint64_int32: ", uint64_int32[i].x, uint64_int32[i].y, uint64_int32[i].fExpected );
 		}
 
 		bool fSuccess = true;
@@ -794,12 +739,7 @@ void MultVerifyUint64Int()
 
 		if( fSuccess != uint64_int32[i].fExpected )
 		{
-			// printf("Error in case uint64_int32 throw: %I64X, %I64X, expected = %s\n",
-			// uint64_int32[i].x, uint64_int32[i].y, uint64_int32[i].fExpected ? "true" : "false");
-			cerr << "Error in case uint64_int32 throw: ";
-			cerr << hex << setw(16) << setfill('0') << uint64_int32[i].x << ", ";
-			cerr << hex << setw(16) << setfill('0') << uint64_int32[i].y << ", ";
-			cerr << "expected = " << uint64_int32[i].fExpected << endl;
+			err_msg( "Error in case uint64_int32 throw: ", uint64_int32[i].x, uint64_int32[i].y, uint64_int32[i].fExpected );
 		}
 	}
 }
@@ -941,12 +881,7 @@ void MultVerifyInt64Int64()
 		if( SafeMultiply(int64_int64[i].x, int64_int64[i].y, ret) != int64_int64[i].fExpected )
 		{
 			//assert(false);
-			// printf("Error in case %I64X, %I64X, expected = %s\n",
-			// int64_int64[i].x, int64_int64[i].y, int64_int64[i].fExpected ? "true" : "false");
-			cerr << "Error in case int64_int64: ";
-			cerr << hex << setw(16) << setfill('0') << int64_int64[i].x << ", ";
-			cerr << hex << setw(16) << setfill('0') << int64_int64[i].y << ", ";
-			cerr << "expected = " << int64_int64[i].fExpected << endl;
+			err_msg( "Error in case int64_int64: ", int64_int64[i].x, int64_int64[i].y, int64_int64[i].fExpected );
 		}
 
 		bool fSuccess = true;
@@ -962,12 +897,7 @@ void MultVerifyInt64Int64()
 
 		if( fSuccess != int64_int64[i].fExpected )
 		{
-			// printf("Error in case int64_int64 throw: %I64X, %I64X, expected = %s\n",
-			// int64_int64[i].x, int64_int64[i].y, int64_int64[i].fExpected ? "true" : "false");
-			cerr << "Error in case int64_int64 throw: ";
-			cerr << hex << setw(16) << setfill('0') << int64_int64[i].x << ", ";
-			cerr << hex << setw(16) << setfill('0') << int64_int64[i].y << ", ";
-			cerr << "expected = " << int64_int64[i].fExpected << endl;
+			err_msg( "Error in case int64_int64 throw: ", int64_int64[i].x, int64_int64[i].y, int64_int64[i].fExpected );
 		}
 	}
 }
@@ -1109,12 +1039,7 @@ void MultVerifyInt64Uint64()
 		if( SafeMultiply(int64_uint64[i].x, int64_uint64[i].y, ret) != int64_uint64[i].fExpected )
 		{
 			//assert(false);
-			// printf("Error in case %I64X, %I64X, expected = %s\n",
-			// int64_uint64[i].x, int64_uint64[i].y, int64_uint64[i].fExpected ? "true" : "false");
-			cerr << "Error in case int64_uint64: ";
-			cerr << hex << setw(16) << setfill('0') << int64_uint64[i].x << ", ";
-			cerr << hex << setw(16) << setfill('0') << int64_uint64[i].y << ", ";
-			cerr << "expected = " << int64_uint64[i].fExpected << endl;
+			err_msg( "Error in case int64_uint64: ", int64_uint64[i].x, int64_uint64[i].y, int64_uint64[i].fExpected );
 		}
 
 		bool fSuccess = true;
@@ -1130,12 +1055,7 @@ void MultVerifyInt64Uint64()
 
 		if( fSuccess != int64_uint64[i].fExpected )
 		{
-			// printf("Error in case int64_uint64 throw: %I64X, %I64X, expected = %s\n",
-			// int64_uint64[i].x, int64_uint64[i].y, int64_uint64[i].fExpected ? "true" : "false");
-			cerr << "Error in case int64_uint64 throw: ";
-			cerr << hex << setw(16) << setfill('0') << int64_uint64[i].x << ", ";
-			cerr << hex << setw(16) << setfill('0') << int64_uint64[i].y << ", ";
-			cerr << "expected = " << int64_uint64[i].fExpected << endl;
+			err_msg( "Error in case int64_uint64 throw: ", int64_uint64[i].x, int64_uint64[i].y, int64_uint64[i].fExpected );
 		}
 	}
 }
@@ -1220,12 +1140,7 @@ void MultVerifyInt64Int()
 		if( SafeMultiply(int64_int[i].x, int64_int[i].y, ret) != int64_int[i].fExpected )
 		{
 			//assert(false);
-			// printf("Error in case %I64X, %I64X, expected = %s\n",
-			// int64_int[i].x, int64_int[i].y, int64_int[i].fExpected ? "true" : "false");
-			cerr << "Error in case int64_int: ";
-			cerr << hex << setw(16) << setfill('0') << int64_int[i].x << ", ";
-			cerr << hex << setw(16) << setfill('0') << int64_int[i].y << ", ";
-			cerr << "expected = " << int64_int[i].fExpected << endl;
+			err_msg( "Error in case int64_int: ", int64_int[i].x, int64_int[i].y, int64_int[i].fExpected );
 		}
 
 		bool fSuccess = true;
@@ -1241,12 +1156,7 @@ void MultVerifyInt64Int()
 
 		if( fSuccess != int64_int[i].fExpected )
 		{
-			// printf("Error in case int64_int throw: %I64X, %I64X, expected = %s\n",
-			// int64_int[i].x, int64_int[i].y, int64_int[i].fExpected ? "true" : "false");
-			cerr << "Error in case int64_int throw: ";
-			cerr << hex << setw(16) << setfill('0') << int64_int[i].x << ", ";
-			cerr << hex << setw(16) << setfill('0') << int64_int[i].y << ", ";
-			cerr << "expected = " << int64_int[i].fExpected << endl;
+			err_msg( "Error in case int64_int throw: ", int64_int[i].x, int64_int[i].y, int64_int[i].fExpected );
 		}
 	}
 }
@@ -1331,12 +1241,7 @@ void MultVerifyInt64Uint()
 		if( SafeMultiply(int64_uint[i].x, int64_uint[i].y, ret) != int64_uint[i].fExpected )
 		{
 			//assert(false);
-			// printf("Error in case %I64X, %I64X, expected = %s\n",
-			// int64_uint[i].x, int64_uint[i].y, int64_uint[i].fExpected ? "true" : "false");
-			cerr << "Error in case int64_uint: ";
-			cerr << hex << setw(16) << setfill('0') << int64_uint[i].x << ", ";
-			cerr << hex << setw(16) << setfill('0') << int64_uint[i].y << ", ";
-			cerr << "expected = " << int64_uint[i].fExpected << endl;
+			err_msg( "Error in case int64_uint: ", int64_uint[i].x, int64_uint[i].y, int64_uint[i].fExpected );
 		}
 
 		bool fSuccess = true;
@@ -1352,12 +1257,7 @@ void MultVerifyInt64Uint()
 
 		if( fSuccess != int64_uint[i].fExpected )
 		{
-			// printf("Error in case int64_uint throw: %I64X, %I64X, expected = %s\n",
-			// int64_uint[i].x, int64_uint[i].y, int64_uint[i].fExpected ? "true" : "false");
-			cerr << "Error in case int64_uint throw: ";
-			cerr << hex << setw(16) << setfill('0') << int64_uint[i].x << ", ";
-			cerr << hex << setw(16) << setfill('0') << int64_uint[i].y << ", ";
-			cerr << "expected = " << int64_uint[i].fExpected << endl;
+			err_msg( "Error in case int64_uint throw: ", int64_uint[i].x, int64_uint[i].y, int64_uint[i].fExpected );
 		}
 	}
 }
@@ -1444,12 +1344,7 @@ void MultVerifyIntInt64()
 		if( SafeMultiply(int_int64[i].x, int_int64[i].y, ret) != int_int64[i].fExpected )
 		{
 			//assert(false);
-			// printf("Error in case %I64X, %I64X, expected = %s\n",
-			// int_int64[i].x, int_int64[i].y, int_int64[i].fExpected ? "true" : "false");
-			cerr << "Error in case int_int64: ";
-			cerr << hex << setw(16) << setfill('0') << int_int64[i].x << ", ";
-			cerr << hex << setw(16) << setfill('0') << int_int64[i].y << ", ";
-			cerr << "expected = " << int_int64[i].fExpected << endl;
+			err_msg( "Error in case int_int64: ", int_int64[i].x, int_int64[i].y, int_int64[i].fExpected );
 		}
 
 		bool fSuccess = true;
@@ -1465,12 +1360,7 @@ void MultVerifyIntInt64()
 
 		if( fSuccess != int_int64[i].fExpected )
 		{
-			// printf("Error in case int_int64 throw: %I64X, %I64X, expected = %s\n",
-			// int_int64[i].x, int_int64[i].y, int_int64[i].fExpected ? "true" : "false");
-			cerr << "Error in case int_int64 throw: ";
-			cerr << hex << setw(16) << setfill('0') << int_int64[i].x << ", ";
-			cerr << hex << setw(16) << setfill('0') << int_int64[i].y << ", ";
-			cerr << "expected = " << int_int64[i].fExpected << endl;
+			err_msg( "Error in case int_int64 throw: ", int_int64[i].x, int_int64[i].y, int_int64[i].fExpected );
 		}
 	}
 }
@@ -1557,12 +1447,7 @@ void MultVerifyIntUint64()
 		if( SafeMultiply(int_uint64[i].x, int_uint64[i].y, ret) != int_uint64[i].fExpected )
 		{
 			//assert(false);
-			// printf("Error in case %I64X, %I64X, expected = %s\n",
-			// int_uint64[i].x, int_uint64[i].y, int_uint64[i].fExpected ? "true" : "false");
-			cerr << "Error in case int_uint64: ";
-			cerr << hex << setw(16) << setfill('0') << int_uint64[i].x << ", ";
-			cerr << hex << setw(16) << setfill('0') << int_uint64[i].y << ", ";
-			cerr << "expected = " << int_uint64[i].fExpected << endl;
+			err_msg( "Error in case int_uint64: ", int_uint64[i].x, int_uint64[i].y, int_uint64[i].fExpected );
 		}
 
 		bool fSuccess = true;
@@ -1578,12 +1463,7 @@ void MultVerifyIntUint64()
 
 		if( fSuccess != int_uint64[i].fExpected )
 		{
-			// printf("Error in case int_uint64 throw: %I64X, %I64X, expected = %s\n",
-			// int_uint64[i].x, int_uint64[i].y, int_uint64[i].fExpected ? "true" : "false");
-			cerr << "Error in case int_uint64 throw: ";
-			cerr << hex << setw(16) << setfill('0') << int_uint64[i].x << ", ";
-			cerr << hex << setw(16) << setfill('0') << int_uint64[i].y << ", ";
-			cerr << "expected = " << int_uint64[i].fExpected << endl;
+			err_msg( "Error in case int_uint64 throw: ", int_uint64[i].x, int_uint64[i].y, int_uint64[i].fExpected );
 		}
 	}
 }
@@ -1726,12 +1606,7 @@ void MultVerifyUint8Uint8()
 		if( SafeMultiply(uint8_uint8[i].x, uint8_uint8[i].y, ret) != uint8_uint8[i].fExpected )
 		{
 			//assert(false);
-			// printf("Error in case uint8_uint8: %02X, %02X, expected = %s\n",
-			// uint8_uint8[i].x, uint8_uint8[i].y, uint8_uint8[i].fExpected ? "true" : "false");
-			cerr << "Error in case uint8_uint8: ";
-			cerr << hex << setw(2) << setfill('0') << (unsigned int)uint8_uint8[i].x << ", ";
-			cerr << hex << setw(2) << setfill('0') << (unsigned int)uint8_uint8[i].y << ", ";
-			cerr << "expected = " << uint8_uint8[i].fExpected << endl;
+			err_msg( "Error in case uint8_uint8: ", (unsigned int)uint8_uint8[i].x, (unsigned int)uint8_uint8[i].y, uint8_uint8[i].fExpected );
 		}
 
 		// Now test throwing version
@@ -1748,12 +1623,7 @@ void MultVerifyUint8Uint8()
 
 		if( fSuccess != uint8_uint8[i].fExpected )
 		{
-			// printf("Error in case uint8_uint8 throw: %02X, %02X, expected = %s\n",
-			// uint8_uint8[i].x, uint8_uint8[i].y, uint8_uint8[i].fExpected ? "true" : "false");
-			cerr << "Error in case uint8_uint8 throw: ";
-			cerr << hex << setw(2) << setfill('0') << (unsigned int)uint8_uint8[i].x << ", ";
-			cerr << hex << setw(2) << setfill('0') << (unsigned int)uint8_uint8[i].y << ", ";
-			cerr << "expected = " << uint8_uint8[i].fExpected << endl;
+			err_msg( "Error in case uint8_uint8 throw: ", (unsigned int)uint8_uint8[i].x, (unsigned int)uint8_uint8[i].y, uint8_uint8[i].fExpected );
 		}
 	}
 }
@@ -1937,12 +1807,7 @@ void MultVerifyInt8Int8()
 		if( SafeMultiply(int8_int8[i].x, int8_int8[i].y, ret) != int8_int8[i].fExpected )
 		{
 			//assert(false);
-			// printf("Error in case int8_int8: %02X, %02X, expected = %s\n",
-			// int8_int8[i].x, int8_int8[i].y, int8_int8[i].fExpected ? "true" : "false");
-			cerr << "Error in case int8_int8: ";
-			cerr << hex << setw(2) << setfill('0') << (unsigned int)int8_int8[i].x << ", ";
-			cerr << hex << setw(2) << setfill('0') << (unsigned int)int8_int8[i].y << ", ";
-			cerr << "expected = " << int8_int8[i].fExpected << endl;
+			err_msg( "Error in case int8_int8: ", (unsigned int)int8_int8[i].x, (unsigned int)int8_int8[i].y, int8_int8[i].fExpected );
 		}
 
 		// Now test throwing version
@@ -1959,19 +1824,14 @@ void MultVerifyInt8Int8()
 
 		if( fSuccess != int8_int8[i].fExpected )
 		{
-			// printf("Error in case int8_int8 throw: %02X, %02X, expected = %s\n",
-			// int8_int8[i].x, int8_int8[i].y, int8_int8[i].fExpected ? "true" : "false");
-			cerr << "Error in case int8_int8 throw: ";
-			cerr << hex << setw(2) << setfill('0') << (unsigned int)int8_int8[i].x << ", ";
-			cerr << hex << setw(2) << setfill('0') << (unsigned int)int8_int8[i].y << ", ";
-			cerr << "expected = " << int8_int8[i].fExpected << endl;
+			err_msg( "Error in case int8_int8 throw: ", (unsigned int)int8_int8[i].x, (unsigned int)int8_int8[i].y, int8_int8[i].fExpected );
 		}
 	}
 }
 
 void MultVerify()
 {
-	cout << "Verifying Multiplication:" << endl;
+	std::cout << "Verifying Multiplication:" << std::endl;
 
 	MultVerifyUint64Uint64();
 	MultVerifyUint64Uint();
