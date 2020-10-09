@@ -5,7 +5,7 @@ dist: xenial
 env:
   global:
   jobs:
-    - compiler=g++-4.6
+    - compiler=g++-4.6 compiler_flags="-std=c++0x"
     - compiler=g++-4.9 compiler_flags="-std=c++11"
     - compiler=g++-5   compiler_flags="-std=c++11"
     - compiler=g++-6
