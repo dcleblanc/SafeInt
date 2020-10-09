@@ -6,7 +6,7 @@ env:
   global:
   jobs:
     - compiler=g++-4.4
-    - compiler=g++-4.9
+    - compiler=g++-4.9 compiler_flags="-std=c++11"
     - compiler=g++-5   compiler_flags="-std=c++11"
     - compiler=g++-6
     - compiler=g++-7
