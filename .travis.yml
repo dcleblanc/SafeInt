@@ -3,10 +3,11 @@ os: linux
 dist: xenial
 
 env:
+  global:
   jobs:
     - compiler=g++-4.4
     - compiler=g++-4.9
-    - compiler=g++-5
+    - compiler=g++-5   compiler_flags="-std=c++11"
     - compiler=g++-6
     - compiler=g++-7
     - compiler=g++-8
@@ -24,6 +25,7 @@ script:
     -D CMAKE_BUILD_TYPE=Debug
     -D "CMAKE_INSTALL_PREFIX=$HOME/install"
     -D "CMAKE_CXX_COMPILER=$compiler"
+    ${compiler_flags:+-D "CMAKE_CXX_FLAGS=$compiler_flags"}
     -D SAFEINT_TESTS=ON
     "-B$HOME/build"
     -H.
