@@ -18,8 +18,7 @@ script:
 
 jobs:
   _anchors:
-    ppa-ubuntu-toolchain: &ppa-ubuntu-toolchain
-      sourceline: 'ppa:ubuntu-toolchain-r/test'
+    ppa-ubuntu-toolchain: &ppa-ubuntu-toolchain {sourceline: 'ppa:ubuntu-toolchain-r/test'}
 
     llvm-toolchain: &llvm-toolchain {key_url: 'https://apt.llvm.org/llvm-snapshot.gpg.key'}
     llvm-toolchain-50: &llvm-toolchain-50 {<<: *llvm-toolchain, sourceline: 'deb http://apt.llvm.org/xenial/ llvm-toolchain-xenial-5.0 main'}
@@ -30,6 +29,7 @@ jobs:
     llvm-toolchain-10: &llvm-toolchain-10 {<<: *llvm-toolchain, sourceline: 'deb http://apt.llvm.org/xenial/ llvm-toolchain-xenial-10 main'}
     llvm-toolchain-11: &llvm-toolchain-11 {<<: *llvm-toolchain, sourceline: 'deb http://apt.llvm.org/xenial/ llvm-toolchain-xenial-11 main'}
 
+    get-gcc-44: &get-gcc-44 {apt: {packages: 'g++-4.4', sources: [*ppa-ubuntu-toolchain]}}
     get-gcc-46: &get-gcc-46 {apt: {packages: 'g++-4.6', sources: [*ppa-ubuntu-toolchain]}}
     get-gcc-49: &get-gcc-49 {apt: {packages: 'g++-4.9', sources: [*ppa-ubuntu-toolchain]}}
     get-gcc-5:  &get-gcc-5  {apt: {packages: 'g++-5',   sources: [*ppa-ubuntu-toolchain]}}
@@ -53,14 +53,19 @@ jobs:
     get-clang-11: &get-clang-11 {apt: {packages: 'clang-11',  sources: [*llvm-toolchain-11]}}
 
   include:
+    # 4.4 is the earliest version available on the toolchain PPA.
+    - {addons: *get-gcc-44, env: {compiler: 'g++-4.4', compiler_flags: '-std=c++0x -fpermissive'}}
+    # 4.6 is the earliest version to support noexcept.
     - {addons: *get-gcc-46, env: {compiler: 'g++-4.6', compiler_flags: '-std=c++0x -fpermissive'}}
     - {addons: *get-gcc-49, env: {compiler: 'g++-4.9', compiler_flags: '-std=c++11'}}
     - {addons: *get-gcc-5,  env: {compiler: 'g++-5',   compiler_flags: '-std=c++11'}}
     - {addons: *get-gcc-6,  env: {compiler: 'g++-6'}}
     - {addons: *get-gcc-7,  env: {compiler: 'g++-7'}}
     - {addons: *get-gcc-8,  env: {compiler: 'g++-8'}}
+    # 9 is the latest version available on the toolchain PPA.
     - {addons: *get-gcc-9,  env: {compiler: 'g++-9'}}
 
+    # 3.5 is the earliest version available in the repository.
     - {addons: *get-clang-35, env: {compiler: 'clang++-3.5', compiler_flags: '-std=c++11'}}
     - {addons: *get-clang-36, env: {compiler: 'clang++-3.6', compiler_flags: '-std=c++11'}}
     - {addons: *get-clang-37, env: {compiler: 'clang++-3.7', compiler_flags: '-std=c++11'}}
@@ -73,4 +78,5 @@ jobs:
     - {addons: *get-clang-8,  env: {compiler: 'clang++-8'}}
     - {addons: *get-clang-9,  env: {compiler: 'clang++-9'}}
     - {addons: *get-clang-10, env: {compiler: 'clang++-10'}}
+    # 11 is the latest version available on apt.llvm.org.
     - {addons: *get-clang-11, env: {compiler: 'clang++-11'}}
