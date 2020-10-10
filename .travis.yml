@@ -21,6 +21,15 @@ jobs:
     ppa-ubuntu-toolchain: &ppa-ubuntu-toolchain
       sourceline: 'ppa:ubuntu-toolchain-r/test'
 
+    llvm-toolchain: &llvm-toolchain {key_url: 'https://apt.llvm.org/llvm-snapshot.gpg.key'}
+    llvm-toolchain-50: &llvm-toolchain-50 {<<: *llvm-toolchain, sourceline: 'deb http://apt.llvm.org/xenial/ llvm-toolchain-xenial-5.0 main'}
+    llvm-toolchain-60: &llvm-toolchain-60 {<<: *llvm-toolchain, sourceline: 'deb http://apt.llvm.org/xenial/ llvm-toolchain-xenial-6.0 main'}
+    llvm-toolchain-7:  &llvm-toolchain-7  {<<: *llvm-toolchain, sourceline: 'deb http://apt.llvm.org/xenial/ llvm-toolchain-xenial-7 main'}
+    llvm-toolchain-8:  &llvm-toolchain-8  {<<: *llvm-toolchain, sourceline: 'deb http://apt.llvm.org/xenial/ llvm-toolchain-xenial-8 main'}
+    llvm-toolchain-9:  &llvm-toolchain-9  {<<: *llvm-toolchain, sourceline: 'deb http://apt.llvm.org/xenial/ llvm-toolchain-xenial-9 main'}
+    llvm-toolchain-10: &llvm-toolchain-10 {<<: *llvm-toolchain, sourceline: 'deb http://apt.llvm.org/xenial/ llvm-toolchain-xenial-10 main'}
+    llvm-toolchain-11: &llvm-toolchain-11 {<<: *llvm-toolchain, sourceline: 'deb http://apt.llvm.org/xenial/ llvm-toolchain-xenial-11 main'}
+
     get-gcc-46: &get-gcc-46 {apt: {packages: 'g++-4.6', sources: [*ppa-ubuntu-toolchain]}}
     get-gcc-49: &get-gcc-49 {apt: {packages: 'g++-4.9', sources: [*ppa-ubuntu-toolchain]}}
     get-gcc-5:  &get-gcc-5  {apt: {packages: 'g++-5',   sources: [*ppa-ubuntu-toolchain]}}
@@ -28,6 +37,20 @@ jobs:
     get-gcc-7:  &get-gcc-7  {apt: {packages: 'g++-7',   sources: [*ppa-ubuntu-toolchain]}}
     get-gcc-8:  &get-gcc-8  {apt: {packages: 'g++-8',   sources: [*ppa-ubuntu-toolchain]}}
     get-gcc-9:  &get-gcc-9  {apt: {packages: 'g++-9',   sources: [*ppa-ubuntu-toolchain]}}
+
+    get-clang-35: &get-clang-35 {apt: {packages: 'clang-3.5'}}
+    get-clang-36: &get-clang-36 {apt: {packages: 'clang-3.6'}}
+    get-clang-37: &get-clang-37 {apt: {packages: 'clang-3.7'}}
+    get-clang-38: &get-clang-38 {apt: {packages: 'clang-3.8'}}
+    get-clang-39: &get-clang-39 {apt: {packages: 'clang-3.9'}}
+    get-clang-40: &get-clang-40 {apt: {packages: 'clang-4.0'}}
+    get-clang-50: &get-clang-50 {apt: {packages: 'clang-5.0', sources: [*llvm-toolchain-50]}}
+    get-clang-60: &get-clang-60 {apt: {packages: 'clang-6.0', sources: [*llvm-toolchain-60]}}
+    get-clang-7:  &get-clang-7  {apt: {packages: 'clang-7',   sources: [*llvm-toolchain-7]}}
+    get-clang-8:  &get-clang-8  {apt: {packages: 'clang-8',   sources: [*llvm-toolchain-8]}}
+    get-clang-9:  &get-clang-9  {apt: {packages: 'clang-9',   sources: [*llvm-toolchain-9]}}
+    get-clang-10: &get-clang-10 {apt: {packages: 'clang-10',  sources: [*llvm-toolchain-10]}}
+    get-clang-11: &get-clang-11 {apt: {packages: 'clang-11',  sources: [*llvm-toolchain-11]}}
 
   include:
     - {addons: *get-gcc-46, env: {compiler: 'g++-4.6', compiler_flags: '-std=c++0x -fpermissive'}}
@@ -37,3 +60,17 @@ jobs:
     - {addons: *get-gcc-7,  env: {compiler: 'g++-7'}}
     - {addons: *get-gcc-8,  env: {compiler: 'g++-8'}}
     - {addons: *get-gcc-9,  env: {compiler: 'g++-9'}}
+
+    - {addons: *get-clang-35, env: {compiler: 'clang++-3.5', compiler_flags: '-std=c++11'}}
+    - {addons: *get-clang-36, env: {compiler: 'clang++-3.6', compiler_flags: '-std=c++11'}}
+    - {addons: *get-clang-37, env: {compiler: 'clang++-3.7', compiler_flags: '-std=c++11'}}
+    - {addons: *get-clang-38, env: {compiler: 'clang++-3.8', compiler_flags: '-std=c++11'}}
+    - {addons: *get-clang-39, env: {compiler: 'clang++-3.9', compiler_flags: '-std=c++11'}}
+    - {addons: *get-clang-40, env: {compiler: 'clang++-4.0', compiler_flags: '-std=c++11'}}
+    - {addons: *get-clang-50, env: {compiler: 'clang++-5.0', compiler_flags: '-std=c++11'}}
+    - {addons: *get-clang-60, env: {compiler: 'clang++-6.0'}}
+    - {addons: *get-clang-7,  env: {compiler: 'clang++-7'}}
+    - {addons: *get-clang-8,  env: {compiler: 'clang++-8'}}
+    - {addons: *get-clang-9,  env: {compiler: 'clang++-9'}}
+    - {addons: *get-clang-10, env: {compiler: 'clang++-10'}}
+    - {addons: *get-clang-11, env: {compiler: 'clang++-11'}}
