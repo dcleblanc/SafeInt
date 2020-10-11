@@ -15,6 +15,7 @@ script:
     -H.
   - cmake --build "$HOME/build" --target install
   - "$HOME/install/bin/SafeInt_Test"
+  - "$HOME/install/bin/SafeInt_CompileTest"
 
 jobs:
   _anchors:

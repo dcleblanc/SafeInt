@@ -37,6 +37,7 @@ after_build:
 
 test_script:
   - '"%install_dir%\bin\SafeInt_Test.exe"'
+  - '"%install_dir%\bin\SafeInt_CompileTest.exe"'
 
 for:
 - matrix:
