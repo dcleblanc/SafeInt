@@ -39,6 +39,9 @@ test_script:
   - '"%install_dir%\bin\SafeInt_Test.exe"'
   - '"%install_dir%\bin\SafeInt_CompileTest.exe"'
 
+# Set GENERATOR environment variable so that CMake doesn't pick up an older VS
+# version accidentally (i.e. on Visual Studio 2015 images both VS 2013 & 2015
+# are installed.
 for:
 - matrix:
     only:
