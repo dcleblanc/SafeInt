@@ -8,6 +8,7 @@ endif()
 
 option(SAFEINT_TESTS "compile the tests" OFF)
 option(SAFEINT_NO_EXCEPTIONS "disable exceptions" OFF)
+option(SAFEINT_SANITIZE "sanitize undefined behaviour" OFF)
 
 add_library(SafeInt INTERFACE)
 target_include_directories(SafeInt INTERFACE .)
