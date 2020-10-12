@@ -21,11 +21,11 @@ script:
     cmake
     -G 'Unix Makefiles'
     -D CMAKE_BUILD_TYPE=Debug
-    -D "CMAKE_INSTALL_PREFIX=$HOME/install"
-    -D "CMAKE_CXX_COMPILER=$compiler"
-    ${compiler_flags:+-D "CMAKE_CXX_FLAGS=$compiler_flags"}
+    -D CMAKE_INSTALL_PREFIX="$HOME/install"
+    -D CMAKE_CXX_COMPILER="$compiler"
+    ${compiler_flags:+-D CMAKE_CXX_FLAGS="$compiler_flags"}
     -D SAFEINT_TESTS=ON
-    -D "SAFEINT_SANITIZE=${sanitize:-ON}"
+    -D SAFEINT_SANITIZE="${sanitize:-ON}"
     "-B$HOME/build/debug"
     -H.
   - cmake --build "$HOME/build/debug" --target install
@@ -38,11 +38,11 @@ script:
     cmake
     -G 'Unix Makefiles'
     -D CMAKE_BUILD_TYPE=Release
-    -D "CMAKE_INSTALL_PREFIX=$HOME/install"
-    -D "CMAKE_CXX_COMPILER=$compiler"
-    ${compiler_flags:+-D "CMAKE_CXX_FLAGS=$compiler_flags"}
+    -D CMAKE_INSTALL_PREFIX="$HOME/install"
+    -D CMAKE_CXX_COMPILER="$compiler"
+    ${compiler_flags:+-D CMAKE_CXX_FLAGS="$compiler_flags"}
     -D SAFEINT_TESTS=ON
-    -D "SAFEINT_SANITIZE=${sanitize:-ON}"
+    -D SAFEINT_SANITIZE="${sanitize:-ON}"
     "-B$HOME/build/release"
     -H.
   - cmake --build "$HOME/build/release" --target install
@@ -55,9 +55,8 @@ script:
     cmake
     -G 'Unix Makefiles'
     -D CMAKE_BUILD_TYPE=Release
-    -D "CMAKE_INSTALL_PREFIX=$HOME/install"
-    -D "CMAKE_CXX_COMPILER=$compiler"
-    ${compiler_flags:+-D "CMAKE_CXX_FLAGS=$compiler_flags"}
+    -D CMAKE_CXX_COMPILER="$compiler"
+    ${compiler_flags:+-D CMAKE_CXX_FLAGS="$compiler_flags"}
     -D SAFEINT_TESTS=ON
     -D SAFEINT_NO_EXCEPTIONS=ON
     "-B$HOME/build/no_eh"
