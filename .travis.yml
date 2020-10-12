@@ -25,9 +25,25 @@ script:
     ${compiler_flags:+-D "CMAKE_CXX_FLAGS=$compiler_flags"}
     -D SAFEINT_TESTS=ON
     -D "SAFEINT_SANITIZE=${sanitize:-ON}"
-    "-B$HOME/build"
+    "-B$HOME/build/debug"
     -H.
-  - cmake --build "$HOME/build" --target install
+  - cmake --build "$HOME/build/debug" --target install
+
+  - "$HOME/install/bin/SafeInt_Test"
+  - "$HOME/install/bin/SafeInt_CompileTest"
+
+  - >-
+    cmake
+    -G 'Unix Makefiles'
+    -D CMAKE_BUILD_TYPE=Release
+    -D "CMAKE_INSTALL_PREFIX=$HOME/install"
+    -D "CMAKE_CXX_COMPILER=$compiler"
+    ${compiler_flags:+-D "CMAKE_CXX_FLAGS=$compiler_flags"}
+    -D SAFEINT_TESTS=ON
+    "-B$HOME/build/release"
+    -H.
+  - cmake --build "$HOME/build/release" --target install
+
   - "$HOME/install/bin/SafeInt_Test"
   - "$HOME/install/bin/SafeInt_CompileTest"
 
