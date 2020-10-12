@@ -16,6 +16,13 @@ add_executable(SafeInt_CompileTest
     ConstExpr.cpp)
 target_link_libraries(SafeInt_CompileTest PRIVATE SafeInt)
 
+if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+    target_compile_options(SafeInt_Test PRIVATE -fsanitize=undefined -ftrapv)
+endif()
+if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU" OR CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+    target_compile_options(SafeInt_CompileTest PRIVATE -Wall)
+endif()
+
 install(TARGETS SafeInt_Test RUNTIME DESTINATION bin)
 install(TARGETS SafeInt_CompileTest RUNTIME DESTINATION bin)
 if(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
