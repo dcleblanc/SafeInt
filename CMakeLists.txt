@@ -15,6 +15,13 @@ target_include_directories(SafeInt INTERFACE .)
 install(FILES SafeInt.hpp DESTINATION include)
 install(FILES LICENSE DESTINATION share)
 
+if(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
+    if(MSVC_VERSION LESS 1900)
+        # Visual Studio compilers prior to 2015 don't support noexcept:
+        target_compile_definitions(SafeInt INTERFACE SAFEINT_REMOVE_NOTHROW)
+    endif()
+endif()
+
 if(SAFEINT_NO_EXCEPTIONS)
     if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
         target_compile_options(SafeInt INTERFACE -fno-exceptions)
