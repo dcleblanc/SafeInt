@@ -22,12 +22,17 @@ if(SAFEINT_SANITIZE)
         target_link_libraries(SafeInt_Test PRIVATE -fsanitize=undefined)
     endif()
 endif()
+
 if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU" OR CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
     target_compile_options(SafeInt_CompileTest PRIVATE -Wall)
 endif()
 if(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
     target_compile_options(SafeInt_Test PRIVATE /W4)
     target_compile_options(SafeInt_CompileTest PRIVATE /W4)
+
+    # /Oi for "Generate Intrinsic Functions"
+    target_compile_options(SafeInt_Test PRIVATE $<$<NOT:$<CONFIG:Debug>>:/Oi>)
+    target_compile_options(SafeInt_CompileTest PRIVATE $<$<NOT:$<CONFIG:Debug>>:/Oi>)
 endif()
 
 install(TARGETS SafeInt_Test RUNTIME DESTINATION bin)
