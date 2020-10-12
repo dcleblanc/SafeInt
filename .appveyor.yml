@@ -17,7 +17,7 @@ platform:
 
 configuration:
   - Debug
-  - RelWithDebInfo
+  - Release
 
 build_script:
   - >-
