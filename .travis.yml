@@ -3,6 +3,19 @@ os: linux
 dist: xenial
 
 script:
+  # -fsanitize=undefined w/ GCC produces the following error:
+  #     /usr/bin/ld: unrecognized option '--push-state--no-as-needed'
+  #
+  # It's apparently a bug that was fixed in GCC 7, but seemingly not on Xenial:
+  # https://stackoverflow.com/questions/50024731/ld-unrecognized-option-push-state-no-as-needed
+  #
+  # So, sanitize w/ clang only.
+  - |
+    if [[ "$compiler" =~ 'g++' ]]; then
+        echo 'No sanitization w/ GCC for now'
+        export sanitize=OFF
+    fi
+
   - >-
     cmake
     -G 'Unix Makefiles'
@@ -11,7 +24,7 @@ script:
     -D "CMAKE_CXX_COMPILER=$compiler"
     ${compiler_flags:+-D "CMAKE_CXX_FLAGS=$compiler_flags"}
     -D SAFEINT_TESTS=ON
-    -D SAFEINT_SANITIZE=ON
+    -D "SAFEINT_SANITIZE=${sanitize:-ON}"
     "-B$HOME/build"
     -H.
   - cmake --build "$HOME/build" --target install
@@ -71,7 +84,8 @@ jobs:
     # 3.5 is the earliest version available in the repository.
     - {addons: *apt-clang-35, env: {compiler: 'clang++-3.5', compiler_flags: '-std=c++11'}}
     - {addons: *apt-clang-36, env: {compiler: 'clang++-3.6', compiler_flags: '-std=c++11'}}
-    - {addons: *apt-clang-37, env: {compiler: 'clang++-3.7', compiler_flags: '-std=c++11'}}
+    # 3.7 doesn't bundle libubsan for some reason, hence no sanitization.
+    - {addons: *apt-clang-37, env: {compiler: 'clang++-3.7', compiler_flags: '-std=c++11', sanitize: 'OFF'}}
     - {addons: *apt-clang-38, env: {compiler: 'clang++-3.8', compiler_flags: '-std=c++11'}}
     - {addons: *apt-clang-39, env: {compiler: 'clang++-3.9', compiler_flags: '-std=c++11'}}
     - {addons: *apt-clang-40, env: {compiler: 'clang++-4.0', compiler_flags: '-std=c++11'}}
