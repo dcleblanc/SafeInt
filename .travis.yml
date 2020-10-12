@@ -16,6 +16,7 @@ script:
         export sanitize=OFF
     fi
 
+  # Debug:
   - >-
     cmake
     -G 'Unix Makefiles'
@@ -32,6 +33,7 @@ script:
   - "$HOME/install/bin/SafeInt_Test"
   - "$HOME/install/bin/SafeInt_CompileTest"
 
+  # Release:
   - >-
     cmake
     -G 'Unix Makefiles'
@@ -40,12 +42,27 @@ script:
     -D "CMAKE_CXX_COMPILER=$compiler"
     ${compiler_flags:+-D "CMAKE_CXX_FLAGS=$compiler_flags"}
     -D SAFEINT_TESTS=ON
+    -D "SAFEINT_SANITIZE=${sanitize:-ON}"
     "-B$HOME/build/release"
     -H.
   - cmake --build "$HOME/build/release" --target install
 
   - "$HOME/install/bin/SafeInt_Test"
   - "$HOME/install/bin/SafeInt_CompileTest"
+
+  # CompileTest with exceptions being disabled:
+  - >-
+    cmake
+    -G 'Unix Makefiles'
+    -D CMAKE_BUILD_TYPE=Release
+    -D "CMAKE_INSTALL_PREFIX=$HOME/install"
+    -D "CMAKE_CXX_COMPILER=$compiler"
+    ${compiler_flags:+-D "CMAKE_CXX_FLAGS=$compiler_flags"}
+    -D SAFEINT_TESTS=ON
+    -D SAFEINT_NO_EXCEPTIONS=ON
+    "-B$HOME/build/no_eh"
+    -H.
+  - cmake --build "$HOME/build/no_eh" --target SafeInt_CompileTest
 
 jobs:
   _anchors:
