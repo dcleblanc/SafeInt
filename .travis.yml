@@ -21,8 +21,8 @@ jobs:
   _anchors:
     src-gcc: &src-gcc {sourceline: 'ppa:ubuntu-toolchain-r/test'}
 
-    apt-gcc-44: &apt-gcc-44 {apt: {packages: 'g++-4.4', sources: [*src-gcc]}}
-    apt-gcc-46: &apt-gcc-46 {apt: {packages: 'g++-4.6', sources: [*src-gcc]}}
+    apt-gcc-47: &apt-gcc-47 {apt: {packages: 'g++-4.7', sources: [*src-gcc]}}
+    apt-gcc-48: &apt-gcc-48 {apt: {packages: 'g++-4.8', sources: [*src-gcc]}}
     apt-gcc-49: &apt-gcc-49 {apt: {packages: 'g++-4.9', sources: [*src-gcc]}}
     apt-gcc-5:  &apt-gcc-5  {apt: {packages: 'g++-5',   sources: [*src-gcc]}}
     apt-gcc-6:  &apt-gcc-6  {apt: {packages: 'g++-6',   sources: [*src-gcc]}}
@@ -55,10 +55,10 @@ jobs:
     apt-clang-11: &apt-clang-11 {apt: {packages: 'clang-11',  sources: [*src-clang-11]}}
 
   include:
-    # 4.4 is the earliest version available on the toolchain PPA.
-    - {addons: *apt-gcc-44, env: {compiler: 'g++-4.4', compiler_flags: '-std=c++0x -fpermissive'}}
-    # 4.6 is the earliest version to support noexcept.
-    - {addons: *apt-gcc-46, env: {compiler: 'g++-4.6', compiler_flags: '-std=c++0x -fpermissive'}}
+    # GCC 4.7 is the earliest version to support -std=c++11 and __cplusplus ==
+    # 201103L: https://gcc.gnu.org/gcc-4.7/changes.html
+    - {addons: *apt-gcc-47, env: {compiler: 'g++-4.7', compiler_flags: '-std=c++11'}}
+    - {addons: *apt-gcc-48, env: {compiler: 'g++-4.8', compiler_flags: '-std=c++11'}}
     - {addons: *apt-gcc-49, env: {compiler: 'g++-4.9', compiler_flags: '-std=c++11'}}
     - {addons: *apt-gcc-5,  env: {compiler: 'g++-5',   compiler_flags: '-std=c++11'}}
     - {addons: *apt-gcc-6,  env: {compiler: 'g++-6'}}
