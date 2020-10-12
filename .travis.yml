@@ -11,6 +11,7 @@ script:
     -D "CMAKE_CXX_COMPILER=$compiler"
     ${compiler_flags:+-D "CMAKE_CXX_FLAGS=$compiler_flags"}
     -D SAFEINT_TESTS=ON
+    -D SAFEINT_SANITIZE=ON
     "-B$HOME/build"
     -H.
   - cmake --build "$HOME/build" --target install
