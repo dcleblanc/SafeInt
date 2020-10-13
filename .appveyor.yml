@@ -19,6 +19,16 @@ configuration:
   - Debug
   - Release
 
+# VS 2015 optimizer is being weird, see e.g.
+# https://ci.appveyor.com/project/egor-tensin/safeint/builds/35720592
+# Everything's fine on Win32 (and all the other compilers) _or_ if you make an
+# irrelevant change to the code, so I consider this to be a compiler bug.
+matrix:
+  allow_failures:
+    - image: Visual Studio 2015
+      platform: x64
+      configuration: Release
+
 build_script:
   - >-
     cmake
