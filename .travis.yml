@@ -58,7 +58,7 @@ script:
     -D CMAKE_CXX_COMPILER="$compiler"
     ${compiler_flags:+-D CMAKE_CXX_FLAGS="$compiler_flags"}
     -D SAFEINT_TESTS=ON
-    -D SAFEINT_NO_EXCEPTIONS=ON
+    -D SAFE_INT_HAS_EXCEPTIONS=OFF
     "-B$HOME/build/no_eh"
     -H.
   - cmake --build "$HOME/build/no_eh" --target SafeInt_CompileTest
