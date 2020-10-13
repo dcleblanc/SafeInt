@@ -17,11 +17,17 @@ install(FILES LICENSE DESTINATION share)
 
 if(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
     if(MSVC_VERSION LESS 1900)
-        # Visual Studio compilers prior to 2015 don't support noexcept:
+        # Visual Studio compilers prior to 2015 don't support noexcept.
+        # This is more of a hack, to be used until a proper macro for noexcept
+        # with compiler version detection is used in the library.
         target_compile_definitions(SafeInt INTERFACE SAFEINT_REMOVE_NOTHROW)
     endif()
 endif()
 
+# SafeInt uses the __cpp_exceptions macro to detect whether -fno-exceptions
+# is used.
+# But older compilers (e.g. GCC < 5, clang <= 3.5) don't use this macro at all,
+# hence the explicit parameter.
 if(SAFE_INT_HAS_EXCEPTIONS)
     target_compile_definitions(SafeInt INTERFACE SAFE_INT_HAS_EXCEPTIONS=1)
 else()
