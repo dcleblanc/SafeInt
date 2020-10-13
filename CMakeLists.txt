@@ -23,9 +23,12 @@ if(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
 endif()
 
 if(SAFEINT_NO_EXCEPTIONS)
+    target_compile_definitions(SafeInt INTERFACE SAFE_INT_HAS_EXCEPTIONS=0)
     if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
         target_compile_options(SafeInt INTERFACE -fno-exceptions)
     endif()
+else()
+    target_compile_definitions(SafeInt INTERFACE SAFE_INT_HAS_EXCEPTIONS=1)
 endif()
 
 if(SAFEINT_TESTS)
