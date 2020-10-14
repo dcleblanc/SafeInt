@@ -31,7 +31,6 @@ script:
   - cmake --build "$HOME/build/debug" --target install
 
   - "$HOME/install/bin/SafeInt_Test"
-  - "$HOME/install/bin/SafeInt_CompileTest"
 
   # Release:
   - >-
@@ -48,7 +47,6 @@ script:
   - cmake --build "$HOME/build/release" --target install
 
   - "$HOME/install/bin/SafeInt_Test"
-  - "$HOME/install/bin/SafeInt_CompileTest"
 
   # CompileTest with exceptions being disabled:
   - >-
