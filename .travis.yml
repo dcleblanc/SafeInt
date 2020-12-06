@@ -1,0 +1,131 @@
+language: cpp
+os: linux
+dist: xenial
+
+script:
+  # -fsanitize=undefined w/ GCC produces the following error:
+  #     /usr/bin/ld: unrecognized option '--push-state--no-as-needed'
+  #
+  # It's apparently a bug that was fixed in GCC 7, but seemingly not on Xenial:
+  # https://stackoverflow.com/questions/50024731/ld-unrecognized-option-push-state-no-as-needed
+  #
+  # So, sanitize w/ clang only.
+  - |
+    if [[ "$compiler" =~ 'g++' ]]; then
+        echo 'No sanitization w/ GCC for now'
+        export sanitize=OFF
+    fi
+
+  # Debug:
+  - >-
+    cmake
+    -G 'Unix Makefiles'
+    -D CMAKE_BUILD_TYPE=Debug
+    -D CMAKE_INSTALL_PREFIX="$HOME/install"
+    -D CMAKE_CXX_COMPILER="$compiler"
+    ${compiler_flags:+-D CMAKE_CXX_FLAGS="$compiler_flags"}
+    -D SAFEINT_TESTS=ON
+    -D SAFEINT_SANITIZE="${sanitize:-ON}"
+    "-B$HOME/build/debug"
+    -H.
+  - cmake --build "$HOME/build/debug" --target install
+
+  - "$HOME/install/bin/SafeInt_Test"
+  - "$HOME/install/bin/SafeInt_CompileTest"
+
+  # Release:
+  - >-
+    cmake
+    -G 'Unix Makefiles'
+    -D CMAKE_BUILD_TYPE=Release
+    -D CMAKE_INSTALL_PREFIX="$HOME/install"
+    -D CMAKE_CXX_COMPILER="$compiler"
+    ${compiler_flags:+-D CMAKE_CXX_FLAGS="$compiler_flags"}
+    -D SAFEINT_TESTS=ON
+    -D SAFEINT_SANITIZE="${sanitize:-ON}"
+    "-B$HOME/build/release"
+    -H.
+  - cmake --build "$HOME/build/release" --target install
+
+  - "$HOME/install/bin/SafeInt_Test"
+  - "$HOME/install/bin/SafeInt_CompileTest"
+
+  # CompileTest with exceptions being disabled:
+  - >-
+    cmake
+    -G 'Unix Makefiles'
+    -D CMAKE_BUILD_TYPE=Release
+    -D CMAKE_CXX_COMPILER="$compiler"
+    ${compiler_flags:+-D CMAKE_CXX_FLAGS="$compiler_flags"}
+    -D SAFEINT_TESTS=ON
+    -D SAFEINT_NO_EXCEPTIONS=ON
+    "-B$HOME/build/no_eh"
+    -H.
+  - cmake --build "$HOME/build/no_eh" --target SafeInt_CompileTest
+
+jobs:
+  _anchors:
+    src-gcc: &src-gcc {sourceline: 'ppa:ubuntu-toolchain-r/test'}
+
+    apt-gcc-47: &apt-gcc-47 {apt: {packages: 'g++-4.7', sources: [*src-gcc]}}
+    apt-gcc-48: &apt-gcc-48 {apt: {packages: 'g++-4.8', sources: [*src-gcc]}}
+    apt-gcc-49: &apt-gcc-49 {apt: {packages: 'g++-4.9', sources: [*src-gcc]}}
+    apt-gcc-5:  &apt-gcc-5  {apt: {packages: 'g++-5',   sources: [*src-gcc]}}
+    apt-gcc-6:  &apt-gcc-6  {apt: {packages: 'g++-6',   sources: [*src-gcc]}}
+    apt-gcc-7:  &apt-gcc-7  {apt: {packages: 'g++-7',   sources: [*src-gcc]}}
+    apt-gcc-8:  &apt-gcc-8  {apt: {packages: 'g++-8',   sources: [*src-gcc]}}
+    apt-gcc-9:  &apt-gcc-9  {apt: {packages: 'g++-9',   sources: [*src-gcc]}}
+
+    src-clang: &src-clang {key_url: 'https://apt.llvm.org/llvm-snapshot.gpg.key'}
+
+    src-clang-50: &src-clang-50 {<<: *src-clang, sourceline: 'deb http://apt.llvm.org/xenial/ llvm-toolchain-xenial-5.0 main'}
+    src-clang-60: &src-clang-60 {<<: *src-clang, sourceline: 'deb http://apt.llvm.org/xenial/ llvm-toolchain-xenial-6.0 main'}
+    src-clang-7:  &src-clang-7  {<<: *src-clang, sourceline: 'deb http://apt.llvm.org/xenial/ llvm-toolchain-xenial-7 main'}
+    src-clang-8:  &src-clang-8  {<<: *src-clang, sourceline: 'deb http://apt.llvm.org/xenial/ llvm-toolchain-xenial-8 main'}
+    src-clang-9:  &src-clang-9  {<<: *src-clang, sourceline: 'deb http://apt.llvm.org/xenial/ llvm-toolchain-xenial-9 main'}
+    src-clang-10: &src-clang-10 {<<: *src-clang, sourceline: 'deb http://apt.llvm.org/xenial/ llvm-toolchain-xenial-10 main'}
+    src-clang-11: &src-clang-11 {<<: *src-clang, sourceline: 'deb http://apt.llvm.org/xenial/ llvm-toolchain-xenial-11 main'}
+
+    apt-clang-35: &apt-clang-35 {apt: {packages: 'clang-3.5'}}
+    apt-clang-36: &apt-clang-36 {apt: {packages: 'clang-3.6'}}
+    apt-clang-37: &apt-clang-37 {apt: {packages: 'clang-3.7'}}
+    apt-clang-38: &apt-clang-38 {apt: {packages: 'clang-3.8'}}
+    apt-clang-39: &apt-clang-39 {apt: {packages: 'clang-3.9'}}
+    apt-clang-40: &apt-clang-40 {apt: {packages: 'clang-4.0'}}
+    apt-clang-50: &apt-clang-50 {apt: {packages: 'clang-5.0', sources: [*src-clang-50]}}
+    apt-clang-60: &apt-clang-60 {apt: {packages: 'clang-6.0', sources: [*src-clang-60]}}
+    apt-clang-7:  &apt-clang-7  {apt: {packages: 'clang-7',   sources: [*src-clang-7]}}
+    apt-clang-8:  &apt-clang-8  {apt: {packages: 'clang-8',   sources: [*src-clang-8]}}
+    apt-clang-9:  &apt-clang-9  {apt: {packages: 'clang-9',   sources: [*src-clang-9]}}
+    apt-clang-10: &apt-clang-10 {apt: {packages: 'clang-10',  sources: [*src-clang-10]}}
+    apt-clang-11: &apt-clang-11 {apt: {packages: 'clang-11',  sources: [*src-clang-11]}}
+
+  include:
+    # GCC 4.7 is the earliest version to support -std=c++11 and __cplusplus ==
+    # 201103L: https://gcc.gnu.org/gcc-4.7/changes.html
+    - {addons: *apt-gcc-47, env: {compiler: 'g++-4.7', compiler_flags: '-std=c++11'}}
+    - {addons: *apt-gcc-48, env: {compiler: 'g++-4.8', compiler_flags: '-std=c++11'}}
+    - {addons: *apt-gcc-49, env: {compiler: 'g++-4.9', compiler_flags: '-std=c++11'}}
+    - {addons: *apt-gcc-5,  env: {compiler: 'g++-5',   compiler_flags: '-std=c++11'}}
+    - {addons: *apt-gcc-6,  env: {compiler: 'g++-6'}}
+    - {addons: *apt-gcc-7,  env: {compiler: 'g++-7'}}
+    - {addons: *apt-gcc-8,  env: {compiler: 'g++-8'}}
+    # 9 is the latest version available on the toolchain PPA.
+    - {addons: *apt-gcc-9,  env: {compiler: 'g++-9'}}
+
+    # 3.5 is the earliest version available in the repository.
+    - {addons: *apt-clang-35, env: {compiler: 'clang++-3.5', compiler_flags: '-std=c++11'}}
+    - {addons: *apt-clang-36, env: {compiler: 'clang++-3.6', compiler_flags: '-std=c++11'}}
+    # 3.7 doesn't bundle libubsan for some reason, hence no sanitization.
+    - {addons: *apt-clang-37, env: {compiler: 'clang++-3.7', compiler_flags: '-std=c++11', sanitize: 'OFF'}}
+    - {addons: *apt-clang-38, env: {compiler: 'clang++-3.8', compiler_flags: '-std=c++11'}}
+    - {addons: *apt-clang-39, env: {compiler: 'clang++-3.9', compiler_flags: '-std=c++11'}}
+    - {addons: *apt-clang-40, env: {compiler: 'clang++-4.0', compiler_flags: '-std=c++11'}}
+    - {addons: *apt-clang-50, env: {compiler: 'clang++-5.0', compiler_flags: '-std=c++11'}}
+    - {addons: *apt-clang-60, env: {compiler: 'clang++-6.0'}}
+    - {addons: *apt-clang-7,  env: {compiler: 'clang++-7'}}
+    - {addons: *apt-clang-8,  env: {compiler: 'clang++-8'}}
+    - {addons: *apt-clang-9,  env: {compiler: 'clang++-9'}}
+    - {addons: *apt-clang-10, env: {compiler: 'clang++-10'}}
+    # 11 is the latest version available on apt.llvm.org.
+    - {addons: *apt-clang-11, env: {compiler: 'clang++-11'}}

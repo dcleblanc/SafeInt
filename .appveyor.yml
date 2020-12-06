@@ -1,0 +1,65 @@
+version: '{build}'
+
+image:
+  - Visual Studio 2013
+  - Visual Studio 2015
+  - Visual Studio 2017
+  - Visual Studio 2019
+
+environment:
+  src_dir: C:\Projects\SafeInt
+  build_dir: C:\Projects\build
+  install_dir: C:\Projects\install\SafeInt
+
+platform:
+  - Win32
+  - x64
+
+configuration:
+  - Debug
+  - Release
+
+build_script:
+  - >-
+    cmake
+    -D "CMAKE_INSTALL_PREFIX=%install_dir%"
+    -G "%GENERATOR%"
+    -A "%PLATFORM%"
+    -D SAFEINT_TESTS=ON
+    "-B%build_dir%"
+    "-H%src_dir%"
+  - cd "%build_dir%"
+  - cmake --build . --config "%CONFIGURATION%" --target install
+
+after_build:
+  - 7z.exe a "%APPVEYOR_PROJECT_NAME%-%PLATFORM%-%CONFIGURATION%.zip" "%install_dir%"
+  - appveyor.exe PushArtifact "%APPVEYOR_PROJECT_NAME%-%PLATFORM%-%CONFIGURATION%.zip"
+
+test_script:
+  - '"%install_dir%\bin\SafeInt_Test.exe"'
+  - '"%install_dir%\bin\SafeInt_CompileTest.exe"'
+
+# Set GENERATOR environment variable so that CMake doesn't pick up an older VS
+# version accidentally (i.e. on Visual Studio 2015 images both VS 2013 & 2015
+# are installed.
+for:
+- matrix:
+    only:
+      - image: Visual Studio 2013
+  environment:
+    GENERATOR: Visual Studio 12 2013
+- matrix:
+    only:
+      - image: Visual Studio 2015
+  environment:
+    GENERATOR: Visual Studio 14 2015
+- matrix:
+    only:
+      - image: Visual Studio 2017
+  environment:
+    GENERATOR: Visual Studio 15 2017
+- matrix:
+    only:
+      - image: Visual Studio 2019
+  environment:
+    GENERATOR: Visual Studio 16 2019

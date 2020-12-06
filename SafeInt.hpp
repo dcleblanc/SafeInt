@@ -127,6 +127,17 @@ Please read the leading comments before using the class.
 #error "Unexpected value of CPLUSPLUS_STD"
 #endif
 
+// Determine whether exceptions are enabled by the compiler
+// Also, allow the user to force this, in case the compiler
+// doesn't support the __cpp_exceptions feature
+#if !defined SAFE_INT_HAS_EXCEPTIONS
+    #if __cpp_exceptions >= 199711L
+        #define SAFE_INT_HAS_EXCEPTIONS 1
+    #else
+        #define SAFE_INT_HAS_EXCEPTIONS 0
+    #endif
+#endif
+
 // Enable compiling with /Wall under VC
 #if SAFEINT_COMPILER == VISUAL_STUDIO_COMPILER
 // Off by default - unreferenced inline function has been removed
@@ -714,7 +725,7 @@ namespace SafeIntInternal
     //                                       exits the app with a crash
     template < typename E > class SafeIntExceptionHandler;
 
-#if __cpp_exceptions >= 199711L
+#if SAFE_INT_HAS_EXCEPTIONS
 
     // Some users may have applications that do not use C++ exceptions
     // and cannot compile the following class. If that is the case,
@@ -779,7 +790,7 @@ namespace SafeIntInternal
 } // namespace SafeIntInternal
 
 // both of these have cross-platform support
-#if __cpp_exceptions >= 199711L
+#if SAFE_INT_HAS_EXCEPTIONS
 typedef SafeIntInternal::SafeIntExceptionHandler < SafeIntException > CPlusPlusExceptionHandler;
 #endif
 
@@ -811,7 +822,7 @@ typedef SafeIntInternal::SafeIntWin32ExceptionHandler Win32ExceptionHandler;
     #elif defined SAFEINT_FAILFAST
         #define SafeIntDefaultExceptionHandler InvalidParameterExceptionHandler
     #else
-        #if __cpp_exceptions >= 199711L
+        #if SAFE_INT_HAS_EXCEPTIONS
             #define SafeIntDefaultExceptionHandler CPlusPlusExceptionHandler
         #else
             #define SafeIntDefaultExceptionHandler InvalidParameterExceptionHandler
