@@ -192,7 +192,10 @@ void CompileType()
 {
 	// Test constructors
 	SafeInt<T> s;
+#if !defined USE_C_HEADERS
 	SafeInt<T> i(Foo::Foo1);
+#endif
+
 	T t = 0;
 	SafeInt<T> st(t);
 	SafeInt<T> sb(false);

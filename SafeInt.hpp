@@ -172,12 +172,36 @@ Please read the leading comments before using the class.
 #define SAFEINT_NOTHROW noexcept
 #endif
 
+//#define USE_C_HEADERS 0
+
+#if defined USE_C_HEADERS
+#include <stdint.h>
+#include <math.h>
+
+// If we do not have std::intXX_t,
+// we will declare them ourselves
+namespace std
+{
+    typedef signed char        int8_t;
+    typedef unsigned char      uint8_t;
+    typedef short              int16_t;
+    typedef unsigned short     uint16_t;
+    typedef int                int32_t;
+    typedef unsigned int       uint32_t;
+    typedef long long          int64_t;
+    typedef unsigned long long uint64_t;
+}
+
+#else
+
 #include <cstdint>
+// type_traits required for isInt, and isEnum
+#include <type_traits>
+// For numeric_traits
 #include <limits>
-#include <type_traits> // This is now required
-// Need this for ptrdiff_t on some compilers
-#include <cstddef>
-#include <cmath> // Needed for floating point implementation
+// Needed for fpclassify
+#include <cmath> 
+#endif
 
 // Note - intrinsics and constexpr are mutually exclusive
 // If it is important to get constexpr for multiplication, then define SAFEINT_USE_INTRINSICS 0
@@ -854,6 +878,47 @@ namespace safeint_internal
 
     // Continue to special case bool
     template <> class numeric_type<bool> { public: enum { isBool = true, isInt = false }; };
+
+#if defined USE_C_HEADERS
+    template <> class numeric_type<char>               { public: enum { isBool = false, isInt = true, isEnum = false }; };
+    template <> class numeric_type<signed char>        { public: enum { isBool = false, isInt = true, isEnum = false }; };
+    template <> class numeric_type<unsigned char>      { public: enum { isBool = false, isInt = true, isEnum = false }; };
+    template <> class numeric_type<short>              { public: enum { isBool = false, isInt = true, isEnum = false }; };
+    template <> class numeric_type<unsigned short>     { public: enum { isBool = false, isInt = true, isEnum = false }; };
+    template <> class numeric_type<int>                { public: enum { isBool = false, isInt = true, isEnum = false }; };
+    template <> class numeric_type<unsigned int>       { public: enum { isBool = false, isInt = true, isEnum = false }; };
+    template <> class numeric_type<long>               { public: enum { isBool = false, isInt = true, isEnum = false }; };
+    template <> class numeric_type<unsigned long>      { public: enum { isBool = false, isInt = true, isEnum = false }; };
+    template <> class numeric_type<long long>          { public: enum { isBool = false, isInt = true, isEnum = false }; };
+    template <> class numeric_type<unsigned long long> { public: enum { isBool = false, isInt = true, isEnum = false }; };
+    template <> class numeric_type<wchar_t>            { public: enum { isBool = false, isInt = true, isEnum = false }; };
+
+    // Abstract out limits for the case of having to use only C headers
+
+    template <typename T> 
+    class numeric_limits
+    {
+    public:
+        static const bool is_signed = (T)-1 < 0;
+        _CONSTEXPR14 static T min() 
+        {
+            T t = is_signed ? 1 : 0;
+            return is_signed ? (T)((T)t << (bits-1)) : t;
+        }
+        
+        // TODO - go check old code, think I had a better way, but this should work
+        _CONSTEXPR14 static T max() 
+        {
+            T t = is_signed ? 1 : 0;
+            return is_signed ? ((T)~(t << (T)(bits - 1))) : ((T)(~t)); 
+        }
+
+    private:
+        static const unsigned int bits = sizeof(T) * 8;
+    };
+    
+#else
+
     template < typename T > class numeric_type
     {
     public:
@@ -868,6 +933,21 @@ namespace safeint_internal
         };
     };
 
+    template <typename T>
+    class numeric_limits
+    {
+    public:
+        static const bool is_signed = std::numeric_limits<T>::is_signed;
+        _CONSTEXPR14 static T min() { return std::numeric_limits<T>::min(); }
+        _CONSTEXPR14 static T max() { return std::numeric_limits<T>::max(); }
+
+    private:
+        static const unsigned int bits = sizeof(T) * 8;
+    };
+
+
+#endif
+
     template < typename T > class int_traits
     {
     public:
@@ -881,14 +961,14 @@ namespace safeint_internal
             is8Bit = (sizeof(T) == 1),
             isLT32Bit = (sizeof(T) < 4),
             isLT64Bit = (sizeof(T) < 8),
-            isInt8 = (sizeof(T) == 1 && std::numeric_limits<T>::is_signed),
-            isUint8 = (sizeof(T) == 1 && !std::numeric_limits<T>::is_signed),
-            isInt16 = (sizeof(T) == 2 && std::numeric_limits<T>::is_signed),
-            isUint16 = (sizeof(T) == 2 && !std::numeric_limits<T>::is_signed),
-            isInt32 = (sizeof(T) == 4 && std::numeric_limits<T>::is_signed),
-            isUint32 = (sizeof(T) == 4 && !std::numeric_limits<T>::is_signed),
-            isInt64 = (sizeof(T) == 8 && std::numeric_limits<T>::is_signed),
-            isUint64 = (sizeof(T) == 8 && !std::numeric_limits<T>::is_signed),
+            isInt8 = (sizeof(T) == 1 && safeint_internal::numeric_limits<T>::is_signed),
+            isUint8 = (sizeof(T) == 1 && !safeint_internal::numeric_limits<T>::is_signed),
+            isInt16 = (sizeof(T) == 2 && safeint_internal::numeric_limits<T>::is_signed),
+            isUint16 = (sizeof(T) == 2 && !safeint_internal::numeric_limits<T>::is_signed),
+            isInt32 = (sizeof(T) == 4 && safeint_internal::numeric_limits<T>::is_signed),
+            isUint32 = (sizeof(T) == 4 && !safeint_internal::numeric_limits<T>::is_signed),
+            isInt64 = (sizeof(T) == 8 && safeint_internal::numeric_limits<T>::is_signed),
+            isUint64 = (sizeof(T) == 8 && !safeint_internal::numeric_limits<T>::is_signed),
             bitCount = (sizeof(T) * 8),
             isBool = ((T)2 == (T)1)
         };
@@ -899,11 +979,11 @@ namespace safeint_internal
     public:
         enum
         {
-            isBothSigned = (std::numeric_limits< T >::is_signed && std::numeric_limits< U >::is_signed),
-            isBothUnsigned = (!std::numeric_limits< T >::is_signed && !std::numeric_limits< U >::is_signed),
-            isLikeSigned = ((bool)(std::numeric_limits< T >::is_signed) == (bool)(std::numeric_limits< U >::is_signed)),
+            isBothSigned = (safeint_internal::numeric_limits< T >::is_signed && safeint_internal::numeric_limits< U >::is_signed),
+            isBothUnsigned = (!safeint_internal::numeric_limits< T >::is_signed && !safeint_internal::numeric_limits< U >::is_signed),
+            isLikeSigned = ((bool)(safeint_internal::numeric_limits< T >::is_signed) == (bool)(safeint_internal::numeric_limits< U >::is_signed)),
             isCastOK = ((isLikeSigned && sizeof(T) >= sizeof(U)) ||
-            (std::numeric_limits< T >::is_signed && sizeof(T) > sizeof(U))),
+            (safeint_internal::numeric_limits< T >::is_signed && sizeof(T) > sizeof(U))),
             isBothLT32Bit = (safeint_internal::int_traits< T >::isLT32Bit && safeint_internal::int_traits< U >::isLT32Bit),
             isBothLT64Bit = (safeint_internal::int_traits< T >::isLT64Bit && safeint_internal::int_traits< U >::isLT64Bit)
         };
@@ -928,11 +1008,11 @@ public:
         IntZone_Uint64_Uint       = safeint_internal::type_compare< T,U >::isBothUnsigned && safeint_internal::int_traits< T >::is64Bit,
         IntZone_UintLT64_Uint64    = safeint_internal::type_compare< T,U >::isBothUnsigned && safeint_internal::int_traits< T >::isLT64Bit && safeint_internal::int_traits< U >::is64Bit,
         //unsigned-signed
-        IntZone_UintLT32_IntLT32  = !std::numeric_limits< T >::is_signed && std::numeric_limits< U >::is_signed && safeint_internal::type_compare< T,U >::isBothLT32Bit,
-        IntZone_Uint32_IntLT64    = safeint_internal::int_traits< T >::isUint32 && std::numeric_limits< U >::is_signed && safeint_internal::int_traits< U >::isLT64Bit,
-        IntZone_UintLT32_Int32    = !std::numeric_limits< T >::is_signed && safeint_internal::int_traits< T >::isLT32Bit && safeint_internal::int_traits< U >::isInt32,
-        IntZone_Uint64_Int        = safeint_internal::int_traits< T >::isUint64 && std::numeric_limits< U >::is_signed && safeint_internal::int_traits< U >::isLT64Bit,
-        IntZone_UintLT64_Int64    = !std::numeric_limits< T >::is_signed && safeint_internal::int_traits< T >::isLT64Bit && safeint_internal::int_traits< U >::isInt64,
+        IntZone_UintLT32_IntLT32  = !safeint_internal::numeric_limits< T >::is_signed && safeint_internal::numeric_limits< U >::is_signed && safeint_internal::type_compare< T,U >::isBothLT32Bit,
+        IntZone_Uint32_IntLT64    = safeint_internal::int_traits< T >::isUint32 && safeint_internal::numeric_limits< U >::is_signed && safeint_internal::int_traits< U >::isLT64Bit,
+        IntZone_UintLT32_Int32    = !safeint_internal::numeric_limits< T >::is_signed && safeint_internal::int_traits< T >::isLT32Bit && safeint_internal::int_traits< U >::isInt32,
+        IntZone_Uint64_Int        = safeint_internal::int_traits< T >::isUint64 && safeint_internal::numeric_limits< U >::is_signed && safeint_internal::int_traits< U >::isLT64Bit,
+        IntZone_UintLT64_Int64    = !safeint_internal::numeric_limits< T >::is_signed && safeint_internal::int_traits< T >::isLT64Bit && safeint_internal::int_traits< U >::isInt64,
         IntZone_Uint64_Int64      = safeint_internal::int_traits< T >::isUint64 && safeint_internal::int_traits< U >::isInt64,
         //signed-signed
         IntZone_IntLT32_IntLT32   = safeint_internal::type_compare< T,U >::isBothSigned && safeint_internal::type_compare< T, U >::isBothLT32Bit,
@@ -942,11 +1022,11 @@ public:
         IntZone_Int64_Int         = safeint_internal::type_compare< T,U >::isBothSigned && safeint_internal::int_traits< T >::is64Bit && safeint_internal::int_traits< U >::isLT64Bit,
         IntZone_IntLT64_Int64     = safeint_internal::type_compare< T,U >::isBothSigned && safeint_internal::int_traits< T >::isLT64Bit && safeint_internal::int_traits< U >::is64Bit,
         //signed-unsigned
-        IntZone_IntLT32_UintLT32  = std::numeric_limits< T >::is_signed && !std::numeric_limits< U >::is_signed && safeint_internal::type_compare< T,U >::isBothLT32Bit,
-        IntZone_Int32_UintLT32    = safeint_internal::int_traits< T >::isInt32 && !std::numeric_limits< U >::is_signed && safeint_internal::int_traits< U >::isLT32Bit,
-        IntZone_IntLT64_Uint32    = std::numeric_limits< T >::is_signed && safeint_internal::int_traits< T >::isLT64Bit && safeint_internal::int_traits< U >::isUint32,
-        IntZone_Int64_UintLT64    = safeint_internal::int_traits< T >::isInt64 && !std::numeric_limits< U >::is_signed && safeint_internal::int_traits< U >::isLT64Bit,
-        IntZone_Int_Uint64        = std::numeric_limits< T >::is_signed && safeint_internal::int_traits< U >::isUint64 && safeint_internal::int_traits< T >::isLT64Bit,
+        IntZone_IntLT32_UintLT32  = safeint_internal::numeric_limits< T >::is_signed && !safeint_internal::numeric_limits< U >::is_signed && safeint_internal::type_compare< T,U >::isBothLT32Bit,
+        IntZone_Int32_UintLT32    = safeint_internal::int_traits< T >::isInt32 && !safeint_internal::numeric_limits< U >::is_signed && safeint_internal::int_traits< U >::isLT32Bit,
+        IntZone_IntLT64_Uint32    = safeint_internal::numeric_limits< T >::is_signed && safeint_internal::int_traits< T >::isLT64Bit && safeint_internal::int_traits< U >::isUint32,
+        IntZone_Int64_UintLT64    = safeint_internal::int_traits< T >::isInt64 && !safeint_internal::numeric_limits< U >::is_signed && safeint_internal::int_traits< U >::isLT64Bit,
+        IntZone_Int_Uint64        = safeint_internal::numeric_limits< T >::is_signed && safeint_internal::int_traits< U >::isUint64 && safeint_internal::int_traits< T >::isLT64Bit,
         IntZone_Int64_Uint64      = safeint_internal::int_traits< T >::isInt64 && safeint_internal::int_traits< U >::isUint64
     };
 };
@@ -973,7 +1053,7 @@ class GetAbsMethod
 public:
     enum
     {
-        method = safeint_internal::int_traits< T >::isLT64Bit && std::numeric_limits< T >::is_signed ? AbsMethodInt :
+        method = safeint_internal::int_traits< T >::isLT64Bit && safeint_internal::numeric_limits< T >::is_signed ? AbsMethodInt :
                  safeint_internal::int_traits< T >::isInt64 ? AbsMethodInt64 : AbsMethodNoop
     };
 };
@@ -1066,7 +1146,7 @@ public:
     _CONSTEXPR14 static T NegativeThrow( T t ) SAFEINT_CPP_THROW
     {
         // corner case
-        if( t != std::numeric_limits<T>::min() )
+        if( t != safeint_internal::numeric_limits<T>::min() )
         {
             // cast prevents unneeded checks in the case of small ints
             return -t;
@@ -1077,7 +1157,7 @@ public:
     _CONSTEXPR14 static bool Negative(T t, T& out)
     {
         // corner case
-        if (t != std::numeric_limits<T>::min())
+        if (t != safeint_internal::numeric_limits<T>::min())
         {
             out = -t;
             return true;
@@ -1135,20 +1215,20 @@ public:
                  ( !safeint_internal::int_traits< FromType >::isBool &&
                      safeint_internal::int_traits< ToType >::isBool )                     ? CastToBool :
 
-                 ( safeint_internal::type_compare< ToType, FromType >::isCastOK )      ? CastOK :
+                 ( safeint_internal::type_compare< ToType, FromType >::isCastOK )         ? CastOK :
 
-                 ( ( std::numeric_limits< ToType >::is_signed &&
-                        !std::numeric_limits< FromType >::is_signed &&
+                 ( (safeint_internal::numeric_limits< ToType >::is_signed &&
+                        !safeint_internal::numeric_limits< FromType >::is_signed &&
                         sizeof( FromType ) >= sizeof( ToType ) ) ||
                    ( safeint_internal::type_compare< ToType, FromType >::isBothUnsigned &&
-                        sizeof( FromType ) > sizeof( ToType ) ) )      ? CastCheckGTMax :
+                        sizeof( FromType ) > sizeof( ToType ) ) )                         ? CastCheckGTMax :
 
-                 ( !std::numeric_limits< ToType >::is_signed &&
-                     std::numeric_limits< FromType >::is_signed &&
-                     sizeof( ToType ) >= sizeof( FromType ) )          ? CastCheckLTZero :
+                 ( !safeint_internal::numeric_limits< ToType >::is_signed &&
+                     safeint_internal::numeric_limits< FromType >::is_signed &&
+                     sizeof( ToType ) >= sizeof( FromType ) )                              ? CastCheckLTZero :
 
-                 ( !std::numeric_limits< ToType >::is_signed )                    ? CastCheckSafeIntMinMaxUnsigned
-                                                                       : CastCheckSafeIntMinMaxSigned
+                 ( !safeint_internal::numeric_limits< ToType >::is_signed )                ? CastCheckSafeIntMinMaxUnsigned
+                                                                                           : CastCheckSafeIntMinMaxSigned
     };
 };
 
@@ -1225,7 +1305,7 @@ public:
             return false;
 
         // The input can now safely be cast to an unsigned long long
-        if (static_cast<std::uint64_t>(d) > std::numeric_limits<T>::max())
+        if (static_cast<std::uint64_t>(d) > safeint_internal::numeric_limits<T>::max())
             return false;
 
         return true;
@@ -1248,7 +1328,7 @@ public:
 
         // And now cast to long long, and check against min and max for this type
         std::int64_t test = static_cast<std::int64_t>(d);
-        if ((std::int64_t)test < (std::int64_t)std::numeric_limits<T>::min() || (std::int64_t)test >(std::int64_t)std::numeric_limits<T>::max())
+        if ((std::int64_t)test < (std::int64_t)safeint_internal::numeric_limits<T>::min() || (std::int64_t)test >(std::int64_t)safeint_internal::numeric_limits<T>::max())
             return false;
 
         return true;
@@ -1266,7 +1346,7 @@ public:
         // 53 bits is:
         bool fValid = false;
 
-        switch (std::fpclassify(d))
+        switch (fpclassify(d))
         {
         case FP_NORMAL:    // A positive or negative normalized non - zero value
         case FP_SUBNORMAL: // A positive or negative denormalized value
@@ -1284,7 +1364,7 @@ public:
         if (!fValid)
             return false;
 
-        return float_cast_helper< T, !std::numeric_limits< T >::is_signed >::Test(d);
+        return float_cast_helper< T, !safeint_internal::numeric_limits< T >::is_signed >::Test(d);
     }
 
     static bool Cast( U u, T& t ) SAFEINT_NOTHROW
@@ -1384,7 +1464,7 @@ template < typename T, typename U > class SafeCastHelper < T, U, CastCheckGTMax 
 public:
     _CONSTEXPR14 static bool Cast( U u, T& t ) SAFEINT_NOTHROW
     {
-        if( u > (U)std::numeric_limits<T>::max() )
+        if( u > (U)safeint_internal::numeric_limits<T>::max() )
             return false;
 
         t = (T)u;
@@ -1394,7 +1474,7 @@ public:
     template < typename E >
     _CONSTEXPR14 static void CastThrow( U u, T& t ) SAFEINT_CPP_THROW
     {
-        if( u > (U)std::numeric_limits<T>::max() )
+        if( u > (U)safeint_internal::numeric_limits<T>::max() )
             E::SafeIntOnOverflow();
 
         t = (T)u;
@@ -1407,7 +1487,7 @@ public:
     _CONSTEXPR14 static bool Cast( U u, T& t ) SAFEINT_NOTHROW
     {
         // U is signed - T could be either signed or unsigned
-        if( u > std::numeric_limits<T>::max() || u < 0 )
+        if( u > safeint_internal::numeric_limits<T>::max() || u < 0 )
             return false;
 
         t = (T)u;
@@ -1418,7 +1498,7 @@ public:
     _CONSTEXPR14 static void CastThrow( U u, T& t ) SAFEINT_CPP_THROW
     {
         // U is signed - T could be either signed or unsigned
-        if( u > std::numeric_limits<T>::max() || u < 0 )
+        if( u > safeint_internal::numeric_limits<T>::max() || u < 0 )
             E::SafeIntOnOverflow();
 
         t = (T)u;
@@ -1431,7 +1511,7 @@ public:
     _CONSTEXPR14 static bool Cast( U u, T& t ) SAFEINT_NOTHROW
     {
         // T, U are signed
-        if( u > std::numeric_limits<T>::max() || u < std::numeric_limits<T>::min() )
+        if( u > safeint_internal::numeric_limits<T>::max() || u < safeint_internal::numeric_limits<T>::min() )
             return false;
 
         t = (T)u;
@@ -1442,7 +1522,7 @@ public:
     _CONSTEXPR14 static void CastThrow( U u, T& t ) SAFEINT_CPP_THROW
     {
         //T, U are signed
-        if( u > std::numeric_limits<T>::max() || u < std::numeric_limits<T>::min() )
+        if( u > safeint_internal::numeric_limits<T>::max() || u < safeint_internal::numeric_limits<T>::min() )
             E::SafeIntOnOverflow();
 
         t = (T)u;
@@ -1484,13 +1564,13 @@ class ValidComparison
 public:
     enum
     {
-        method = ( ( safeint_internal::type_compare< T, U >::isLikeSigned )                              ? ComparisonMethod_Ok :
-                 ( ( std::numeric_limits< T >::is_signed && sizeof(T) < 8 && sizeof(U) < 4 ) ||
-                   ( std::numeric_limits< U >::is_signed && sizeof(T) < 4 && sizeof(U) < 8 ) )  ? ComparisonMethod_CastInt :
-                 ( ( std::numeric_limits< T >::is_signed && sizeof(U) < 8 ) ||
-                   ( std::numeric_limits< U >::is_signed && sizeof(T) < 8 ) )                   ? ComparisonMethod_CastInt64 :
-                 ( !std::numeric_limits< T >::is_signed )                                       ? ComparisonMethod_UnsignedT :
-                                                                                       ComparisonMethod_UnsignedU )
+        method = ( ( safeint_internal::type_compare< T, U >::isLikeSigned )                                 ? ComparisonMethod_Ok :
+                 ( (safeint_internal::numeric_limits< T >::is_signed && sizeof(T) < 8 && sizeof(U) < 4 ) ||
+                   (safeint_internal::numeric_limits< U >::is_signed && sizeof(T) < 4 && sizeof(U) < 8 ) )  ? ComparisonMethod_CastInt :
+                 ( (safeint_internal::numeric_limits< T >::is_signed && sizeof(U) < 8 ) ||
+                   (safeint_internal::numeric_limits< U >::is_signed && sizeof(T) < 8 ) )                   ? ComparisonMethod_CastInt64 :
+                 ( !safeint_internal::numeric_limits< T >::is_signed )                                      ? ComparisonMethod_UnsignedT :
+                                                                                                              ComparisonMethod_UnsignedU )
     };
 };
 
@@ -1623,7 +1703,7 @@ public:
             return SafeIntError::SafeIntDivideByZero;
 
         //trap corner case
-        if(mod_corner_case<U, std::numeric_limits< U >::is_signed >::is_undefined(u))
+        if(mod_corner_case<U, safeint_internal::numeric_limits< U >::is_signed >::is_undefined(u))
         {
             result = 0;
             return SafeIntError::SafeIntNoError;
@@ -1640,7 +1720,7 @@ public:
             E::SafeIntOnDivZero();
 
         //trap corner case
-        if (mod_corner_case<U, std::numeric_limits< U >::is_signed >::is_undefined(u))
+        if (mod_corner_case<U, safeint_internal::numeric_limits< U >::is_signed >::is_undefined(u))
         {
             result = 0;
             return;
@@ -1659,7 +1739,7 @@ public:
             return SafeIntError::SafeIntDivideByZero;
 
         //trap corner case
-        if (mod_corner_case<U, std::numeric_limits< U >::is_signed >::is_undefined(u))
+        if (mod_corner_case<U, safeint_internal::numeric_limits< U >::is_signed >::is_undefined(u))
         {
             result = 0;
             return SafeIntError::SafeIntNoError;
@@ -1676,7 +1756,7 @@ public:
             E::SafeIntOnDivZero();
 
         //trap corner case
-        if (mod_corner_case<U, std::numeric_limits< U >::is_signed >::is_undefined(u))
+        if (mod_corner_case<U, safeint_internal::numeric_limits< U >::is_signed >::is_undefined(u))
         {
             result = 0;
             return;
@@ -1695,7 +1775,7 @@ public:
             return SafeIntError::SafeIntDivideByZero;
 
         //trap corner case
-        if (mod_corner_case<U, std::numeric_limits< U >::is_signed >::is_undefined(u))
+        if (mod_corner_case<U, safeint_internal::numeric_limits< U >::is_signed >::is_undefined(u))
         {
             result = 0;
             return SafeIntError::SafeIntNoError;
@@ -1711,7 +1791,7 @@ public:
         if(u == 0)
             E::SafeIntOnDivZero();
 
-        if (mod_corner_case<U, std::numeric_limits< U >::is_signed >::is_undefined(u))
+        if (mod_corner_case<U, safeint_internal::numeric_limits< U >::is_signed >::is_undefined(u))
         {
             result = 0;
             return;
@@ -1857,7 +1937,7 @@ public:
     {
         int tmp = t * u;
 
-        if( tmp > std::numeric_limits<T>::max() || tmp < std::numeric_limits<T>::min() )
+        if( tmp > safeint_internal::numeric_limits<T>::max() || tmp < safeint_internal::numeric_limits<T>::min() )
             return false;
 
         ret = (T)tmp;
@@ -1869,7 +1949,7 @@ public:
     {
         int tmp = t * u;
 
-        if( tmp > std::numeric_limits<T>::max() || tmp < std::numeric_limits<T>::min() )
+        if( tmp > safeint_internal::numeric_limits<T>::max() || tmp < safeint_internal::numeric_limits<T>::min() )
             E::SafeIntOnOverflow();
 
         ret = (T)tmp;
@@ -1884,7 +1964,7 @@ public:
     {
         unsigned int tmp = (unsigned int)t * (unsigned int)u;
 
-        if( tmp > std::numeric_limits<T>::max() )
+        if( tmp > safeint_internal::numeric_limits<T>::max() )
             return false;
 
         ret = (T)tmp;
@@ -1896,7 +1976,7 @@ public:
     {
         unsigned int tmp = (unsigned int)( t * u );
 
-        if( tmp > std::numeric_limits<T>::max() )
+        if( tmp > safeint_internal::numeric_limits<T>::max() )
             E::SafeIntOnOverflow();
 
         ret = (T)tmp;
@@ -1911,7 +1991,7 @@ public:
     {
         std::int64_t tmp = (std::int64_t)t * (std::int64_t)u;
 
-        if(tmp > (std::int64_t)std::numeric_limits<T>::max() || tmp < (std::int64_t)std::numeric_limits<T>::min())
+        if(tmp > (std::int64_t)safeint_internal::numeric_limits<T>::max() || tmp < (std::int64_t)safeint_internal::numeric_limits<T>::min())
             return false;
 
         ret = (T)tmp;
@@ -1923,7 +2003,7 @@ public:
     {
         std::int64_t tmp = (std::int64_t)t * (std::int64_t)u;
 
-        if(tmp > (std::int64_t)std::numeric_limits<T>::max() || tmp < (std::int64_t)std::numeric_limits<T>::min())
+        if(tmp > (std::int64_t)safeint_internal::numeric_limits<T>::max() || tmp < (std::int64_t)safeint_internal::numeric_limits<T>::min())
             E::SafeIntOnOverflow();
 
         ret = (T)tmp;
@@ -1938,7 +2018,7 @@ public:
     {
         std::uint64_t tmp = (std::uint64_t)t * (std::uint64_t)u;
 
-        if(tmp > (std::uint64_t)std::numeric_limits<T>::max())
+        if(tmp > (std::uint64_t)safeint_internal::numeric_limits<T>::max())
             return false;
 
         ret = (T)tmp;
@@ -1950,7 +2030,7 @@ public:
     {
         std::uint64_t tmp = (std::uint64_t)t * (std::uint64_t)u;
 
-        if(tmp > (std::uint64_t)std::numeric_limits<T>::max())
+        if(tmp > (std::uint64_t)safeint_internal::numeric_limits<T>::max())
             E::SafeIntOnOverflow();
 
         ret = (T)tmp;
@@ -1994,7 +2074,7 @@ inline bool IntrinsicMultiplyInt64( const std::int64_t& a, const std::int64_t& b
     {
         // Result should be positive
         // Check for overflow
-        if( llHigh == 0 && (std::uint64_t)*pRet <= (std::uint64_t)std::numeric_limits<std::int64_t>::max() )
+        if( llHigh == 0 && (std::uint64_t)*pRet <= (std::uint64_t)safeint_internal::numeric_limits<std::int64_t>::max() )
             return true;
     }
     return false;
@@ -2309,7 +2389,7 @@ public:
 
         if( !fIsNegative )
         {
-            if( tmp <= (std::uint64_t)std::numeric_limits< std::int32_t >::max() )
+            if( tmp <= (std::uint64_t)safeint_internal::numeric_limits< std::int32_t >::max() )
             {
                 *pRet = (std::int32_t)tmp;
                 return true;
@@ -2317,7 +2397,7 @@ public:
         }
         else
         {
-            if( tmp <= (std::uint64_t)std::numeric_limits< std::int32_t >::max()+1 )
+            if( tmp <= (std::uint64_t)safeint_internal::numeric_limits< std::int32_t >::max()+1 )
             {
                 *pRet = SignedNegation< std::int32_t >::Value( tmp );
                 return true;
@@ -2355,7 +2435,7 @@ public:
 
         if( !fIsNegative )
         {
-            if( tmp <= (std::uint64_t)std::numeric_limits< std::int32_t >::max() )
+            if( tmp <= (std::uint64_t)safeint_internal::numeric_limits< std::int32_t >::max() )
             {
                 *pRet = (std::int32_t)tmp;
                 return;
@@ -2363,7 +2443,7 @@ public:
         }
         else
         {
-            if( tmp <= (std::uint64_t)std::numeric_limits< std::int32_t >::max()+1 )
+            if( tmp <= (std::uint64_t)safeint_internal::numeric_limits< std::int32_t >::max()+1 )
             {
                 *pRet = SignedNegation< std::int32_t >::Value( tmp );
                 return;
@@ -2466,7 +2546,7 @@ public:
             if( aNegative ^ bNegative )
             {
                 // Result must be negative
-                if( tmp <= (std::uint64_t)std::numeric_limits< std::int64_t >::min() )
+                if( tmp <= (std::uint64_t)safeint_internal::numeric_limits< std::int64_t >::min() )
                 {
                     *pRet = SignedNegation< std::int64_t >::Value( tmp );
                     return true;
@@ -2475,7 +2555,7 @@ public:
             else
             {
                 // Result must be positive
-                if( tmp <= (std::uint64_t)std::numeric_limits<std::int64_t>::max() )
+                if( tmp <= (std::uint64_t)safeint_internal::numeric_limits<std::int64_t>::max() )
                 {
                     *pRet = (std::int64_t)tmp;
                     return true;
@@ -2519,7 +2599,7 @@ public:
         if( aNegative ^ bNegative )
         {
             // Result must be negative
-            if( tmp <= (std::uint64_t)std::numeric_limits< std::int64_t >::min() )
+            if( tmp <= (std::uint64_t)safeint_internal::numeric_limits< std::int64_t >::min() )
             {
                 *pRet = SignedNegation< std::int64_t >::Value( tmp );
                 return;
@@ -2528,7 +2608,7 @@ public:
         else
         {
             // Result must be positive
-            if( tmp <= (std::uint64_t)std::numeric_limits<std::int64_t>::max() )
+            if( tmp <= (std::uint64_t)safeint_internal::numeric_limits<std::int64_t>::max() )
             {
                 *pRet = (std::int64_t)tmp;
                 return;
@@ -2564,7 +2644,7 @@ public:
             if( aNegative )
             {
                 // Result must be negative
-                if( tmp <= (std::uint64_t)std::numeric_limits< std::int64_t >::min() )
+                if( tmp <= (std::uint64_t)safeint_internal::numeric_limits< std::int64_t >::min() )
                 {
                     *pRet = SignedNegation< std::int64_t >::Value( tmp );
                     return true;
@@ -2573,7 +2653,7 @@ public:
             else
             {
                 // Result must be positive
-                if( tmp <= (std::uint64_t)std::numeric_limits<std::int64_t>::max() )
+                if( tmp <= (std::uint64_t)safeint_internal::numeric_limits<std::int64_t>::max() )
                 {
                     *pRet = (std::int64_t)tmp;
                     return true;
@@ -2608,7 +2688,7 @@ public:
         if( aNegative )
         {
             // Result must be negative
-            if( tmp <= (std::uint64_t)std::numeric_limits< std::int64_t >::min() )
+            if( tmp <= (std::uint64_t)safeint_internal::numeric_limits< std::int64_t >::min() )
             {
                 *pRet = SignedNegation< std::int64_t >::Value( tmp );
                 return;
@@ -2617,7 +2697,7 @@ public:
         else
         {
             // Result must be positive
-            if( tmp <= (std::uint64_t)std::numeric_limits<std::int64_t>::max() )
+            if( tmp <= (std::uint64_t)safeint_internal::numeric_limits<std::int64_t>::max() )
             {
                 *pRet = (std::int64_t)tmp;
                 return;
@@ -2662,7 +2742,7 @@ public:
             if( aNegative ^ bNegative )
             {
                 // Result must be negative
-                if( tmp <= (std::uint64_t)std::numeric_limits< std::int64_t >::min() )
+                if( tmp <= (std::uint64_t)safeint_internal::numeric_limits< std::int64_t >::min() )
                 {
                     *pRet = SignedNegation< std::int64_t >::Value( tmp );
                     return true;
@@ -2671,7 +2751,7 @@ public:
             else
             {
                 // Result must be positive
-                if( tmp <= (std::uint64_t)std::numeric_limits<std::int64_t>::max() )
+                if( tmp <= (std::uint64_t)safeint_internal::numeric_limits<std::int64_t>::max() )
                 {
                     *pRet = (std::int64_t)tmp;
                     return true;
@@ -2713,7 +2793,7 @@ public:
         if( aNegative ^ bNegative )
         {
             // Result must be negative
-            if( tmp <= (std::uint64_t)std::numeric_limits< std::int64_t >::min() )
+            if( tmp <= (std::uint64_t)safeint_internal::numeric_limits< std::int64_t >::min() )
             {
                 *pRet = SignedNegation< std::int64_t >::Value( tmp );
                 return;
@@ -2722,7 +2802,7 @@ public:
         else
         {
             // Result must be positive
-            if( tmp <= (std::uint64_t)std::numeric_limits<std::int64_t>::max() )
+            if( tmp <= (std::uint64_t)safeint_internal::numeric_limits<std::int64_t>::max() )
             {
                 *pRet = (std::int64_t)tmp;
                 return;
@@ -2744,8 +2824,8 @@ public:
 
         if( IntrinsicMultiplyInt64( a, b, &tmp ) )
         {
-            if( tmp > std::numeric_limits< std::int32_t >::max() ||
-                tmp < std::numeric_limits< std::int32_t >::min() )
+            if( tmp > safeint_internal::numeric_limits< std::int32_t >::max() ||
+                tmp < safeint_internal::numeric_limits< std::int32_t >::min() )
             {
                 return false;
             }
@@ -2779,7 +2859,7 @@ public:
             if( aNegative ^ bNegative )
             {
                 // Result must be negative
-                if( tmp <= (std::uint32_t)std::numeric_limits< std::int32_t >::min() )
+                if( tmp <= (std::uint32_t)safeint_internal::numeric_limits< std::int32_t >::min() )
                 {
                     *pRet = SignedNegation< std::int32_t >::Value( tmp );
                     return true;
@@ -2788,7 +2868,7 @@ public:
             else
             {
                 // Result must be positive
-                if( tmp <= (std::uint32_t)std::numeric_limits< std::int32_t >::max() )
+                if( tmp <= (std::uint32_t)safeint_internal::numeric_limits< std::int32_t >::max() )
                 {
                     *pRet = (std::int32_t)tmp;
                     return true;
@@ -2808,8 +2888,8 @@ public:
 
         if( IntrinsicMultiplyInt64( a, b, &tmp ) )
         {
-            if( tmp > std::numeric_limits< std::int32_t >::max() ||
-                tmp < std::numeric_limits< std::int32_t >::min() )
+            if( tmp > safeint_internal::numeric_limits< std::int32_t >::max() ||
+                tmp < safeint_internal::numeric_limits< std::int32_t >::min() )
             {
                 E::SafeIntOnOverflow();
             }
@@ -2843,7 +2923,7 @@ public:
         if( aNegative ^ bNegative )
         {
             // Result must be negative
-            if( tmp <= (std::uint32_t)std::numeric_limits< std::int32_t >::min() )
+            if( tmp <= (std::uint32_t)safeint_internal::numeric_limits< std::int32_t >::min() )
             {
                 *pRet = SignedNegation< std::int32_t >::Value( tmp );
                 return;
@@ -2852,7 +2932,7 @@ public:
         else
         {
             // Result must be positive
-            if( tmp <= (std::uint32_t)std::numeric_limits< std::int32_t >::max() )
+            if( tmp <= (std::uint32_t)safeint_internal::numeric_limits< std::int32_t >::max() )
             {
                 *pRet = (std::int32_t)tmp;
                 return;
@@ -2887,7 +2967,7 @@ public:
             if( aNegative )
             {
                 // Result must be negative
-                if( tmp <= (std::uint64_t)std::numeric_limits< std::int64_t >::min() )
+                if( tmp <= (std::uint64_t)safeint_internal::numeric_limits< std::int64_t >::min() )
                 {
                     *pRet = SignedNegation< std::int64_t >::Value( tmp );
                     return true;
@@ -2896,7 +2976,7 @@ public:
             else
             {
                 // Result must be positive
-                if( tmp <= (std::uint64_t)std::numeric_limits<std::int64_t>::max() )
+                if( tmp <= (std::uint64_t)safeint_internal::numeric_limits<std::int64_t>::max() )
                 {
                     *pRet = (std::int64_t)tmp;
                     return true;
@@ -2926,7 +3006,7 @@ public:
             if( aNegative )
             {
                 // Result must be negative
-                if( tmp <= (std::uint64_t)std::numeric_limits< std::int64_t >::min() )
+                if( tmp <= (std::uint64_t)safeint_internal::numeric_limits< std::int64_t >::min() )
                 {
                     *pRet = SignedNegation< std::int64_t >::Value( tmp );
                     return;
@@ -2935,7 +3015,7 @@ public:
             else
             {
                 // Result must be positive
-                if( tmp <= (std::uint64_t)std::numeric_limits<std::int64_t>::max() )
+                if( tmp <= (std::uint64_t)safeint_internal::numeric_limits<std::int64_t>::max() )
                 {
                     *pRet = (std::int64_t)tmp;
                     return;
@@ -3311,12 +3391,12 @@ public:
     enum
     {
         method = (safeint_internal::type_compare< T, U >::isBothUnsigned                     ? DivisionState_OK :
-                 (!std::numeric_limits< T >::is_signed && std::numeric_limits< U >::is_signed) ? DivisionState_UnsignedSigned :
-                 (std::numeric_limits< T >::is_signed &&
+                 (!safeint_internal::numeric_limits< T >::is_signed && safeint_internal::numeric_limits< U >::is_signed) ? DivisionState_UnsignedSigned :
+                 (safeint_internal::numeric_limits< T >::is_signed &&
                     safeint_internal::int_traits< U >::isUint32 &&
                     safeint_internal::int_traits< T >::isLT64Bit)                           ? DivisionState_SignedUnsigned32 :
-                 (std::numeric_limits< T >::is_signed && safeint_internal::int_traits< U >::isUint64)  ? DivisionState_SignedUnsigned64 :
-                 (std::numeric_limits< T >::is_signed && !std::numeric_limits< U >::is_signed) ? DivisionState_SignedUnsigned :
+                 (safeint_internal::numeric_limits< T >::is_signed && safeint_internal::int_traits< U >::isUint64)  ? DivisionState_SignedUnsigned64 :
+                 (safeint_internal::numeric_limits< T >::is_signed && !safeint_internal::numeric_limits< U >::is_signed) ? DivisionState_SignedUnsigned :
                                                                            DivisionState_SignedSigned)
     };
 };
@@ -3502,12 +3582,12 @@ public:
             return SafeIntError::SafeIntNoError;
         }
 
-        if( u <= (std::uint64_t)std::numeric_limits<T>::max() )
+        if( u <= (std::uint64_t)safeint_internal::numeric_limits<T>::max() )
         {
             result = div_signed_uint64 < T, U, sizeof(T) < sizeof(std::int64_t) > ::divide(t, u);
         }
         else // Corner case
-        if( t == std::numeric_limits<T>::min() && u == (std::uint64_t)std::numeric_limits<T>::min() )
+        if( t == safeint_internal::numeric_limits<T>::min() && u == (std::uint64_t)safeint_internal::numeric_limits<T>::min() )
         {
             // Min int divided by it's own magnitude is -1
             result = -1;
@@ -3535,12 +3615,12 @@ public:
             return;
         }
 
-        if( u <= (std::uint64_t)std::numeric_limits<T>::max() )
+        if( u <= (std::uint64_t)safeint_internal::numeric_limits<T>::max() )
         {
             result = div_signed_uint64 < T, U, sizeof(T) < sizeof(std::int64_t) > ::divide(t, u);
         }
         else // Corner case
-        if( t == std::numeric_limits<T>::min() && u == (std::uint64_t)std::numeric_limits<T>::min() )
+        if( t == safeint_internal::numeric_limits<T>::min() && u == (std::uint64_t)safeint_internal::numeric_limits<T>::min() )
         {
             // Min int divided by it's own magnitude is -1
             result = -1;
@@ -3609,7 +3689,7 @@ public:
         }
 
         // Must test for corner case
-        if( t == std::numeric_limits<T>::min() && u == (U)-1 )
+        if( t == safeint_internal::numeric_limits<T>::min() && u == (U)-1 )
             return SafeIntError::SafeIntArithmeticOverflow;
 
         result = (T)( t/u );
@@ -3631,7 +3711,7 @@ public:
         }
 
         // Must test for corner case
-        if( t == std::numeric_limits<T>::min() && u == (U)-1 )
+        if( t == safeint_internal::numeric_limits<T>::min() && u == (U)-1 )
             E::SafeIntOnOverflow();
 
         result = (T)( t/u );
@@ -3705,7 +3785,7 @@ public:
         //16-bit or less unsigned addition
         std::int32_t tmp = lhs + rhs;
 
-        if( tmp <= (std::int32_t)std::numeric_limits<T>::max() )
+        if( tmp <= (std::int32_t)safeint_internal::numeric_limits<T>::max() )
         {
             result = (T)tmp;
             return true;
@@ -3720,7 +3800,7 @@ public:
         //16-bit or less unsigned addition
         std::int32_t tmp = lhs + rhs;
 
-        if( tmp <= (std::int32_t)std::numeric_limits<T>::max() )
+        if( tmp <= (std::int32_t)safeint_internal::numeric_limits<T>::max() )
         {
             result = (T)tmp;
             return;
@@ -3772,7 +3852,7 @@ public:
         std::uint32_t tmp = (std::uint32_t)lhs + (std::uint32_t)rhs;
 
         // We added and it didn't get smaller or exceed maxInt
-        if( tmp >= lhs && tmp <= std::numeric_limits<T>::max() )
+        if( tmp >= lhs && tmp <= safeint_internal::numeric_limits<T>::max() )
         {
             result = (T)tmp;
             return true;
@@ -3787,7 +3867,7 @@ public:
         std::uint32_t tmp = (std::uint32_t)lhs + (std::uint32_t)rhs;
 
         // We added and it didn't get smaller or exceed maxInt
-        if( tmp >= lhs && tmp <= std::numeric_limits<T>::max() )
+        if( tmp >= lhs && tmp <= safeint_internal::numeric_limits<T>::max() )
         {
             result = (T)tmp;
             return;
@@ -3840,7 +3920,7 @@ public:
         std::uint64_t tmp = (std::uint64_t)lhs + (std::uint64_t)rhs;
 
         // We added and it didn't get smaller
-        if( tmp >= lhs && tmp <= std::numeric_limits<T>::max() )
+        if( tmp >= lhs && tmp <= safeint_internal::numeric_limits<T>::max() )
         {
             result = (T)tmp;
             return true;
@@ -3856,7 +3936,7 @@ public:
         std::uint64_t tmp = (std::uint64_t)lhs + (std::uint64_t)rhs;
 
         // We added and it didn't get smaller
-        if( tmp >= lhs && tmp <= std::numeric_limits<T>::max() )
+        if( tmp >= lhs && tmp <= safeint_internal::numeric_limits<T>::max() )
         {
             result = (T)tmp;
             return;
@@ -3874,7 +3954,7 @@ public:
         // 16-bit or less - one or both are signed
         std::int32_t tmp = lhs + rhs;
 
-        if( tmp <= (std::int32_t)std::numeric_limits<T>::max() && tmp >= (std::int32_t)std::numeric_limits<T>::min() )
+        if( tmp <= (std::int32_t)safeint_internal::numeric_limits<T>::max() && tmp >= (std::int32_t)safeint_internal::numeric_limits<T>::min() )
         {
             result = (T)tmp;
             return true;
@@ -3889,7 +3969,7 @@ public:
         // 16-bit or less - one or both are signed
         std::int32_t tmp = lhs + rhs;
 
-        if( tmp <= (std::int32_t)std::numeric_limits<T>::max() && tmp >= (std::int32_t)std::numeric_limits<T>::min() )
+        if( tmp <= (std::int32_t)safeint_internal::numeric_limits<T>::max() && tmp >= (std::int32_t)safeint_internal::numeric_limits<T>::min() )
         {
             result = (T)tmp;
             return;
@@ -3907,7 +3987,7 @@ public:
         // 32-bit or less - one or both are signed
         std::int64_t tmp = (std::int64_t)lhs + (std::int64_t)rhs;
 
-        if( tmp <= (std::int64_t)std::numeric_limits<T>::max() && tmp >= (std::int64_t)std::numeric_limits<T>::min() )
+        if( tmp <= (std::int64_t)safeint_internal::numeric_limits<T>::max() && tmp >= (std::int64_t)safeint_internal::numeric_limits<T>::min() )
         {
             result = (T)tmp;
             return true;
@@ -3922,7 +4002,7 @@ public:
         // 32-bit or less - one or both are signed
         std::int64_t tmp = (std::int64_t)lhs + (std::int64_t)rhs;
 
-        if( tmp <= (std::int64_t)std::numeric_limits<T>::max() && tmp >= (std::int64_t)std::numeric_limits<T>::min() )
+        if( tmp <= (std::int64_t)safeint_internal::numeric_limits<T>::max() && tmp >= (std::int64_t)safeint_internal::numeric_limits<T>::min() )
         {
             result = (T)tmp;
             return;
@@ -3940,7 +4020,7 @@ public:
         // 32-bit or less - lhs signed, rhs unsigned
         std::int64_t tmp = (std::int64_t)lhs + (std::int64_t)rhs;
 
-        if( tmp <= std::numeric_limits<T>::max() )
+        if( tmp <= safeint_internal::numeric_limits<T>::max() )
         {
             result = (T)tmp;
             return true;
@@ -3955,7 +4035,7 @@ public:
         // 32-bit or less - lhs signed, rhs unsigned
         std::int64_t tmp = (std::int64_t)lhs + (std::int64_t)rhs;
 
-        if( tmp <= std::numeric_limits<T>::max() )
+        if( tmp <= safeint_internal::numeric_limits<T>::max() )
         {
             result = (T)tmp;
             return;
@@ -4055,7 +4135,7 @@ public:
 
             // special case - rhs cannot be larger than 0x7fffffffffffffff, lhs cannot be larger than 0xffffffff
             // it is not possible for the operation above to overflow, so just check max
-            if( tmp <= std::numeric_limits<T>::max() )
+            if( tmp <= safeint_internal::numeric_limits<T>::max() )
             {
                 result = (T)tmp;
                 return true;
@@ -4083,7 +4163,7 @@ public:
 
             // special case - rhs cannot be larger than 0x7fffffffffffffff, lhs cannot be larger than 0xffffffff
             // it is not possible for the operation above to overflow, so just check max
-            if( tmp <= std::numeric_limits<T>::max() )
+            if( tmp <= safeint_internal::numeric_limits<T>::max() )
             {
                 result = (T)tmp;
                 return;
@@ -4150,8 +4230,8 @@ public:
         std::int64_t tmp = 0;
 
         if( AdditionHelper< std::int64_t, std::int64_t, AdditionState_CastInt64CheckOverflow >::Addition( (std::int64_t)lhs, (std::int64_t)rhs, tmp ) &&
-            tmp <= std::numeric_limits<T>::max() &&
-            tmp >= std::numeric_limits<T>::min() )
+            tmp <= safeint_internal::numeric_limits<T>::max() &&
+            tmp >= safeint_internal::numeric_limits<T>::min() )
         {
             result = (T)tmp;
             return true;
@@ -4168,8 +4248,8 @@ public:
 
         AdditionHelper< std::int64_t, std::int64_t, AdditionState_CastInt64CheckOverflow >::AdditionThrow< E >( (std::int64_t)lhs, (std::int64_t)rhs, tmp );
 
-        if( tmp <= std::numeric_limits<T>::max() &&
-            tmp >= std::numeric_limits<T>::min() )
+        if( tmp <= safeint_internal::numeric_limits<T>::max() &&
+            tmp >= safeint_internal::numeric_limits<T>::min() )
         {
             result = (T)tmp;
             return;
@@ -4517,7 +4597,7 @@ public:
         // rhs is unsigned - check only minimum
         std::int32_t tmp = lhs - rhs;
 
-        if( tmp >= (std::int32_t)std::numeric_limits<T>::min() )
+        if( tmp >= (std::int32_t)safeint_internal::numeric_limits<T>::min() )
         {
             result = (T)tmp;
             return true;
@@ -4533,7 +4613,7 @@ public:
         // rhs is unsigned - check only minimum
         std::int32_t tmp = lhs - rhs;
 
-        if( tmp >= (std::int32_t)std::numeric_limits<T>::min() )
+        if( tmp >= (std::int32_t)safeint_internal::numeric_limits<T>::min() )
         {
             result = (T)tmp;
             return;
@@ -4598,7 +4678,7 @@ public:
         // rhs is unsigned - check only minimum
         std::int64_t tmp = (std::int64_t)lhs - (std::int64_t)rhs;
 
-        if( tmp >= (std::int64_t)std::numeric_limits<T>::min() )
+        if( tmp >= (std::int64_t)safeint_internal::numeric_limits<T>::min() )
         {
             result = (T)tmp;
             return true;
@@ -4614,7 +4694,7 @@ public:
         // rhs is unsigned - check only minimum
         std::int64_t tmp = (std::int64_t)lhs - (std::int64_t)rhs;
 
-        if( tmp >= (std::int64_t)std::numeric_limits<T>::min() )
+        if( tmp >= (std::int64_t)safeint_internal::numeric_limits<T>::min() )
         {
             result = (T)tmp;
             return;
@@ -4693,7 +4773,7 @@ public:
             tmp = lhs + (std::uint64_t)AbsValueHelper< T, GetAbsMethod< T >::method >::Abs( rhs );
 
             // must check for addition overflow and max
-            if( tmp >= lhs && tmp <= std::numeric_limits<T>::max() )
+            if( tmp >= lhs && tmp <= safeint_internal::numeric_limits<T>::max() )
             {
                 result = (T)tmp;
                 return true;
@@ -4712,7 +4792,7 @@ public:
             // result is positive
             std::uint64_t tmp = (std::uint64_t)lhs - (std::uint64_t)rhs;
 
-            if( tmp <= std::numeric_limits<T>::max() )
+            if( tmp <= safeint_internal::numeric_limits<T>::max() )
             {
                 result = (T)tmp;
                 return true;
@@ -4734,7 +4814,7 @@ public:
             tmp = lhs + (std::uint64_t)AbsValueHelper< T, GetAbsMethod< T >::method >::Abs( rhs );
 
             // must check for addition overflow and max
-            if( tmp >= lhs && tmp <= (std::uint64_t)std::numeric_limits<T>::max() )
+            if( tmp >= lhs && tmp <= (std::uint64_t)safeint_internal::numeric_limits<T>::max() )
             {
                 result = (T)tmp;
                 return;
@@ -4753,7 +4833,7 @@ public:
             // result is positive
             std::uint64_t tmp = (std::uint64_t)lhs - (std::uint64_t)rhs;
 
-            if( tmp <= (std::uint64_t)std::numeric_limits<T>::max() )
+            if( tmp <= (std::uint64_t)safeint_internal::numeric_limits<T>::max() )
             {
                 result = (T)tmp;
                 return;
@@ -4787,7 +4867,7 @@ public:
             std::uint64_t tmp = lhs + ~(std::uint64_t)( rhs ) + 1; // negation safe
 
             // but we could exceed MaxInt
-            if(tmp <= std::numeric_limits<T>::max())
+            if(tmp <= safeint_internal::numeric_limits<T>::max())
             {
                 result = (T)tmp;
                 return true;
@@ -4818,7 +4898,7 @@ public:
             std::uint64_t tmp = lhs + ~(std::uint64_t)( rhs ) + 1; // negation safe
 
             // but we could exceed MaxInt
-            if(tmp <= std::numeric_limits<T>::max())
+            if(tmp <= safeint_internal::numeric_limits<T>::max())
             {
                 result = (T)tmp;
                 return;
@@ -4847,7 +4927,7 @@ public:
             // which cannot overflow internally
             std::uint64_t tmp = (std::uint64_t)lhs + (std::uint64_t)( -rhs );
 
-            if( tmp <= (std::uint64_t)std::numeric_limits<T>::max() )
+            if( tmp <= (std::uint64_t)safeint_internal::numeric_limits<T>::max() )
             {
                 result = (T)tmp;
                 return true;
@@ -4873,7 +4953,7 @@ public:
             // which cannot overflow internally
             std::uint64_t tmp = (std::uint64_t)lhs + (std::uint64_t)( -rhs );
 
-            if( tmp <= (std::uint64_t)std::numeric_limits<T>::max() )
+            if( tmp <= (std::uint64_t)safeint_internal::numeric_limits<T>::max() )
             {
                 result = (T)tmp;
                 return;
@@ -4945,12 +5025,12 @@ template < typename T, typename U> class subtract_corner_case_max < T, U, true>
 public:
     _CONSTEXPR14 static bool isOverflowPositive(const T& rhs, const U& lhs, std::int64_t tmp)
     {
-        return (tmp > std::numeric_limits<T>::max() || (rhs < 0 && tmp < lhs));
+        return (tmp > safeint_internal::numeric_limits<T>::max() || (rhs < 0 && tmp < lhs));
     }
 
     _CONSTEXPR14 static bool isOverflowNegative(const T& rhs, const U& lhs, std::int64_t tmp)
     {
-         return (tmp < std::numeric_limits<T>::min() || (rhs >= 0 && tmp > lhs));
+         return (tmp < safeint_internal::numeric_limits<T>::min() || (rhs >= 0 && tmp > lhs));
     }
 };
 
@@ -5060,7 +5140,7 @@ public:
             // first case
             if( rhs >= 0 )
             {
-                if( tmp >= std::numeric_limits<T>::min() )
+                if( tmp >= safeint_internal::numeric_limits<T>::min() )
                 {
                     result = (T)tmp;
                     return true;
@@ -5069,7 +5149,7 @@ public:
             else
             {
                 // second case
-                if( tmp >= lhs && tmp <= std::numeric_limits<T>::max() )
+                if( tmp >= lhs && tmp <= safeint_internal::numeric_limits<T>::max() )
                 {
                     result = (T)tmp;
                     return true;
@@ -5082,7 +5162,7 @@ public:
             // third case
             if( rhs >= 0 )
             {
-                if( tmp <= lhs && tmp >= std::numeric_limits<T>::min() )
+                if( tmp <= lhs && tmp >= safeint_internal::numeric_limits<T>::min() )
                 {
                     result = (T)tmp;
                     return true;
@@ -5091,7 +5171,7 @@ public:
             else
             {
                 // fourth case
-                if( tmp <= std::numeric_limits<T>::max() )
+                if( tmp <= safeint_internal::numeric_limits<T>::max() )
                 {
                     result = (T)tmp;
                     return true;
@@ -5120,7 +5200,7 @@ public:
             // first case
             if( rhs >= 0 )
             {
-                if( tmp >= std::numeric_limits<T>::min() )
+                if( tmp >= safeint_internal::numeric_limits<T>::min() )
                 {
                     result = (T)tmp;
                     return;
@@ -5129,7 +5209,7 @@ public:
             else
             {
                 // second case
-                if( tmp >= lhs && tmp <= std::numeric_limits<T>::max() )
+                if( tmp >= lhs && tmp <= safeint_internal::numeric_limits<T>::max() )
                 {
                     result = (T)tmp;
                     return;
@@ -5142,7 +5222,7 @@ public:
             // third case
             if( rhs >= 0 )
             {
-                if( tmp <= lhs && tmp >= std::numeric_limits<T>::min() )
+                if( tmp <= lhs && tmp >= safeint_internal::numeric_limits<T>::min() )
                 {
                     result = (T)tmp;
                     return;
@@ -5151,7 +5231,7 @@ public:
             else
             {
                 // fourth case
-                if( tmp <= std::numeric_limits<T>::max() )
+                if( tmp <= safeint_internal::numeric_limits<T>::max() )
                 {
                     result = (T)tmp;
                     return;
@@ -5243,7 +5323,7 @@ public:
         // Do this as unsigned to prevent unwanted optimizations
         std::uint64_t tmp = (std::uint64_t)lhs - (std::uint64_t)rhs;
 
-        if( (std::int64_t)tmp <= std::numeric_limits<T>::max() && (std::int64_t)tmp >= std::numeric_limits<T>::min() )
+        if( (std::int64_t)tmp <= safeint_internal::numeric_limits<T>::max() && (std::int64_t)tmp >= safeint_internal::numeric_limits<T>::min() )
         {
             result = (T)(std::int64_t)tmp;
             return true;
@@ -5258,7 +5338,7 @@ public:
         // Do this as unsigned to prevent unwanted optimizations
         std::uint64_t tmp = (std::uint64_t)lhs - (std::uint64_t)rhs;
 
-        if( (std::int64_t)tmp <= std::numeric_limits<T>::max() && (std::int64_t)tmp >= std::numeric_limits<T>::min() )
+        if( (std::int64_t)tmp <= safeint_internal::numeric_limits<T>::max() && (std::int64_t)tmp >= safeint_internal::numeric_limits<T>::min() )
         {
             result = (T)(std::int64_t)tmp;
             return;
@@ -5276,9 +5356,9 @@ public:
         // lhs is any signed int, rhs unsigned int64
         // check against available range
 
-        // We need the absolute value of std::numeric_limits<T>::min()
+        // We need the absolute value of safeint_internal::numeric_limits<T>::min()
         // This will give it to us without extraneous compiler warnings
-        const std::uint64_t AbsMinIntT = (std::uint64_t)std::numeric_limits<T>::max() + 1;
+        const std::uint64_t AbsMinIntT = (std::uint64_t)safeint_internal::numeric_limits<T>::max() + 1;
 
         if( lhs < 0 )
         {
@@ -5306,9 +5386,9 @@ public:
         // lhs is any signed int, rhs unsigned int64
         // check against available range
 
-        // We need the absolute value of std::numeric_limits<T>::min()
+        // We need the absolute value of safeint_internal::numeric_limits<T>::min()
         // This will give it to us without extraneous compiler warnings
-        const std::uint64_t AbsMinIntT = (std::uint64_t)std::numeric_limits<T>::max() + 1;
+        const std::uint64_t AbsMinIntT = (std::uint64_t)safeint_internal::numeric_limits<T>::max() + 1;
 
         if( lhs < 0 )
         {
@@ -5449,7 +5529,7 @@ public:
         // Then binary operations won't produce unexpected results
         method = ( sizeof( T ) <= sizeof( U ) ||
                  safeint_internal::type_compare< T, U >::isBothUnsigned ||
-                 !std::numeric_limits< U >::is_signed )          ? BinaryState_OK :
+                 !safeint_internal::numeric_limits< U >::is_signed )          ? BinaryState_OK :
                  safeint_internal::int_traits< U >::isInt8               ? BinaryState_Int8 :
                  safeint_internal::int_traits< U >::isInt16              ? BinaryState_Int16
                                                       : BinaryState_Int32
@@ -5665,7 +5745,7 @@ _CONSTEXPR11 inline bool SafeSubtract( T t, U u, T& result ) SAFEINT_NOTHROW
 template < typename T >
 _CONSTEXPR11 inline bool SafeNegation(T t, T& result) SAFEINT_NOTHROW
 {
-    return NegationHelper< T, std::numeric_limits<T>::is_signed>::Negative(t, result);
+    return NegationHelper< T, safeint_internal::numeric_limits<T>::is_signed>::Negative(t, result);
 }
 
 /*****************  end external functions ************************************/
@@ -5922,13 +6002,13 @@ public:
     {
         // Note - unsigned still performs the bitwise manipulation
         // will warn at level 2 or higher if the value is 32-bit or larger
-        return SafeInt<T, E>(NegationHelper<T, std::numeric_limits< T >::is_signed>::template NegativeThrow<E>(m_int));
+        return SafeInt<T, E>(NegationHelper<T, safeint_internal::numeric_limits< T >::is_signed>::template NegativeThrow<E>(m_int));
     }
 
     // prefix increment operator
     _CONSTEXPR14 SafeInt< T, E >& operator ++() SAFEINT_CPP_THROW
     {
-        if( m_int != std::numeric_limits<T>::max() )
+        if( m_int != safeint_internal::numeric_limits<T>::max() )
         {
             ++m_int;
             return *this;
@@ -5939,7 +6019,7 @@ public:
     // prefix decrement operator
     _CONSTEXPR14 SafeInt< T, E >& operator --() SAFEINT_CPP_THROW
     {
-        if( m_int != std::numeric_limits<T>::min() )
+        if( m_int != safeint_internal::numeric_limits<T>::min() )
         {
             --m_int;
             return *this;
@@ -5953,7 +6033,7 @@ public:
     // postfix increment operator
     _CONSTEXPR14 SafeInt< T, E > operator ++( int )  SAFEINT_CPP_THROW // dummy arg to comply with spec
     {
-        if( m_int != std::numeric_limits<T>::max() )
+        if( m_int != safeint_internal::numeric_limits<T>::max() )
         {
             SafeInt< T, E > tmp( m_int );
 
@@ -5966,7 +6046,7 @@ public:
     // postfix decrement operator
     _CONSTEXPR14 SafeInt< T, E > operator --( int ) SAFEINT_CPP_THROW // dummy arg to comply with spec
     {
-        if( m_int != std::numeric_limits<T>::min() )
+        if( m_int != safeint_internal::numeric_limits<T>::min() )
         {
             SafeInt< T, E > tmp( m_int );
             m_int--;
@@ -6214,7 +6294,7 @@ public:
     template < typename U >
     _CONSTEXPR14 SafeInt< T, E > operator <<( U bits ) const SAFEINT_NOTHROW
     {
-        ShiftAssert( !std::numeric_limits< U >::is_signed || bits >= 0 );
+        ShiftAssert( !safeint_internal::numeric_limits< U >::is_signed || bits >= 0 );
         ShiftAssert( bits < (int)safeint_internal::int_traits< T >::bitCount );
 
         return SafeInt< T, E >( (T)( m_int << bits ) );
@@ -6223,7 +6303,7 @@ public:
     template < typename U >
     _CONSTEXPR14 SafeInt< T, E > operator <<( SafeInt< U, E > bits ) const SAFEINT_NOTHROW
     {
-        ShiftAssert( !std::numeric_limits< U >::is_signed || (U)bits >= 0 );
+        ShiftAssert( !safeint_internal::numeric_limits< U >::is_signed || (U)bits >= 0 );
         ShiftAssert( (U)bits < (int)safeint_internal::int_traits< T >::bitCount );
 
         return SafeInt< T, E >( (T)( m_int << (U)bits ) );
@@ -6234,7 +6314,7 @@ public:
     template < typename U >
     _CONSTEXPR14 SafeInt< T, E >& operator <<=( U bits ) SAFEINT_NOTHROW
     {
-        ShiftAssert( !std::numeric_limits< U >::is_signed || bits >= 0 );
+        ShiftAssert( !safeint_internal::numeric_limits< U >::is_signed || bits >= 0 );
         ShiftAssert( bits < (int)safeint_internal::int_traits< T >::bitCount );
 
         m_int <<= bits;
@@ -6244,7 +6324,7 @@ public:
     template < typename U >
     _CONSTEXPR14 SafeInt< T, E >& operator <<=( SafeInt< U, E > bits ) SAFEINT_NOTHROW
     {
-        ShiftAssert( !std::numeric_limits< U >::is_signed || (U)bits >= 0 );
+        ShiftAssert( !safeint_internal::numeric_limits< U >::is_signed || (U)bits >= 0 );
         ShiftAssert( (U)bits < (int)safeint_internal::int_traits< T >::bitCount );
 
         m_int <<= (U)bits;
@@ -6255,7 +6335,7 @@ public:
     template < typename U >
     _CONSTEXPR14 SafeInt< T, E > operator >>( U bits ) const SAFEINT_NOTHROW
     {
-        ShiftAssert( !std::numeric_limits< U >::is_signed || bits >= 0 );
+        ShiftAssert( !safeint_internal::numeric_limits< U >::is_signed || bits >= 0 );
         ShiftAssert( bits < (int)safeint_internal::int_traits< T >::bitCount );
 
         return SafeInt< T, E >( (T)( m_int >> bits ) );
@@ -6264,7 +6344,7 @@ public:
     template < typename U >
     _CONSTEXPR14 SafeInt< T, E > operator >>( SafeInt< U, E > bits ) const SAFEINT_NOTHROW
     {
-        ShiftAssert( !std::numeric_limits< U >::is_signed || (U)bits >= 0 );
+        ShiftAssert( !safeint_internal::numeric_limits< U >::is_signed || (U)bits >= 0 );
         ShiftAssert( (U)bits < (int)safeint_internal::int_traits< T >::bitCount );
 
         return SafeInt< T, E >( (T)(m_int >> (U)bits) );
@@ -6274,7 +6354,7 @@ public:
     template < typename U >
     _CONSTEXPR14 SafeInt< T, E >& operator >>=( U bits ) SAFEINT_NOTHROW
     {
-        ShiftAssert( !std::numeric_limits< U >::is_signed || bits >= 0 );
+        ShiftAssert( !safeint_internal::numeric_limits< U >::is_signed || bits >= 0 );
         ShiftAssert( bits < (int)safeint_internal::int_traits< T >::bitCount );
 
         m_int >>= bits;
@@ -6284,7 +6364,7 @@ public:
     template < typename U >
     _CONSTEXPR14 SafeInt< T, E >& operator >>=( SafeInt< U, E > bits ) SAFEINT_NOTHROW
     {
-        ShiftAssert( !std::numeric_limits< U >::is_signed || (U)bits >= 0 );
+        ShiftAssert( !safeint_internal::numeric_limits< U >::is_signed || (U)bits >= 0 );
         ShiftAssert( (U)bits < (int)safeint_internal::int_traits< T >::bitCount );
 
         m_int >>= (U)bits;
@@ -6411,13 +6491,13 @@ public:
     }
 
     // Miscellaneous helper functions
-    SafeInt< T, E > Min( SafeInt< T, E > test, const T floor = std::numeric_limits<T>::min() ) const SAFEINT_NOTHROW
+    SafeInt< T, E > Min( SafeInt< T, E > test, const T floor = safeint_internal::numeric_limits<T>::min() ) const SAFEINT_NOTHROW
     {
         T tmp = test < m_int ? (T)test : m_int;
         return tmp < floor ? floor : tmp;
     }
 
-    SafeInt< T, E > Max( SafeInt< T, E > test, const T upper = std::numeric_limits<T>::max() ) const SAFEINT_NOTHROW
+    SafeInt< T, E > Max( SafeInt< T, E > test, const T upper = safeint_internal::numeric_limits<T>::max() ) const SAFEINT_NOTHROW
     {
         T tmp = test > m_int ? (T)test : m_int;
         return tmp > upper ? upper : tmp;
@@ -6464,9 +6544,9 @@ public:
         // or signed numbers on bitCount-1 (e.g., 7 bits = 128, signed char max = 127).
         // Also makes no sense to try to align on negative or no bits.
 
-        ShiftAssert( ( ( std::numeric_limits< T >::is_signed && bits < (int)safeint_internal::int_traits< T >::bitCount - 1 )
-                    || ( !std::numeric_limits< T >::is_signed && bits < (int)safeint_internal::int_traits< T >::bitCount ) ) &&
-                    bits >= 0 && ( !std::numeric_limits< T >::is_signed || m_int > 0 ) );
+        ShiftAssert( ( ( safeint_internal::numeric_limits< T >::is_signed && bits < (int)safeint_internal::int_traits< T >::bitCount - 1 )
+                    || ( !safeint_internal::numeric_limits< T >::is_signed && bits < (int)safeint_internal::int_traits< T >::bitCount ) ) &&
+                    bits >= 0 && ( !safeint_internal::numeric_limits< T >::is_signed || m_int > 0 ) );
 
         const T AlignValue = ( (T)1 << bits ) - 1;
 
@@ -6722,7 +6802,7 @@ public:
     {
         if( rhs != 0 )
         {
-            if( ModulusSignedCaseHelper< T, E, std::numeric_limits< T >::is_signed >::SignedCase( rhs, result ) )
+            if( ModulusSignedCaseHelper< T, E, safeint_internal::numeric_limits< T >::is_signed >::SignedCase( rhs, result ) )
             return true;
 
             result = (T)( lhs % (T)rhs );
@@ -6755,7 +6835,7 @@ _CONSTEXPR14 SafeInt< T, E > operator %( U lhs, SafeInt< T, E > rhs ) SAFEINT_CP
     // same size and same sign
     SafeInt< T, E > result;
 
-    if( ModulusSimpleCaseHelper< T, U, E, (sizeof(T) == sizeof(U)) && ((bool)std::numeric_limits< T >::is_signed == (bool)std::numeric_limits< U >::is_signed) >::ModulusSimpleCase( lhs, rhs, result ) )
+    if( ModulusSimpleCaseHelper< T, U, E, (sizeof(T) == sizeof(U)) && ((bool)safeint_internal::numeric_limits< T >::is_signed == (bool)safeint_internal::numeric_limits< U >::is_signed) >::ModulusSimpleCase( lhs, rhs, result ) )
         return result;
 
     result = (SafeInt< U, E >(lhs) % (T)rhs);
@@ -6798,17 +6878,17 @@ public:
         // any operator casts now do the right thing
         U tmp = division_negative_negateU< T, U, sizeof(T) == 4>::div(rhs, lhs);
 
-        if( tmp <= (U)std::numeric_limits<T>::max() )
+        if( tmp <= (U)safeint_internal::numeric_limits<T>::max() )
         {
             result = SafeInt< T, E >( (T)(~(std::uint64_t)tmp + 1) );
             return true;
         }
 
         // Corner case
-        T maxT = std::numeric_limits<T>::max();
+        T maxT = safeint_internal::numeric_limits<T>::max();
         if( tmp == (U)maxT + 1 )
         {
-            T minT = std::numeric_limits<T>::min();
+            T minT = safeint_internal::numeric_limits<T>::min();
             result = SafeInt< T, E >( minT );
             return true;
         }
@@ -6871,7 +6951,7 @@ template < typename T, typename U > class div_negate_min < T, U , true >
 public:
     _CONSTEXPR14 static bool Value(T& ret)
     {
-        ret = (T)(-(T)std::numeric_limits< U >::min());
+        ret = (T)(-(T)safeint_internal::numeric_limits< U >::min());
         return true;
     }
 };
@@ -6890,7 +6970,7 @@ template < typename T, typename U, typename E > class DivisionCornerCaseHelper2 
 public:
     _CONSTEXPR14 static bool DivisionCornerCase2( U lhs, SafeInt< T, E > rhs, SafeInt<T, E>& result ) SAFEINT_CPP_THROW
     {
-        if( lhs == std::numeric_limits< U >::min() && (T)rhs == -1 )
+        if( lhs == safeint_internal::numeric_limits< U >::min() && (T)rhs == -1 )
         {
             // corner case of a corner case - lhs = min int, rhs = -1,
             // but rhs is the return type, so in essence, we can return -lhs
@@ -7138,7 +7218,7 @@ _CONSTEXPR14 T*& operator >>=( T*& lhs, SafeInt< U, E > ) SAFEINT_NOTHROW
 template < typename T, typename U, typename E >
 _CONSTEXPR14 SafeInt< U, E > operator <<( U lhs, SafeInt< T, E > bits ) SAFEINT_NOTHROW
 {
-    ShiftAssert( !std::numeric_limits< T >::is_signed || (T)bits >= 0 );
+    ShiftAssert( !safeint_internal::numeric_limits< T >::is_signed || (T)bits >= 0 );
     ShiftAssert( (T)bits < (int)safeint_internal::int_traits< U >::bitCount );
 
     return SafeInt< U, E >( (U)( lhs << (T)bits ) );
@@ -7148,7 +7228,7 @@ _CONSTEXPR14 SafeInt< U, E > operator <<( U lhs, SafeInt< T, E > bits ) SAFEINT_
 template < typename T, typename U, typename E >
 _CONSTEXPR14 SafeInt< U, E > operator >>( U lhs, SafeInt< T, E > bits ) SAFEINT_NOTHROW
 {
-    ShiftAssert( !std::numeric_limits< T >::is_signed || (T)bits >= 0 );
+    ShiftAssert( !safeint_internal::numeric_limits< T >::is_signed || (T)bits >= 0 );
     ShiftAssert( (T)bits < (int)safeint_internal::int_traits< U >::bitCount );
 
     return SafeInt< U, E >( (U)( lhs >> (T)bits ) );
