@@ -1952,7 +1952,7 @@ template < typename T, typename U > class LargeIntRegMultiply;
 
 #if SAFEINT_USE_INTRINSICS
 // As usual, unsigned is easy
-inline bool IntrinsicMultiplyUint64( const std::uint64_t& a, const std::uint64_t& b, std::uint64_t* pRet ) SAFEINT_NOTHROW
+inline bool IntrinsicMultiplyUint64( std::uint64_t a, std::uint64_t b, std::uint64_t* pRet ) SAFEINT_NOTHROW
 {
     std::uint64_t ulHigh = 0;
     *pRet = _umul128(a , b, &ulHigh);
@@ -1960,7 +1960,7 @@ inline bool IntrinsicMultiplyUint64( const std::uint64_t& a, const std::uint64_t
 }
 
 // Signed, is not so easy
-inline bool IntrinsicMultiplyInt64( const std::int64_t& a, const std::int64_t& b, std::int64_t* pRet ) SAFEINT_NOTHROW
+inline bool IntrinsicMultiplyInt64( std::int64_t a, std::int64_t b, std::int64_t* pRet ) SAFEINT_NOTHROW
 {
     std::int64_t llHigh = 0;
     *pRet = _mul128(a , b, &llHigh);
