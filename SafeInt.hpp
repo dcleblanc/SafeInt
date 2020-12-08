@@ -161,7 +161,7 @@ Please read the leading comments before using the class.
 #define SAFEINT_NOTHROW noexcept
 #endif
 
-#include <cstdint>
+#include <stdint.h>
 #include <limits>
 #include <type_traits> // This is now required
 // Need this for ptrdiff_t on some compilers
@@ -375,7 +375,7 @@ SAFEINT_DISABLE_ADDRESS_OPERATOR   - Disables the overload of the & operator, wh
 *  of debug builds.
 *
 *  3.0 update - not only have we maintained the specialization, there were some cases that were overly complex,
-*  and using some additional cases (e.g. std::int64_t and std::uint64_t) resulted in some simplification.
+*  and using some additional cases (e.g. int64_t and uint64_t) resulted in some simplification.
 *  Additionally, there was a lot of work done to better optimize the 64-bit multiplication.
 *
 *  Binary Operators
@@ -458,10 +458,10 @@ SAFEINT_DISABLE_ADDRESS_OPERATOR   - Disables the overload of the & operator, wh
 *
 *  The problem here is that c gets cast to an int, now has a value of 0xffffffff, and then gets
 *  cast again to an unsigned int, losing the true value. This behavior is despite the fact that
-*  an std::int64_t exists, and the following code will yield a different (and intuitively correct)
+*  an int64_t exists, and the following code will yield a different (and intuitively correct)
 *  answer:
 *
-*  if((std::int64_t)c == (std::int64_t)l))
+*  if((int64_t)c == (int64_t)l))
 *    printf("Why is -1 equal to 4 billion???\n");
 *  else
 *    printf("Why doesn't the compiler upcast to 64-bits when needed?\n");
@@ -478,7 +478,7 @@ SAFEINT_DISABLE_ADDRESS_OPERATOR   - Disables the overload of the & operator, wh
 *  Dec 28, 2003 - 1.0
 *                 added support for mixed-type operations
 *                 thanks to vikramh
-*                 also fixed broken std::int64_t multiplication section
+*                 also fixed broken int64_t multiplication section
 *                 added extended support for mixed-type operations where possible
 *  Jan 28, 2004 - 1.0.1
 *                 changed WCHAR to wchar_t
@@ -489,7 +489,7 @@ SAFEINT_DISABLE_ADDRESS_OPERATOR   - Disables the overload of the & operator, wh
 *                 Thanks to Niels Dekker for the input
 *  Feb 12, 2004 - 1.0.2
 *                 Minor changes to remove dependency on Windows headers
-*                 Consistently used std::int16_t, std::int32_t and std::int64_t to ensure
+*                 Consistently used int16_t, int32_t and int64_t to ensure
 *                 portability
 *  May 10, 2004 - 1.0.3
 *                 Corrected bug in one case of GreaterThan
@@ -505,14 +505,14 @@ SAFEINT_DISABLE_ADDRESS_OPERATOR   - Disables the overload of the & operator, wh
 *                 Added support for SEH exceptions instead of C++ exceptions - Win32 only
 *                 Made handlers for DIV0 and overflows individually overridable
 *                 Commented out the destructor - major perf gains here
-*                 Added cast operator for type long, since long != std::int32_t
+*                 Added cast operator for type long, since long != int32_t
 *                  Corrected a couple of missing const modifiers
 *                 Fixed broken >= and <= operators for type U op SafeInt< T, E >
 *  Nov 5, 2004 - 1.0.6
 *                 Implemented new logic in binary operators to resolve issues with
 *                 implicit casts
 *                 Fixed casting operator because char != signed char
-*                 Defined std::int32_t as int instead of long
+*                 Defined int32_t as int instead of long
 *                 Removed unsafe SafeInt::Value method
 *                 Re-implemented casting operator as a result of removing Value method
 *  Dec 1, 2004 - 1.0.7
@@ -531,25 +531,28 @@ SAFEINT_DISABLE_ADDRESS_OPERATOR   - Disables the overload of the & operator, wh
 *                 for determining not just the issues, but also suggesting fixes.
 *                 Also updating some of the header internals to be the same as the upcoming Visual Studio version.
 *
-*  Jan 16, 2010   64-bit gcc has long == std::int64_t, which means that many of the existing 64-bit
+*  Jan 16, 2010   64-bit gcc has long == int64_t, which means that many of the existing 64-bit
 *                 templates are over-specialized. This forces a redefinition of all the 64-bit
 *                 multiplication routines to use pointers instead of references for return
 *                 values. Also, let's use some intrinsics for x64 Microsoft compiler to
 *                 reduce code size, and hopefully improve efficiency.
 *
 *  June 21, 2014  Better support for clang, higher warning levels supported for all 3 primary supported
-                  compilers (Visual Studio, clang, gcc).
-                  Also started to converge the code base such that the public CodePlex version will
-                  be a drop-in replacement for the Visual Studio version.
-
+*                 compilers (Visual Studio, clang, gcc).
+*                 Also started to converge the code base such that the public CodePlex version will
+*                 be a drop-in replacement for the Visual Studio version.
+*
 * Feb 12, 2018    Fixed floating point bug
 *                 Fix to allow initialization by an enum
 *                 Add support for static_assert, make it default to fix compiler warnings from C_ASSERT on gcc, clang
 *                 Changed throw() to noexcept
-
+*
 * March, 2018     Introduced support for constexpr, both the C++11 and C++14 flavors work. The C++14 standard
-                  allows for much more thorough usage, and should be preferred.
-
+*                 allows for much more thorough usage, and should be preferred.
+*
+* December, 2020  Replaced std::[u]int* with [u]int*, cstdint with stdint.h. This is believed
+*                 to be more portable, but there are other ways.
+*
 *  Note about code style - throughout this class, casts will be written using C-style (T),
 *  not C++ style static_cast< T >. This is because the class is nearly always dealing with integer
 *  types, and in this case static_cast and a C cast are equivalent. Given the large number of casts,
@@ -975,20 +978,20 @@ template < typename T, int > class AbsValueHelper;
 template < typename T > class AbsValueHelper < T, AbsMethodInt>
 {
 public:
-    _CONSTEXPR14 static std::uint32_t Abs( T t ) SAFEINT_NOTHROW
+    _CONSTEXPR14 static uint32_t Abs( T t ) SAFEINT_NOTHROW
     {
         SAFEINT_ASSERT( t < 0 );
-        return ~(std::uint32_t)t + 1;
+        return ~(uint32_t)t + 1;
     }
 };
 
 template < typename T > class AbsValueHelper < T, AbsMethodInt64 >
 {
 public:
-    _CONSTEXPR14 static std::uint64_t Abs( T t ) SAFEINT_NOTHROW
+    _CONSTEXPR14 static uint64_t Abs( T t ) SAFEINT_NOTHROW
     {
         SAFEINT_ASSERT( t < 0 );
-        return ~(std::uint64_t)t + 1;
+        return ~(uint64_t)t + 1;
     }
 };
 
@@ -1008,27 +1011,27 @@ public:
 template < typename T > class SignedNegation;
 
 template <>
-class SignedNegation <std::int32_t>
+class SignedNegation <int32_t>
 {
 public:
-    _CONSTEXPR11 static std::int32_t Value(std::uint64_t in) SAFEINT_NOTHROW
+    _CONSTEXPR11 static int32_t Value(uint64_t in) SAFEINT_NOTHROW
     {
-        return (std::int32_t)(~(std::uint32_t)in + 1);
+        return (int32_t)(~(uint32_t)in + 1);
     }
 
-    _CONSTEXPR11 static std::int32_t Value(std::uint32_t in) SAFEINT_NOTHROW
+    _CONSTEXPR11 static int32_t Value(uint32_t in) SAFEINT_NOTHROW
     {
-        return (std::int32_t)(~in + 1);
+        return (int32_t)(~in + 1);
     }
 };
 
 template <>
-class SignedNegation <std::int64_t>
+class SignedNegation <int64_t>
 {
 public:
-    _CONSTEXPR11 static std::int64_t Value(std::uint64_t in) SAFEINT_NOTHROW
+    _CONSTEXPR11 static int64_t Value(uint64_t in) SAFEINT_NOTHROW
     {
-        return (std::int64_t)(~in + 1);
+        return (int64_t)(~in + 1);
     }
 };
 
@@ -1085,7 +1088,7 @@ public:
         static_assert( sizeof(T) == 0, "Unsigned negation is unsupported" );
 #endif
         // This may not be the most efficient approach, but you shouldn't be doing this
-        return (T)SignedNegation<std::int64_t>::Value(t);
+        return (T)SignedNegation<int64_t>::Value(t);
     }
 
     _CONSTEXPR14 static bool Negative(T , T& /*out*/)
@@ -1202,10 +1205,10 @@ template <typename T> class float_cast_helper <T, true> // Unsigned case
 public:
     _CONSTEXPR14 static bool Test(double d)
     {
-        const std::uint64_t signifDouble = 0x1fffffffffffff;
+        const uint64_t signifDouble = 0x1fffffffffffff;
 
         // Anything larger than this either is larger than 2^64-1, or cannot be represented by a double
-        const std::uint64_t maxUnsignedDouble = signifDouble << 11;
+        const uint64_t maxUnsignedDouble = signifDouble << 11;
 
         // There is the possibility of both negative and positive zero,
         // but we'll allow either, since (-0.0 < 0) == false
@@ -1214,7 +1217,7 @@ public:
             return false;
 
         // The input can now safely be cast to an unsigned long long
-        if (static_cast<std::uint64_t>(d) > std::numeric_limits<T>::max())
+        if (static_cast<uint64_t>(d) > std::numeric_limits<T>::max())
             return false;
 
         return true;
@@ -1226,18 +1229,18 @@ template <typename T> class float_cast_helper <T, false> // Signed case
 public:
     _CONSTEXPR14 static bool Test(double d)
     {
-        const std::uint64_t signifDouble = 0x1fffffffffffff;
+        const uint64_t signifDouble = 0x1fffffffffffff;
         // This has to fit in 2^63-1
-        const std::uint64_t maxSignedDouble = signifDouble << 10;
+        const uint64_t maxSignedDouble = signifDouble << 10;
         // The smallest signed long long is easier
-        const std::int64_t minSignedDouble = static_cast<std::int64_t>(0x8000000000000000);
+        const int64_t minSignedDouble = static_cast<int64_t>(0x8000000000000000);
 
         if (d < static_cast<double>(minSignedDouble) || d > static_cast<double>(maxSignedDouble))
             return false;
 
         // And now cast to long long, and check against min and max for this type
-        std::int64_t test = static_cast<std::int64_t>(d);
-        if ((std::int64_t)test < (std::int64_t)std::numeric_limits<T>::min() || (std::int64_t)test >(std::int64_t)std::numeric_limits<T>::max())
+        int64_t test = static_cast<int64_t>(d);
+        if ((int64_t)test < (int64_t)std::numeric_limits<T>::min() || (int64_t)test >(int64_t)std::numeric_limits<T>::max())
             return false;
 
         return true;
@@ -1457,7 +1460,7 @@ enum ComparisonMethod
     // (unsigned int)a < b == false
     //
     // I do not think this makes sense - if you perform
-    // a cast to an std::int64_t, which can clearly preserve both value and signedness
+    // a cast to an int64_t, which can clearly preserve both value and signedness
     // then you get a different and intuitively correct answer
     // IMHO, -1 should be less than 4 billion
     // If you prefer to retain the ANSI standard behavior
@@ -1500,7 +1503,7 @@ public:
 template < typename T, typename U > class EqualityTest< T, U, ComparisonMethod_CastInt64 >
 {
 public:
-    _CONSTEXPR11 static bool IsEquals( const T t, const U u ) SAFEINT_NOTHROW { return ( (std::int64_t)t == (std::int64_t)u ); }
+    _CONSTEXPR11 static bool IsEquals( const T t, const U u ) SAFEINT_NOTHROW { return ( (int64_t)t == (int64_t)u ); }
 };
 
 template < typename T, typename U > class EqualityTest< T, U, ComparisonMethod_UnsignedT >
@@ -1548,7 +1551,7 @@ public:
 template < typename T, typename U > class GreaterThanTest< T, U, ComparisonMethod_CastInt64 >
 {
 public:
-    _CONSTEXPR11 static bool GreaterThan( const T t, const U u ) SAFEINT_NOTHROW { return ( (std::int64_t)t > (std::int64_t)u ); }
+    _CONSTEXPR11 static bool GreaterThan( const T t, const U u ) SAFEINT_NOTHROW { return ( (int64_t)t > (int64_t)u ); }
 };
 
 template < typename T, typename U > class GreaterThanTest< T, U, ComparisonMethod_UnsignedT >
@@ -1690,7 +1693,7 @@ public:
             return SafeIntError::SafeIntNoError;
         }
 
-        result = (T)((std::int64_t)t % (std::int64_t)u);
+        result = (T)((int64_t)t % (int64_t)u);
         return SafeIntError::SafeIntNoError;
     }
 
@@ -1706,11 +1709,11 @@ public:
             return;
         }
 
-        result = (T)((std::int64_t)t % (std::int64_t)u);
+        result = (T)((int64_t)t % (int64_t)u);
     }
 };
 
-// T is std::uint64_t, U is any signed int
+// T is uint64_t, U is any signed int
 template < typename T, typename U > class ModulusHelper< T, U, ComparisonMethod_UnsignedT>
 {
 public:
@@ -1743,7 +1746,7 @@ public:
     }
 };
 
-// U is std::uint64_t, T any signed int
+// U is uint64_t, T any signed int
 template < typename T, typename U > class ModulusHelper< T, U, ComparisonMethod_UnsignedU>
 {
 public:
@@ -1898,9 +1901,9 @@ public:
     //mixed signed or both signed where at least one argument is 32-bit, and both a 32-bit or less
     _CONSTEXPR14 static bool Multiply( const T& t, const U& u, T& ret ) SAFEINT_NOTHROW
     {
-        std::int64_t tmp = (std::int64_t)t * (std::int64_t)u;
+        int64_t tmp = (int64_t)t * (int64_t)u;
 
-        if(tmp > (std::int64_t)std::numeric_limits<T>::max() || tmp < (std::int64_t)std::numeric_limits<T>::min())
+        if(tmp > (int64_t)std::numeric_limits<T>::max() || tmp < (int64_t)std::numeric_limits<T>::min())
             return false;
 
         ret = (T)tmp;
@@ -1910,9 +1913,9 @@ public:
     template < typename E >
     _CONSTEXPR14 static void MultiplyThrow( const T& t, const U& u, T& ret ) SAFEINT_CPP_THROW
     {
-        std::int64_t tmp = (std::int64_t)t * (std::int64_t)u;
+        int64_t tmp = (int64_t)t * (int64_t)u;
 
-        if(tmp > (std::int64_t)std::numeric_limits<T>::max() || tmp < (std::int64_t)std::numeric_limits<T>::min())
+        if(tmp > (int64_t)std::numeric_limits<T>::max() || tmp < (int64_t)std::numeric_limits<T>::min())
             E::SafeIntOnOverflow();
 
         ret = (T)tmp;
@@ -1925,9 +1928,9 @@ public:
     //both unsigned where at least one argument is 32-bit, and both are 32-bit or less
     _CONSTEXPR14 static bool Multiply( const T& t, const U& u, T& ret ) SAFEINT_NOTHROW
     {
-        std::uint64_t tmp = (std::uint64_t)t * (std::uint64_t)u;
+        uint64_t tmp = (uint64_t)t * (uint64_t)u;
 
-        if(tmp > (std::uint64_t)std::numeric_limits<T>::max())
+        if(tmp > (uint64_t)std::numeric_limits<T>::max())
             return false;
 
         ret = (T)tmp;
@@ -1937,9 +1940,9 @@ public:
     template < typename E >
     _CONSTEXPR14 static void MultiplyThrow( const T& t, const U& u, T& ret ) SAFEINT_CPP_THROW
     {
-        std::uint64_t tmp = (std::uint64_t)t * (std::uint64_t)u;
+        uint64_t tmp = (uint64_t)t * (uint64_t)u;
 
-        if(tmp > (std::uint64_t)std::numeric_limits<T>::max())
+        if(tmp > (uint64_t)std::numeric_limits<T>::max())
             E::SafeIntOnOverflow();
 
         ret = (T)tmp;
@@ -1952,17 +1955,17 @@ template < typename T, typename U > class LargeIntRegMultiply;
 
 #if SAFEINT_USE_INTRINSICS
 // As usual, unsigned is easy
-inline bool IntrinsicMultiplyUint64( const std::uint64_t& a, const std::uint64_t& b, std::uint64_t* pRet ) SAFEINT_NOTHROW
+inline bool IntrinsicMultiplyUint64( const uint64_t& a, const uint64_t& b, uint64_t* pRet ) SAFEINT_NOTHROW
 {
-    std::uint64_t ulHigh = 0;
+    uint64_t ulHigh = 0;
     *pRet = _umul128(a , b, &ulHigh);
     return ulHigh == 0;
 }
 
 // Signed, is not so easy
-inline bool IntrinsicMultiplyInt64( const std::int64_t& a, const std::int64_t& b, std::int64_t* pRet ) SAFEINT_NOTHROW
+inline bool IntrinsicMultiplyInt64( const int64_t& a, const int64_t& b, int64_t* pRet ) SAFEINT_NOTHROW
 {
-    std::int64_t llHigh = 0;
+    int64_t llHigh = 0;
     *pRet = _mul128(a , b, &llHigh);
 
     // Now we need to figure out what we expect
@@ -1983,7 +1986,7 @@ inline bool IntrinsicMultiplyInt64( const std::int64_t& a, const std::int64_t& b
     {
         // Result should be positive
         // Check for overflow
-        if( llHigh == 0 && (std::uint64_t)*pRet <= (std::uint64_t)std::numeric_limits<std::int64_t>::max() )
+        if( llHigh == 0 && (uint64_t)*pRet <= (uint64_t)std::numeric_limits<int64_t>::max() )
             return true;
     }
     return false;
@@ -1991,25 +1994,25 @@ inline bool IntrinsicMultiplyInt64( const std::int64_t& a, const std::int64_t& b
 
 #endif
 
-template<> class LargeIntRegMultiply< std::uint64_t, std::uint64_t >
+template<> class LargeIntRegMultiply< uint64_t, uint64_t >
 {
 public:
-    _CONSTEXPR14_MULTIPLY static bool RegMultiply( const std::uint64_t& a, const std::uint64_t& b, std::uint64_t* pRet ) SAFEINT_NOTHROW
+    _CONSTEXPR14_MULTIPLY static bool RegMultiply( const uint64_t& a, const uint64_t& b, uint64_t* pRet ) SAFEINT_NOTHROW
     {
 #if SAFEINT_USE_INTRINSICS
         return IntrinsicMultiplyUint64( a, b, pRet );
 #else
-        std::uint32_t aHigh = 0, aLow = 0, bHigh = 0, bLow = 0;
+        uint32_t aHigh = 0, aLow = 0, bHigh = 0, bLow = 0;
 
         // Consider that a*b can be broken up into:
         // (aHigh * 2^32 + aLow) * (bHigh * 2^32 + bLow)
         // => (aHigh * bHigh * 2^64) + (aLow * bHigh * 2^32) + (aHigh * bLow * 2^32) + (aLow * bLow)
         // Note - same approach applies for 128 bit math on a 64-bit system
 
-        aHigh = (std::uint32_t)(a >> 32);
-        aLow  = (std::uint32_t)a;
-        bHigh = (std::uint32_t)(b >> 32);
-        bLow  = (std::uint32_t)b;
+        aHigh = (uint32_t)(a >> 32);
+        aLow  = (uint32_t)a;
+        bHigh = (uint32_t)(b >> 32);
+        bLow  = (uint32_t)b;
 
         *pRet = 0;
 
@@ -2017,14 +2020,14 @@ public:
         {
             if(bHigh != 0)
             {
-                *pRet = (std::uint64_t)aLow * (std::uint64_t)bHigh;
+                *pRet = (uint64_t)aLow * (uint64_t)bHigh;
             }
         }
         else if(bHigh == 0)
         {
             if(aHigh != 0)
             {
-                *pRet = (std::uint64_t)aHigh * (std::uint64_t)bLow;
+                *pRet = (uint64_t)aHigh * (uint64_t)bLow;
             }
         }
         else
@@ -2034,13 +2037,13 @@ public:
 
         if(*pRet != 0)
         {
-            std::uint64_t tmp = 0;
+            uint64_t tmp = 0;
 
-            if((std::uint32_t)(*pRet >> 32) != 0)
+            if((uint32_t)(*pRet >> 32) != 0)
                 return false;
 
             *pRet <<= 32;
-            tmp = (std::uint64_t)aLow * (std::uint64_t)bLow;
+            tmp = (uint64_t)aLow * (uint64_t)bLow;
             *pRet += tmp;
 
             if(*pRet < tmp)
@@ -2049,29 +2052,29 @@ public:
             return true;
         }
 
-        *pRet = (std::uint64_t)aLow * (std::uint64_t)bLow;
+        *pRet = (uint64_t)aLow * (uint64_t)bLow;
         return true;
 #endif
     }
 
     template < typename E >
-    _CONSTEXPR14_MULTIPLY static void RegMultiplyThrow( const std::uint64_t& a, const std::uint64_t& b, std::uint64_t* pRet ) SAFEINT_CPP_THROW
+    _CONSTEXPR14_MULTIPLY static void RegMultiplyThrow( const uint64_t& a, const uint64_t& b, uint64_t* pRet ) SAFEINT_CPP_THROW
     {
 #if SAFEINT_USE_INTRINSICS
         if( !IntrinsicMultiplyUint64( a, b, pRet ) )
             E::SafeIntOnOverflow();
 #else
-        std::uint32_t aHigh = 0, aLow = 0, bHigh = 0, bLow = 0;
+        uint32_t aHigh = 0, aLow = 0, bHigh = 0, bLow = 0;
 
         // Consider that a*b can be broken up into:
         // (aHigh * 2^32 + aLow) * (bHigh * 2^32 + bLow)
         // => (aHigh * bHigh * 2^64) + (aLow * bHigh * 2^32) + (aHigh * bLow * 2^32) + (aLow * bLow)
         // Note - same approach applies for 128 bit math on a 64-bit system
 
-        aHigh = (std::uint32_t)(a >> 32);
-        aLow  = (std::uint32_t)a;
-        bHigh = (std::uint32_t)(b >> 32);
-        bLow  = (std::uint32_t)b;
+        aHigh = (uint32_t)(a >> 32);
+        aLow  = (uint32_t)a;
+        bHigh = (uint32_t)(b >> 32);
+        bLow  = (uint32_t)b;
 
         *pRet = 0;
 
@@ -2079,14 +2082,14 @@ public:
         {
             if(bHigh != 0)
             {
-                *pRet = (std::uint64_t)aLow * (std::uint64_t)bHigh;
+                *pRet = (uint64_t)aLow * (uint64_t)bHigh;
             }
         }
         else if(bHigh == 0)
         {
             if(aHigh != 0)
             {
-                *pRet = (std::uint64_t)aHigh * (std::uint64_t)bLow;
+                *pRet = (uint64_t)aHigh * (uint64_t)bLow;
             }
         }
         else
@@ -2096,13 +2099,13 @@ public:
 
         if(*pRet != 0)
         {
-            std::uint64_t tmp = 0;
+            uint64_t tmp = 0;
 
-            if((std::uint32_t)(*pRet >> 32) != 0)
+            if((uint32_t)(*pRet >> 32) != 0)
                 E::SafeIntOnOverflow();
 
             *pRet <<= 32;
-            tmp = (std::uint64_t)aLow * (std::uint64_t)bLow;
+            tmp = (uint64_t)aLow * (uint64_t)bLow;
             *pRet += tmp;
 
             if(*pRet < tmp)
@@ -2111,41 +2114,41 @@ public:
             return;
         }
 
-        *pRet = (std::uint64_t)aLow * (std::uint64_t)bLow;
+        *pRet = (uint64_t)aLow * (uint64_t)bLow;
 #endif
     }
 };
 
-template<> class LargeIntRegMultiply< std::uint64_t, std::uint32_t >
+template<> class LargeIntRegMultiply< uint64_t, uint32_t >
 {
 public:
-    _CONSTEXPR14_MULTIPLY static bool RegMultiply( const std::uint64_t& a, std::uint32_t b, std::uint64_t* pRet ) SAFEINT_NOTHROW
+    _CONSTEXPR14_MULTIPLY static bool RegMultiply( const uint64_t& a, uint32_t b, uint64_t* pRet ) SAFEINT_NOTHROW
     {
 #if SAFEINT_USE_INTRINSICS
-        return IntrinsicMultiplyUint64( a, (std::uint64_t)b, pRet );
+        return IntrinsicMultiplyUint64( a, (uint64_t)b, pRet );
 #else
-        std::uint32_t aHigh = 0, aLow = 0;
+        uint32_t aHigh = 0, aLow = 0;
 
         // Consider that a*b can be broken up into:
         // (aHigh * 2^32 + aLow) * b
         // => (aHigh * b * 2^32) + (aLow * b)
 
-        aHigh = (std::uint32_t)(a >> 32);
-        aLow  = (std::uint32_t)a;
+        aHigh = (uint32_t)(a >> 32);
+        aLow  = (uint32_t)a;
 
         *pRet = 0;
 
         if(aHigh != 0)
         {
-            *pRet = (std::uint64_t)aHigh * (std::uint64_t)b;
+            *pRet = (uint64_t)aHigh * (uint64_t)b;
 
-            std::uint64_t tmp = 0;
+            uint64_t tmp = 0;
 
-            if((std::uint32_t)(*pRet >> 32) != 0)
+            if((uint32_t)(*pRet >> 32) != 0)
                 return false;
 
             *pRet <<= 32;
-            tmp = (std::uint64_t)aLow * (std::uint64_t)b;
+            tmp = (uint64_t)aLow * (uint64_t)b;
             *pRet += tmp;
 
             if(*pRet < tmp)
@@ -2154,40 +2157,40 @@ public:
             return true;
         }
 
-        *pRet = (std::uint64_t)aLow * (std::uint64_t)b;
+        *pRet = (uint64_t)aLow * (uint64_t)b;
         return true;
 #endif
     }
 
     template < typename E >
-    _CONSTEXPR14_MULTIPLY static void RegMultiplyThrow( const std::uint64_t& a, std::uint32_t b, std::uint64_t* pRet ) SAFEINT_CPP_THROW
+    _CONSTEXPR14_MULTIPLY static void RegMultiplyThrow( const uint64_t& a, uint32_t b, uint64_t* pRet ) SAFEINT_CPP_THROW
     {
 #if SAFEINT_USE_INTRINSICS
-        if( !IntrinsicMultiplyUint64( a, (std::uint64_t)b, pRet ) )
+        if( !IntrinsicMultiplyUint64( a, (uint64_t)b, pRet ) )
             E::SafeIntOnOverflow();
 #else
-        std::uint32_t aHigh = 0, aLow = 0;
+        uint32_t aHigh = 0, aLow = 0;
 
         // Consider that a*b can be broken up into:
         // (aHigh * 2^32 + aLow) * b
         // => (aHigh * b * 2^32) + (aLow * b)
 
-        aHigh = (std::uint32_t)(a >> 32);
-        aLow  = (std::uint32_t)a;
+        aHigh = (uint32_t)(a >> 32);
+        aLow  = (uint32_t)a;
 
         *pRet = 0;
 
         if(aHigh != 0)
         {
-            *pRet = (std::uint64_t)aHigh * (std::uint64_t)b;
+            *pRet = (uint64_t)aHigh * (uint64_t)b;
 
-            std::uint64_t tmp = 0;
+            uint64_t tmp = 0;
 
-            if((std::uint32_t)(*pRet >> 32) != 0)
+            if((uint32_t)(*pRet >> 32) != 0)
                 E::SafeIntOnOverflow();
 
             *pRet <<= 32;
-            tmp = (std::uint64_t)aLow * (std::uint64_t)b;
+            tmp = (uint64_t)aLow * (uint64_t)b;
             *pRet += tmp;
 
             if(*pRet < tmp)
@@ -2196,80 +2199,80 @@ public:
             return;
         }
 
-        *pRet = (std::uint64_t)aLow * (std::uint64_t)b;
+        *pRet = (uint64_t)aLow * (uint64_t)b;
         return;
 #endif
     }
 };
 
-template<> class LargeIntRegMultiply< std::uint64_t, std::int32_t >
+template<> class LargeIntRegMultiply< uint64_t, int32_t >
 {
 public:
     // Intrinsic not needed
-    _CONSTEXPR14_MULTIPLY static bool RegMultiply( const std::uint64_t& a, std::int32_t b, std::uint64_t* pRet ) SAFEINT_NOTHROW
+    _CONSTEXPR14_MULTIPLY static bool RegMultiply( const uint64_t& a, int32_t b, uint64_t* pRet ) SAFEINT_NOTHROW
     {
         if( b < 0 && a != 0 )
             return false;
 
 #if SAFEINT_USE_INTRINSICS
-        return IntrinsicMultiplyUint64( a, (std::uint64_t)b, pRet );
+        return IntrinsicMultiplyUint64( a, (uint64_t)b, pRet );
 #else
-        return LargeIntRegMultiply< std::uint64_t, std::uint32_t >::RegMultiply(a, (std::uint32_t)b, pRet);
+        return LargeIntRegMultiply< uint64_t, uint32_t >::RegMultiply(a, (uint32_t)b, pRet);
 #endif
     }
 
     template < typename E >
-    _CONSTEXPR14_MULTIPLY static void RegMultiplyThrow( const std::uint64_t& a, std::int32_t b, std::uint64_t* pRet ) SAFEINT_CPP_THROW
+    _CONSTEXPR14_MULTIPLY static void RegMultiplyThrow( const uint64_t& a, int32_t b, uint64_t* pRet ) SAFEINT_CPP_THROW
     {
         if( b < 0 && a != 0 )
             E::SafeIntOnOverflow();
 
 #if SAFEINT_USE_INTRINSICS
-        if( !IntrinsicMultiplyUint64( a, (std::uint64_t)b, pRet ) )
+        if( !IntrinsicMultiplyUint64( a, (uint64_t)b, pRet ) )
             E::SafeIntOnOverflow();
 #else
-        LargeIntRegMultiply< std::uint64_t, std::uint32_t >::template RegMultiplyThrow< E >( a, (std::uint32_t)b, pRet );
+        LargeIntRegMultiply< uint64_t, uint32_t >::template RegMultiplyThrow< E >( a, (uint32_t)b, pRet );
 #endif
     }
 };
 
-template<> class LargeIntRegMultiply< std::uint64_t, std::int64_t >
+template<> class LargeIntRegMultiply< uint64_t, int64_t >
 {
 public:
-    _CONSTEXPR14_MULTIPLY static bool RegMultiply( const std::uint64_t& a, std::int64_t b, std::uint64_t* pRet ) SAFEINT_NOTHROW
+    _CONSTEXPR14_MULTIPLY static bool RegMultiply( const uint64_t& a, int64_t b, uint64_t* pRet ) SAFEINT_NOTHROW
     {
         if( b < 0 && a != 0 )
             return false;
 
 #if SAFEINT_USE_INTRINSICS
-        return IntrinsicMultiplyUint64( a, (std::uint64_t)b, pRet );
+        return IntrinsicMultiplyUint64( a, (uint64_t)b, pRet );
 #else
-        return LargeIntRegMultiply< std::uint64_t, std::uint64_t >::RegMultiply(a, (std::uint64_t)b, pRet);
+        return LargeIntRegMultiply< uint64_t, uint64_t >::RegMultiply(a, (uint64_t)b, pRet);
 #endif
     }
 
     template < typename E >
-    _CONSTEXPR14_MULTIPLY static void RegMultiplyThrow( const std::uint64_t& a, std::int64_t b, std::uint64_t* pRet ) SAFEINT_CPP_THROW
+    _CONSTEXPR14_MULTIPLY static void RegMultiplyThrow( const uint64_t& a, int64_t b, uint64_t* pRet ) SAFEINT_CPP_THROW
     {
         if( b < 0 && a != 0 )
             E::SafeIntOnOverflow();
 
 #if SAFEINT_USE_INTRINSICS
-        if( !IntrinsicMultiplyUint64( a, (std::uint64_t)b, pRet ) )
+        if( !IntrinsicMultiplyUint64( a, (uint64_t)b, pRet ) )
             E::SafeIntOnOverflow();
 #else
-        LargeIntRegMultiply< std::uint64_t, std::uint64_t >::template RegMultiplyThrow< E >( a, (std::uint64_t)b, pRet );
+        LargeIntRegMultiply< uint64_t, uint64_t >::template RegMultiplyThrow< E >( a, (uint64_t)b, pRet );
 #endif
     }
 };
 
-template<> class LargeIntRegMultiply< std::int32_t, std::uint64_t >
+template<> class LargeIntRegMultiply< int32_t, uint64_t >
 {
 public:
     // Devolves into ordinary 64-bit calculation
-    _CONSTEXPR14 static bool RegMultiply( std::int32_t a, const std::uint64_t& b, std::int32_t* pRet ) SAFEINT_NOTHROW
+    _CONSTEXPR14 static bool RegMultiply( int32_t a, const uint64_t& b, int32_t* pRet ) SAFEINT_NOTHROW
     {
-        std::uint32_t bHigh = 0, bLow = 0;
+        uint32_t bHigh = 0, bLow = 0;
         bool fIsNegative = false;
 
         // Consider that a*b can be broken up into:
@@ -2279,8 +2282,8 @@ public:
         // ( aLow * bHigh * 2^32 ) + ( aLow + bLow )
         // If the first part is != 0, fail
 
-        bHigh = (std::uint32_t)(b >> 32);
-        bLow  = (std::uint32_t)b;
+        bHigh = (uint32_t)(b >> 32);
+        bLow  = (uint32_t)b;
 
         *pRet = 0;
 
@@ -2290,25 +2293,25 @@ public:
         if( a < 0 )
         {
 
-            a = (std::int32_t)AbsValueHelper< std::int32_t, GetAbsMethod< std::int32_t >::method >::Abs(a);
+            a = (int32_t)AbsValueHelper< int32_t, GetAbsMethod< int32_t >::method >::Abs(a);
             fIsNegative = true;
         }
 
-        std::uint64_t tmp = (std::uint32_t)a * (std::uint64_t)bLow;
+        uint64_t tmp = (uint32_t)a * (uint64_t)bLow;
 
         if( !fIsNegative )
         {
-            if( tmp <= (std::uint64_t)std::numeric_limits< std::int32_t >::max() )
+            if( tmp <= (uint64_t)std::numeric_limits< int32_t >::max() )
             {
-                *pRet = (std::int32_t)tmp;
+                *pRet = (int32_t)tmp;
                 return true;
             }
         }
         else
         {
-            if( tmp <= (std::uint64_t)std::numeric_limits< std::int32_t >::max()+1 )
+            if( tmp <= (uint64_t)std::numeric_limits< int32_t >::max()+1 )
             {
-                *pRet = SignedNegation< std::int32_t >::Value( tmp );
+                *pRet = SignedNegation< int32_t >::Value( tmp );
                 return true;
             }
         }
@@ -2317,17 +2320,17 @@ public:
     }
 
     template < typename E >
-    _CONSTEXPR14 static void RegMultiplyThrow( std::int32_t a, const std::uint64_t& b, std::int32_t* pRet ) SAFEINT_CPP_THROW
+    _CONSTEXPR14 static void RegMultiplyThrow( int32_t a, const uint64_t& b, int32_t* pRet ) SAFEINT_CPP_THROW
     {
-        std::uint32_t bHigh = 0, bLow = 0;
+        uint32_t bHigh = 0, bLow = 0;
         bool fIsNegative = false;
 
         // Consider that a*b can be broken up into:
         // (aHigh * 2^32 + aLow) * (bHigh * 2^32 + bLow)
         // => (aHigh * bHigh * 2^64) + (aLow * bHigh * 2^32) + (aHigh * bLow * 2^32) + (aLow * bLow)
 
-        bHigh = (std::uint32_t)(b >> 32);
-        bLow  = (std::uint32_t)b;
+        bHigh = (uint32_t)(b >> 32);
+        bLow  = (uint32_t)b;
 
         *pRet = 0;
 
@@ -2336,25 +2339,25 @@ public:
 
         if( a < 0 )
         {
-            a = (std::int32_t)AbsValueHelper< std::int32_t, GetAbsMethod< std::int32_t >::method >::Abs(a);
+            a = (int32_t)AbsValueHelper< int32_t, GetAbsMethod< int32_t >::method >::Abs(a);
             fIsNegative = true;
         }
 
-        std::uint64_t tmp = (std::uint32_t)a * (std::uint64_t)bLow;
+        uint64_t tmp = (uint32_t)a * (uint64_t)bLow;
 
         if( !fIsNegative )
         {
-            if( tmp <= (std::uint64_t)std::numeric_limits< std::int32_t >::max() )
+            if( tmp <= (uint64_t)std::numeric_limits< int32_t >::max() )
             {
-                *pRet = (std::int32_t)tmp;
+                *pRet = (int32_t)tmp;
                 return;
             }
         }
         else
         {
-            if( tmp <= (std::uint64_t)std::numeric_limits< std::int32_t >::max()+1 )
+            if( tmp <= (uint64_t)std::numeric_limits< int32_t >::max()+1 )
             {
-                *pRet = SignedNegation< std::int32_t >::Value( tmp );
+                *pRet = SignedNegation< int32_t >::Value( tmp );
                 return;
             }
         }
@@ -2363,11 +2366,11 @@ public:
     }
 };
 
-template<> class LargeIntRegMultiply< std::uint32_t, std::uint64_t >
+template<> class LargeIntRegMultiply< uint32_t, uint64_t >
 {
 public:
     // Becomes ordinary 64-bit multiplication, intrinsic not needed
-    _CONSTEXPR14 static bool RegMultiply( std::uint32_t a, const std::uint64_t& b, std::uint32_t* pRet ) SAFEINT_NOTHROW
+    _CONSTEXPR14 static bool RegMultiply( uint32_t a, const uint64_t& b, uint32_t* pRet ) SAFEINT_NOTHROW
     {
         // Consider that a*b can be broken up into:
         // (bHigh * 2^32 + bLow) * a
@@ -2375,57 +2378,57 @@ public:
         // In this case, the result must fit into 32-bits
         // If bHigh != 0 && a != 0, immediate error.
 
-        if( (std::uint32_t)(b >> 32) != 0 && a != 0 )
+        if( (uint32_t)(b >> 32) != 0 && a != 0 )
             return false;
 
-        std::uint64_t tmp = b * (std::uint64_t)a;
+        uint64_t tmp = b * (uint64_t)a;
 
-        if( (std::uint32_t)(tmp >> 32) != 0 ) // overflow
+        if( (uint32_t)(tmp >> 32) != 0 ) // overflow
             return false;
 
-        *pRet = (std::uint32_t)tmp;
+        *pRet = (uint32_t)tmp;
         return true;
     }
 
     template < typename E >
-    _CONSTEXPR14 static void RegMultiplyThrow( std::uint32_t a, const std::uint64_t& b, std::uint32_t* pRet ) SAFEINT_CPP_THROW
+    _CONSTEXPR14 static void RegMultiplyThrow( uint32_t a, const uint64_t& b, uint32_t* pRet ) SAFEINT_CPP_THROW
     {
-        if( (std::uint32_t)(b >> 32) != 0 && a != 0 )
+        if( (uint32_t)(b >> 32) != 0 && a != 0 )
             E::SafeIntOnOverflow();
 
-        std::uint64_t tmp = b * (std::uint64_t)a;
+        uint64_t tmp = b * (uint64_t)a;
 
-        if( (std::uint32_t)(tmp >> 32) != 0 ) // overflow
+        if( (uint32_t)(tmp >> 32) != 0 ) // overflow
             E::SafeIntOnOverflow();
 
-        *pRet = (std::uint32_t)tmp;
+        *pRet = (uint32_t)tmp;
     }
 };
 
-template<> class LargeIntRegMultiply< std::uint32_t, std::int64_t >
+template<> class LargeIntRegMultiply< uint32_t, int64_t >
 {
 public:
-    _CONSTEXPR14 static bool RegMultiply( std::uint32_t a, const std::int64_t& b, std::uint32_t* pRet ) SAFEINT_NOTHROW
+    _CONSTEXPR14 static bool RegMultiply( uint32_t a, const int64_t& b, uint32_t* pRet ) SAFEINT_NOTHROW
     {
         if( b < 0 && a != 0 )
             return false;
-        return LargeIntRegMultiply< std::uint32_t, std::uint64_t >::RegMultiply( a, (std::uint64_t)b, pRet );
+        return LargeIntRegMultiply< uint32_t, uint64_t >::RegMultiply( a, (uint64_t)b, pRet );
     }
 
     template < typename E >
-    _CONSTEXPR14 static void RegMultiplyThrow( std::uint32_t a, const std::int64_t& b, std::uint32_t* pRet ) SAFEINT_CPP_THROW
+    _CONSTEXPR14 static void RegMultiplyThrow( uint32_t a, const int64_t& b, uint32_t* pRet ) SAFEINT_CPP_THROW
     {
         if( b < 0 && a != 0 )
             E::SafeIntOnOverflow();
 
-        LargeIntRegMultiply< std::uint32_t, std::uint64_t >::template RegMultiplyThrow< E >( a, (std::uint64_t)b, pRet );
+        LargeIntRegMultiply< uint32_t, uint64_t >::template RegMultiplyThrow< E >( a, (uint64_t)b, pRet );
     }
 };
 
-template<> class LargeIntRegMultiply< std::int64_t, std::int64_t >
+template<> class LargeIntRegMultiply< int64_t, int64_t >
 {
 public:
-    _CONSTEXPR14_MULTIPLY static bool RegMultiply( const std::int64_t& a, const std::int64_t& b, std::int64_t* pRet ) SAFEINT_NOTHROW
+    _CONSTEXPR14_MULTIPLY static bool RegMultiply( const int64_t& a, const int64_t& b, int64_t* pRet ) SAFEINT_NOTHROW
     {
 #if SAFEINT_USE_INTRINSICS
         return IntrinsicMultiplyInt64( a, b, pRet );
@@ -2433,40 +2436,40 @@ public:
         bool aNegative = false;
         bool bNegative = false;
 
-        std::uint64_t tmp = 0;
-        std::int64_t a1 = a;
-        std::int64_t b1 = b;
+        uint64_t tmp = 0;
+        int64_t a1 = a;
+        int64_t b1 = b;
 
         if( a1 < 0 )
         {
             aNegative = true;
-            a1 = (std::int64_t)AbsValueHelper< std::int64_t, GetAbsMethod< std::int64_t >::method >::Abs(a1);
+            a1 = (int64_t)AbsValueHelper< int64_t, GetAbsMethod< int64_t >::method >::Abs(a1);
         }
 
         if( b1 < 0 )
         {
             bNegative = true;
-            b1 = (std::int64_t)AbsValueHelper< std::int64_t, GetAbsMethod< std::int64_t >::method >::Abs(b1);
+            b1 = (int64_t)AbsValueHelper< int64_t, GetAbsMethod< int64_t >::method >::Abs(b1);
         }
 
-        if( LargeIntRegMultiply< std::uint64_t, std::uint64_t >::RegMultiply( (std::uint64_t)a1, (std::uint64_t)b1, &tmp ) )
+        if( LargeIntRegMultiply< uint64_t, uint64_t >::RegMultiply( (uint64_t)a1, (uint64_t)b1, &tmp ) )
         {
             // The unsigned multiplication didn't overflow
             if( aNegative ^ bNegative )
             {
                 // Result must be negative
-                if( tmp <= (std::uint64_t)std::numeric_limits< std::int64_t >::min() )
+                if( tmp <= (uint64_t)std::numeric_limits< int64_t >::min() )
                 {
-                    *pRet = SignedNegation< std::int64_t >::Value( tmp );
+                    *pRet = SignedNegation< int64_t >::Value( tmp );
                     return true;
                 }
             }
             else
             {
                 // Result must be positive
-                if( tmp <= (std::uint64_t)std::numeric_limits<std::int64_t>::max() )
+                if( tmp <= (uint64_t)std::numeric_limits<int64_t>::max() )
                 {
-                    *pRet = (std::int64_t)tmp;
+                    *pRet = (int64_t)tmp;
                     return true;
                 }
             }
@@ -2477,7 +2480,7 @@ public:
     }
 
     template < typename E >
-    _CONSTEXPR14_MULTIPLY static void RegMultiplyThrow( const std::int64_t& a, const std::int64_t& b, std::int64_t* pRet ) SAFEINT_CPP_THROW
+    _CONSTEXPR14_MULTIPLY static void RegMultiplyThrow( const int64_t& a, const int64_t& b, int64_t* pRet ) SAFEINT_CPP_THROW
     {
 #if SAFEINT_USE_INTRINSICS
         if( !IntrinsicMultiplyInt64( a, b, pRet ) )
@@ -2486,40 +2489,40 @@ public:
         bool aNegative = false;
         bool bNegative = false;
 
-        std::uint64_t tmp = 0;
-        std::int64_t a1 = a;
-        std::int64_t b1 = b;
+        uint64_t tmp = 0;
+        int64_t a1 = a;
+        int64_t b1 = b;
 
         if( a1 < 0 )
         {
             aNegative = true;
-            a1 = (std::int64_t)AbsValueHelper< std::int64_t, GetAbsMethod< std::int64_t >::method >::Abs(a1);
+            a1 = (int64_t)AbsValueHelper< int64_t, GetAbsMethod< int64_t >::method >::Abs(a1);
         }
 
         if( b1 < 0 )
         {
             bNegative = true;
-            b1 = (std::int64_t)AbsValueHelper< std::int64_t, GetAbsMethod< std::int64_t >::method >::Abs(b1);
+            b1 = (int64_t)AbsValueHelper< int64_t, GetAbsMethod< int64_t >::method >::Abs(b1);
         }
 
-        LargeIntRegMultiply< std::uint64_t, std::uint64_t >::template RegMultiplyThrow< E >( (std::uint64_t)a1, (std::uint64_t)b1, &tmp );
+        LargeIntRegMultiply< uint64_t, uint64_t >::template RegMultiplyThrow< E >( (uint64_t)a1, (uint64_t)b1, &tmp );
 
         // The unsigned multiplication didn't overflow or we'd be in the exception handler
         if( aNegative ^ bNegative )
         {
             // Result must be negative
-            if( tmp <= (std::uint64_t)std::numeric_limits< std::int64_t >::min() )
+            if( tmp <= (uint64_t)std::numeric_limits< int64_t >::min() )
             {
-                *pRet = SignedNegation< std::int64_t >::Value( tmp );
+                *pRet = SignedNegation< int64_t >::Value( tmp );
                 return;
             }
         }
         else
         {
             // Result must be positive
-            if( tmp <= (std::uint64_t)std::numeric_limits<std::int64_t>::max() )
+            if( tmp <= (uint64_t)std::numeric_limits<int64_t>::max() )
             {
-                *pRet = (std::int64_t)tmp;
+                *pRet = (int64_t)tmp;
                 return;
             }
         }
@@ -2529,42 +2532,42 @@ public:
     }
 };
 
-template<> class LargeIntRegMultiply< std::int64_t, std::uint32_t >
+template<> class LargeIntRegMultiply< int64_t, uint32_t >
 {
 public:
-    _CONSTEXPR14_MULTIPLY static bool RegMultiply( const std::int64_t& a, std::uint32_t b, std::int64_t* pRet ) SAFEINT_NOTHROW
+    _CONSTEXPR14_MULTIPLY static bool RegMultiply( const int64_t& a, uint32_t b, int64_t* pRet ) SAFEINT_NOTHROW
     {
 #if SAFEINT_USE_INTRINSICS
-        return IntrinsicMultiplyInt64( a, (std::int64_t)b, pRet );
+        return IntrinsicMultiplyInt64( a, (int64_t)b, pRet );
 #else
         bool aNegative = false;
-        std::uint64_t tmp = 0;
-        std::int64_t a1 = a;
+        uint64_t tmp = 0;
+        int64_t a1 = a;
 
         if( a1 < 0 )
         {
             aNegative = true;
-            a1 = (std::int64_t)AbsValueHelper< std::int64_t, GetAbsMethod< std::int64_t >::method >::Abs(a1);
+            a1 = (int64_t)AbsValueHelper< int64_t, GetAbsMethod< int64_t >::method >::Abs(a1);
         }
 
-        if( LargeIntRegMultiply< std::uint64_t, std::uint32_t >::RegMultiply( (std::uint64_t)a1, b, &tmp ) )
+        if( LargeIntRegMultiply< uint64_t, uint32_t >::RegMultiply( (uint64_t)a1, b, &tmp ) )
         {
             // The unsigned multiplication didn't overflow
             if( aNegative )
             {
                 // Result must be negative
-                if( tmp <= (std::uint64_t)std::numeric_limits< std::int64_t >::min() )
+                if( tmp <= (uint64_t)std::numeric_limits< int64_t >::min() )
                 {
-                    *pRet = SignedNegation< std::int64_t >::Value( tmp );
+                    *pRet = SignedNegation< int64_t >::Value( tmp );
                     return true;
                 }
             }
             else
             {
                 // Result must be positive
-                if( tmp <= (std::uint64_t)std::numeric_limits<std::int64_t>::max() )
+                if( tmp <= (uint64_t)std::numeric_limits<int64_t>::max() )
                 {
-                    *pRet = (std::int64_t)tmp;
+                    *pRet = (int64_t)tmp;
                     return true;
                 }
             }
@@ -2575,40 +2578,40 @@ public:
     }
 
     template < typename E >
-    _CONSTEXPR14_MULTIPLY static void RegMultiplyThrow( const std::int64_t& a, std::uint32_t b, std::int64_t* pRet ) SAFEINT_CPP_THROW
+    _CONSTEXPR14_MULTIPLY static void RegMultiplyThrow( const int64_t& a, uint32_t b, int64_t* pRet ) SAFEINT_CPP_THROW
     {
 #if SAFEINT_USE_INTRINSICS
-        if( !IntrinsicMultiplyInt64( a, (std::int64_t)b, pRet ) )
+        if( !IntrinsicMultiplyInt64( a, (int64_t)b, pRet ) )
             E::SafeIntOnOverflow();
 #else
         bool aNegative = false;
-        std::uint64_t tmp = 0;
-        std::int64_t a1 = a;
+        uint64_t tmp = 0;
+        int64_t a1 = a;
 
         if( a1 < 0 )
         {
             aNegative = true;
-            a1 = (std::int64_t)AbsValueHelper< std::int64_t, GetAbsMethod< std::int64_t >::method >::Abs(a1);
+            a1 = (int64_t)AbsValueHelper< int64_t, GetAbsMethod< int64_t >::method >::Abs(a1);
         }
 
-        LargeIntRegMultiply< std::uint64_t, std::uint32_t >::template RegMultiplyThrow< E >( (std::uint64_t)a1, b, &tmp );
+        LargeIntRegMultiply< uint64_t, uint32_t >::template RegMultiplyThrow< E >( (uint64_t)a1, b, &tmp );
 
         // The unsigned multiplication didn't overflow
         if( aNegative )
         {
             // Result must be negative
-            if( tmp <= (std::uint64_t)std::numeric_limits< std::int64_t >::min() )
+            if( tmp <= (uint64_t)std::numeric_limits< int64_t >::min() )
             {
-                *pRet = SignedNegation< std::int64_t >::Value( tmp );
+                *pRet = SignedNegation< int64_t >::Value( tmp );
                 return;
             }
         }
         else
         {
             // Result must be positive
-            if( tmp <= (std::uint64_t)std::numeric_limits<std::int64_t>::max() )
+            if( tmp <= (uint64_t)std::numeric_limits<int64_t>::max() )
             {
-                *pRet = (std::int64_t)tmp;
+                *pRet = (int64_t)tmp;
                 return;
             }
         }
@@ -2618,51 +2621,51 @@ public:
     }
 };
 
-template<> class LargeIntRegMultiply< std::int64_t, std::int32_t >
+template<> class LargeIntRegMultiply< int64_t, int32_t >
 {
 public:
-    _CONSTEXPR14_MULTIPLY static bool RegMultiply( const std::int64_t& a, std::int32_t b, std::int64_t* pRet ) SAFEINT_NOTHROW
+    _CONSTEXPR14_MULTIPLY static bool RegMultiply( const int64_t& a, int32_t b, int64_t* pRet ) SAFEINT_NOTHROW
     {
 #if SAFEINT_USE_INTRINSICS
-        return IntrinsicMultiplyInt64( a, (std::int64_t)b, pRet );
+        return IntrinsicMultiplyInt64( a, (int64_t)b, pRet );
 #else
         bool aNegative = false;
         bool bNegative = false;
 
-        std::uint64_t tmp = 0;
-        std::int64_t a1 = a;
-        std::int64_t b1 = b;
+        uint64_t tmp = 0;
+        int64_t a1 = a;
+        int64_t b1 = b;
 
         if( a1 < 0 )
         {
             aNegative = true;
-            a1 = (std::int64_t)AbsValueHelper< std::int64_t, GetAbsMethod< std::int64_t >::method >::Abs(a1);
+            a1 = (int64_t)AbsValueHelper< int64_t, GetAbsMethod< int64_t >::method >::Abs(a1);
         }
 
         if( b1 < 0 )
         {
             bNegative = true;
-            b1 = (std::int64_t)AbsValueHelper< std::int64_t, GetAbsMethod< std::int64_t >::method >::Abs(b1);
+            b1 = (int64_t)AbsValueHelper< int64_t, GetAbsMethod< int64_t >::method >::Abs(b1);
         }
 
-        if( LargeIntRegMultiply< std::uint64_t, std::uint32_t >::RegMultiply( (std::uint64_t)a1, (std::uint32_t)b1, &tmp ) )
+        if( LargeIntRegMultiply< uint64_t, uint32_t >::RegMultiply( (uint64_t)a1, (uint32_t)b1, &tmp ) )
         {
             // The unsigned multiplication didn't overflow
             if( aNegative ^ bNegative )
             {
                 // Result must be negative
-                if( tmp <= (std::uint64_t)std::numeric_limits< std::int64_t >::min() )
+                if( tmp <= (uint64_t)std::numeric_limits< int64_t >::min() )
                 {
-                    *pRet = SignedNegation< std::int64_t >::Value( tmp );
+                    *pRet = SignedNegation< int64_t >::Value( tmp );
                     return true;
                 }
             }
             else
             {
                 // Result must be positive
-                if( tmp <= (std::uint64_t)std::numeric_limits<std::int64_t>::max() )
+                if( tmp <= (uint64_t)std::numeric_limits<int64_t>::max() )
                 {
-                    *pRet = (std::int64_t)tmp;
+                    *pRet = (int64_t)tmp;
                     return true;
                 }
             }
@@ -2673,47 +2676,47 @@ public:
     }
 
     template < typename E >
-    _CONSTEXPR14_MULTIPLY static void RegMultiplyThrow( std::int64_t a, std::int32_t b, std::int64_t* pRet ) SAFEINT_CPP_THROW
+    _CONSTEXPR14_MULTIPLY static void RegMultiplyThrow( int64_t a, int32_t b, int64_t* pRet ) SAFEINT_CPP_THROW
     {
 #if SAFEINT_USE_INTRINSICS
-        if( !IntrinsicMultiplyInt64( a, (std::int64_t)b, pRet ) )
+        if( !IntrinsicMultiplyInt64( a, (int64_t)b, pRet ) )
             E::SafeIntOnOverflow();
 #else
         bool aNegative = false;
         bool bNegative = false;
 
-        std::uint64_t tmp = 0;
+        uint64_t tmp = 0;
 
         if( a < 0 )
         {
             aNegative = true;
-            a = (std::int64_t)AbsValueHelper< std::int64_t, GetAbsMethod< std::int64_t >::method >::Abs(a);
+            a = (int64_t)AbsValueHelper< int64_t, GetAbsMethod< int64_t >::method >::Abs(a);
         }
 
         if( b < 0 )
         {
             bNegative = true;
-            b = (std::int32_t)AbsValueHelper< std::int32_t, GetAbsMethod< std::int32_t >::method >::Abs(b);
+            b = (int32_t)AbsValueHelper< int32_t, GetAbsMethod< int32_t >::method >::Abs(b);
         }
 
-        LargeIntRegMultiply< std::uint64_t, std::uint32_t >::template RegMultiplyThrow< E >( (std::uint64_t)a, (std::uint32_t)b, &tmp );
+        LargeIntRegMultiply< uint64_t, uint32_t >::template RegMultiplyThrow< E >( (uint64_t)a, (uint32_t)b, &tmp );
 
         // The unsigned multiplication didn't overflow
         if( aNegative ^ bNegative )
         {
             // Result must be negative
-            if( tmp <= (std::uint64_t)std::numeric_limits< std::int64_t >::min() )
+            if( tmp <= (uint64_t)std::numeric_limits< int64_t >::min() )
             {
-                *pRet = SignedNegation< std::int64_t >::Value( tmp );
+                *pRet = SignedNegation< int64_t >::Value( tmp );
                 return;
             }
         }
         else
         {
             // Result must be positive
-            if( tmp <= (std::uint64_t)std::numeric_limits<std::int64_t>::max() )
+            if( tmp <= (uint64_t)std::numeric_limits<int64_t>::max() )
             {
-                *pRet = (std::int64_t)tmp;
+                *pRet = (int64_t)tmp;
                 return;
             }
         }
@@ -2723,23 +2726,23 @@ public:
     }
 };
 
-template<> class LargeIntRegMultiply< std::int32_t, std::int64_t >
+template<> class LargeIntRegMultiply< int32_t, int64_t >
 {
 public:
-    _CONSTEXPR14_MULTIPLY static bool RegMultiply( std::int32_t a, const std::int64_t& b, std::int32_t* pRet ) SAFEINT_NOTHROW
+    _CONSTEXPR14_MULTIPLY static bool RegMultiply( int32_t a, const int64_t& b, int32_t* pRet ) SAFEINT_NOTHROW
     {
 #if SAFEINT_USE_INTRINSICS
-        std::int64_t tmp = 0;
+        int64_t tmp = 0;
 
         if( IntrinsicMultiplyInt64( a, b, &tmp ) )
         {
-            if( tmp > std::numeric_limits< std::int32_t >::max() ||
-                tmp < std::numeric_limits< std::int32_t >::min() )
+            if( tmp > std::numeric_limits< int32_t >::max() ||
+                tmp < std::numeric_limits< int32_t >::min() )
             {
                 return false;
             }
 
-            *pRet = (std::int32_t)tmp;
+            *pRet = (int32_t)tmp;
             return true;
         }
         return false;
@@ -2747,39 +2750,39 @@ public:
         bool aNegative = false;
         bool bNegative = false;
 
-        std::uint32_t tmp = 0;
-        std::int64_t b1 = b;
+        uint32_t tmp = 0;
+        int64_t b1 = b;
 
         if( a < 0 )
         {
             aNegative = true;
-            a = (std::int32_t)AbsValueHelper< std::int32_t, GetAbsMethod< std::int32_t >::method >::Abs(a);
+            a = (int32_t)AbsValueHelper< int32_t, GetAbsMethod< int32_t >::method >::Abs(a);
         }
 
         if( b1 < 0 )
         {
             bNegative = true;
-            b1 = (std::int64_t)AbsValueHelper< std::int64_t, GetAbsMethod< std::int64_t >::method >::Abs(b1);
+            b1 = (int64_t)AbsValueHelper< int64_t, GetAbsMethod< int64_t >::method >::Abs(b1);
         }
 
-        if( LargeIntRegMultiply< std::uint32_t, std::uint64_t >::RegMultiply( (std::uint32_t)a, (std::uint64_t)b1, &tmp ) )
+        if( LargeIntRegMultiply< uint32_t, uint64_t >::RegMultiply( (uint32_t)a, (uint64_t)b1, &tmp ) )
         {
             // The unsigned multiplication didn't overflow
             if( aNegative ^ bNegative )
             {
                 // Result must be negative
-                if( tmp <= (std::uint32_t)std::numeric_limits< std::int32_t >::min() )
+                if( tmp <= (uint32_t)std::numeric_limits< int32_t >::min() )
                 {
-                    *pRet = SignedNegation< std::int32_t >::Value( tmp );
+                    *pRet = SignedNegation< int32_t >::Value( tmp );
                     return true;
                 }
             }
             else
             {
                 // Result must be positive
-                if( tmp <= (std::uint32_t)std::numeric_limits< std::int32_t >::max() )
+                if( tmp <= (uint32_t)std::numeric_limits< int32_t >::max() )
                 {
-                    *pRet = (std::int32_t)tmp;
+                    *pRet = (int32_t)tmp;
                     return true;
                 }
             }
@@ -2790,20 +2793,20 @@ public:
     }
 
     template < typename E >
-    _CONSTEXPR14_MULTIPLY static void RegMultiplyThrow( std::int32_t a, const std::int64_t& b, std::int32_t* pRet ) SAFEINT_CPP_THROW
+    _CONSTEXPR14_MULTIPLY static void RegMultiplyThrow( int32_t a, const int64_t& b, int32_t* pRet ) SAFEINT_CPP_THROW
     {
 #if SAFEINT_USE_INTRINSICS
-        std::int64_t tmp;
+        int64_t tmp;
 
         if( IntrinsicMultiplyInt64( a, b, &tmp ) )
         {
-            if( tmp > std::numeric_limits< std::int32_t >::max() ||
-                tmp < std::numeric_limits< std::int32_t >::min() )
+            if( tmp > std::numeric_limits< int32_t >::max() ||
+                tmp < std::numeric_limits< int32_t >::min() )
             {
                 E::SafeIntOnOverflow();
             }
 
-            *pRet = (std::int32_t)tmp;
+            *pRet = (int32_t)tmp;
             return;
         }
         E::SafeIntOnOverflow();
@@ -2811,39 +2814,39 @@ public:
         bool aNegative = false;
         bool bNegative = false;
 
-        std::uint32_t tmp = 0;
-        std::int64_t b2 = b;
+        uint32_t tmp = 0;
+        int64_t b2 = b;
 
         if( a < 0 )
         {
             aNegative = true;
-            a = (std::int32_t)AbsValueHelper< std::int32_t, GetAbsMethod< std::int32_t >::method >::Abs(a);
+            a = (int32_t)AbsValueHelper< int32_t, GetAbsMethod< int32_t >::method >::Abs(a);
         }
 
         if( b < 0 )
         {
             bNegative = true;
-            b2 = (std::int64_t)AbsValueHelper< std::int64_t, GetAbsMethod< std::int64_t >::method >::Abs(b2);
+            b2 = (int64_t)AbsValueHelper< int64_t, GetAbsMethod< int64_t >::method >::Abs(b2);
         }
 
-        LargeIntRegMultiply< std::uint32_t, std::uint64_t >::template RegMultiplyThrow< E >( (std::uint32_t)a, (std::uint64_t)b2, &tmp );
+        LargeIntRegMultiply< uint32_t, uint64_t >::template RegMultiplyThrow< E >( (uint32_t)a, (uint64_t)b2, &tmp );
 
         // The unsigned multiplication didn't overflow
         if( aNegative ^ bNegative )
         {
             // Result must be negative
-            if( tmp <= (std::uint32_t)std::numeric_limits< std::int32_t >::min() )
+            if( tmp <= (uint32_t)std::numeric_limits< int32_t >::min() )
             {
-                *pRet = SignedNegation< std::int32_t >::Value( tmp );
+                *pRet = SignedNegation< int32_t >::Value( tmp );
                 return;
             }
         }
         else
         {
             // Result must be positive
-            if( tmp <= (std::uint32_t)std::numeric_limits< std::int32_t >::max() )
+            if( tmp <= (uint32_t)std::numeric_limits< int32_t >::max() )
             {
-                *pRet = (std::int32_t)tmp;
+                *pRet = (int32_t)tmp;
                 return;
             }
         }
@@ -2853,41 +2856,41 @@ public:
     }
 };
 
-template<> class LargeIntRegMultiply< std::int64_t, std::uint64_t >
+template<> class LargeIntRegMultiply< int64_t, uint64_t >
 {
 public:
     // Leave this one as-is - will call unsigned intrinsic internally
-    _CONSTEXPR14_MULTIPLY static bool RegMultiply( const std::int64_t& a, const std::uint64_t& b, std::int64_t* pRet ) SAFEINT_NOTHROW
+    _CONSTEXPR14_MULTIPLY static bool RegMultiply( const int64_t& a, const uint64_t& b, int64_t* pRet ) SAFEINT_NOTHROW
     {
         bool aNegative = false;
 
-        std::uint64_t tmp = 0;
-        std::int64_t a1 = a;
+        uint64_t tmp = 0;
+        int64_t a1 = a;
 
         if( a1 < 0 )
         {
             aNegative = true;
-            a1 = (std::int64_t)AbsValueHelper< std::int64_t, GetAbsMethod< std::int64_t >::method >::Abs(a1);
+            a1 = (int64_t)AbsValueHelper< int64_t, GetAbsMethod< int64_t >::method >::Abs(a1);
         }
 
-        if( LargeIntRegMultiply< std::uint64_t, std::uint64_t >::RegMultiply( (std::uint64_t)a1, (std::uint64_t)b, &tmp ) )
+        if( LargeIntRegMultiply< uint64_t, uint64_t >::RegMultiply( (uint64_t)a1, (uint64_t)b, &tmp ) )
         {
             // The unsigned multiplication didn't overflow
             if( aNegative )
             {
                 // Result must be negative
-                if( tmp <= (std::uint64_t)std::numeric_limits< std::int64_t >::min() )
+                if( tmp <= (uint64_t)std::numeric_limits< int64_t >::min() )
                 {
-                    *pRet = SignedNegation< std::int64_t >::Value( tmp );
+                    *pRet = SignedNegation< int64_t >::Value( tmp );
                     return true;
                 }
             }
             else
             {
                 // Result must be positive
-                if( tmp <= (std::uint64_t)std::numeric_limits<std::int64_t>::max() )
+                if( tmp <= (uint64_t)std::numeric_limits<int64_t>::max() )
                 {
-                    *pRet = (std::int64_t)tmp;
+                    *pRet = (int64_t)tmp;
                     return true;
                 }
             }
@@ -2897,36 +2900,36 @@ public:
     }
 
     template < typename E >
-    _CONSTEXPR14_MULTIPLY static void RegMultiplyThrow( const std::int64_t& a, const std::uint64_t& b, std::int64_t* pRet ) SAFEINT_CPP_THROW
+    _CONSTEXPR14_MULTIPLY static void RegMultiplyThrow( const int64_t& a, const uint64_t& b, int64_t* pRet ) SAFEINT_CPP_THROW
     {
         bool aNegative = false;
-        std::uint64_t tmp = 0;
-        std::int64_t a1 = a;
+        uint64_t tmp = 0;
+        int64_t a1 = a;
 
         if( a1 < 0 )
         {
             aNegative = true;
-            a1 = (std::int64_t)AbsValueHelper< std::int64_t, GetAbsMethod< std::int64_t >::method >::Abs(a1);
+            a1 = (int64_t)AbsValueHelper< int64_t, GetAbsMethod< int64_t >::method >::Abs(a1);
         }
 
-        if( LargeIntRegMultiply< std::uint64_t, std::uint64_t >::RegMultiply( (std::uint64_t)a1, (std::uint64_t)b, &tmp ) )
+        if( LargeIntRegMultiply< uint64_t, uint64_t >::RegMultiply( (uint64_t)a1, (uint64_t)b, &tmp ) )
         {
             // The unsigned multiplication didn't overflow
             if( aNegative )
             {
                 // Result must be negative
-                if( tmp <= (std::uint64_t)std::numeric_limits< std::int64_t >::min() )
+                if( tmp <= (uint64_t)std::numeric_limits< int64_t >::min() )
                 {
-                    *pRet = SignedNegation< std::int64_t >::Value( tmp );
+                    *pRet = SignedNegation< int64_t >::Value( tmp );
                     return;
                 }
             }
             else
             {
                 // Result must be positive
-                if( tmp <= (std::uint64_t)std::numeric_limits<std::int64_t>::max() )
+                if( tmp <= (uint64_t)std::numeric_limits<int64_t>::max() )
                 {
-                    *pRet = (std::int64_t)tmp;
+                    *pRet = (int64_t)tmp;
                     return;
                 }
             }
@@ -2937,33 +2940,33 @@ public:
 };
 
 // In all of the following functions where LargeIntRegMultiply methods are called,
-// we need to properly transition types. The methods need std::int64_t, std::int32_t, etc.
+// we need to properly transition types. The methods need int64_t, int32_t, etc.
 // but the variables being passed to us could be long long, long int, or long, depending on
-// the compiler. Microsoft compiler knows that long long is the same type as std::int64_t, but gcc doesn't
+// the compiler. Microsoft compiler knows that long long is the same type as int64_t, but gcc doesn't
 
 template < typename T, typename U > class MultiplicationHelper< T, U, MultiplicationState_Uint64Uint64 >
 {
 public:
-    // T, U are std::uint64_t
+    // T, U are uint64_t
     _CONSTEXPR14_MULTIPLY static bool Multiply( const T& t, const U& u, T& ret ) SAFEINT_NOTHROW
     {
         static_assert( safeint_internal::int_traits<T>::isUint64 && safeint_internal::int_traits<U>::isUint64, "T, U must be Uint64" );
-        std::uint64_t t1 = t;
-        std::uint64_t u1 = u;
-        std::uint64_t tmp = 0;
-        bool f = LargeIntRegMultiply< std::uint64_t, std::uint64_t >::RegMultiply( t1, u1, &tmp );
+        uint64_t t1 = t;
+        uint64_t u1 = u;
+        uint64_t tmp = 0;
+        bool f = LargeIntRegMultiply< uint64_t, uint64_t >::RegMultiply( t1, u1, &tmp );
         ret = tmp;
         return f;
     }
 
     template < typename E >
-    _CONSTEXPR14_MULTIPLY static void MultiplyThrow(const std::uint64_t& t, const std::uint64_t& u, T& ret) SAFEINT_CPP_THROW
+    _CONSTEXPR14_MULTIPLY static void MultiplyThrow(const uint64_t& t, const uint64_t& u, T& ret) SAFEINT_CPP_THROW
     {
         static_assert(safeint_internal::int_traits<T>::isUint64 && safeint_internal::int_traits<U>::isUint64, "T, U must be Uint64");
-        std::uint64_t t1 = t;
-        std::uint64_t u1 = u;
-        std::uint64_t tmp = 0;
-        LargeIntRegMultiply< std::uint64_t, std::uint64_t >::template RegMultiplyThrow< E >( t1, u1, &tmp );
+        uint64_t t1 = t;
+        uint64_t u1 = u;
+        uint64_t tmp = 0;
+        LargeIntRegMultiply< uint64_t, uint64_t >::template RegMultiplyThrow< E >( t1, u1, &tmp );
         ret = tmp;
     }
 };
@@ -2971,14 +2974,14 @@ public:
 template < typename T, typename U > class MultiplicationHelper< T, U, MultiplicationState_Uint64Uint >
 {
 public:
-    // T is std::uint64_t
+    // T is uint64_t
     // U is any unsigned int 32-bit or less
     _CONSTEXPR14_MULTIPLY static bool Multiply( const T& t, const U& u, T& ret ) SAFEINT_NOTHROW
     {
         static_assert( safeint_internal::int_traits<T>::isUint64, "T must be Uint64" );
-        std::uint64_t t1 = t;
-        std::uint64_t tmp = 0;
-        bool f = LargeIntRegMultiply< std::uint64_t, std::uint32_t >::RegMultiply( t1, (std::uint32_t)u, &tmp );
+        uint64_t t1 = t;
+        uint64_t tmp = 0;
+        bool f = LargeIntRegMultiply< uint64_t, uint32_t >::RegMultiply( t1, (uint32_t)u, &tmp );
         ret = tmp;
         return f;
     }
@@ -2987,9 +2990,9 @@ public:
     _CONSTEXPR14_MULTIPLY static void MultiplyThrow( const T& t, const U& u, T& ret ) SAFEINT_CPP_THROW
     {
         static_assert(safeint_internal::int_traits<T>::isUint64, "T must be Uint64");
-        std::uint64_t t1 = t;
-        std::uint64_t tmp = 0;
-        LargeIntRegMultiply< std::uint64_t, std::uint32_t >::template RegMultiplyThrow< E >( t1, (std::uint32_t)u, &tmp );
+        uint64_t t1 = t;
+        uint64_t tmp = 0;
+        LargeIntRegMultiply< uint64_t, uint32_t >::template RegMultiplyThrow< E >( t1, (uint32_t)u, &tmp );
         ret = tmp;
     }
 };
@@ -2999,15 +3002,15 @@ template < typename T, typename U > class MultiplicationHelper< T, U, Multiplica
 {
 public:
     // T is any unsigned int up to 32-bit
-    // U is std::uint64_t
+    // U is uint64_t
     _CONSTEXPR14 static bool Multiply(const T& t, const U& u, T& ret) SAFEINT_NOTHROW
     {
         static_assert(safeint_internal::int_traits<U>::isUint64, "U must be Uint64");
-        std::uint64_t u1 = u;
-        std::uint32_t tmp = 0;
+        uint64_t u1 = u;
+        uint32_t tmp = 0;
 
-        if( LargeIntRegMultiply< std::uint32_t, std::uint64_t >::RegMultiply( t, u1, &tmp ) &&
-            SafeCastHelper< T, std::uint32_t, GetCastMethod< T, std::uint32_t >::method >::Cast(tmp, ret) )
+        if( LargeIntRegMultiply< uint32_t, uint64_t >::RegMultiply( t, u1, &tmp ) &&
+            SafeCastHelper< T, uint32_t, GetCastMethod< T, uint32_t >::method >::Cast(tmp, ret) )
         {
             return true;
         }
@@ -3019,25 +3022,25 @@ public:
     _CONSTEXPR14 static void MultiplyThrow(const T& t, const U& u, T& ret) SAFEINT_CPP_THROW
     {
         static_assert(safeint_internal::int_traits<U>::isUint64, "U must be Uint64");
-        std::uint64_t u1 = u;
-        std::uint32_t tmp = 0;
+        uint64_t u1 = u;
+        uint32_t tmp = 0;
 
-        LargeIntRegMultiply< std::uint32_t, std::uint64_t >::template RegMultiplyThrow< E >( t, u1, &tmp );
-        SafeCastHelper< T, std::uint32_t, GetCastMethod< T, std::uint32_t >::method >::template CastThrow< E >(tmp, ret);
+        LargeIntRegMultiply< uint32_t, uint64_t >::template RegMultiplyThrow< E >( t, u1, &tmp );
+        SafeCastHelper< T, uint32_t, GetCastMethod< T, uint32_t >::method >::template CastThrow< E >(tmp, ret);
     }
 };
 
 template < typename T, typename U > class MultiplicationHelper< T, U, MultiplicationState_Uint64Int >
 {
 public:
-    // T is std::uint64_t
+    // T is uint64_t
     // U is any signed int, up to 64-bit
     _CONSTEXPR14_MULTIPLY static bool Multiply(const T& t, const U& u, T& ret) SAFEINT_NOTHROW
     {
         static_assert(safeint_internal::int_traits<T>::isUint64, "T must be Uint64");
-        std::uint64_t t1 = t;
-        std::uint64_t tmp = 0;
-        bool f = LargeIntRegMultiply< std::uint64_t, std::int32_t >::RegMultiply(t1, (std::int32_t)u, &tmp);
+        uint64_t t1 = t;
+        uint64_t tmp = 0;
+        bool f = LargeIntRegMultiply< uint64_t, int32_t >::RegMultiply(t1, (int32_t)u, &tmp);
         ret = tmp;
         return f;
     }
@@ -3046,9 +3049,9 @@ public:
     _CONSTEXPR14_MULTIPLY static void MultiplyThrow(const T& t, const U& u, T& ret) SAFEINT_CPP_THROW
     {
         static_assert(safeint_internal::int_traits<T>::isUint64, "T must be Uint64");
-        std::uint64_t t1 = t;
-        std::uint64_t tmp = 0;
-        LargeIntRegMultiply< std::uint64_t, std::int32_t >::template RegMultiplyThrow< E >(t1, (std::int32_t)u, &tmp);
+        uint64_t t1 = t;
+        uint64_t tmp = 0;
+        LargeIntRegMultiply< uint64_t, int32_t >::template RegMultiplyThrow< E >(t1, (int32_t)u, &tmp);
         ret = tmp;
     }
 };
@@ -3056,15 +3059,15 @@ public:
 template < typename T, typename U > class MultiplicationHelper< T, U, MultiplicationState_Uint64Int64 >
 {
 public:
-    // T is std::uint64_t
-    // U is std::int64_t
+    // T is uint64_t
+    // U is int64_t
     _CONSTEXPR14_MULTIPLY static bool Multiply(const T& t, const U& u, T& ret) SAFEINT_NOTHROW
     {
         static_assert( safeint_internal::int_traits<T>::isUint64 && safeint_internal::int_traits<U>::isInt64, "T must be Uint64, U Int64" );
-        std::uint64_t t1 = t;
-        std::int64_t          u1 = u;
-        std::uint64_t tmp = 0;
-        bool f = LargeIntRegMultiply< std::uint64_t, std::int64_t >::RegMultiply(t1, u1, &tmp);
+        uint64_t t1 = t;
+        int64_t          u1 = u;
+        uint64_t tmp = 0;
+        bool f = LargeIntRegMultiply< uint64_t, int64_t >::RegMultiply(t1, u1, &tmp);
         ret = tmp;
         return f;
     }
@@ -3073,10 +3076,10 @@ public:
     _CONSTEXPR14_MULTIPLY static void MultiplyThrow(const T& t, const U& u, T& ret) SAFEINT_CPP_THROW
     {
         static_assert(safeint_internal::int_traits<T>::isUint64 && safeint_internal::int_traits<U>::isInt64, "T must be Uint64, U Int64");
-        std::uint64_t t1 = t;
-        std::int64_t          u1 = u;
-        std::uint64_t tmp = 0;
-        LargeIntRegMultiply< std::uint64_t, std::int64_t >::template RegMultiplyThrow< E >(t1, u1, &tmp);
+        uint64_t t1 = t;
+        int64_t          u1 = u;
+        uint64_t tmp = 0;
+        LargeIntRegMultiply< uint64_t, int64_t >::template RegMultiplyThrow< E >(t1, u1, &tmp);
         ret = tmp;
     }
 };
@@ -3085,15 +3088,15 @@ template < typename T, typename U > class MultiplicationHelper< T, U, Multiplica
 {
 public:
     // T is unsigned up to 32-bit
-    // U is std::int64_t
+    // U is int64_t
     _CONSTEXPR14 static bool Multiply(const T& t, const U& u, T& ret) SAFEINT_NOTHROW
     {
         static_assert(safeint_internal::int_traits<U>::isInt64, "U must be Int64");
-        std::int64_t          u1 = u;
-        std::uint32_t tmp = 0;
+        int64_t          u1 = u;
+        uint32_t tmp = 0;
 
-        if( LargeIntRegMultiply< std::uint32_t, std::int64_t >::RegMultiply( (std::uint32_t)t, u1, &tmp ) &&
-            SafeCastHelper< T, std::uint32_t, GetCastMethod< T, std::uint32_t >::method >::Cast(tmp, ret) )
+        if( LargeIntRegMultiply< uint32_t, int64_t >::RegMultiply( (uint32_t)t, u1, &tmp ) &&
+            SafeCastHelper< T, uint32_t, GetCastMethod< T, uint32_t >::method >::Cast(tmp, ret) )
         {
             return true;
         }
@@ -3105,25 +3108,25 @@ public:
     _CONSTEXPR14 static void MultiplyThrow(const T& t, const U& u, T& ret) SAFEINT_CPP_THROW
     {
         static_assert(safeint_internal::int_traits<U>::isInt64, "U must be Int64");
-        std::int64_t          u1 = u;
-        std::uint32_t tmp = 0;
+        int64_t          u1 = u;
+        uint32_t tmp = 0;
 
-        LargeIntRegMultiply< std::uint32_t, std::int64_t >::template RegMultiplyThrow< E >( (std::uint32_t)t, u1, &tmp );
-        SafeCastHelper< T, std::uint32_t, GetCastMethod< T, std::uint32_t >::method >::template CastThrow< E >(tmp, ret);
+        LargeIntRegMultiply< uint32_t, int64_t >::template RegMultiplyThrow< E >( (uint32_t)t, u1, &tmp );
+        SafeCastHelper< T, uint32_t, GetCastMethod< T, uint32_t >::method >::template CastThrow< E >(tmp, ret);
     }
 };
 
 template < typename T, typename U > class MultiplicationHelper< T, U, MultiplicationState_Int64Uint >
 {
 public:
-    // T is std::int64_t
+    // T is int64_t
     // U is unsigned up to 32-bit
     _CONSTEXPR14_MULTIPLY static bool Multiply( const T& t, const U& u, T& ret ) SAFEINT_NOTHROW
     {
         static_assert(safeint_internal::int_traits<T>::isInt64, "T must be Int64");
-        std::int64_t t1 = t;
-        std::int64_t tmp = 0;
-        bool f = LargeIntRegMultiply< std::int64_t, std::uint32_t >::RegMultiply( t1, (std::uint32_t)u, &tmp );
+        int64_t t1 = t;
+        int64_t tmp = 0;
+        bool f = LargeIntRegMultiply< int64_t, uint32_t >::RegMultiply( t1, (uint32_t)u, &tmp );
         ret = tmp;
         return f;
     }
@@ -3132,9 +3135,9 @@ public:
     _CONSTEXPR14_MULTIPLY static void MultiplyThrow( const T& t, const U& u, T& ret ) SAFEINT_CPP_THROW
     {
         static_assert(safeint_internal::int_traits<T>::isInt64, "T must be Int64");
-        std::int64_t          t1 = t;
-        std::int64_t tmp = 0;
-        LargeIntRegMultiply< std::int64_t, std::uint32_t >::template RegMultiplyThrow< E >( t1, (std::uint32_t)u, &tmp );
+        int64_t          t1 = t;
+        int64_t tmp = 0;
+        LargeIntRegMultiply< int64_t, uint32_t >::template RegMultiplyThrow< E >( t1, (uint32_t)u, &tmp );
         ret = tmp;
     }
 };
@@ -3142,14 +3145,14 @@ public:
 template < typename T, typename U > class MultiplicationHelper< T, U, MultiplicationState_Int64Int64 >
 {
 public:
-    // T, U are std::int64_t
+    // T, U are int64_t
     _CONSTEXPR14_MULTIPLY static bool Multiply( const T& t, const U& u, T& ret ) SAFEINT_NOTHROW
     {
         static_assert( safeint_internal::int_traits<T>::isInt64 && safeint_internal::int_traits<U>::isInt64, "T, U must be Int64" );
-        std::int64_t  t1 = t;
-        std::int64_t u1 = u;
-        std::int64_t tmp = 0;
-        bool f = LargeIntRegMultiply< std::int64_t, std::int64_t >::RegMultiply( t1, u1, &tmp );
+        int64_t  t1 = t;
+        int64_t u1 = u;
+        int64_t tmp = 0;
+        bool f = LargeIntRegMultiply< int64_t, int64_t >::RegMultiply( t1, u1, &tmp );
         ret = tmp;
         return f;
     }
@@ -3158,10 +3161,10 @@ public:
     _CONSTEXPR14_MULTIPLY static void MultiplyThrow( const T& t, const U& u, T& ret ) SAFEINT_CPP_THROW
     {
         static_assert(safeint_internal::int_traits<T>::isInt64 && safeint_internal::int_traits<U>::isInt64, "T, U must be Int64");
-        std::int64_t t1 = t;
-        std::int64_t u1 = u;
-        std::int64_t tmp = 0;
-        LargeIntRegMultiply< std::int64_t, std::int64_t >::template RegMultiplyThrow< E >( t1, u1, &tmp);
+        int64_t t1 = t;
+        int64_t u1 = u;
+        int64_t tmp = 0;
+        LargeIntRegMultiply< int64_t, int64_t >::template RegMultiplyThrow< E >( t1, u1, &tmp);
         ret = tmp;
     }
 };
@@ -3169,25 +3172,25 @@ public:
 template < typename T, typename U > class MultiplicationHelper< T, U, MultiplicationState_Int64Int >
 {
 public:
-    // T is std::int64_t
+    // T is int64_t
     // U is signed up to 32-bit
     _CONSTEXPR14_MULTIPLY static bool Multiply( const T& t, U u, T& ret ) SAFEINT_NOTHROW
     {
         static_assert(safeint_internal::int_traits<T>::isInt64, "T must be Int64");
-        std::int64_t t1 = t;
-        std::int64_t tmp = 0;
-        bool f = LargeIntRegMultiply< std::int64_t, std::int32_t >::RegMultiply( t1, (std::int32_t)u, &tmp);
+        int64_t t1 = t;
+        int64_t tmp = 0;
+        bool f = LargeIntRegMultiply< int64_t, int32_t >::RegMultiply( t1, (int32_t)u, &tmp);
         ret = tmp;
         return f;
     }
 
     template < typename E >
-    _CONSTEXPR14_MULTIPLY static void MultiplyThrow( const std::int64_t& t, U u, T& ret ) SAFEINT_CPP_THROW
+    _CONSTEXPR14_MULTIPLY static void MultiplyThrow( const int64_t& t, U u, T& ret ) SAFEINT_CPP_THROW
     {
         static_assert(safeint_internal::int_traits<T>::isInt64, "T must be Int64");
-        std::int64_t t1 = t;
-        std::int64_t tmp = 0;
-        LargeIntRegMultiply< std::int64_t, std::int32_t >::template RegMultiplyThrow< E >(t1, (std::int32_t)u, &tmp);
+        int64_t t1 = t;
+        int64_t tmp = 0;
+        LargeIntRegMultiply< int64_t, int32_t >::template RegMultiplyThrow< E >(t1, (int32_t)u, &tmp);
         ret = tmp;
     }
 };
@@ -3196,15 +3199,15 @@ template < typename T, typename U > class MultiplicationHelper< T, U, Multiplica
 {
 public:
     // T is signed up to 32-bit
-    // U is std::uint64_t
+    // U is uint64_t
     _CONSTEXPR14 static bool Multiply(T t, const U& u, T& ret) SAFEINT_NOTHROW
     {
         static_assert(safeint_internal::int_traits<U>::isUint64, "U must be Uint64");
-        std::uint64_t u1 = u;
-        std::int32_t tmp = 0;
+        uint64_t u1 = u;
+        int32_t tmp = 0;
 
-        if( LargeIntRegMultiply< std::int32_t, std::uint64_t >::RegMultiply( (std::int32_t)t, u1, &tmp ) &&
-            SafeCastHelper< T, std::int32_t, GetCastMethod< T, std::int32_t >::method >::Cast( tmp, ret ) )
+        if( LargeIntRegMultiply< int32_t, uint64_t >::RegMultiply( (int32_t)t, u1, &tmp ) &&
+            SafeCastHelper< T, int32_t, GetCastMethod< T, int32_t >::method >::Cast( tmp, ret ) )
         {
             return true;
         }
@@ -3213,41 +3216,41 @@ public:
     }
 
     template < typename E >
-    _CONSTEXPR14 static void MultiplyThrow(T t, const std::uint64_t& u, T& ret) SAFEINT_CPP_THROW
+    _CONSTEXPR14 static void MultiplyThrow(T t, const uint64_t& u, T& ret) SAFEINT_CPP_THROW
     {
         static_assert(safeint_internal::int_traits<U>::isUint64, "U must be Uint64");
-        std::uint64_t u1 = u;
-        std::int32_t tmp = 0;
+        uint64_t u1 = u;
+        int32_t tmp = 0;
 
-        LargeIntRegMultiply< std::int32_t, std::uint64_t >::template RegMultiplyThrow< E >( (std::int32_t)t, u1, &tmp );
-        SafeCastHelper< T, std::int32_t, GetCastMethod< T, std::int32_t >::method >::template CastThrow< E >( tmp, ret );
+        LargeIntRegMultiply< int32_t, uint64_t >::template RegMultiplyThrow< E >( (int32_t)t, u1, &tmp );
+        SafeCastHelper< T, int32_t, GetCastMethod< T, int32_t >::method >::template CastThrow< E >( tmp, ret );
     }
 };
 
 template < typename T, typename U > class MultiplicationHelper< T, U, MultiplicationState_Int64Uint64>
 {
 public:
-    // T is std::int64_t
-    // U is std::uint64_t
+    // T is int64_t
+    // U is uint64_t
     _CONSTEXPR14_MULTIPLY static bool Multiply( const T& t, const U& u, T& ret ) SAFEINT_NOTHROW
     {
         static_assert( safeint_internal::int_traits<T>::isInt64 && safeint_internal::int_traits<U>::isUint64, "T must be Int64, U Uint64" );
-        std::int64_t t1 = t;
-        std::uint64_t u1 = u;
-        std::int64_t tmp = 0;
-        bool f = LargeIntRegMultiply< std::int64_t, std::uint64_t >::RegMultiply( t1, u1, &tmp );
+        int64_t t1 = t;
+        uint64_t u1 = u;
+        int64_t tmp = 0;
+        bool f = LargeIntRegMultiply< int64_t, uint64_t >::RegMultiply( t1, u1, &tmp );
         ret = tmp;
         return f;
     }
 
     template < typename E >
-    _CONSTEXPR14_MULTIPLY static void MultiplyThrow( const std::int64_t& t, const std::uint64_t& u, T& ret ) SAFEINT_CPP_THROW
+    _CONSTEXPR14_MULTIPLY static void MultiplyThrow( const int64_t& t, const uint64_t& u, T& ret ) SAFEINT_CPP_THROW
     {
         static_assert(safeint_internal::int_traits<T>::isInt64 && safeint_internal::int_traits<U>::isUint64, "T must be Int64, U Uint64");
-        std::int64_t t1 = t;
-        std::uint64_t u1 = u;
-        std::int64_t tmp = 0;
-        LargeIntRegMultiply< std::int64_t, std::uint64_t >::template RegMultiplyThrow< E >( t1, u1, &tmp );
+        int64_t t1 = t;
+        uint64_t u1 = u;
+        int64_t tmp = 0;
+        LargeIntRegMultiply< int64_t, uint64_t >::template RegMultiplyThrow< E >( t1, u1, &tmp );
         ret = tmp;
     }
 };
@@ -3256,15 +3259,15 @@ template < typename T, typename U > class MultiplicationHelper< T, U, Multiplica
 {
 public:
     // T is signed, up to 32-bit
-    // U is std::int64_t
+    // U is int64_t
     _CONSTEXPR14 static bool Multiply( T t, const U& u, T& ret ) SAFEINT_NOTHROW
     {
         static_assert( safeint_internal::int_traits<U>::isInt64, "U must be Int64" );
-        std::int64_t u1 = u;
-        std::int32_t tmp = 0;
+        int64_t u1 = u;
+        int32_t tmp = 0;
 
-        if( LargeIntRegMultiply< std::int32_t, std::int64_t >::RegMultiply( (std::int32_t)t, u1, &tmp ) &&
-            SafeCastHelper< T, std::int32_t, GetCastMethod< T, std::int32_t >::method >::Cast( tmp, ret ) )
+        if( LargeIntRegMultiply< int32_t, int64_t >::RegMultiply( (int32_t)t, u1, &tmp ) &&
+            SafeCastHelper< T, int32_t, GetCastMethod< T, int32_t >::method >::Cast( tmp, ret ) )
         {
             return true;
         }
@@ -3276,11 +3279,11 @@ public:
     _CONSTEXPR14 static void MultiplyThrow(T t, const U& u, T& ret) SAFEINT_CPP_THROW
     {
         static_assert(safeint_internal::int_traits<U>::isInt64, "U must be Int64");
-        std::int64_t u1 = u;
-        std::int32_t tmp = 0;
+        int64_t u1 = u;
+        int32_t tmp = 0;
 
-        LargeIntRegMultiply< std::int32_t, std::int64_t >::template RegMultiplyThrow< E >( (std::int32_t)t, u1, &tmp );
-        SafeCastHelper< T, std::int32_t, GetCastMethod< T, std::int32_t >::method >::template CastThrow< E >( tmp, ret );
+        LargeIntRegMultiply< int32_t, int64_t >::template RegMultiplyThrow< E >( (int32_t)t, u1, &tmp );
+        SafeCastHelper< T, int32_t, GetCastMethod< T, int32_t >::method >::template CastThrow< E >( tmp, ret );
     }
 };
 
@@ -3430,7 +3433,7 @@ public:
         if( t > 0 )
             result = (T)( t/u );
         else
-            result = (T)( (std::int64_t)t/(std::int64_t)u );
+            result = (T)( (int64_t)t/(int64_t)u );
 
         return SafeIntError::SafeIntNoError;
     }
@@ -3456,7 +3459,7 @@ public:
         if( t > 0 )
             result = (T)( t/u );
         else
-            result = (T)( (std::int64_t)t/(std::int64_t)u );
+            result = (T)( (int64_t)t/(int64_t)u );
     }
 };
 
@@ -3464,19 +3467,19 @@ template < typename T, typename U, bool > class div_signed_uint64;
 template < typename T, typename U> class div_signed_uint64 <T, U, true> // Value of u fits into an int32
 {
 public:
-    _CONSTEXPR14 static T divide(T t, U u) { return (T)((std::int32_t)t / (std::int32_t)u); }
+    _CONSTEXPR14 static T divide(T t, U u) { return (T)((int32_t)t / (int32_t)u); }
 };
 
 template < typename T, typename U> class div_signed_uint64 <T, U, false>
 {
 public:
-    _CONSTEXPR14 static T divide(T t, U u) { return (T)((std::int64_t)t / (std::int64_t)u); }
+    _CONSTEXPR14 static T divide(T t, U u) { return (T)((int64_t)t / (int64_t)u); }
 };
 
 template < typename T, typename U > class DivisionHelper< T, U, DivisionState_SignedUnsigned64 >
 {
 public:
-    _CONSTEXPR14 static SafeIntError Divide( const T& t, const std::uint64_t& u, T& result ) SAFEINT_NOTHROW
+    _CONSTEXPR14 static SafeIntError Divide( const T& t, const uint64_t& u, T& result ) SAFEINT_NOTHROW
     {
         static_assert(safeint_internal::int_traits<U>::isUint64, "U must be Uint64");
 
@@ -3491,12 +3494,12 @@ public:
             return SafeIntError::SafeIntNoError;
         }
 
-        if( u <= (std::uint64_t)std::numeric_limits<T>::max() )
+        if( u <= (uint64_t)std::numeric_limits<T>::max() )
         {
-            result = div_signed_uint64 < T, U, sizeof(T) < sizeof(std::int64_t) > ::divide(t, u);
+            result = div_signed_uint64 < T, U, sizeof(T) < sizeof(int64_t) > ::divide(t, u);
         }
         else // Corner case
-        if( t == std::numeric_limits<T>::min() && u == (std::uint64_t)std::numeric_limits<T>::min() )
+        if( t == std::numeric_limits<T>::min() && u == (uint64_t)std::numeric_limits<T>::min() )
         {
             // Min int divided by it's own magnitude is -1
             result = -1;
@@ -3509,7 +3512,7 @@ public:
     }
 
     template < typename E >
-    _CONSTEXPR14 static void DivideThrow( const T& t, const std::uint64_t& u, T& result ) SAFEINT_CPP_THROW
+    _CONSTEXPR14 static void DivideThrow( const T& t, const uint64_t& u, T& result ) SAFEINT_CPP_THROW
     {
         static_assert(safeint_internal::int_traits<U>::isUint64, "U must be Uint64");
 
@@ -3524,12 +3527,12 @@ public:
             return;
         }
 
-        if( u <= (std::uint64_t)std::numeric_limits<T>::max() )
+        if( u <= (uint64_t)std::numeric_limits<T>::max() )
         {
-            result = div_signed_uint64 < T, U, sizeof(T) < sizeof(std::int64_t) > ::divide(t, u);
+            result = div_signed_uint64 < T, U, sizeof(T) < sizeof(int64_t) > ::divide(t, u);
         }
         else // Corner case
-        if( t == std::numeric_limits<T>::min() && u == (std::uint64_t)std::numeric_limits<T>::min() )
+        if( t == std::numeric_limits<T>::min() && u == (uint64_t)std::numeric_limits<T>::min() )
         {
             // Min int divided by it's own magnitude is -1
             result = -1;
@@ -3692,9 +3695,9 @@ public:
     _CONSTEXPR14 static bool Addition( const T& lhs, const U& rhs, T& result ) SAFEINT_NOTHROW
     {
         //16-bit or less unsigned addition
-        std::int32_t tmp = lhs + rhs;
+        int32_t tmp = lhs + rhs;
 
-        if( tmp <= (std::int32_t)std::numeric_limits<T>::max() )
+        if( tmp <= (int32_t)std::numeric_limits<T>::max() )
         {
             result = (T)tmp;
             return true;
@@ -3707,9 +3710,9 @@ public:
     _CONSTEXPR14 static void AdditionThrow( const T& lhs, const U& rhs, T& result ) SAFEINT_CPP_THROW
     {
         //16-bit or less unsigned addition
-        std::int32_t tmp = lhs + rhs;
+        int32_t tmp = lhs + rhs;
 
-        if( tmp <= (std::int32_t)std::numeric_limits<T>::max() )
+        if( tmp <= (int32_t)std::numeric_limits<T>::max() )
         {
             result = (T)tmp;
             return;
@@ -3725,7 +3728,7 @@ public:
     _CONSTEXPR14 static bool Addition( const T& lhs, const U& rhs, T& result ) SAFEINT_NOTHROW
     {
         // 32-bit or less - both are unsigned
-        std::uint32_t tmp = (std::uint32_t)lhs + (std::uint32_t)rhs;
+        uint32_t tmp = (uint32_t)lhs + (uint32_t)rhs;
 
         //we added didn't get smaller
         if( tmp >= lhs )
@@ -3740,7 +3743,7 @@ public:
     _CONSTEXPR14 static void AdditionThrow( const T& lhs, const U& rhs, T& result ) SAFEINT_CPP_THROW
     {
         // 32-bit or less - both are unsigned
-        std::uint32_t tmp = (std::uint32_t)lhs + (std::uint32_t)rhs;
+        uint32_t tmp = (uint32_t)lhs + (uint32_t)rhs;
 
         //we added didn't get smaller
         if( tmp >= lhs )
@@ -3758,7 +3761,7 @@ public:
     _CONSTEXPR14 static bool Addition( const T& lhs, const U& rhs, T& result ) SAFEINT_NOTHROW
     {
         // 32-bit or less - both are unsigned
-        std::uint32_t tmp = (std::uint32_t)lhs + (std::uint32_t)rhs;
+        uint32_t tmp = (uint32_t)lhs + (uint32_t)rhs;
 
         // We added and it didn't get smaller or exceed maxInt
         if( tmp >= lhs && tmp <= std::numeric_limits<T>::max() )
@@ -3773,7 +3776,7 @@ public:
     _CONSTEXPR14 static void AdditionThrow( const T& lhs, const U& rhs, T& result ) SAFEINT_CPP_THROW
     {
         //32-bit or less - both are unsigned
-        std::uint32_t tmp = (std::uint32_t)lhs + (std::uint32_t)rhs;
+        uint32_t tmp = (uint32_t)lhs + (uint32_t)rhs;
 
         // We added and it didn't get smaller or exceed maxInt
         if( tmp >= lhs && tmp <= std::numeric_limits<T>::max() )
@@ -3790,8 +3793,8 @@ template < typename T, typename U > class AdditionHelper < T, U, AdditionState_C
 public:
     _CONSTEXPR14 static bool Addition( const T& lhs, const U& rhs, T& result ) SAFEINT_NOTHROW
     {
-        // lhs std::uint64_t, rhs unsigned
-        std::uint64_t tmp = (std::uint64_t)lhs + (std::uint64_t)rhs;
+        // lhs uint64_t, rhs unsigned
+        uint64_t tmp = (uint64_t)lhs + (uint64_t)rhs;
 
         // We added and it didn't get smaller
         if(tmp >= lhs)
@@ -3806,8 +3809,8 @@ public:
     template < typename E >
     _CONSTEXPR14 static void AdditionThrow( const T& lhs, const U& rhs, T& result ) SAFEINT_CPP_THROW
     {
-        // lhs std::uint64_t, rhs unsigned
-        std::uint64_t tmp = (std::uint64_t)lhs + (std::uint64_t)rhs;
+        // lhs uint64_t, rhs unsigned
+        uint64_t tmp = (uint64_t)lhs + (uint64_t)rhs;
 
         // We added and it didn't get smaller
         if(tmp >= lhs)
@@ -3825,8 +3828,8 @@ template < typename T, typename U > class AdditionHelper < T, U, AdditionState_C
 public:
     _CONSTEXPR14 static bool Addition( const T& lhs, const U& rhs, T& result ) SAFEINT_NOTHROW
     {
-        //lhs std::uint64_t, rhs unsigned
-        std::uint64_t tmp = (std::uint64_t)lhs + (std::uint64_t)rhs;
+        //lhs uint64_t, rhs unsigned
+        uint64_t tmp = (uint64_t)lhs + (uint64_t)rhs;
 
         // We added and it didn't get smaller
         if( tmp >= lhs && tmp <= std::numeric_limits<T>::max() )
@@ -3841,8 +3844,8 @@ public:
     template < typename E >
     _CONSTEXPR14 static void AdditionThrow( const T& lhs, const U& rhs, T& result ) SAFEINT_CPP_THROW
     {
-        //lhs std::uint64_t, rhs unsigned
-        std::uint64_t tmp = (std::uint64_t)lhs + (std::uint64_t)rhs;
+        //lhs uint64_t, rhs unsigned
+        uint64_t tmp = (uint64_t)lhs + (uint64_t)rhs;
 
         // We added and it didn't get smaller
         if( tmp >= lhs && tmp <= std::numeric_limits<T>::max() )
@@ -3861,9 +3864,9 @@ public:
     _CONSTEXPR14 static bool Addition( const T& lhs, const U& rhs, T& result ) SAFEINT_NOTHROW
     {
         // 16-bit or less - one or both are signed
-        std::int32_t tmp = lhs + rhs;
+        int32_t tmp = lhs + rhs;
 
-        if( tmp <= (std::int32_t)std::numeric_limits<T>::max() && tmp >= (std::int32_t)std::numeric_limits<T>::min() )
+        if( tmp <= (int32_t)std::numeric_limits<T>::max() && tmp >= (int32_t)std::numeric_limits<T>::min() )
         {
             result = (T)tmp;
             return true;
@@ -3876,9 +3879,9 @@ public:
     _CONSTEXPR14 static void AdditionThrow( const T& lhs, const U& rhs, T& result ) SAFEINT_CPP_THROW
     {
         // 16-bit or less - one or both are signed
-        std::int32_t tmp = lhs + rhs;
+        int32_t tmp = lhs + rhs;
 
-        if( tmp <= (std::int32_t)std::numeric_limits<T>::max() && tmp >= (std::int32_t)std::numeric_limits<T>::min() )
+        if( tmp <= (int32_t)std::numeric_limits<T>::max() && tmp >= (int32_t)std::numeric_limits<T>::min() )
         {
             result = (T)tmp;
             return;
@@ -3894,9 +3897,9 @@ public:
     _CONSTEXPR14 static bool Addition( const T& lhs, const U& rhs, T& result ) SAFEINT_NOTHROW
     {
         // 32-bit or less - one or both are signed
-        std::int64_t tmp = (std::int64_t)lhs + (std::int64_t)rhs;
+        int64_t tmp = (int64_t)lhs + (int64_t)rhs;
 
-        if( tmp <= (std::int64_t)std::numeric_limits<T>::max() && tmp >= (std::int64_t)std::numeric_limits<T>::min() )
+        if( tmp <= (int64_t)std::numeric_limits<T>::max() && tmp >= (int64_t)std::numeric_limits<T>::min() )
         {
             result = (T)tmp;
             return true;
@@ -3909,9 +3912,9 @@ public:
     _CONSTEXPR14 static void AdditionThrow( const T& lhs, const U& rhs, T& result ) SAFEINT_CPP_THROW
     {
         // 32-bit or less - one or both are signed
-        std::int64_t tmp = (std::int64_t)lhs + (std::int64_t)rhs;
+        int64_t tmp = (int64_t)lhs + (int64_t)rhs;
 
-        if( tmp <= (std::int64_t)std::numeric_limits<T>::max() && tmp >= (std::int64_t)std::numeric_limits<T>::min() )
+        if( tmp <= (int64_t)std::numeric_limits<T>::max() && tmp >= (int64_t)std::numeric_limits<T>::min() )
         {
             result = (T)tmp;
             return;
@@ -3927,7 +3930,7 @@ public:
     _CONSTEXPR14 static bool Addition( const T& lhs, const U& rhs, T& result ) SAFEINT_NOTHROW
     {
         // 32-bit or less - lhs signed, rhs unsigned
-        std::int64_t tmp = (std::int64_t)lhs + (std::int64_t)rhs;
+        int64_t tmp = (int64_t)lhs + (int64_t)rhs;
 
         if( tmp <= std::numeric_limits<T>::max() )
         {
@@ -3942,7 +3945,7 @@ public:
     _CONSTEXPR14 static void AdditionThrow( const T& lhs, const U& rhs, T& result ) SAFEINT_CPP_THROW
     {
         // 32-bit or less - lhs signed, rhs unsigned
-        std::int64_t tmp = (std::int64_t)lhs + (std::int64_t)rhs;
+        int64_t tmp = (int64_t)lhs + (int64_t)rhs;
 
         if( tmp <= std::numeric_limits<T>::max() )
         {
@@ -3959,8 +3962,8 @@ template < typename T, typename U > class AdditionHelper < T, U, AdditionState_C
 public:
     _CONSTEXPR14 static bool Addition( const T& lhs, const U& rhs, T& result ) SAFEINT_NOTHROW
     {
-        // lhs is std::uint64_t, rhs signed
-        std::uint64_t tmp = 0;
+        // lhs is uint64_t, rhs signed
+        uint64_t tmp = 0;
 
         if( rhs < 0 )
         {
@@ -3975,8 +3978,8 @@ public:
         }
         else
         {
-            // now we know that rhs can be safely cast into an std::uint64_t
-            tmp = (std::uint64_t)lhs + (std::uint64_t)rhs;
+            // now we know that rhs can be safely cast into an uint64_t
+            tmp = (uint64_t)lhs + (uint64_t)rhs;
 
             // We added and it did not become smaller
             if( tmp >= lhs )
@@ -3992,8 +3995,8 @@ public:
     template < typename E >
     _CONSTEXPR14 static void AdditionThrow( const T& lhs, const U& rhs, T& result ) SAFEINT_CPP_THROW
     {
-        // lhs is std::uint64_t, rhs signed
-        std::uint64_t tmp = 0;
+        // lhs is uint64_t, rhs signed
+        uint64_t tmp = 0;
 
         if( rhs < 0 )
         {
@@ -4008,8 +4011,8 @@ public:
         }
         else
         {
-            // now we know that rhs can be safely cast into an std::uint64_t
-            tmp = (std::uint64_t)lhs + (std::uint64_t)rhs;
+            // now we know that rhs can be safely cast into an uint64_t
+            tmp = (uint64_t)lhs + (uint64_t)rhs;
 
             // We added and it did not become smaller
             if( tmp >= lhs )
@@ -4028,10 +4031,10 @@ template < typename T, typename U > class AdditionHelper < T, U, AdditionState_C
 public:
     _CONSTEXPR14 static bool Addition( const T& lhs, const U& rhs, T& result ) SAFEINT_NOTHROW
     {
-        // lhs is unsigned and < 64-bit, rhs std::int64_t
+        // lhs is unsigned and < 64-bit, rhs int64_t
         if( rhs < 0 )
         {
-            if( lhs >= ~(std::uint64_t)( rhs ) + 1 )//negation is safe, since rhs is 64-bit
+            if( lhs >= ~(uint64_t)( rhs ) + 1 )//negation is safe, since rhs is 64-bit
             {
                 result = (T)( lhs + rhs );
                 return true;
@@ -4039,8 +4042,8 @@ public:
         }
         else
         {
-            // now we know that rhs can be safely cast into an std::uint64_t
-            std::uint64_t tmp = (std::uint64_t)lhs + (std::uint64_t)rhs;
+            // now we know that rhs can be safely cast into an uint64_t
+            uint64_t tmp = (uint64_t)lhs + (uint64_t)rhs;
 
             // special case - rhs cannot be larger than 0x7fffffffffffffff, lhs cannot be larger than 0xffffffff
             // it is not possible for the operation above to overflow, so just check max
@@ -4056,10 +4059,10 @@ public:
     template < typename E >
     _CONSTEXPR14 static void AdditionThrow( const T& lhs, const U& rhs, T& result ) SAFEINT_CPP_THROW
     {
-        // lhs is unsigned and < 64-bit, rhs std::int64_t
+        // lhs is unsigned and < 64-bit, rhs int64_t
         if( rhs < 0 )
         {
-            if( lhs >= ~(std::uint64_t)( rhs ) + 1) //negation is safe, since rhs is 64-bit
+            if( lhs >= ~(uint64_t)( rhs ) + 1) //negation is safe, since rhs is 64-bit
             {
                 result = (T)( lhs + rhs );
                 return;
@@ -4067,8 +4070,8 @@ public:
         }
         else
         {
-            // now we know that rhs can be safely cast into an std::uint64_t
-            std::uint64_t tmp = (std::uint64_t)lhs + (std::uint64_t)rhs;
+            // now we know that rhs can be safely cast into an uint64_t
+            uint64_t tmp = (uint64_t)lhs + (uint64_t)rhs;
 
             // special case - rhs cannot be larger than 0x7fffffffffffffff, lhs cannot be larger than 0xffffffff
             // it is not possible for the operation above to overflow, so just check max
@@ -4087,8 +4090,8 @@ template < typename T, typename U > class AdditionHelper < T, U, AdditionState_C
 public:
     _CONSTEXPR14 static bool Addition( const T& lhs, const U& rhs, T& result ) SAFEINT_NOTHROW
     {
-        // lhs is std::int64_t, rhs signed
-        std::int64_t tmp = (std::int64_t)((std::uint64_t)lhs + (std::uint64_t)rhs);
+        // lhs is int64_t, rhs signed
+        int64_t tmp = (int64_t)((uint64_t)lhs + (uint64_t)rhs);
 
         if( lhs >= 0 )
         {
@@ -4110,8 +4113,8 @@ public:
     template < typename E >
     _CONSTEXPR14 static void AdditionThrow( const T& lhs, const U& rhs, T& result ) SAFEINT_CPP_THROW
     {
-        // lhs is std::int64_t, rhs signed
-        std::int64_t tmp = (std::int64_t)((std::uint64_t)lhs + (std::uint64_t)rhs);
+        // lhs is int64_t, rhs signed
+        int64_t tmp = (int64_t)((uint64_t)lhs + (uint64_t)rhs);
 
         if( lhs >= 0 )
         {
@@ -4135,10 +4138,10 @@ template < typename T, typename U > class AdditionHelper < T, U, AdditionState_C
 public:
     _CONSTEXPR14 static bool Addition( const T& lhs, const U& rhs, T& result ) SAFEINT_NOTHROW
     {
-        //rhs is std::int64_t, lhs signed
-        std::int64_t tmp = 0;
+        //rhs is int64_t, lhs signed
+        int64_t tmp = 0;
 
-        if( AdditionHelper< std::int64_t, std::int64_t, AdditionState_CastInt64CheckOverflow >::Addition( (std::int64_t)lhs, (std::int64_t)rhs, tmp ) &&
+        if( AdditionHelper< int64_t, int64_t, AdditionState_CastInt64CheckOverflow >::Addition( (int64_t)lhs, (int64_t)rhs, tmp ) &&
             tmp <= std::numeric_limits<T>::max() &&
             tmp >= std::numeric_limits<T>::min() )
         {
@@ -4152,10 +4155,10 @@ public:
     template < typename E >
     _CONSTEXPR14 static void AdditionThrow( const T& lhs, const U& rhs, T& result ) SAFEINT_CPP_THROW
     {
-        //rhs is std::int64_t, lhs signed
-        std::int64_t tmp = 0;
+        //rhs is int64_t, lhs signed
+        int64_t tmp = 0;
 
-        AdditionHelper< std::int64_t, std::int64_t, AdditionState_CastInt64CheckOverflow >::AdditionThrow< E >( (std::int64_t)lhs, (std::int64_t)rhs, tmp );
+        AdditionHelper< int64_t, int64_t, AdditionState_CastInt64CheckOverflow >::AdditionThrow< E >( (int64_t)lhs, (int64_t)rhs, tmp );
 
         if( tmp <= std::numeric_limits<T>::max() &&
             tmp >= std::numeric_limits<T>::min() )
@@ -4173,12 +4176,12 @@ template < typename T, typename U > class AdditionHelper < T, U, AdditionState_C
 public:
     _CONSTEXPR14 static bool Addition( const T& lhs, const U& rhs, T& result ) SAFEINT_NOTHROW
     {
-        //lhs is std::int64_t, rhs unsigned < 64-bit
-        std::uint64_t tmp = (std::uint64_t)lhs + (std::uint64_t)rhs;
+        //lhs is int64_t, rhs unsigned < 64-bit
+        uint64_t tmp = (uint64_t)lhs + (uint64_t)rhs;
 
-        if( (std::int64_t)tmp >= lhs )
+        if( (int64_t)tmp >= lhs )
         {
-            result = (T)(std::int64_t)tmp;
+            result = (T)(int64_t)tmp;
             return true;
         }
 
@@ -4188,14 +4191,14 @@ public:
     template < typename E >
     _CONSTEXPR14 static void AdditionThrow( const T& lhs, const U& rhs, T& result ) SAFEINT_CPP_THROW
     {
-        // lhs is std::int64_t, rhs unsigned < 64-bit
+        // lhs is int64_t, rhs unsigned < 64-bit
         // Some compilers get optimization-happy, let's thwart them
 
-        std::uint64_t tmp = (std::uint64_t)lhs + (std::uint64_t)rhs;
+        uint64_t tmp = (uint64_t)lhs + (uint64_t)rhs;
 
-        if( (std::int64_t)tmp >= lhs )
+        if( (int64_t)tmp >= lhs )
         {
-            result = (T)(std::int64_t)tmp;
+            result = (T)(int64_t)tmp;
             return;
         }
 
@@ -4206,17 +4209,17 @@ public:
 template < typename T, typename U > class AdditionHelper < T, U, AdditionState_ManualCheckInt64Uint64 >
 {
 public:
-    _CONSTEXPR14 static bool Addition( const std::int64_t& lhs, const std::uint64_t& rhs, T& result ) SAFEINT_NOTHROW
+    _CONSTEXPR14 static bool Addition( const int64_t& lhs, const uint64_t& rhs, T& result ) SAFEINT_NOTHROW
     {
         static_assert( safeint_internal::int_traits< T >::isInt64 && safeint_internal::int_traits< U >::isUint64, "T must be Int64, U Uint64" );
-        // rhs is std::uint64_t, lhs std::int64_t
+        // rhs is uint64_t, lhs int64_t
         // cast everything to unsigned, perform addition, then
         // cast back for check - this is done to stop optimizers from removing the code
-        std::uint64_t tmp = (std::uint64_t)lhs + rhs;
+        uint64_t tmp = (uint64_t)lhs + rhs;
 
-        if( (std::int64_t)tmp >= lhs )
+        if( (int64_t)tmp >= lhs )
         {
-            result = (std::int64_t)tmp;
+            result = (int64_t)tmp;
             return true;
         }
 
@@ -4225,15 +4228,15 @@ public:
     }
 
     template < typename E >
-    _CONSTEXPR14 static void AdditionThrow( const std::int64_t& lhs, const std::uint64_t& rhs, T& result ) SAFEINT_CPP_THROW
+    _CONSTEXPR14 static void AdditionThrow( const int64_t& lhs, const uint64_t& rhs, T& result ) SAFEINT_CPP_THROW
     {
         static_assert(safeint_internal::int_traits< T >::isInt64 && safeint_internal::int_traits< U >::isUint64, "T must be Int64, U Uint64");
-        // rhs is std::uint64_t, lhs std::int64_t
-        std::uint64_t tmp = (std::uint64_t)lhs + rhs;
+        // rhs is uint64_t, lhs int64_t
+        uint64_t tmp = (uint64_t)lhs + rhs;
 
-        if( (std::int64_t)tmp >= lhs )
+        if( (int64_t)tmp >= lhs )
         {
-            result = (std::int64_t)tmp;
+            result = (int64_t)tmp;
             return;
         }
 
@@ -4246,15 +4249,15 @@ template < typename T, typename U > class AdditionHelper < T, U, AdditionState_M
 public:
     _CONSTEXPR14 static bool Addition( const T& lhs, const U& rhs, T& result ) SAFEINT_NOTHROW
     {
-        // rhs is std::uint64_t, lhs signed, 32-bit or less
-        if( (std::uint32_t)( rhs >> 32 ) == 0 )
+        // rhs is uint64_t, lhs signed, 32-bit or less
+        if( (uint32_t)( rhs >> 32 ) == 0 )
         {
             // Now it just happens to work out that the standard behavior does what we want
             // Adding explicit casts to show exactly what's happening here
             // Note - this is tweaked to keep optimizers from tossing out the code.
-            std::uint32_t tmp = (std::uint32_t)rhs + (std::uint32_t)lhs;
+            uint32_t tmp = (uint32_t)rhs + (uint32_t)lhs;
 
-            if( (std::int32_t)tmp >= lhs && SafeCastHelper< T, std::int32_t, GetCastMethod< T, std::int32_t >::method >::Cast( (std::int32_t)tmp, result ) )
+            if( (int32_t)tmp >= lhs && SafeCastHelper< T, int32_t, GetCastMethod< T, int32_t >::method >::Cast( (int32_t)tmp, result ) )
                 return true;
         }
 
@@ -4264,17 +4267,17 @@ public:
     template < typename E >
     _CONSTEXPR14 static void AdditionThrow( const T& lhs, const U& rhs, T& result ) SAFEINT_CPP_THROW
     {
-        // rhs is std::uint64_t, lhs signed, 32-bit or less
+        // rhs is uint64_t, lhs signed, 32-bit or less
 
-        if( (std::uint32_t)( rhs >> 32 ) == 0 )
+        if( (uint32_t)( rhs >> 32 ) == 0 )
         {
             // Now it just happens to work out that the standard behavior does what we want
             // Adding explicit casts to show exactly what's happening here
-            std::uint32_t tmp = (std::uint32_t)rhs + (std::uint32_t)lhs;
+            uint32_t tmp = (uint32_t)rhs + (uint32_t)lhs;
 
-            if( (std::int32_t)tmp >= lhs )
+            if( (int32_t)tmp >= lhs )
             {
-                SafeCastHelper< T, std::int32_t, GetCastMethod< T, std::int32_t >::method >::template CastThrow< E >( (std::int32_t)tmp, result );
+                SafeCastHelper< T, int32_t, GetCastMethod< T, int32_t >::method >::template CastThrow< E >( (int32_t)tmp, result );
                 return;
             }
         }
@@ -4452,9 +4455,9 @@ public:
     {
         // both values are 16-bit or less
         // rhs is signed, so could end up increasing or decreasing
-        std::int32_t tmp = lhs - rhs;
+        int32_t tmp = lhs - rhs;
 
-        if( SafeCastHelper< T, std::int32_t, GetCastMethod< T, std::int32_t >::method >::Cast( tmp, result ) )
+        if( SafeCastHelper< T, int32_t, GetCastMethod< T, int32_t >::method >::Cast( tmp, result ) )
         {
             result = (T)tmp;
             return true;
@@ -4468,9 +4471,9 @@ public:
     {
         // both values are 16-bit or less
         // rhs is signed, so could end up increasing or decreasing
-        std::int32_t tmp = lhs - rhs;
+        int32_t tmp = lhs - rhs;
 
-        SafeCastHelper< T, std::int32_t, GetCastMethod< T, std::int32_t >::method >::template CastThrow< E >( tmp, result );
+        SafeCastHelper< T, int32_t, GetCastMethod< T, int32_t >::method >::template CastThrow< E >( tmp, result );
     }
 };
 
@@ -4481,9 +4484,9 @@ public:
     {
         // both values are 16-bit or less
         // rhs is signed, so could end up increasing or decreasing
-        std::int32_t tmp = lhs - rhs;
+        int32_t tmp = lhs - rhs;
 
-        return SafeCastHelper< T, std::int32_t, GetCastMethod< T, std::int32_t >::method >::Cast( tmp, result );
+        return SafeCastHelper< T, int32_t, GetCastMethod< T, int32_t >::method >::Cast( tmp, result );
     }
 
     template < typename E >
@@ -4491,9 +4494,9 @@ public:
     {
         // both values are 16-bit or less
         // rhs is signed, so could end up increasing or decreasing
-        std::int32_t tmp = lhs - rhs;
+        int32_t tmp = lhs - rhs;
 
-        SafeCastHelper< T, std::int32_t, GetCastMethod< T, std::int32_t >::method >::template CastThrow< E >( tmp, result );
+        SafeCastHelper< T, int32_t, GetCastMethod< T, int32_t >::method >::template CastThrow< E >( tmp, result );
     }
 };
 
@@ -4504,9 +4507,9 @@ public:
     {
         // both values are 16-bit or less
         // rhs is unsigned - check only minimum
-        std::int32_t tmp = lhs - rhs;
+        int32_t tmp = lhs - rhs;
 
-        if( tmp >= (std::int32_t)std::numeric_limits<T>::min() )
+        if( tmp >= (int32_t)std::numeric_limits<T>::min() )
         {
             result = (T)tmp;
             return true;
@@ -4520,9 +4523,9 @@ public:
     {
         // both values are 16-bit or less
         // rhs is unsigned - check only minimum
-        std::int32_t tmp = lhs - rhs;
+        int32_t tmp = lhs - rhs;
 
-        if( tmp >= (std::int32_t)std::numeric_limits<T>::min() )
+        if( tmp >= (int32_t)std::numeric_limits<T>::min() )
         {
             result = (T)tmp;
             return;
@@ -4539,9 +4542,9 @@ public:
     {
         // both values are 32-bit or less
         // rhs is signed, so could end up increasing or decreasing
-        std::int64_t tmp = (std::int64_t)lhs - (std::int64_t)rhs;
+        int64_t tmp = (int64_t)lhs - (int64_t)rhs;
 
-        return SafeCastHelper< T, std::int64_t, GetCastMethod< T, std::int64_t >::method >::Cast( tmp, result );
+        return SafeCastHelper< T, int64_t, GetCastMethod< T, int64_t >::method >::Cast( tmp, result );
     }
 
     template < typename E >
@@ -4549,9 +4552,9 @@ public:
     {
         // both values are 32-bit or less
         // rhs is signed, so could end up increasing or decreasing
-        std::int64_t tmp = (std::int64_t)lhs - (std::int64_t)rhs;
+        int64_t tmp = (int64_t)lhs - (int64_t)rhs;
 
-        SafeCastHelper< T, std::int64_t, GetCastMethod< T, std::int64_t >::method >::template CastThrow< E >( tmp, result );
+        SafeCastHelper< T, int64_t, GetCastMethod< T, int64_t >::method >::template CastThrow< E >( tmp, result );
     }
 };
 
@@ -4562,9 +4565,9 @@ public:
     {
         // both values are 32-bit or less
         // rhs is signed, so could end up increasing or decreasing
-        std::int64_t tmp = (std::int64_t)lhs - (std::int64_t)rhs;
+        int64_t tmp = (int64_t)lhs - (int64_t)rhs;
 
-        return SafeCastHelper< T, std::int64_t, GetCastMethod< T, std::int64_t >::method >::Cast( tmp, result );
+        return SafeCastHelper< T, int64_t, GetCastMethod< T, int64_t >::method >::Cast( tmp, result );
     }
 
     template < typename E >
@@ -4572,9 +4575,9 @@ public:
     {
         // both values are 32-bit or less
         // rhs is signed, so could end up increasing or decreasing
-        std::int64_t tmp = (std::int64_t)lhs - (std::int64_t)rhs;
+        int64_t tmp = (int64_t)lhs - (int64_t)rhs;
 
-        SafeCastHelper< T, std::int64_t, GetCastMethod< T, std::int64_t >::method >::template CastThrow< E >( tmp, result );
+        SafeCastHelper< T, int64_t, GetCastMethod< T, int64_t >::method >::template CastThrow< E >( tmp, result );
     }
 };
 
@@ -4585,9 +4588,9 @@ public:
     {
         // both values are 32-bit or less
         // rhs is unsigned - check only minimum
-        std::int64_t tmp = (std::int64_t)lhs - (std::int64_t)rhs;
+        int64_t tmp = (int64_t)lhs - (int64_t)rhs;
 
-        if( tmp >= (std::int64_t)std::numeric_limits<T>::min() )
+        if( tmp >= (int64_t)std::numeric_limits<T>::min() )
         {
             result = (T)tmp;
             return true;
@@ -4601,9 +4604,9 @@ public:
     {
         // both values are 32-bit or less
         // rhs is unsigned - check only minimum
-        std::int64_t tmp = (std::int64_t)lhs - (std::int64_t)rhs;
+        int64_t tmp = (int64_t)lhs - (int64_t)rhs;
 
-        if( tmp >= (std::int64_t)std::numeric_limits<T>::min() )
+        if( tmp >= (int64_t)std::numeric_limits<T>::min() )
         {
             result = (T)tmp;
             return;
@@ -4618,13 +4621,13 @@ template < typename T, typename U > class SubtractionHelper< T, U, SubtractionSt
 public:
     _CONSTEXPR14 static bool Subtract( const T& lhs, const U& rhs, T& result ) SAFEINT_NOTHROW
     {
-        // lhs is an std::uint64_t, rhs signed
+        // lhs is an uint64_t, rhs signed
         // must first see if rhs is positive or negative
         if( rhs >= 0 )
         {
-            if( (std::uint64_t)rhs <= lhs )
+            if( (uint64_t)rhs <= lhs )
             {
-                result = (T)( lhs - (std::uint64_t)rhs );
+                result = (T)( lhs - (uint64_t)rhs );
                 return true;
             }
         }
@@ -4644,13 +4647,13 @@ public:
     template < typename E >
     _CONSTEXPR14 static void SubtractThrow( const T& lhs, const U& rhs, T& result ) SAFEINT_CPP_THROW
     {
-        // lhs is an std::uint64_t, rhs signed
+        // lhs is an uint64_t, rhs signed
         // must first see if rhs is positive or negative
         if( rhs >= 0 )
         {
-            if( (std::uint64_t)rhs <= lhs )
+            if( (uint64_t)rhs <= lhs )
             {
-                result = (T)( lhs - (std::uint64_t)rhs );
+                result = (T)( lhs - (uint64_t)rhs );
                 return;
             }
         }
@@ -4673,13 +4676,13 @@ template < typename U, typename T > class SubtractionHelper< U, T, SubtractionSt
 public:
     _CONSTEXPR14 static bool Subtract( const U& lhs, const T& rhs, T& result ) SAFEINT_NOTHROW
     {
-        // U is std::uint64_t, T is signed
+        // U is uint64_t, T is signed
         if( rhs < 0 )
         {
             // treat this as addition
-            std::uint64_t tmp = 0;
+            uint64_t tmp = 0;
 
-            tmp = lhs + (std::uint64_t)AbsValueHelper< T, GetAbsMethod< T >::method >::Abs( rhs );
+            tmp = lhs + (uint64_t)AbsValueHelper< T, GetAbsMethod< T >::method >::Abs( rhs );
 
             // must check for addition overflow and max
             if( tmp >= lhs && tmp <= std::numeric_limits<T>::max() )
@@ -4688,7 +4691,7 @@ public:
                 return true;
             }
         }
-        else if( (std::uint64_t)rhs > lhs ) // now both are positive, so comparison always works
+        else if( (uint64_t)rhs > lhs ) // now both are positive, so comparison always works
         {
             // result is negative
             // implies that lhs must fit into T, and result cannot overflow
@@ -4699,7 +4702,7 @@ public:
         else
         {
             // result is positive
-            std::uint64_t tmp = (std::uint64_t)lhs - (std::uint64_t)rhs;
+            uint64_t tmp = (uint64_t)lhs - (uint64_t)rhs;
 
             if( tmp <= std::numeric_limits<T>::max() )
             {
@@ -4714,22 +4717,22 @@ public:
     template < typename E >
     _CONSTEXPR14 static void SubtractThrow( const U& lhs, const T& rhs, T& result ) SAFEINT_CPP_THROW
     {
-        // U is std::uint64_t, T is signed
+        // U is uint64_t, T is signed
         if( rhs < 0 )
         {
             // treat this as addition
-            std::uint64_t tmp = 0;
+            uint64_t tmp = 0;
 
-            tmp = lhs + (std::uint64_t)AbsValueHelper< T, GetAbsMethod< T >::method >::Abs( rhs );
+            tmp = lhs + (uint64_t)AbsValueHelper< T, GetAbsMethod< T >::method >::Abs( rhs );
 
             // must check for addition overflow and max
-            if( tmp >= lhs && tmp <= (std::uint64_t)std::numeric_limits<T>::max() )
+            if( tmp >= lhs && tmp <= (uint64_t)std::numeric_limits<T>::max() )
             {
                 result = (T)tmp;
                 return;
             }
         }
-        else if( (std::uint64_t)rhs > lhs ) // now both are positive, so comparison always works
+        else if( (uint64_t)rhs > lhs ) // now both are positive, so comparison always works
         {
             // result is negative
             // implies that lhs must fit into T, and result cannot overflow
@@ -4740,9 +4743,9 @@ public:
         else
         {
             // result is positive
-            std::uint64_t tmp = (std::uint64_t)lhs - (std::uint64_t)rhs;
+            uint64_t tmp = (uint64_t)lhs - (uint64_t)rhs;
 
-            if( tmp <= (std::uint64_t)std::numeric_limits<T>::max() )
+            if( tmp <= (uint64_t)std::numeric_limits<T>::max() )
             {
                 result = (T)tmp;
                 return;
@@ -4758,11 +4761,11 @@ template < typename T, typename U > class SubtractionHelper< T, U, SubtractionSt
 public:
     _CONSTEXPR14 static bool Subtract( const T& lhs, const U& rhs, T& result ) SAFEINT_NOTHROW
     {
-        // lhs is an unsigned int32 or smaller, rhs std::int64_t
+        // lhs is an unsigned int32 or smaller, rhs int64_t
         // must first see if rhs is positive or negative
         if( rhs >= 0 )
         {
-            if( (std::uint64_t)rhs <= lhs )
+            if( (uint64_t)rhs <= lhs )
             {
                 result = (T)( lhs - (T)rhs );
                 return true;
@@ -4773,7 +4776,7 @@ public:
             // we're now effectively adding
             // since lhs is 32-bit, and rhs cannot exceed 2^63
             // this addition cannot overflow
-            std::uint64_t tmp = lhs + ~(std::uint64_t)( rhs ) + 1; // negation safe
+            uint64_t tmp = lhs + ~(uint64_t)( rhs ) + 1; // negation safe
 
             // but we could exceed MaxInt
             if(tmp <= std::numeric_limits<T>::max())
@@ -4789,11 +4792,11 @@ public:
     template < typename E >
     _CONSTEXPR14 static void SubtractThrow( const T& lhs, const U& rhs, T& result ) SAFEINT_CPP_THROW
     {
-        // lhs is an unsigned int32 or smaller, rhs std::int64_t
+        // lhs is an unsigned int32 or smaller, rhs int64_t
         // must first see if rhs is positive or negative
         if( rhs >= 0 )
         {
-            if( (std::uint64_t)rhs <= lhs )
+            if( (uint64_t)rhs <= lhs )
             {
                 result = (T)( lhs - (T)rhs );
                 return;
@@ -4804,7 +4807,7 @@ public:
             // we're now effectively adding
             // since lhs is 32-bit, and rhs cannot exceed 2^63
             // this addition cannot overflow
-            std::uint64_t tmp = lhs + ~(std::uint64_t)( rhs ) + 1; // negation safe
+            uint64_t tmp = lhs + ~(uint64_t)( rhs ) + 1; // negation safe
 
             // but we could exceed MaxInt
             if(tmp <= std::numeric_limits<T>::max())
@@ -4823,20 +4826,20 @@ template <typename U, typename T> class SubtractionHelper< U, T, SubtractionStat
 public:
     _CONSTEXPR14 static bool Subtract( const U& lhs, const T& rhs, T& result ) SAFEINT_NOTHROW
     {
-        // U unsigned 32-bit or less, T std::int64_t
+        // U unsigned 32-bit or less, T int64_t
         if( rhs >= 0 )
         {
             // overflow not possible
-            result = (T)( (std::int64_t)lhs - rhs );
+            result = (T)( (int64_t)lhs - rhs );
             return true;
         }
         else
         {
             // we effectively have an addition
             // which cannot overflow internally
-            std::uint64_t tmp = (std::uint64_t)lhs + (std::uint64_t)( -rhs );
+            uint64_t tmp = (uint64_t)lhs + (uint64_t)( -rhs );
 
-            if( tmp <= (std::uint64_t)std::numeric_limits<T>::max() )
+            if( tmp <= (uint64_t)std::numeric_limits<T>::max() )
             {
                 result = (T)tmp;
                 return true;
@@ -4849,20 +4852,20 @@ public:
     template < typename E >
     _CONSTEXPR14 static void SubtractThrow( const U& lhs, const T& rhs, T& result ) SAFEINT_CPP_THROW
     {
-        // U unsigned 32-bit or less, T std::int64_t
+        // U unsigned 32-bit or less, T int64_t
         if( rhs >= 0 )
         {
             // overflow not possible
-            result = (T)( (std::int64_t)lhs - rhs );
+            result = (T)( (int64_t)lhs - rhs );
             return;
         }
         else
         {
             // we effectively have an addition
             // which cannot overflow internally
-            std::uint64_t tmp = (std::uint64_t)lhs + (std::uint64_t)( -rhs );
+            uint64_t tmp = (uint64_t)lhs + (uint64_t)( -rhs );
 
-            if( tmp <= (std::uint64_t)std::numeric_limits<T>::max() )
+            if( tmp <= (uint64_t)std::numeric_limits<T>::max() )
             {
                 result = (T)tmp;
                 return;
@@ -4878,7 +4881,7 @@ template < typename T, typename U > class SubtractionHelper< T, U, SubtractionSt
 public:
     _CONSTEXPR14 static bool Subtract( const T& lhs, const U& rhs, T& result ) SAFEINT_NOTHROW
     {
-        // lhs is an std::int64_t, rhs signed (up to 64-bit)
+        // lhs is an int64_t, rhs signed (up to 64-bit)
         // we have essentially 4 cases:
         //
         // 1) lhs positive, rhs positive - overflow not possible
@@ -4886,7 +4889,7 @@ public:
         // 3) lhs negative, rhs positive - check result <= lhs
         // 4) lhs negative, rhs negative - overflow not possible
 
-        std::int64_t tmp = (std::int64_t)((std::uint64_t)lhs - (std::uint64_t)rhs);
+        int64_t tmp = (int64_t)((uint64_t)lhs - (uint64_t)rhs);
 
         // Note - ideally, we can order these so that true conditionals
         // lead to success, which enables better pipelining
@@ -4904,7 +4907,7 @@ public:
     template < typename E >
     _CONSTEXPR14 static void SubtractThrow( const T& lhs, const U& rhs, T& result ) SAFEINT_CPP_THROW
     {
-        // lhs is an std::int64_t, rhs signed (up to 64-bit)
+        // lhs is an int64_t, rhs signed (up to 64-bit)
         // we have essentially 4 cases:
         //
         // 1) lhs positive, rhs positive - overflow not possible
@@ -4912,7 +4915,7 @@ public:
         // 3) lhs negative, rhs positive - check result <= lhs
         // 4) lhs negative, rhs negative - overflow not possible
 
-        std::int64_t tmp = (std::int64_t)((std::uint64_t)lhs - (std::uint64_t)rhs);
+        int64_t tmp = (int64_t)((uint64_t)lhs - (uint64_t)rhs);
 
         // Note - ideally, we can order these so that true conditionals
         // lead to success, which enables better pipelining
@@ -4932,12 +4935,12 @@ template < typename T, typename U, bool > class subtract_corner_case_max;
 template < typename T, typename U> class subtract_corner_case_max < T, U, true>
 {
 public:
-    _CONSTEXPR14 static bool isOverflowPositive(const T& rhs, const U& lhs, std::int64_t tmp)
+    _CONSTEXPR14 static bool isOverflowPositive(const T& rhs, const U& lhs, int64_t tmp)
     {
         return (tmp > std::numeric_limits<T>::max() || (rhs < 0 && tmp < lhs));
     }
 
-    _CONSTEXPR14 static bool isOverflowNegative(const T& rhs, const U& lhs, std::int64_t tmp)
+    _CONSTEXPR14 static bool isOverflowNegative(const T& rhs, const U& lhs, int64_t tmp)
     {
          return (tmp < std::numeric_limits<T>::min() || (rhs >= 0 && tmp > lhs));
     }
@@ -4946,12 +4949,12 @@ public:
 template < typename T, typename U> class subtract_corner_case_max < T, U, false>
 {
 public:
-    _CONSTEXPR14 static bool isOverflowPositive(const T& rhs, const U& lhs, std::int64_t tmp)
+    _CONSTEXPR14 static bool isOverflowPositive(const T& rhs, const U& lhs, int64_t tmp)
     {
         return (rhs < 0 && tmp < lhs);
     }
 
-    _CONSTEXPR14 static bool isOverflowNegative(const T& rhs, const U& lhs, std::int64_t tmp)
+    _CONSTEXPR14 static bool isOverflowNegative(const T& rhs, const U& lhs, int64_t tmp)
     {
         return (rhs >= 0 && tmp > lhs);
     }
@@ -4962,8 +4965,8 @@ template < typename U, typename T > class SubtractionHelper< U, T, SubtractionSt
 public:
     _CONSTEXPR14 static bool Subtract( const U& lhs, const T& rhs, T& result ) SAFEINT_NOTHROW
     {
-        // lhs std::int64_t, rhs any signed int (including std::int64_t)
-        std::int64_t tmp = lhs - rhs;
+        // lhs int64_t, rhs any signed int (including int64_t)
+        int64_t tmp = lhs - rhs;
 
         // we have essentially 4 cases:
         //
@@ -4997,8 +5000,8 @@ public:
     template < typename E >
     _CONSTEXPR14 static void SubtractThrow( const U& lhs, const T& rhs, T& result ) SAFEINT_CPP_THROW
     {
-        // lhs std::int64_t, rhs any signed int (including std::int64_t)
-        std::int64_t tmp = lhs - rhs;
+        // lhs int64_t, rhs any signed int (including int64_t)
+        int64_t tmp = lhs - rhs;
 
         // we have essentially 4 cases:
         //
@@ -5034,7 +5037,7 @@ template < typename T, typename U > class SubtractionHelper< T, U, SubtractionSt
 public:
     _CONSTEXPR14 static bool Subtract( const T& lhs, const U& rhs, T& result ) SAFEINT_NOTHROW
     {
-        // lhs is a 32-bit int or less, rhs std::int64_t
+        // lhs is a 32-bit int or less, rhs int64_t
         // we have essentially 4 cases:
         //
         // lhs positive, rhs positive - rhs could be larger than lhs can represent
@@ -5042,7 +5045,7 @@ public:
         // lhs negative, rhs positive - check tmp <= lhs and tmp < min int
         // lhs negative, rhs negative - addition cannot internally overflow, check against max
 
-        std::int64_t tmp = (std::int64_t)((std::uint64_t)lhs - (std::uint64_t)rhs);
+        int64_t tmp = (int64_t)((uint64_t)lhs - (uint64_t)rhs);
 
         if( lhs >= 0 )
         {
@@ -5094,7 +5097,7 @@ public:
     template < typename E >
     _CONSTEXPR14 static void SubtractThrow( const T& lhs, const U& rhs, T& result ) SAFEINT_CPP_THROW
     {
-        // lhs is a 32-bit int or less, rhs std::int64_t
+        // lhs is a 32-bit int or less, rhs int64_t
         // we have essentially 4 cases:
         //
         // lhs positive, rhs positive - rhs could be larger than lhs can represent
@@ -5102,7 +5105,7 @@ public:
         // lhs negative, rhs positive - check tmp <= lhs and tmp < min int
         // lhs negative, rhs negative - addition cannot internally overflow, check against max
 
-        std::int64_t tmp = (std::int64_t)((std::uint64_t)lhs - (std::uint64_t)rhs);
+        int64_t tmp = (int64_t)((uint64_t)lhs - (uint64_t)rhs);
 
         if( lhs >= 0 )
         {
@@ -5158,7 +5161,7 @@ public:
     _CONSTEXPR14 static bool Subtract( const U& lhs, const T& rhs, T& result ) SAFEINT_NOTHROW
     {
         // lhs is any signed int32 or smaller, rhs is int64
-        std::int64_t tmp = (std::int64_t)lhs - rhs;
+        int64_t tmp = (int64_t)lhs - rhs;
 
         if( ( lhs >= 0 && rhs < 0 && tmp < lhs ) ||
             ( rhs > 0 && tmp > lhs ) )
@@ -5175,7 +5178,7 @@ public:
     _CONSTEXPR14 static void SubtractThrow( const U& lhs, const T& rhs, T& result ) SAFEINT_CPP_THROW
     {
         // lhs is any signed int32 or smaller, rhs is int64
-        std::int64_t tmp = (std::int64_t)lhs - rhs;
+        int64_t tmp = (int64_t)lhs - rhs;
 
         if( ( lhs >= 0 && rhs < 0 && tmp < lhs ) ||
             ( rhs > 0 && tmp > lhs ) )
@@ -5195,11 +5198,11 @@ public:
     {
         // lhs is a 64-bit int, rhs unsigned int32 or smaller
         // perform test as unsigned to prevent unwanted optimizations
-        std::uint64_t tmp = (std::uint64_t)lhs - (std::uint64_t)rhs;
+        uint64_t tmp = (uint64_t)lhs - (uint64_t)rhs;
 
-        if( (std::int64_t)tmp <= lhs )
+        if( (int64_t)tmp <= lhs )
         {
-            result = (T)(std::int64_t)tmp;
+            result = (T)(int64_t)tmp;
             return true;
         }
 
@@ -5211,9 +5214,9 @@ public:
     {
         // lhs is a 64-bit int, rhs unsigned int32 or smaller
         // perform test as unsigned to prevent unwanted optimizations
-        std::uint64_t tmp = (std::uint64_t)lhs - (std::uint64_t)rhs;
+        uint64_t tmp = (uint64_t)lhs - (uint64_t)rhs;
 
-        if( (std::int64_t)tmp <= lhs )
+        if( (int64_t)tmp <= lhs )
         {
             result = (T)tmp;
             return;
@@ -5226,15 +5229,15 @@ public:
 template < typename U, typename T > class SubtractionHelper< U, T, SubtractionState_Int64Uint2 >
 {
 public:
-    // lhs is std::int64_t, rhs is unsigned 32-bit or smaller
+    // lhs is int64_t, rhs is unsigned 32-bit or smaller
     _CONSTEXPR14 static bool Subtract( const U& lhs, const T& rhs, T& result ) SAFEINT_NOTHROW
     {
         // Do this as unsigned to prevent unwanted optimizations
-        std::uint64_t tmp = (std::uint64_t)lhs - (std::uint64_t)rhs;
+        uint64_t tmp = (uint64_t)lhs - (uint64_t)rhs;
 
-        if( (std::int64_t)tmp <= std::numeric_limits<T>::max() && (std::int64_t)tmp >= std::numeric_limits<T>::min() )
+        if( (int64_t)tmp <= std::numeric_limits<T>::max() && (int64_t)tmp >= std::numeric_limits<T>::min() )
         {
-            result = (T)(std::int64_t)tmp;
+            result = (T)(int64_t)tmp;
             return true;
         }
 
@@ -5245,11 +5248,11 @@ public:
     _CONSTEXPR14 static void SubtractThrow( const U& lhs, const T& rhs, T& result ) SAFEINT_CPP_THROW
     {
         // Do this as unsigned to prevent unwanted optimizations
-        std::uint64_t tmp = (std::uint64_t)lhs - (std::uint64_t)rhs;
+        uint64_t tmp = (uint64_t)lhs - (uint64_t)rhs;
 
-        if( (std::int64_t)tmp <= std::numeric_limits<T>::max() && (std::int64_t)tmp >= std::numeric_limits<T>::min() )
+        if( (int64_t)tmp <= std::numeric_limits<T>::max() && (int64_t)tmp >= std::numeric_limits<T>::min() )
         {
-            result = (T)(std::int64_t)tmp;
+            result = (T)(int64_t)tmp;
             return;
         }
 
@@ -5267,7 +5270,7 @@ public:
 
         // We need the absolute value of std::numeric_limits<T>::min()
         // This will give it to us without extraneous compiler warnings
-        const std::uint64_t AbsMinIntT = (std::uint64_t)std::numeric_limits<T>::max() + 1;
+        const uint64_t AbsMinIntT = (uint64_t)std::numeric_limits<T>::max() + 1;
 
         if( lhs < 0 )
         {
@@ -5279,7 +5282,7 @@ public:
         }
         else
         {
-            if( rhs <= AbsMinIntT + (std::uint64_t)lhs )
+            if( rhs <= AbsMinIntT + (uint64_t)lhs )
             {
                 result = (T)( lhs - rhs );
                 return true;
@@ -5297,7 +5300,7 @@ public:
 
         // We need the absolute value of std::numeric_limits<T>::min()
         // This will give it to us without extraneous compiler warnings
-        const std::uint64_t AbsMinIntT = (std::uint64_t)std::numeric_limits<T>::max() + 1;
+        const uint64_t AbsMinIntT = (uint64_t)std::numeric_limits<T>::max() + 1;
 
         if( lhs < 0 )
         {
@@ -5309,7 +5312,7 @@ public:
         }
         else
         {
-            if( rhs <= AbsMinIntT + (std::uint64_t)lhs )
+            if( rhs <= AbsMinIntT + (uint64_t)lhs )
             {
                 result = (T)( lhs - rhs );
                 return;
@@ -5353,32 +5356,32 @@ public:
 template < typename T, typename U > class SubtractionHelper< T, U, SubtractionState_Int64Uint64 >
 {
 public:
-    _CONSTEXPR14 static bool Subtract( const std::int64_t& lhs, const std::uint64_t& rhs, std::int64_t& result ) SAFEINT_NOTHROW
+    _CONSTEXPR14 static bool Subtract( const int64_t& lhs, const uint64_t& rhs, int64_t& result ) SAFEINT_NOTHROW
     {
         static_assert(safeint_internal::int_traits< T >::isInt64 && safeint_internal::int_traits< U >::isUint64, "T must be Int64, U Uint64");
         // if we subtract, and it gets larger, there's a problem
         // Perform test as unsigned to prevent unwanted optimizations
-        std::uint64_t tmp = (std::uint64_t)lhs - rhs;
+        uint64_t tmp = (uint64_t)lhs - rhs;
 
-        if( (std::int64_t)tmp <= lhs )
+        if( (int64_t)tmp <= lhs )
         {
-            result = (std::int64_t)tmp;
+            result = (int64_t)tmp;
             return true;
         }
         return false;
     }
 
     template < typename E >
-    _CONSTEXPR14 static void SubtractThrow( const std::int64_t& lhs, const std::uint64_t& rhs, T& result ) SAFEINT_CPP_THROW
+    _CONSTEXPR14 static void SubtractThrow( const int64_t& lhs, const uint64_t& rhs, T& result ) SAFEINT_CPP_THROW
     {
         static_assert(safeint_internal::int_traits< T >::isInt64 && safeint_internal::int_traits< U >::isUint64, "T must be Int64, U Uint64");
         // if we subtract, and it gets larger, there's a problem
         // Perform test as unsigned to prevent unwanted optimizations
-        std::uint64_t tmp = (std::uint64_t)lhs - rhs;
+        uint64_t tmp = (uint64_t)lhs - rhs;
 
-        if( (std::int64_t)tmp <= lhs )
+        if( (int64_t)tmp <= lhs )
         {
-            result = (std::int64_t)tmp;
+            result = (int64_t)tmp;
             return;
         }
 
@@ -5392,12 +5395,12 @@ template < typename U, typename T > class SubtractionHelper< U, T, SubtractionSt
 public:
     // If lhs is negative, immediate problem - return must be positive, and subtracting only makes it
     // get smaller. If rhs > lhs, then it would also go negative, which is the other case
-    _CONSTEXPR14 static bool Subtract( const std::int64_t& lhs, const std::uint64_t& rhs, T& result ) SAFEINT_NOTHROW
+    _CONSTEXPR14 static bool Subtract( const int64_t& lhs, const uint64_t& rhs, T& result ) SAFEINT_NOTHROW
     {
         static_assert( safeint_internal::int_traits< T >::isUint64 && safeint_internal::int_traits< U >::isInt64, "T must be Uint64, U Int64" );
-        if( lhs >= 0 && (std::uint64_t)lhs >= rhs )
+        if( lhs >= 0 && (uint64_t)lhs >= rhs )
         {
-            result = (std::uint64_t)lhs - rhs;
+            result = (uint64_t)lhs - rhs;
             return true;
         }
 
@@ -5405,12 +5408,12 @@ public:
     }
 
     template < typename E >
-    _CONSTEXPR14 static void SubtractThrow( const std::int64_t& lhs, const std::uint64_t& rhs, T& result ) SAFEINT_CPP_THROW
+    _CONSTEXPR14 static void SubtractThrow( const int64_t& lhs, const uint64_t& rhs, T& result ) SAFEINT_CPP_THROW
     {
         static_assert(safeint_internal::int_traits< T >::isUint64 && safeint_internal::int_traits< U >::isInt64, "T must be Uint64, U Int64");
-        if( lhs >= 0 && (std::uint64_t)lhs >= rhs )
+        if( lhs >= 0 && (uint64_t)lhs >= rhs )
         {
-            result = (std::uint64_t)lhs - rhs;
+            result = (uint64_t)lhs - rhs;
             return;
         }
 
@@ -5465,8 +5468,8 @@ public:
     _CONSTEXPR14 static T And( T lhs, U rhs ) SAFEINT_NOTHROW
     {
         // cast forces sign extension to be zeros
-        BinaryAssert( ( lhs & rhs ) == ( lhs & (std::uint8_t)rhs ) );
-        return (T)( lhs & (std::uint8_t)rhs );
+        BinaryAssert( ( lhs & rhs ) == ( lhs & (uint8_t)rhs ) );
+        return (T)( lhs & (uint8_t)rhs );
     }
 };
 
@@ -5476,8 +5479,8 @@ public:
     _CONSTEXPR14 static T And( T lhs, U rhs ) SAFEINT_NOTHROW
     {
         //cast forces sign extension to be zeros
-        BinaryAssert( ( lhs & rhs ) == ( lhs & (std::uint16_t)rhs ) );
-        return (T)( lhs & (std::uint16_t)rhs );
+        BinaryAssert( ( lhs & rhs ) == ( lhs & (uint16_t)rhs ) );
+        return (T)( lhs & (uint16_t)rhs );
     }
 };
 
@@ -5487,8 +5490,8 @@ public:
     _CONSTEXPR14 static T And( T lhs, U rhs ) SAFEINT_NOTHROW
     {
         //cast forces sign extension to be zeros
-        BinaryAssert( ( lhs & rhs ) == ( lhs & (std::uint32_t)rhs ) );
-        return (T)( lhs & (std::uint32_t)rhs );
+        BinaryAssert( ( lhs & rhs ) == ( lhs & (uint32_t)rhs ) );
+        return (T)( lhs & (uint32_t)rhs );
     }
 };
 
@@ -5506,8 +5509,8 @@ public:
     _CONSTEXPR14 static T Or( T lhs, U rhs ) SAFEINT_NOTHROW
     {
         //cast forces sign extension to be zeros
-        BinaryAssert( ( lhs | rhs ) == ( lhs | (std::uint8_t)rhs ) );
-        return (T)( lhs | (std::uint8_t)rhs );
+        BinaryAssert( ( lhs | rhs ) == ( lhs | (uint8_t)rhs ) );
+        return (T)( lhs | (uint8_t)rhs );
     }
 };
 
@@ -5517,8 +5520,8 @@ public:
     _CONSTEXPR14 static T Or( T lhs, U rhs ) SAFEINT_NOTHROW
     {
         //cast forces sign extension to be zeros
-        BinaryAssert( ( lhs | rhs ) == ( lhs | (std::uint16_t)rhs ) );
-        return (T)( lhs | (std::uint16_t)rhs );
+        BinaryAssert( ( lhs | rhs ) == ( lhs | (uint16_t)rhs ) );
+        return (T)( lhs | (uint16_t)rhs );
     }
 };
 
@@ -5528,8 +5531,8 @@ public:
     _CONSTEXPR14 static T Or( T lhs, U rhs ) SAFEINT_NOTHROW
     {
         //cast forces sign extension to be zeros
-        BinaryAssert( ( lhs | rhs ) == ( lhs | (std::uint32_t)rhs ) );
-        return (T)( lhs | (std::uint32_t)rhs );
+        BinaryAssert( ( lhs | rhs ) == ( lhs | (uint32_t)rhs ) );
+        return (T)( lhs | (uint32_t)rhs );
     }
 };
 
@@ -5547,8 +5550,8 @@ public:
     _CONSTEXPR14 static T Xor( T lhs, U rhs ) SAFEINT_NOTHROW
     {
         // cast forces sign extension to be zeros
-        BinaryAssert( ( lhs ^ rhs ) == ( lhs ^ (std::uint8_t)rhs ) );
-        return (T)( lhs ^ (std::uint8_t)rhs );
+        BinaryAssert( ( lhs ^ rhs ) == ( lhs ^ (uint8_t)rhs ) );
+        return (T)( lhs ^ (uint8_t)rhs );
     }
 };
 
@@ -5558,8 +5561,8 @@ public:
     _CONSTEXPR14 static T Xor( T lhs, U rhs ) SAFEINT_NOTHROW
     {
         // cast forces sign extension to be zeros
-        BinaryAssert( ( lhs ^ rhs ) == ( lhs ^ (std::uint16_t)rhs ) );
-        return (T)( lhs ^ (std::uint16_t)rhs );
+        BinaryAssert( ( lhs ^ rhs ) == ( lhs ^ (uint16_t)rhs ) );
+        return (T)( lhs ^ (uint16_t)rhs );
     }
 };
 
@@ -5569,8 +5572,8 @@ public:
     _CONSTEXPR14 static T Xor( T lhs, U rhs ) SAFEINT_NOTHROW
     {
         // cast forces sign extension to be zeros
-        BinaryAssert( ( lhs ^ rhs ) == ( lhs ^ (std::uint32_t)rhs ) );
-        return (T)( lhs ^ (std::uint32_t)rhs );
+        BinaryAssert( ( lhs ^ rhs ) == ( lhs ^ (uint32_t)rhs ) );
+        return (T)( lhs ^ (uint32_t)rhs );
     }
 };
 
@@ -5797,8 +5800,8 @@ public:
         return val;
     }
 
-    // The compiler knows that int == std::int32_t
-    // but not that long == std::int32_t, because on some systems, long == std::int64_t
+    // The compiler knows that int == int32_t
+    // but not that long == int32_t, because on some systems, long == int64_t
     _CONSTEXPR14 operator long() const SAFEINT_CPP_THROW
     {
         long val = 0;
@@ -6768,13 +6771,13 @@ template < typename T, typename U > class division_negative_negateU< T, U, true>
 {
 public:
     // sizeof(T) == 4
-    _CONSTEXPR14 static U div(T rhs, U lhs) { return lhs / (U)(~(std::uint32_t)(T)rhs + 1); }
+    _CONSTEXPR14 static U div(T rhs, U lhs) { return lhs / (U)(~(uint32_t)(T)rhs + 1); }
 };
 
 template < typename T, typename U > class division_negative_negateU< T, U, false>
 {
 public:
-    _CONSTEXPR14 static U div(T rhs, U lhs) { return lhs / (U)(~(std::uint64_t)(T)rhs + 1); }
+    _CONSTEXPR14 static U div(T rhs, U lhs) { return lhs / (U)(~(uint64_t)(T)rhs + 1); }
 };
 
 template < typename T, typename U, typename E > class DivisionNegativeCornerCaseHelper< T, U, E, true >
@@ -6789,7 +6792,7 @@ public:
 
         if( tmp <= (U)std::numeric_limits<T>::max() )
         {
-            result = SafeInt< T, E >( (T)(~(std::uint64_t)tmp + 1) );
+            result = SafeInt< T, E >( (T)(~(uint64_t)tmp + 1) );
             return true;
         }
 
