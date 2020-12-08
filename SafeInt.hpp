@@ -172,11 +172,28 @@ Please read the leading comments before using the class.
 #define SAFEINT_NOTHROW noexcept
 #endif
 
-//#define USE_C_HEADERS 0
+#define SAFEINT_USE_C_HEADERS 0
 
-#if defined USE_C_HEADERS
+#if defined SAFEINT_USE_C_HEADERS
+
+// This is to allow the class to be used in non-standard environments
+// that do not have C++ headers available, such as some internal Microsoft 
+// build systems
 #include <stdint.h>
 #include <math.h>
+
+// wchar_t has been a built-in type according to the standard since 1990
+// however, the initial implementation was to define it in terms of other integer types
+// The Microsoft compiler still supports a non-standard switch to disable wchar_t
+#if SAFEINT_COMPILER == VISUAL_STUDIO_COMPILER
+
+#if !defined _NATIVE_WCHAR_T_DEFINED
+#define SAFEINT_STANDARD_WCHAR_T 0
+#else
+#define SAFEINT_STANDARD_WCHAR_T 1
+#endif
+
+#endif
 
 // If we do not have std::intXX_t,
 // we will declare them ourselves
@@ -201,6 +218,8 @@ namespace std
 #include <limits>
 // Needed for fpclassify
 #include <cmath> 
+
+#define SAFEINT_STANDARD_WCHAR_T 1
 #endif
 
 // Note - intrinsics and constexpr are mutually exclusive
@@ -879,7 +898,7 @@ namespace safeint_internal
     // Continue to special case bool
     template <> class numeric_type<bool> { public: enum { isBool = true, isInt = false }; };
 
-#if defined USE_C_HEADERS
+#if defined SAFEINT_USE_C_HEADERS
     template <> class numeric_type<char>               { public: enum { isBool = false, isInt = true, isEnum = false }; };
     template <> class numeric_type<signed char>        { public: enum { isBool = false, isInt = true, isEnum = false }; };
     template <> class numeric_type<unsigned char>      { public: enum { isBool = false, isInt = true, isEnum = false }; };
@@ -891,7 +910,10 @@ namespace safeint_internal
     template <> class numeric_type<unsigned long>      { public: enum { isBool = false, isInt = true, isEnum = false }; };
     template <> class numeric_type<long long>          { public: enum { isBool = false, isInt = true, isEnum = false }; };
     template <> class numeric_type<unsigned long long> { public: enum { isBool = false, isInt = true, isEnum = false }; };
+
+#if SAFEINT_STANDARD_WCHAR_T
     template <> class numeric_type<wchar_t>            { public: enum { isBool = false, isInt = true, isEnum = false }; };
+#endif
 
     // Abstract out limits for the case of having to use only C headers
 
@@ -905,8 +927,8 @@ namespace safeint_internal
             T t = is_signed ? 1 : 0;
             return is_signed ? (T)((T)t << (bits-1)) : t;
         }
-        
-        // TODO - go check old code, think I had a better way, but this should work
+
+        // Revert to code used in an older version
         _CONSTEXPR14 static T max() 
         {
             T t = is_signed ? 1 : 0;
@@ -5918,12 +5940,14 @@ public:
         return val;
     }
 
+#if SAFEINT_STANDARD_WCHAR_T
     _CONSTEXPR14 operator wchar_t() const SAFEINT_CPP_THROW
     {
         wchar_t val = 0;
         SafeCastHelper< wchar_t, T, GetCastMethod< wchar_t, T >::method >::template CastThrow< E >( m_int, val );
         return val;
     }
+#endif
 
 #ifdef SIZE_T_CAST_NEEDED
     // We also need an explicit cast to size_t, or the compiler will complain
