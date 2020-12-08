@@ -203,10 +203,6 @@ Please read the leading comments before using the class.
 // We're assuming two's complement negative numbers
 static_assert( -1 == static_cast<int>(0xffffffff), "Two's complement signed numbers are required" );
 
-#ifndef SAFEINT_SUPPORT_WCHAR
-#define SAFEINT_SUPPORT_WCHAR 1
-#endif
-
 /************* Compiler Options *****************************************************************************************************
 
 SafeInt supports several compile-time options that can change the behavior of the class.
@@ -243,14 +239,6 @@ SAFEINT_DISABLE_ADDRESS_OPERATOR   - Disables the overload of the & operator, wh
                                      modification, which is especially handy in legacy code bases. The drawback is that it breaks good C++
                                      practice, and breaks some libraries that auto-generate code. In the future, I expect to make disabling this the 
                                      default.
-
-SAFEINT_SUPPORT_WCHAR              - This should be 0 or 1 and defaults to 1.
-                                     In some environments, wchar_t is an alias to unsigned short,
-                                     and providing overloads for both fails to compile.
-                                     This is historical Visual C++ and Visual C++ with /Zc:wchar_t-.
-                                     /Zc:wchar_t- is non-conformant, but heavily used for compatibility.
-                                     Switching to the conformant mode changes mangled names.
-                                     This decision probably could be automatic.
 
 ************************************************************************************************************************************/
 
@@ -5839,7 +5827,8 @@ public:
         return val;
     }
 
-#if SAFEINT_SUPPORT_WCHAR
+// With Visual C++ /Zc:wchar_t- flag: typedef unsigned short wchar_t and the following function is an error.
+#if !defined(_MSC_VER) || defined(NATIVE_WCHAR_T_DEFINED)
 
     _CONSTEXPR14 operator wchar_t() const SAFEINT_CPP_THROW
     {
