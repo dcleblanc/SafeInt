@@ -5828,7 +5828,7 @@ public:
     }
 
 // With Visual C++ /Zc:wchar_t- flag: typedef unsigned short wchar_t and the following function is an error.
-#if !defined(_MSC_VER) || defined(NATIVE_WCHAR_T_DEFINED)
+#if !defined(_MSC_VER) || defined(_NATIVE_WCHAR_T_DEFINED)
 
     _CONSTEXPR14 operator wchar_t() const SAFEINT_CPP_THROW
     {
