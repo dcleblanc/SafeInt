@@ -1999,17 +1999,15 @@ public:
 #if SAFEINT_USE_INTRINSICS
         return IntrinsicMultiplyUint64( a, b, pRet );
 #else
-        std::uint32_t aHigh = 0, aLow = 0, bHigh = 0, bLow = 0;
-
         // Consider that a*b can be broken up into:
         // (aHigh * 2^32 + aLow) * (bHigh * 2^32 + bLow)
         // => (aHigh * bHigh * 2^64) + (aLow * bHigh * 2^32) + (aHigh * bLow * 2^32) + (aLow * bLow)
         // Note - same approach applies for 128 bit math on a 64-bit system
 
-        aHigh = (std::uint32_t)(a >> 32);
-        aLow  = (std::uint32_t)a;
-        bHigh = (std::uint32_t)(b >> 32);
-        bLow  = (std::uint32_t)b;
+        std::uint32_t aHigh = (std::uint32_t)(a >> 32);
+        std::uint32_t aLow  = (std::uint32_t)a;
+        std::uint32_t bHigh = (std::uint32_t)(b >> 32);
+        std::uint32_t bLow  = (std::uint32_t)b;
 
         *pRet = 0;
 
@@ -2034,13 +2032,12 @@ public:
 
         if(*pRet != 0)
         {
-            std::uint64_t tmp = 0;
 
             if((std::uint32_t)(*pRet >> 32) != 0)
                 return false;
 
             *pRet <<= 32;
-            tmp = (std::uint64_t)aLow * (std::uint64_t)bLow;
+            std::uint64_t tmp = (std::uint64_t)aLow * (std::uint64_t)bLow;
             *pRet += tmp;
 
             if(*pRet < tmp)
@@ -2061,17 +2058,15 @@ public:
         if( !IntrinsicMultiplyUint64( a, b, pRet ) )
             E::SafeIntOnOverflow();
 #else
-        std::uint32_t aHigh = 0, aLow = 0, bHigh = 0, bLow = 0;
-
         // Consider that a*b can be broken up into:
         // (aHigh * 2^32 + aLow) * (bHigh * 2^32 + bLow)
         // => (aHigh * bHigh * 2^64) + (aLow * bHigh * 2^32) + (aHigh * bLow * 2^32) + (aLow * bLow)
         // Note - same approach applies for 128 bit math on a 64-bit system
 
-        aHigh = (std::uint32_t)(a >> 32);
-        aLow  = (std::uint32_t)a;
-        bHigh = (std::uint32_t)(b >> 32);
-        bLow  = (std::uint32_t)b;
+        std::uint32_t aHigh = (std::uint32_t)(a >> 32);
+        std::uint32_t aLow  = (std::uint32_t)a;
+        std::uint32_t bHigh = (std::uint32_t)(b >> 32);
+        std::uint32_t bLow  = (std::uint32_t)b;
 
         *pRet = 0;
 
@@ -2096,13 +2091,11 @@ public:
 
         if(*pRet != 0)
         {
-            std::uint64_t tmp = 0;
-
             if((std::uint32_t)(*pRet >> 32) != 0)
                 E::SafeIntOnOverflow();
 
             *pRet <<= 32;
-            tmp = (std::uint64_t)aLow * (std::uint64_t)bLow;
+            std::uint64_t tmp = (std::uint64_t)aLow * (std::uint64_t)bLow;
             *pRet += tmp;
 
             if(*pRet < tmp)
@@ -2124,14 +2117,12 @@ public:
 #if SAFEINT_USE_INTRINSICS
         return IntrinsicMultiplyUint64( a, (std::uint64_t)b, pRet );
 #else
-        std::uint32_t aHigh = 0, aLow = 0;
-
         // Consider that a*b can be broken up into:
         // (aHigh * 2^32 + aLow) * b
         // => (aHigh * b * 2^32) + (aLow * b)
 
-        aHigh = (std::uint32_t)(a >> 32);
-        aLow  = (std::uint32_t)a;
+        std::uint32_t aHigh = (std::uint32_t)(a >> 32);
+        std::uint32_t aLow  = (std::uint32_t)a;
 
         *pRet = 0;
 
@@ -2139,13 +2130,11 @@ public:
         {
             *pRet = (std::uint64_t)aHigh * (std::uint64_t)b;
 
-            std::uint64_t tmp = 0;
-
             if((std::uint32_t)(*pRet >> 32) != 0)
                 return false;
 
             *pRet <<= 32;
-            tmp = (std::uint64_t)aLow * (std::uint64_t)b;
+            std::uint64_t tmp = (std::uint64_t)aLow * (std::uint64_t)b;
             *pRet += tmp;
 
             if(*pRet < tmp)
@@ -2166,14 +2155,12 @@ public:
         if( !IntrinsicMultiplyUint64( a, (std::uint64_t)b, pRet ) )
             E::SafeIntOnOverflow();
 #else
-        std::uint32_t aHigh = 0, aLow = 0;
-
         // Consider that a*b can be broken up into:
         // (aHigh * 2^32 + aLow) * b
         // => (aHigh * b * 2^32) + (aLow * b)
 
-        aHigh = (std::uint32_t)(a >> 32);
-        aLow  = (std::uint32_t)a;
+        std::uint32_t aHigh = (std::uint32_t)(a >> 32);
+        std::uint32_t aLow  = (std::uint32_t)a;
 
         *pRet = 0;
 
@@ -2181,13 +2168,11 @@ public:
         {
             *pRet = (std::uint64_t)aHigh * (std::uint64_t)b;
 
-            std::uint64_t tmp = 0;
-
             if((std::uint32_t)(*pRet >> 32) != 0)
                 E::SafeIntOnOverflow();
 
             *pRet <<= 32;
-            tmp = (std::uint64_t)aLow * (std::uint64_t)b;
+            std::uint64_t tmp = (std::uint64_t)aLow * (std::uint64_t)b;
             *pRet += tmp;
 
             if(*pRet < tmp)
@@ -2269,7 +2254,6 @@ public:
     // Devolves into ordinary 64-bit calculation
     _CONSTEXPR14 static bool RegMultiply( std::int32_t a, const std::uint64_t& b, std::int32_t* pRet ) SAFEINT_NOTHROW
     {
-        std::uint32_t bHigh = 0, bLow = 0;
         bool fIsNegative = false;
 
         // Consider that a*b can be broken up into:
@@ -2279,8 +2263,8 @@ public:
         // ( aLow * bHigh * 2^32 ) + ( aLow + bLow )
         // If the first part is != 0, fail
 
-        bHigh = (std::uint32_t)(b >> 32);
-        bLow  = (std::uint32_t)b;
+        std::uint32_t bHigh = (std::uint32_t)(b >> 32);
+        std::uint32_t bLow  = (std::uint32_t)b;
 
         *pRet = 0;
 
@@ -2319,15 +2303,14 @@ public:
     template < typename E >
     _CONSTEXPR14 static void RegMultiplyThrow( std::int32_t a, const std::uint64_t& b, std::int32_t* pRet ) SAFEINT_CPP_THROW
     {
-        std::uint32_t bHigh = 0, bLow = 0;
         bool fIsNegative = false;
 
         // Consider that a*b can be broken up into:
         // (aHigh * 2^32 + aLow) * (bHigh * 2^32 + bLow)
         // => (aHigh * bHigh * 2^64) + (aLow * bHigh * 2^32) + (aHigh * bLow * 2^32) + (aLow * bLow)
 
-        bHigh = (std::uint32_t)(b >> 32);
-        bLow  = (std::uint32_t)b;
+        std::uint32_t bHigh = (std::uint32_t)(b >> 32);
+        std::uint32_t bLow  = (std::uint32_t)b;
 
         *pRet = 0;
 
