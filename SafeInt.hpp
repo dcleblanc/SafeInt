@@ -174,7 +174,7 @@ Please read the leading comments before using the class.
 #if SAFEINT_COMPILER == VISUAL_STUDIO_COMPILER && defined _M_AMD64 && !defined SAFEINT_USE_INTRINSICS
     #include <intrin.h>
     #define SAFEINT_USE_INTRINSICS 1
-    #define _CONSTEXPR14_MULTIPLY 
+    #define _CONSTEXPR14_MULTIPLY
 #else
     #define SAFEINT_USE_INTRINSICS 0
     #define _CONSTEXPR14_MULTIPLY _CONSTEXPR14
@@ -240,7 +240,7 @@ SAFEINT_DISABLE_ADDRESS_OPERATOR   - Disables the overload of the & operator, wh
                                      practice, and breaks some libraries that auto-generate code. In the future, I expect to make disabling this the 
                                      default.
 
-SAFEINT_USE_INT128                 - 0 or 1, defaults to 0 (TODO: Some autodetection).
+SAFEINT_USE_INT128                 - 0 or 1, defaults to defined(SAFEINT_USE_INT128)
                                      When 1, use int128 for efficient implementation of 64bit multiplication.
                                      For example, on AMD64, 64x64=128 is one instruction, the same one
                                      used for 64x64=64.
@@ -248,7 +248,11 @@ SAFEINT_USE_INT128                 - 0 or 1, defaults to 0 (TODO: Some autodetec
 ************************************************************************************************************************************/
 
 #ifndef SAFEINT_USE_INT128
+#ifdef __SIZEOF_INT128__
+#define SAFEINT_USE_INT128 1
+#else
 #define SAFEINT_USE_INT128 0
+#endif
 #endif
 
 /*
@@ -2003,7 +2007,7 @@ inline bool IntrinsicMultiplyInt64( const std::int64_t& a, const std::int64_t& b
 typedef unsigned __int128 uint128_t;
 typedef __int128 int128_t;
 
-inline bool Int128MultiplyInt64( int64_t a, int64_t b, int64_t* pRet ) SAFEINT_NOTHROW
+_CONSTEXPR14 inline bool Int128MultiplyInt64( int64_t a, int64_t b, int64_t* pRet ) SAFEINT_NOTHROW
 {
     const int128_t result = static_cast<int128_t>(a) * static_cast<int128_t>(b);
     const int64_t resultHigh = static_cast<int64_t>(result >> 64);
@@ -2014,7 +2018,7 @@ inline bool Int128MultiplyInt64( int64_t a, int64_t b, int64_t* pRet ) SAFEINT_N
     return (resultLow < 0 && resultHigh == -1) || (resultLow >= 0 && resultHigh == 0);
 }
 
-inline bool Int128MultiplyUint64( uint64_t a, uint64_t b, uint64_t* pRet ) SAFEINT_NOTHROW
+_CONSTEXPR14 inline bool Int128MultiplyUint64( uint64_t a, uint64_t b, uint64_t* pRet ) SAFEINT_NOTHROW
 {
         const uint128_t result = static_cast<uint128_t>(a) * static_cast<uint128_t>(b);
         const uint64_t resultHigh = static_cast<uint64_t>(result >> 64);
@@ -2691,7 +2695,7 @@ public:
 #if SAFEINT_USE_INTRINSICS
         return IntrinsicMultiplyInt64( a, (std::int64_t)b, pRet );
 #elif SAFEINT_USE_INT128
-        return Int128MultiplyInt64( a, (std::int64_t)b, pRet ) )
+        return Int128MultiplyInt64( a, (std::int64_t)b, pRet );
 #else
         bool aNegative = false;
         bool bNegative = false;
@@ -2867,11 +2871,11 @@ public:
     _CONSTEXPR14_MULTIPLY static void RegMultiplyThrow( std::int32_t a, const std::int64_t& b, std::int32_t* pRet ) SAFEINT_CPP_THROW
     {
 #if SAFEINT_USE_INTRINSICS || SAFEINT_USE_INT128
-        std::int64_t tmp;
-
 #if SAFEINT_USE_INTRINSICS
+        std::int64_t tmp;
         if( IntrinsicMultiplyInt64( a, b, &tmp ) )
 #else
+        std::int64_t tmp = 0; // Constexpr requires initialization.
         if( Int128MultiplyInt64( a, b, &tmp ) )
 #endif
         {
