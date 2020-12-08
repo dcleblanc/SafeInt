@@ -1952,7 +1952,7 @@ template < typename T, typename U > class LargeIntRegMultiply;
 
 #if SAFEINT_USE_INTRINSICS
 // As usual, unsigned is easy
-inline bool IntrinsicMultiplyUint64( const std::uint64_t a, const std::uint64_t b, std::uint64_t* pRet ) SAFEINT_NOTHROW
+inline bool IntrinsicMultiplyUint64( std::uint64_t a, std::uint64_t b, std::uint64_t* pRet ) SAFEINT_NOTHROW
 {
     std::uint64_t ulHigh = 0;
     *pRet = _umul128(a , b, &ulHigh);
@@ -1960,7 +1960,7 @@ inline bool IntrinsicMultiplyUint64( const std::uint64_t a, const std::uint64_t 
 }
 
 // Signed, is not so easy
-inline bool IntrinsicMultiplyInt64( const std::int64_t a, const std::int64_t b, std::int64_t* pRet ) SAFEINT_NOTHROW
+inline bool IntrinsicMultiplyInt64( std::int64_t a, std::int64_t b, std::int64_t* pRet ) SAFEINT_NOTHROW
 {
     std::int64_t llHigh = 0;
     *pRet = _mul128(a , b, &llHigh);
@@ -1994,7 +1994,7 @@ inline bool IntrinsicMultiplyInt64( const std::int64_t a, const std::int64_t b, 
 template<> class LargeIntRegMultiply< std::uint64_t, std::uint64_t >
 {
 public:
-    _CONSTEXPR14_MULTIPLY static bool RegMultiply( const std::uint64_t a, const std::uint64_t b, std::uint64_t* pRet ) SAFEINT_NOTHROW
+    _CONSTEXPR14_MULTIPLY static bool RegMultiply( std::uint64_t a, std::uint64_t b, std::uint64_t* pRet ) SAFEINT_NOTHROW
     {
 #if SAFEINT_USE_INTRINSICS
         return IntrinsicMultiplyUint64( a, b, pRet );
@@ -2055,7 +2055,7 @@ public:
     }
 
     template < typename E >
-    _CONSTEXPR14_MULTIPLY static void RegMultiplyThrow( const std::uint64_t a, const std::uint64_t b, std::uint64_t* pRet ) SAFEINT_CPP_THROW
+    _CONSTEXPR14_MULTIPLY static void RegMultiplyThrow( std::uint64_t a, std::uint64_t b, std::uint64_t* pRet ) SAFEINT_CPP_THROW
     {
 #if SAFEINT_USE_INTRINSICS
         if( !IntrinsicMultiplyUint64( a, b, pRet ) )
@@ -2119,7 +2119,7 @@ public:
 template<> class LargeIntRegMultiply< std::uint64_t, std::uint32_t >
 {
 public:
-    _CONSTEXPR14_MULTIPLY static bool RegMultiply( const std::uint64_t a, std::uint32_t b, std::uint64_t* pRet ) SAFEINT_NOTHROW
+    _CONSTEXPR14_MULTIPLY static bool RegMultiply( std::uint64_t a, std::uint32_t b, std::uint64_t* pRet ) SAFEINT_NOTHROW
     {
 #if SAFEINT_USE_INTRINSICS
         return IntrinsicMultiplyUint64( a, (std::uint64_t)b, pRet );
@@ -2160,7 +2160,7 @@ public:
     }
 
     template < typename E >
-    _CONSTEXPR14_MULTIPLY static void RegMultiplyThrow( const std::uint64_t a, std::uint32_t b, std::uint64_t* pRet ) SAFEINT_CPP_THROW
+    _CONSTEXPR14_MULTIPLY static void RegMultiplyThrow( std::uint64_t a, std::uint32_t b, std::uint64_t* pRet ) SAFEINT_CPP_THROW
     {
 #if SAFEINT_USE_INTRINSICS
         if( !IntrinsicMultiplyUint64( a, (std::uint64_t)b, pRet ) )
@@ -2206,7 +2206,7 @@ template<> class LargeIntRegMultiply< std::uint64_t, std::int32_t >
 {
 public:
     // Intrinsic not needed
-    _CONSTEXPR14_MULTIPLY static bool RegMultiply( const std::uint64_t a, std::int32_t b, std::uint64_t* pRet ) SAFEINT_NOTHROW
+    _CONSTEXPR14_MULTIPLY static bool RegMultiply( std::uint64_t a, std::int32_t b, std::uint64_t* pRet ) SAFEINT_NOTHROW
     {
         if( b < 0 && a != 0 )
             return false;
@@ -2219,7 +2219,7 @@ public:
     }
 
     template < typename E >
-    _CONSTEXPR14_MULTIPLY static void RegMultiplyThrow( const std::uint64_t a, std::int32_t b, std::uint64_t* pRet ) SAFEINT_CPP_THROW
+    _CONSTEXPR14_MULTIPLY static void RegMultiplyThrow( std::uint64_t a, std::int32_t b, std::uint64_t* pRet ) SAFEINT_CPP_THROW
     {
         if( b < 0 && a != 0 )
             E::SafeIntOnOverflow();
@@ -2236,7 +2236,7 @@ public:
 template<> class LargeIntRegMultiply< std::uint64_t, std::int64_t >
 {
 public:
-    _CONSTEXPR14_MULTIPLY static bool RegMultiply( const std::uint64_t a, std::int64_t b, std::uint64_t* pRet ) SAFEINT_NOTHROW
+    _CONSTEXPR14_MULTIPLY static bool RegMultiply( std::uint64_t a, std::int64_t b, std::uint64_t* pRet ) SAFEINT_NOTHROW
     {
         if( b < 0 && a != 0 )
             return false;
@@ -2249,7 +2249,7 @@ public:
     }
 
     template < typename E >
-    _CONSTEXPR14_MULTIPLY static void RegMultiplyThrow( const std::uint64_t a, std::int64_t b, std::uint64_t* pRet ) SAFEINT_CPP_THROW
+    _CONSTEXPR14_MULTIPLY static void RegMultiplyThrow( std::uint64_t a, std::int64_t b, std::uint64_t* pRet ) SAFEINT_CPP_THROW
     {
         if( b < 0 && a != 0 )
             E::SafeIntOnOverflow();
@@ -2267,7 +2267,7 @@ template<> class LargeIntRegMultiply< std::int32_t, std::uint64_t >
 {
 public:
     // Devolves into ordinary 64-bit calculation
-    _CONSTEXPR14 static bool RegMultiply( std::int32_t a, const std::uint64_t b, std::int32_t* pRet ) SAFEINT_NOTHROW
+    _CONSTEXPR14 static bool RegMultiply( std::int32_t a, std::uint64_t b, std::int32_t* pRet ) SAFEINT_NOTHROW
     {
         std::uint32_t bHigh = 0, bLow = 0;
         bool fIsNegative = false;
@@ -2317,7 +2317,7 @@ public:
     }
 
     template < typename E >
-    _CONSTEXPR14 static void RegMultiplyThrow( std::int32_t a, const std::uint64_t b, std::int32_t* pRet ) SAFEINT_CPP_THROW
+    _CONSTEXPR14 static void RegMultiplyThrow( std::int32_t a, std::uint64_t b, std::int32_t* pRet ) SAFEINT_CPP_THROW
     {
         std::uint32_t bHigh = 0, bLow = 0;
         bool fIsNegative = false;
@@ -2367,7 +2367,7 @@ template<> class LargeIntRegMultiply< std::uint32_t, std::uint64_t >
 {
 public:
     // Becomes ordinary 64-bit multiplication, intrinsic not needed
-    _CONSTEXPR14 static bool RegMultiply( std::uint32_t a, const std::uint64_t b, std::uint32_t* pRet ) SAFEINT_NOTHROW
+    _CONSTEXPR14 static bool RegMultiply( std::uint32_t a, std::uint64_t b, std::uint32_t* pRet ) SAFEINT_NOTHROW
     {
         // Consider that a*b can be broken up into:
         // (bHigh * 2^32 + bLow) * a
@@ -2388,7 +2388,7 @@ public:
     }
 
     template < typename E >
-    _CONSTEXPR14 static void RegMultiplyThrow( std::uint32_t a, const std::uint64_t b, std::uint32_t* pRet ) SAFEINT_CPP_THROW
+    _CONSTEXPR14 static void RegMultiplyThrow( std::uint32_t a, std::uint64_t b, std::uint32_t* pRet ) SAFEINT_CPP_THROW
     {
         if( (std::uint32_t)(b >> 32) != 0 && a != 0 )
             E::SafeIntOnOverflow();
@@ -2405,7 +2405,7 @@ public:
 template<> class LargeIntRegMultiply< std::uint32_t, std::int64_t >
 {
 public:
-    _CONSTEXPR14 static bool RegMultiply( std::uint32_t a, const std::int64_t b, std::uint32_t* pRet ) SAFEINT_NOTHROW
+    _CONSTEXPR14 static bool RegMultiply( std::uint32_t a, std::int64_t b, std::uint32_t* pRet ) SAFEINT_NOTHROW
     {
         if( b < 0 && a != 0 )
             return false;
@@ -2413,7 +2413,7 @@ public:
     }
 
     template < typename E >
-    _CONSTEXPR14 static void RegMultiplyThrow( std::uint32_t a, const std::int64_t b, std::uint32_t* pRet ) SAFEINT_CPP_THROW
+    _CONSTEXPR14 static void RegMultiplyThrow( std::uint32_t a, std::int64_t b, std::uint32_t* pRet ) SAFEINT_CPP_THROW
     {
         if( b < 0 && a != 0 )
             E::SafeIntOnOverflow();
@@ -2425,7 +2425,7 @@ public:
 template<> class LargeIntRegMultiply< std::int64_t, std::int64_t >
 {
 public:
-    _CONSTEXPR14_MULTIPLY static bool RegMultiply( const std::int64_t a, const std::int64_t b, std::int64_t* pRet ) SAFEINT_NOTHROW
+    _CONSTEXPR14_MULTIPLY static bool RegMultiply( std::int64_t a, std::int64_t b, std::int64_t* pRet ) SAFEINT_NOTHROW
     {
 #if SAFEINT_USE_INTRINSICS
         return IntrinsicMultiplyInt64( a, b, pRet );
@@ -2477,7 +2477,7 @@ public:
     }
 
     template < typename E >
-    _CONSTEXPR14_MULTIPLY static void RegMultiplyThrow( const std::int64_t a, const std::int64_t b, std::int64_t* pRet ) SAFEINT_CPP_THROW
+    _CONSTEXPR14_MULTIPLY static void RegMultiplyThrow( std::int64_t a, std::int64_t b, std::int64_t* pRet ) SAFEINT_CPP_THROW
     {
 #if SAFEINT_USE_INTRINSICS
         if( !IntrinsicMultiplyInt64( a, b, pRet ) )
@@ -2532,7 +2532,7 @@ public:
 template<> class LargeIntRegMultiply< std::int64_t, std::uint32_t >
 {
 public:
-    _CONSTEXPR14_MULTIPLY static bool RegMultiply( const std::int64_t a, std::uint32_t b, std::int64_t* pRet ) SAFEINT_NOTHROW
+    _CONSTEXPR14_MULTIPLY static bool RegMultiply( std::int64_t a, std::uint32_t b, std::int64_t* pRet ) SAFEINT_NOTHROW
     {
 #if SAFEINT_USE_INTRINSICS
         return IntrinsicMultiplyInt64( a, (std::int64_t)b, pRet );
@@ -2575,7 +2575,7 @@ public:
     }
 
     template < typename E >
-    _CONSTEXPR14_MULTIPLY static void RegMultiplyThrow( const std::int64_t a, std::uint32_t b, std::int64_t* pRet ) SAFEINT_CPP_THROW
+    _CONSTEXPR14_MULTIPLY static void RegMultiplyThrow( std::int64_t a, std::uint32_t b, std::int64_t* pRet ) SAFEINT_CPP_THROW
     {
 #if SAFEINT_USE_INTRINSICS
         if( !IntrinsicMultiplyInt64( a, (std::int64_t)b, pRet ) )
@@ -2621,7 +2621,7 @@ public:
 template<> class LargeIntRegMultiply< std::int64_t, std::int32_t >
 {
 public:
-    _CONSTEXPR14_MULTIPLY static bool RegMultiply( const std::int64_t a, std::int32_t b, std::int64_t* pRet ) SAFEINT_NOTHROW
+    _CONSTEXPR14_MULTIPLY static bool RegMultiply( std::int64_t a, std::int32_t b, std::int64_t* pRet ) SAFEINT_NOTHROW
     {
 #if SAFEINT_USE_INTRINSICS
         return IntrinsicMultiplyInt64( a, (std::int64_t)b, pRet );
@@ -2726,7 +2726,7 @@ public:
 template<> class LargeIntRegMultiply< std::int32_t, std::int64_t >
 {
 public:
-    _CONSTEXPR14_MULTIPLY static bool RegMultiply( std::int32_t a, const std::int64_t b, std::int32_t* pRet ) SAFEINT_NOTHROW
+    _CONSTEXPR14_MULTIPLY static bool RegMultiply( std::int32_t a, std::int64_t b, std::int32_t* pRet ) SAFEINT_NOTHROW
     {
 #if SAFEINT_USE_INTRINSICS
         std::int64_t tmp = 0;
@@ -2790,7 +2790,7 @@ public:
     }
 
     template < typename E >
-    _CONSTEXPR14_MULTIPLY static void RegMultiplyThrow( std::int32_t a, const std::int64_t b, std::int32_t* pRet ) SAFEINT_CPP_THROW
+    _CONSTEXPR14_MULTIPLY static void RegMultiplyThrow( std::int32_t a, std::int64_t b, std::int32_t* pRet ) SAFEINT_CPP_THROW
     {
 #if SAFEINT_USE_INTRINSICS
         std::int64_t tmp;
@@ -2857,7 +2857,7 @@ template<> class LargeIntRegMultiply< std::int64_t, std::uint64_t >
 {
 public:
     // Leave this one as-is - will call unsigned intrinsic internally
-    _CONSTEXPR14_MULTIPLY static bool RegMultiply( const std::int64_t a, const std::uint64_t b, std::int64_t* pRet ) SAFEINT_NOTHROW
+    _CONSTEXPR14_MULTIPLY static bool RegMultiply( std::int64_t a, std::uint64_t b, std::int64_t* pRet ) SAFEINT_NOTHROW
     {
         bool aNegative = false;
 
@@ -2897,7 +2897,7 @@ public:
     }
 
     template < typename E >
-    _CONSTEXPR14_MULTIPLY static void RegMultiplyThrow( const std::int64_t a, const std::uint64_t b, std::int64_t* pRet ) SAFEINT_CPP_THROW
+    _CONSTEXPR14_MULTIPLY static void RegMultiplyThrow( std::int64_t a, std::uint64_t b, std::int64_t* pRet ) SAFEINT_CPP_THROW
     {
         bool aNegative = false;
         std::uint64_t tmp = 0;
@@ -2957,7 +2957,7 @@ public:
     }
 
     template < typename E >
-    _CONSTEXPR14_MULTIPLY static void MultiplyThrow(const std::uint64_t t, const std::uint64_t u, T& ret) SAFEINT_CPP_THROW
+    _CONSTEXPR14_MULTIPLY static void MultiplyThrow(std::uint64_t t, std::uint64_t u, T& ret) SAFEINT_CPP_THROW
     {
         static_assert(safeint_internal::int_traits<T>::isUint64 && safeint_internal::int_traits<U>::isUint64, "T, U must be Uint64");
         std::uint64_t t1 = t;
@@ -3182,7 +3182,7 @@ public:
     }
 
     template < typename E >
-    _CONSTEXPR14_MULTIPLY static void MultiplyThrow( const std::int64_t t, U u, T& ret ) SAFEINT_CPP_THROW
+    _CONSTEXPR14_MULTIPLY static void MultiplyThrow( std::int64_t t, U u, T& ret ) SAFEINT_CPP_THROW
     {
         static_assert(safeint_internal::int_traits<T>::isInt64, "T must be Int64");
         std::int64_t t1 = t;
@@ -3213,7 +3213,7 @@ public:
     }
 
     template < typename E >
-    _CONSTEXPR14 static void MultiplyThrow(T t, const std::uint64_t u, T& ret) SAFEINT_CPP_THROW
+    _CONSTEXPR14 static void MultiplyThrow(T t, std::uint64_t u, T& ret) SAFEINT_CPP_THROW
     {
         static_assert(safeint_internal::int_traits<U>::isUint64, "U must be Uint64");
         std::uint64_t u1 = u;
@@ -3241,7 +3241,7 @@ public:
     }
 
     template < typename E >
-    _CONSTEXPR14_MULTIPLY static void MultiplyThrow( const std::int64_t t, const std::uint64_t u, T& ret ) SAFEINT_CPP_THROW
+    _CONSTEXPR14_MULTIPLY static void MultiplyThrow( std::int64_t t, std::uint64_t u, T& ret ) SAFEINT_CPP_THROW
     {
         static_assert(safeint_internal::int_traits<T>::isInt64 && safeint_internal::int_traits<U>::isUint64, "T must be Int64, U Uint64");
         std::int64_t t1 = t;
@@ -3476,7 +3476,7 @@ public:
 template < typename T, typename U > class DivisionHelper< T, U, DivisionState_SignedUnsigned64 >
 {
 public:
-    _CONSTEXPR14 static SafeIntError Divide( const T& t, const std::uint64_t u, T& result ) SAFEINT_NOTHROW
+    _CONSTEXPR14 static SafeIntError Divide( const T& t, std::uint64_t u, T& result ) SAFEINT_NOTHROW
     {
         static_assert(safeint_internal::int_traits<U>::isUint64, "U must be Uint64");
 
@@ -3509,7 +3509,7 @@ public:
     }
 
     template < typename E >
-    _CONSTEXPR14 static void DivideThrow( const T& t, const std::uint64_t u, T& result ) SAFEINT_CPP_THROW
+    _CONSTEXPR14 static void DivideThrow( const T& t, std::uint64_t u, T& result ) SAFEINT_CPP_THROW
     {
         static_assert(safeint_internal::int_traits<U>::isUint64, "U must be Uint64");
 
@@ -4206,7 +4206,7 @@ public:
 template < typename T, typename U > class AdditionHelper < T, U, AdditionState_ManualCheckInt64Uint64 >
 {
 public:
-    _CONSTEXPR14 static bool Addition( const std::int64_t lhs, const std::uint64_t rhs, T& result ) SAFEINT_NOTHROW
+    _CONSTEXPR14 static bool Addition( std::int64_t lhs, std::uint64_t rhs, T& result ) SAFEINT_NOTHROW
     {
         static_assert( safeint_internal::int_traits< T >::isInt64 && safeint_internal::int_traits< U >::isUint64, "T must be Int64, U Uint64" );
         // rhs is std::uint64_t, lhs std::int64_t
@@ -4225,7 +4225,7 @@ public:
     }
 
     template < typename E >
-    _CONSTEXPR14 static void AdditionThrow( const std::int64_t lhs, const std::uint64_t rhs, T& result ) SAFEINT_CPP_THROW
+    _CONSTEXPR14 static void AdditionThrow( std::int64_t lhs, std::uint64_t rhs, T& result ) SAFEINT_CPP_THROW
     {
         static_assert(safeint_internal::int_traits< T >::isInt64 && safeint_internal::int_traits< U >::isUint64, "T must be Int64, U Uint64");
         // rhs is std::uint64_t, lhs std::int64_t
@@ -5353,7 +5353,7 @@ public:
 template < typename T, typename U > class SubtractionHelper< T, U, SubtractionState_Int64Uint64 >
 {
 public:
-    _CONSTEXPR14 static bool Subtract( const std::int64_t lhs, const std::uint64_t rhs, std::int64_t result ) SAFEINT_NOTHROW
+    _CONSTEXPR14 static bool Subtract( std::int64_t lhs, std::uint64_t rhs, std::int64_t result ) SAFEINT_NOTHROW
     {
         static_assert(safeint_internal::int_traits< T >::isInt64 && safeint_internal::int_traits< U >::isUint64, "T must be Int64, U Uint64");
         // if we subtract, and it gets larger, there's a problem
@@ -5369,7 +5369,7 @@ public:
     }
 
     template < typename E >
-    _CONSTEXPR14 static void SubtractThrow( const std::int64_t lhs, const std::uint64_t rhs, T& result ) SAFEINT_CPP_THROW
+    _CONSTEXPR14 static void SubtractThrow( std::int64_t lhs, std::uint64_t rhs, T& result ) SAFEINT_CPP_THROW
     {
         static_assert(safeint_internal::int_traits< T >::isInt64 && safeint_internal::int_traits< U >::isUint64, "T must be Int64, U Uint64");
         // if we subtract, and it gets larger, there's a problem
@@ -5392,7 +5392,7 @@ template < typename U, typename T > class SubtractionHelper< U, T, SubtractionSt
 public:
     // If lhs is negative, immediate problem - return must be positive, and subtracting only makes it
     // get smaller. If rhs > lhs, then it would also go negative, which is the other case
-    _CONSTEXPR14 static bool Subtract( const std::int64_t lhs, const std::uint64_t rhs, T& result ) SAFEINT_NOTHROW
+    _CONSTEXPR14 static bool Subtract( std::int64_t lhs, std::uint64_t rhs, T& result ) SAFEINT_NOTHROW
     {
         static_assert( safeint_internal::int_traits< T >::isUint64 && safeint_internal::int_traits< U >::isInt64, "T must be Uint64, U Int64" );
         if( lhs >= 0 && (std::uint64_t)lhs >= rhs )
@@ -5405,7 +5405,7 @@ public:
     }
 
     template < typename E >
-    _CONSTEXPR14 static void SubtractThrow( const std::int64_t lhs, const std::uint64_t rhs, T& result ) SAFEINT_CPP_THROW
+    _CONSTEXPR14 static void SubtractThrow( std::int64_t lhs, std::uint64_t rhs, T& result ) SAFEINT_CPP_THROW
     {
         static_assert(safeint_internal::int_traits< T >::isUint64 && safeint_internal::int_traits< U >::isInt64, "T must be Uint64, U Int64");
         if( lhs >= 0 && (std::uint64_t)lhs >= rhs )
