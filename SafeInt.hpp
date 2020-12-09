@@ -172,8 +172,6 @@ Please read the leading comments before using the class.
 #define SAFEINT_NOTHROW noexcept
 #endif
 
-#define SAFEINT_USE_C_HEADERS 0
-
 #if defined SAFEINT_USE_C_HEADERS
 
 // This is to allow the class to be used in non-standard environments
