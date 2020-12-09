@@ -5804,6 +5804,8 @@ public:
         m_int = (T)SafeInt< T, E >( (U)u );
     }
 
+    _CONSTEXPR14 SafeInt(const SafeInt< T, E >& t) SAFEINT_NOTHROW = default;
+
     template < typename U >
     _CONSTEXPR14 SafeInt( const U& i ) SAFEINT_CPP_THROW : m_int(0)
     {
@@ -5848,11 +5850,7 @@ public:
         return *this;
     }
 
-    _CONSTEXPR14 SafeInt< T, E >& operator =( const SafeInt< T, E >& rhs ) SAFEINT_NOTHROW
-    {
-        m_int = rhs.m_int;
-        return *this;
-    }
+    _CONSTEXPR14 SafeInt< T, E >& operator =(const SafeInt< T, E >& rhs) SAFEINT_NOTHROW = default;
 
     // Casting operators
 
