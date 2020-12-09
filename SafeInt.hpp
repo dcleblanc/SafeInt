@@ -5977,7 +5977,7 @@ public:
     }
     _CONSTEXPR14 operator long double() const SAFEINT_CPP_THROW
     {
-        long double val = 0.0;
+        long double val = 0.0l;
         SafeCastHelper< long double, T, GetCastMethod< long double, T >::method >::template CastThrow< E >( m_int, val );
         return val;
     }
