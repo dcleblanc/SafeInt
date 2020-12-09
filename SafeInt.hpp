@@ -5669,6 +5669,12 @@ public:
         static_assert( safeint_internal::numeric_type< T >::isInt, "Integer type required" );
     }
 
+#if CPLUSPLUS_STD >= CPLUSPLUS_11
+    _CONSTEXPR11 SafeInt(const SafeInt& other) SAFEINT_NOTHROW = default;
+#else
+    _CONSTEXPR11 SafeInt(const SafeInt& other) SAFEINT_NOTHROW : m_int(other.m_int) { }
+#endif
+
     // Having a constructor for every type of int
     // avoids having the compiler evade our checks when doing implicit casts -
     // e.g., SafeInt<char> s = 0x7fffffff;
@@ -5735,11 +5741,15 @@ public:
         return *this;
     }
 
+#if CPLUSPLUS_STD >= CPLUSPLUS_11
+    _CONSTEXPR14 SafeInt< T, E >& operator =( const SafeInt< T, E >& rhs ) SAFEINT_NOTHROW = default;
+#else
     _CONSTEXPR14 SafeInt< T, E >& operator =( const SafeInt< T, E >& rhs ) SAFEINT_NOTHROW
     {
         m_int = rhs.m_int;
         return *this;
     }
+#endif
 
     // Casting operators
 
