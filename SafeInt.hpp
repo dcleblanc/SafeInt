@@ -177,8 +177,10 @@ Please read the leading comments before using the class.
 // This is to allow the class to be used in non-standard environments
 // that do not have C++ headers available, such as some internal Microsoft 
 // build systems
+#include <stddef.h>
 #include <stdint.h>
 #include <math.h>
+#include <wchar.h>
 
 #define SAFEINT_FPCLASSIFY fpclassify
 
@@ -187,10 +189,10 @@ Please read the leading comments before using the class.
 // The Microsoft compiler still supports a non-standard switch to disable wchar_t
 #if SAFEINT_COMPILER == VISUAL_STUDIO_COMPILER
 
-#if !defined _NATIVE_WCHAR_T_DEFINED
-#define SAFEINT_STANDARD_WCHAR_T 0
-#else
+#if defined _NATIVE_WCHAR_T_DEFINED || defined _WCHAR_H
 #define SAFEINT_STANDARD_WCHAR_T 1
+#else
+#define SAFEINT_STANDARD_WCHAR_T 0
 #endif
 
 #endif
@@ -224,7 +226,6 @@ namespace std
 // std namespace, but can't be when using C headers
 #define SAFEINT_FPCLASSIFY std::fpclassify
 
-#define SAFEINT_STANDARD_WCHAR_T 1
 #endif
 
 // Note - intrinsics and constexpr are mutually exclusive
@@ -915,10 +916,7 @@ namespace safeint_internal
     template <> class numeric_type<unsigned long>      { public: enum { isBool = false, isInt = true, isEnum = false }; };
     template <> class numeric_type<long long>          { public: enum { isBool = false, isInt = true, isEnum = false }; };
     template <> class numeric_type<unsigned long long> { public: enum { isBool = false, isInt = true, isEnum = false }; };
-
-#if SAFEINT_STANDARD_WCHAR_T
     template <> class numeric_type<wchar_t>            { public: enum { isBool = false, isInt = true, isEnum = false }; };
-#endif
 
     // Abstract out limits for the case of having to use only C headers
 
@@ -5947,14 +5945,12 @@ public:
         return val;
     }
 
-#if SAFEINT_STANDARD_WCHAR_T
     _CONSTEXPR14 operator wchar_t() const SAFEINT_CPP_THROW
     {
         wchar_t val = 0;
         SafeCastHelper< wchar_t, T, GetCastMethod< wchar_t, T >::method >::template CastThrow< E >( m_int, val );
         return val;
     }
-#endif
 
 #ifdef SIZE_T_CAST_NEEDED
     // We also need an explicit cast to size_t, or the compiler will complain
