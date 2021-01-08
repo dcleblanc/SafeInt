@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.27130.2027
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30320.27
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SafeIntTestVS17", "SafeIntTestVS17\SafeIntTestVS17.vcxproj", "{1D3628DA-8471-4F50-86B6-3B04B3CC6D5F}"
 EndProject
@@ -13,6 +13,8 @@ Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
 		Debug|x86 = Debug|x86
+		Release - C headers|x64 = Release - C headers|x64
+		Release - C headers|x86 = Release - C headers|x86
 		Release|x64 = Release|x64
 		Release|x86 = Release|x86
 	EndGlobalSection
@@ -21,6 +23,10 @@ Global
 		{1D3628DA-8471-4F50-86B6-3B04B3CC6D5F}.Debug|x64.Build.0 = Debug|x64
 		{1D3628DA-8471-4F50-86B6-3B04B3CC6D5F}.Debug|x86.ActiveCfg = Debug|Win32
 		{1D3628DA-8471-4F50-86B6-3B04B3CC6D5F}.Debug|x86.Build.0 = Debug|Win32
+		{1D3628DA-8471-4F50-86B6-3B04B3CC6D5F}.Release - C headers|x64.ActiveCfg = Release - C headers|x64
+		{1D3628DA-8471-4F50-86B6-3B04B3CC6D5F}.Release - C headers|x64.Build.0 = Release - C headers|x64
+		{1D3628DA-8471-4F50-86B6-3B04B3CC6D5F}.Release - C headers|x86.ActiveCfg = Release - C headers|Win32
+		{1D3628DA-8471-4F50-86B6-3B04B3CC6D5F}.Release - C headers|x86.Build.0 = Release - C headers|Win32
 		{1D3628DA-8471-4F50-86B6-3B04B3CC6D5F}.Release|x64.ActiveCfg = Release|x64
 		{1D3628DA-8471-4F50-86B6-3B04B3CC6D5F}.Release|x64.Build.0 = Release|x64
 		{1D3628DA-8471-4F50-86B6-3B04B3CC6D5F}.Release|x86.ActiveCfg = Release|Win32
@@ -29,6 +35,10 @@ Global
 		{1E55B5E4-2A0D-4782-82E7-58F508A7CC80}.Debug|x64.Build.0 = Debug|x64
 		{1E55B5E4-2A0D-4782-82E7-58F508A7CC80}.Debug|x86.ActiveCfg = Debug|Win32
 		{1E55B5E4-2A0D-4782-82E7-58F508A7CC80}.Debug|x86.Build.0 = Debug|Win32
+		{1E55B5E4-2A0D-4782-82E7-58F508A7CC80}.Release - C headers|x64.ActiveCfg = Release - C headers|x64
+		{1E55B5E4-2A0D-4782-82E7-58F508A7CC80}.Release - C headers|x64.Build.0 = Release - C headers|x64
+		{1E55B5E4-2A0D-4782-82E7-58F508A7CC80}.Release - C headers|x86.ActiveCfg = Release - C headers|Win32
+		{1E55B5E4-2A0D-4782-82E7-58F508A7CC80}.Release - C headers|x86.Build.0 = Release - C headers|Win32
 		{1E55B5E4-2A0D-4782-82E7-58F508A7CC80}.Release|x64.ActiveCfg = Release|x64
 		{1E55B5E4-2A0D-4782-82E7-58F508A7CC80}.Release|x64.Build.0 = Release|x64
 		{1E55B5E4-2A0D-4782-82E7-58F508A7CC80}.Release|x86.ActiveCfg = Release|Win32
@@ -37,6 +47,10 @@ Global
 		{A431887C-4B24-47F9-9A23-392FB44C2952}.Debug|x64.Build.0 = Debug|x64
 		{A431887C-4B24-47F9-9A23-392FB44C2952}.Debug|x86.ActiveCfg = Debug|Win32
 		{A431887C-4B24-47F9-9A23-392FB44C2952}.Debug|x86.Build.0 = Debug|Win32
+		{A431887C-4B24-47F9-9A23-392FB44C2952}.Release - C headers|x64.ActiveCfg = Release - C headers|x64
+		{A431887C-4B24-47F9-9A23-392FB44C2952}.Release - C headers|x64.Build.0 = Release - C headers|x64
+		{A431887C-4B24-47F9-9A23-392FB44C2952}.Release - C headers|x86.ActiveCfg = Release - C headers|Win32
+		{A431887C-4B24-47F9-9A23-392FB44C2952}.Release - C headers|x86.Build.0 = Release - C headers|Win32
 		{A431887C-4B24-47F9-9A23-392FB44C2952}.Release|x64.ActiveCfg = Release|x64
 		{A431887C-4B24-47F9-9A23-392FB44C2952}.Release|x64.Build.0 = Release|x64
 		{A431887C-4B24-47F9-9A23-392FB44C2952}.Release|x86.ActiveCfg = Release|Win32
