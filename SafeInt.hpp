@@ -180,6 +180,8 @@ Please read the leading comments before using the class.
 #include <stdint.h>
 #include <math.h>
 
+#define SAFEINT_FPCLASSIFY fpclassify
+
 // wchar_t has been a built-in type according to the standard since 1990
 // however, the initial implementation was to define it in terms of other integer types
 // The Microsoft compiler still supports a non-standard switch to disable wchar_t
@@ -209,6 +211,7 @@ namespace std
 
 #else
 
+#include <cstddef>
 #include <cstdint>
 // type_traits required for isInt, and isEnum
 #include <type_traits>
@@ -216,6 +219,10 @@ namespace std
 #include <limits>
 // Needed for fpclassify
 #include <cmath> 
+
+// When in proper C++, fpclassify will want to be part of 
+// std namespace, but can't be when using C headers
+#define SAFEINT_FPCLASSIFY std::fpclassify
 
 #define SAFEINT_STANDARD_WCHAR_T 1
 #endif
@@ -1366,7 +1373,7 @@ public:
         // 53 bits is:
         bool fValid = false;
 
-        switch (fpclassify(d))
+        switch (SAFEINT_FPCLASSIFY(d))
         {
         case FP_NORMAL:    // A positive or negative normalized non - zero value
         case FP_SUBNORMAL: // A positive or negative denormalized value
@@ -5802,7 +5809,7 @@ public:
         m_int = (T)SafeInt< T, E >( (U)u );
     }
 
-    _CONSTEXPR14 SafeInt(const SafeInt< T, E >& t) SAFEINT_NOTHROW = default;
+    _CONSTEXPR14 SafeInt(const SafeInt< T, E >& t) SAFEINT_NOTHROW  : m_int(t.m_int) {}
 
     template < typename U >
     _CONSTEXPR14 SafeInt( const U& i ) SAFEINT_CPP_THROW : m_int(0)
@@ -5848,7 +5855,11 @@ public:
         return *this;
     }
 
-    _CONSTEXPR14 SafeInt< T, E >& operator =(const SafeInt< T, E >& rhs) SAFEINT_NOTHROW = default;
+    _CONSTEXPR14 SafeInt< T, E >& operator =(const SafeInt< T, E >& rhs) SAFEINT_NOTHROW 
+    {
+        m_int = rhs.m_int;
+        return *this;
+    }
 
     // Casting operators
 
