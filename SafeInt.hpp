@@ -172,6 +172,13 @@ Please read the leading comments before using the class.
 #define SAFEINT_NOTHROW noexcept
 #endif
 
+// Support annotating return values with nodisard attributes when the compiler supports it.
+#if defined __cplusplus  && defined __has_cpp_attribute && __has_cpp_attribute(nodiscard)
+#define SAFEINT_NODISCARD [[nodiscard]]
+#else
+#define SAFEINT_NODISCARD
+#endif
+
 #include <cstdint>
 #include <limits>
 #include <type_traits> // This is now required
@@ -5202,7 +5209,7 @@ public:
 template < typename T, typename U > class SubtractionHelper< T, U, SubtractionState_Int64Uint >
 {
 public:
-    _CONSTEXPR14 static bool Subtract( const T& lhs, const U& rhs, T& result ) SAFEINT_NOTHROW
+    _CONSTEXPR14 SAFEINT_NODISCARD static bool Subtract( const T& lhs, const U& rhs, T& result ) SAFEINT_NOTHROW
     {
         // lhs is a 64-bit int, rhs unsigned int32 or smaller
         // perform test as unsigned to prevent unwanted optimizations
@@ -5218,7 +5225,7 @@ public:
     }
 
     template < typename E >
-    _CONSTEXPR14 static void SubtractThrow( const T& lhs, const U& rhs, T& result ) SAFEINT_CPP_THROW
+    _CONSTEXPR14 SAFEINT_NODISCARD static void SubtractThrow( const T& lhs, const U& rhs, T& result ) SAFEINT_CPP_THROW
     {
         // lhs is a 64-bit int, rhs unsigned int32 or smaller
         // perform test as unsigned to prevent unwanted optimizations
@@ -5238,7 +5245,7 @@ template < typename U, typename T > class SubtractionHelper< U, T, SubtractionSt
 {
 public:
     // lhs is std::int64_t, rhs is unsigned 32-bit or smaller
-    _CONSTEXPR14 static bool Subtract( const U& lhs, const T& rhs, T& result ) SAFEINT_NOTHROW
+    _CONSTEXPR14 SAFEINT_NODISCARD static bool Subtract( const U& lhs, const T& rhs, T& result ) SAFEINT_NOTHROW
     {
         // Do this as unsigned to prevent unwanted optimizations
         std::uint64_t tmp = (std::uint64_t)lhs - (std::uint64_t)rhs;
@@ -5253,7 +5260,7 @@ public:
     }
 
     template < typename E >
-    _CONSTEXPR14 static void SubtractThrow( const U& lhs, const T& rhs, T& result ) SAFEINT_CPP_THROW
+    _CONSTEXPR14 SAFEINT_NODISCARD static void SubtractThrow( const U& lhs, const T& rhs, T& result ) SAFEINT_CPP_THROW
     {
         // Do this as unsigned to prevent unwanted optimizations
         std::uint64_t tmp = (std::uint64_t)lhs - (std::uint64_t)rhs;
@@ -5271,7 +5278,7 @@ public:
 template < typename T, typename U > class SubtractionHelper< T, U, SubtractionState_IntUint64 >
 {
 public:
-    _CONSTEXPR14 static bool Subtract( const T& lhs, const U& rhs, T& result ) SAFEINT_NOTHROW
+    _CONSTEXPR14 SAFEINT_NODISCARD static bool Subtract( const T& lhs, const U& rhs, T& result ) SAFEINT_NOTHROW
     {
         // lhs is any signed int, rhs unsigned int64
         // check against available range
@@ -5334,7 +5341,7 @@ public:
 template < typename U, typename T > class SubtractionHelper< U, T, SubtractionState_IntUint642 >
 {
 public:
-    _CONSTEXPR14 static bool Subtract( const U& lhs, const T& rhs, T& result ) SAFEINT_NOTHROW
+    _CONSTEXPR14 SAFEINT_NODISCARD static bool Subtract( const U& lhs, const T& rhs, T& result ) SAFEINT_NOTHROW
     {
         // We run into upcasting problems on comparison - needs 2 checks
         if( lhs >= 0 && (T)lhs >= rhs )
@@ -5364,7 +5371,7 @@ public:
 template < typename T, typename U > class SubtractionHelper< T, U, SubtractionState_Int64Uint64 >
 {
 public:
-    _CONSTEXPR14 static bool Subtract( const std::int64_t& lhs, const std::uint64_t& rhs, std::int64_t& result ) SAFEINT_NOTHROW
+    _CONSTEXPR14 SAFEINT_NODISCARD static bool Subtract( const std::int64_t& lhs, const std::uint64_t& rhs, std::int64_t& result ) SAFEINT_NOTHROW
     {
         static_assert(safeint_internal::int_traits< T >::isInt64 && safeint_internal::int_traits< U >::isUint64, "T must be Int64, U Uint64");
         // if we subtract, and it gets larger, there's a problem
@@ -5403,7 +5410,7 @@ template < typename U, typename T > class SubtractionHelper< U, T, SubtractionSt
 public:
     // If lhs is negative, immediate problem - return must be positive, and subtracting only makes it
     // get smaller. If rhs > lhs, then it would also go negative, which is the other case
-    _CONSTEXPR14 static bool Subtract( const std::int64_t& lhs, const std::uint64_t& rhs, T& result ) SAFEINT_NOTHROW
+    _CONSTEXPR14 SAFEINT_NODISCARD static bool Subtract( const std::int64_t& lhs, const std::uint64_t& rhs, T& result ) SAFEINT_NOTHROW
     {
         static_assert( safeint_internal::int_traits< T >::isUint64 && safeint_internal::int_traits< U >::isInt64, "T must be Uint64, U Int64" );
         if( lhs >= 0 && (std::uint64_t)lhs >= rhs )
@@ -5591,79 +5598,79 @@ public:
 // non-class helper function so that you can check for a cast's validity
 // and handle errors how you like
 template < typename T, typename U >
-_CONSTEXPR11 inline bool SafeCast( const T From, U& To ) SAFEINT_NOTHROW
+_CONSTEXPR11 SAFEINT_NODISCARD inline bool SafeCast( const T From, U& To ) SAFEINT_NOTHROW
 {
     return SafeCastHelper< U, T, GetCastMethod< U, T >::method >::Cast( From, To );
 }
 
 template < typename T, typename U >
-_CONSTEXPR11 inline bool SafeEquals( const T t, const U u ) SAFEINT_NOTHROW
+_CONSTEXPR11 SAFEINT_NODISCARD inline bool SafeEquals( const T t, const U u ) SAFEINT_NOTHROW
 {
     return EqualityTest< T, U, ValidComparison< T, U >::method >::IsEquals( t, u );
 }
 
 template < typename T, typename U >
-_CONSTEXPR11 inline bool SafeNotEquals( const T t, const U u ) SAFEINT_NOTHROW
+_CONSTEXPR11 SAFEINT_NODISCARD inline bool SafeNotEquals( const T t, const U u ) SAFEINT_NOTHROW
 {
     return !EqualityTest< T, U, ValidComparison< T, U >::method >::IsEquals( t, u );
 }
 
 template < typename T, typename U >
-_CONSTEXPR11 inline bool SafeGreaterThan( const T t, const U u ) SAFEINT_NOTHROW
+_CONSTEXPR11 SAFEINT_NODISCARD inline bool SafeGreaterThan( const T t, const U u ) SAFEINT_NOTHROW
 {
     return GreaterThanTest< T, U, ValidComparison< T, U >::method >::GreaterThan( t, u );
 }
 
 template < typename T, typename U >
-_CONSTEXPR11 inline bool SafeGreaterThanEquals( const T t, const U u ) SAFEINT_NOTHROW
+_CONSTEXPR11 SAFEINT_NODISCARD inline bool SafeGreaterThanEquals( const T t, const U u ) SAFEINT_NOTHROW
 {
     return !GreaterThanTest< U, T, ValidComparison< U, T >::method >::GreaterThan( u, t );
 }
 
 template < typename T, typename U >
-_CONSTEXPR11 inline bool SafeLessThan( const T t, const U u ) SAFEINT_NOTHROW
+_CONSTEXPR11 SAFEINT_NODISCARD inline bool SafeLessThan( const T t, const U u ) SAFEINT_NOTHROW
 {
     return GreaterThanTest< U, T, ValidComparison< U, T >::method >::GreaterThan( u, t );
 }
 
 template < typename T, typename U >
-_CONSTEXPR11 inline bool SafeLessThanEquals( const T t, const U u ) SAFEINT_NOTHROW
+_CONSTEXPR11 SAFEINT_NODISCARD inline bool SafeLessThanEquals( const T t, const U u ) SAFEINT_NOTHROW
 {
     return !GreaterThanTest< T, U, ValidComparison< T, U >::method >::GreaterThan( t, u );
 }
 
 template < typename T, typename U >
-_CONSTEXPR11 inline bool SafeModulus( const T& t, const U& u, T& result ) SAFEINT_NOTHROW
+_CONSTEXPR11 SAFEINT_NODISCARD inline bool SafeModulus( const T& t, const U& u, T& result ) SAFEINT_NOTHROW
 {
     return ( ModulusHelper< T, U, ValidComparison< T, U >::method >::Modulus( t, u, result ) == SafeIntError::SafeIntNoError );
 }
 
 template < typename T, typename U >
-_CONSTEXPR14_MULTIPLY inline bool SafeMultiply( T t, U u, T& result ) SAFEINT_NOTHROW
+_CONSTEXPR14_MULTIPLY SAFEINT_NODISCARD inline bool SafeMultiply( T t, U u, T& result ) SAFEINT_NOTHROW
 {
     return MultiplicationHelper< T, U, MultiplicationMethod< T, U >::method >::Multiply( t, u, result );
 }
 
 template < typename T, typename U >
-_CONSTEXPR11 inline bool SafeDivide( T t, U u, T& result ) SAFEINT_NOTHROW
+_CONSTEXPR11 SAFEINT_NODISCARD inline bool SafeDivide( T t, U u, T& result ) SAFEINT_NOTHROW
 {
     return ( DivisionHelper< T, U, DivisionMethod< T, U >::method >::Divide( t, u, result ) == SafeIntError::SafeIntNoError );
 }
 
 template < typename T, typename U >
-_CONSTEXPR11 inline bool SafeAdd( T t, U u, T& result ) SAFEINT_NOTHROW
+_CONSTEXPR11 SAFEINT_NODISCARD inline bool SafeAdd( T t, U u, T& result ) SAFEINT_NOTHROW
 {
     return AdditionHelper< T, U, AdditionMethod< T, U >::method >::Addition( t, u, result );
 }
 
 template < typename T, typename U >
-_CONSTEXPR11 inline bool SafeSubtract( T t, U u, T& result ) SAFEINT_NOTHROW
+_CONSTEXPR11 SAFEINT_NODISCARD inline bool SafeSubtract( T t, U u, T& result ) SAFEINT_NOTHROW
 {
     return SubtractionHelper< T, U, SubtractionMethod< T, U >::method >::Subtract( t, u, result );
 }
 
 template < typename T >
-_CONSTEXPR11 inline bool SafeNegation(T t, T& result) SAFEINT_NOTHROW
+_CONSTEXPR11 SAFEINT_NODISCARD inline bool SafeNegation(T t, T& result) SAFEINT_NOTHROW
 {
     return NegationHelper< T, std::numeric_limits<T>::is_signed>::Negative(t, result);
 }
@@ -5909,7 +5916,7 @@ public:
 #endif
 
     // Unary operators
-    _CONSTEXPR11 bool operator !() const SAFEINT_NOTHROW { return (!m_int) ? true : false; }
+    _CONSTEXPR11 SAFEINT_NODISCARD bool operator !() const SAFEINT_NOTHROW { return (!m_int) ? true : false; }
 
     // operator + (unary)
     // note - normally, the '+' and '-' operators will upcast to a signed int
@@ -6694,7 +6701,7 @@ template < typename T, typename E, int method > class ModulusSignedCaseHelper;
 template < typename T, typename E > class ModulusSignedCaseHelper < T, E, true >
 {
 public:
-    _CONSTEXPR14 static bool SignedCase( SafeInt< T, E > rhs, SafeInt< T, E >& result ) SAFEINT_NOTHROW
+    _CONSTEXPR14 SAFEINT_NODISCARD static bool SignedCase( SafeInt< T, E > rhs, SafeInt< T, E >& result ) SAFEINT_NOTHROW
     {
         if( (T)rhs == (T)-1 )
         {
@@ -6708,7 +6715,7 @@ public:
 template < typename T, typename E > class ModulusSignedCaseHelper < T, E, false >
 {
 public:
-    _CONSTEXPR11 static bool SignedCase( SafeInt< T, E > /*rhs*/, SafeInt< T, E >& /*result*/ ) SAFEINT_NOTHROW
+    _CONSTEXPR11 SAFEINT_NODISCARD static bool SignedCase( SafeInt< T, E > /*rhs*/, SafeInt< T, E >& /*result*/ ) SAFEINT_NOTHROW
     {
         return false;
     }
@@ -6718,7 +6725,7 @@ template < typename T, typename U, typename E >
 class ModulusSimpleCaseHelper < T, U, E, true >
 {
 public:
-    _CONSTEXPR14 static bool ModulusSimpleCase( U lhs, SafeInt< T, E > rhs, SafeInt< T, E >& result ) SAFEINT_CPP_THROW
+    _CONSTEXPR14 SAFEINT_NODISCARD static bool ModulusSimpleCase( U lhs, SafeInt< T, E > rhs, SafeInt< T, E >& result ) SAFEINT_CPP_THROW
     {
         if( rhs != 0 )
         {
@@ -6737,7 +6744,7 @@ template< typename T, typename U, typename E >
 class ModulusSimpleCaseHelper < T, U, E, false >
 {
 public:
-    _CONSTEXPR11 static bool ModulusSimpleCase( U /*lhs*/, SafeInt< T, E > /*rhs*/, SafeInt< T, E >& /*result*/ ) SAFEINT_NOTHROW
+    _CONSTEXPR11 SAFEINT_NODISCARD static bool ModulusSimpleCase( U /*lhs*/, SafeInt< T, E > /*rhs*/, SafeInt< T, E >& /*result*/ ) SAFEINT_NOTHROW
     {
         return false;
     }
@@ -6791,7 +6798,7 @@ public:
 template < typename T, typename U, typename E > class DivisionNegativeCornerCaseHelper< T, U, E, true >
 {
 public:
-    static bool NegativeCornerCase( U lhs, SafeInt< T, E > rhs, SafeInt<T, E>& result ) SAFEINT_CPP_THROW
+    static SAFEINT_NODISCARD bool NegativeCornerCase( U lhs, SafeInt< T, E > rhs, SafeInt<T, E>& result ) SAFEINT_CPP_THROW
     {
         // Problem case - normal casting behavior changes meaning
         // flip rhs to positive
@@ -6820,7 +6827,7 @@ public:
 template < typename T, typename U, typename E > class DivisionNegativeCornerCaseHelper< T, U, E, false >
 {
 public:
-    _CONSTEXPR11 static bool NegativeCornerCase( U /*lhs*/, SafeInt< T, E > /*rhs*/, SafeInt<T, E>& /*result*/ ) SAFEINT_NOTHROW
+    _CONSTEXPR11 SAFEINT_NODISCARD static bool NegativeCornerCase( U /*lhs*/, SafeInt< T, E > /*rhs*/, SafeInt<T, E>& /*result*/ ) SAFEINT_NOTHROW
     {
         return false;
     }
@@ -6831,7 +6838,7 @@ template < typename T, typename U, typename E, int method > class DivisionCorner
 template < typename T, typename U, typename E > class DivisionCornerCaseHelper < T, U, E, true >
 {
 public:
-    _CONSTEXPR14 static bool DivisionCornerCase1( U lhs, SafeInt< T, E > rhs, SafeInt<T, E>& result ) SAFEINT_CPP_THROW
+    _CONSTEXPR14 SAFEINT_NODISCARD static bool DivisionCornerCase1( U lhs, SafeInt< T, E > rhs, SafeInt<T, E>& result ) SAFEINT_CPP_THROW
     {
         if( (T)rhs > 0 )
         {
@@ -6856,7 +6863,7 @@ public:
 template < typename T, typename U, typename E > class DivisionCornerCaseHelper < T, U, E, false >
 {
 public:
-    _CONSTEXPR11 static bool DivisionCornerCase1( U /*lhs*/, SafeInt< T, E > /*rhs*/, SafeInt<T, E>& /*result*/ ) SAFEINT_NOTHROW
+    _CONSTEXPR11 SAFEINT_NODISCARD static bool DivisionCornerCase1( U /*lhs*/, SafeInt< T, E > /*rhs*/, SafeInt<T, E>& /*result*/ ) SAFEINT_NOTHROW
     {
         return false;
     }
@@ -6869,7 +6876,7 @@ template < typename T, typename U, bool > class div_negate_min;
 template < typename T, typename U > class div_negate_min < T, U , true >
 {
 public:
-    _CONSTEXPR14 static bool Value(T& ret)
+    _CONSTEXPR14 SAFEINT_NODISCARD static bool Value(T& ret)
     {
         ret = (T)(-(T)std::numeric_limits< U >::min());
         return true;
@@ -6879,7 +6886,7 @@ public:
 template < typename T, typename U > class div_negate_min < T, U, false >
 {
 public:
-    _CONSTEXPR14 static bool Value(T& )
+    _CONSTEXPR14 SAFEINT_NODISCARD static bool Value(T& )
     {
         return false;
     }
@@ -6888,7 +6895,7 @@ public:
 template < typename T, typename U, typename E > class DivisionCornerCaseHelper2 < T, U, E, true >
 {
 public:
-    _CONSTEXPR14 static bool DivisionCornerCase2( U lhs, SafeInt< T, E > rhs, SafeInt<T, E>& result ) SAFEINT_CPP_THROW
+    _CONSTEXPR14 SAFEINT_NODISCARD static bool DivisionCornerCase2( U lhs, SafeInt< T, E > rhs, SafeInt<T, E>& result ) SAFEINT_CPP_THROW
     {
         if( lhs == std::numeric_limits< U >::min() && (T)rhs == -1 )
         {
@@ -6913,7 +6920,7 @@ public:
 template < typename T, typename U, typename E > class DivisionCornerCaseHelper2 < T, U, E, false >
 {
 public:
-    _CONSTEXPR11 static bool DivisionCornerCase2( U /*lhs*/, SafeInt< T, E > /*rhs*/, SafeInt<T, E>& /*result*/ ) SAFEINT_NOTHROW
+    _CONSTEXPR11 SAFEINT_NODISCARD static bool DivisionCornerCase2( U /*lhs*/, SafeInt< T, E > /*rhs*/, SafeInt<T, E>& /*result*/ ) SAFEINT_NOTHROW
     {
         return false;
     }
