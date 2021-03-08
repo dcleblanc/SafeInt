@@ -182,7 +182,7 @@ Please read the leading comments before using the class.
 // Note - intrinsics and constexpr are mutually exclusive
 // If it is important to get constexpr for multiplication, then define SAFEINT_USE_INTRINSICS 0
 // However, intrinsics will result in much smaller code, and should have better perf
-#if SAFEINT_COMPILER == VISUAL_STUDIO_COMPILER && defined _M_AMD64 && !defined SAFEINT_USE_INTRINSICS
+#if SAFEINT_COMPILER == VISUAL_STUDIO_COMPILER && (defined(_M_AMD64) && !defined(_M_ARM64EC)) && !defined SAFEINT_USE_INTRINSICS
     #include <intrin.h>
     #define SAFEINT_USE_INTRINSICS 1
     #define _CONSTEXPR14_MULTIPLY 
