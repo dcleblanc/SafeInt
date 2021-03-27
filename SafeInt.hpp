@@ -179,15 +179,36 @@ Please read the leading comments before using the class.
 #include <cstddef>
 #include <cmath> // Needed for floating point implementation
 
+// Figure out if we should use intrinsics
+// If the user has already decided, let that override
 // Note - intrinsics and constexpr are mutually exclusive
 // If it is important to get constexpr for multiplication, then define SAFEINT_USE_INTRINSICS 0
 // However, intrinsics will result in much smaller code, and should have better perf
-#if SAFEINT_COMPILER == VISUAL_STUDIO_COMPILER && defined _M_AMD64 && !defined SAFEINT_USE_INTRINSICS
-    #include <intrin.h>
-    #define SAFEINT_USE_INTRINSICS 1
+
+#if !defined SAFEINT_USE_INTRINSICS
+
+// If it is the Visual Studio compiler, then it has to be 64-bit, and not ARM64EC
+#if SAFEINT_COMPILER == VISUAL_STUDIO_COMPILER
+    #if defined _M_AMD64 && !defined _M_ARM64EC
+        #include <intrin.h>
+        #define SAFEINT_USE_INTRINSICS 1
+    #else
+        #define SAFEINT_USE_INTRINSICS 0
+    #endif
+#else
+    // Else for gcc and clang, we can use builtin functions
+    #if SAFEINT_COMPILER == CLANG_COMPILER || SAFEINT_COMPILER == GCC_COMPILER
+        #define SAFEINT_USE_INTRINSICS 1
+    #else
+        #define SAFEINT_USE_INTRINSICS 0
+    #endif
+#endif
+
+#endif
+
+#if SAFEINT_USE_INTRINSICS
     #define _CONSTEXPR14_MULTIPLY 
 #else
-    #define SAFEINT_USE_INTRINSICS 0
     #define _CONSTEXPR14_MULTIPLY _CONSTEXPR14
 #endif
 
@@ -1962,8 +1983,10 @@ public:
 template < typename T, typename U > class LargeIntRegMultiply;
 
 #if SAFEINT_USE_INTRINSICS
+
+#if SAFEINT_COMPILER == VISUAL_STUDIO_COMPILER
 // As usual, unsigned is easy
-inline bool IntrinsicMultiplyUint64( const std::uint64_t& a, const std::uint64_t& b, std::uint64_t* pRet ) SAFEINT_NOTHROW
+inline bool IntrinsicMultiplyUint64( std::uint64_t a, std::uint64_t b, std::uint64_t* pRet ) SAFEINT_NOTHROW
 {
     std::uint64_t ulHigh = 0;
     *pRet = _umul128(a , b, &ulHigh);
@@ -1971,7 +1994,7 @@ inline bool IntrinsicMultiplyUint64( const std::uint64_t& a, const std::uint64_t
 }
 
 // Signed, is not so easy
-inline bool IntrinsicMultiplyInt64( const std::int64_t& a, const std::int64_t& b, std::int64_t* pRet ) SAFEINT_NOTHROW
+inline bool IntrinsicMultiplyInt64( std::int64_t a, std::int64_t b, std::int64_t* pRet ) SAFEINT_NOTHROW
 {
     std::int64_t llHigh = 0;
     *pRet = _mul128(a , b, &llHigh);
@@ -1999,6 +2022,26 @@ inline bool IntrinsicMultiplyInt64( const std::int64_t& a, const std::int64_t& b
     }
     return false;
 }
+#elif SAFEINT_COMPILER == GCC_COMPILER || SAFEINT_COMPILER == CLANG_COMPILER
+
+// Not sure what header is needed - 
+bool __builtin_umulll_overflow(unsigned long long int a, unsigned long long int b, unsigned long long int* res);
+bool __builtin_smulll_overflow(long long int a, long long int b, long long int* res);
+
+inline bool IntrinsicMultiplyUint64(std::uint64_t a, std::uint64_t b, std::uint64_t* pRet) SAFEINT_NOTHROW
+{
+    return __builtin_umulll_overflow(a, b, pRet);
+}
+
+inline bool IntrinsicMultiplyInt64(std::int64_t a, std::int64_t b, std::int64_t* pRet) SAFEINT_NOTHROW
+{
+    return bool __builtin_smulll_overflow(a, b, pRet);
+}
+
+#else
+// If you are aware of intrinsics for some other platform, please file an issue
+# error Intrinsics enabled, no available intrinics defined
+#endif
 
 #endif
 
