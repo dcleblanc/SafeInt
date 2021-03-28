@@ -2030,12 +2030,12 @@ bool __builtin_smulll_overflow(long long int a, long long int b, long long int* 
 
 inline bool IntrinsicMultiplyUint64(std::uint64_t a, std::uint64_t b, std::uint64_t* pRet) SAFEINT_NOTHROW
 {
-    return __builtin_umulll_overflow(a, b, pRet);
+    return __builtin_umulll_overflow(a, b, (unsigned long long*)pRet);
 }
 
 inline bool IntrinsicMultiplyInt64(std::int64_t a, std::int64_t b, std::int64_t* pRet) SAFEINT_NOTHROW
 {
-    return bool __builtin_smulll_overflow(a, b, pRet);
+    return !__builtin_smulll_overflow(a, b, (long long*)pRet);
 }
 
 #else
