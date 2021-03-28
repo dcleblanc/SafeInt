@@ -2024,13 +2024,9 @@ inline bool IntrinsicMultiplyInt64( std::int64_t a, std::int64_t b, std::int64_t
 }
 #elif SAFEINT_COMPILER == GCC_COMPILER || SAFEINT_COMPILER == CLANG_COMPILER
 
-// Not sure what header is needed - 
-bool __builtin_umulll_overflow(unsigned long long int a, unsigned long long int b, unsigned long long int* res);
-bool __builtin_smulll_overflow(long long int a, long long int b, long long int* res);
-
 inline bool IntrinsicMultiplyUint64(std::uint64_t a, std::uint64_t b, std::uint64_t* pRet) SAFEINT_NOTHROW
 {
-    return __builtin_umulll_overflow(a, b, (unsigned long long*)pRet);
+    return !__builtin_umulll_overflow(a, b, (unsigned long long*)pRet);
 }
 
 inline bool IntrinsicMultiplyInt64(std::int64_t a, std::int64_t b, std::int64_t* pRet) SAFEINT_NOTHROW
