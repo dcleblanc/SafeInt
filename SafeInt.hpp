@@ -2008,18 +2008,24 @@ _CONSTEXPR14 inline bool MultiplyUint64(std::uint64_t a, std::uint64_t b, std::u
 _CONSTEXPR14 inline bool MultiplyInt64(std::int64_t a, std::int64_t b, std::int64_t* pRet) SAFEINT_NOTHROW
 {
     __int128 tmp = (__int128)a * (__int128)b;
+    *pRet = (std::int64_t)tmp;
 
-    // Top 64 bits should be either 0, or 0xffffffffffffffff, only if the lower 64 is also negative
-    if ((tmp >> 64) == 0)
+    // Check and see what result we expect
+    if( (a ^ b) < 0 )
     {
-        *pRet = (std::int64_t)tmp;
-        return true;
+        // Result expected to be negative
+        if( ((tmp >> 64) == -1 && *pRet < 0) ||
+            ((tmp >> 64) == 0 && *pRet == 0))
+        {
+            return true;            
+        } 
     }
-
-    if ((tmp >> 64) == -1 && (std::int64_t)tmp < 0)
+    else
     {
-        *pRet = (std::int64_t)tmp;
-        return true;
+        if ((tmp >> 64) == 0)
+        {
+            return (std::uint64_t)*pRet <= (std::uint64_t)std::numeric_limits<std::int64_t>::max();
+        }
     }
 
     return false;
@@ -2888,7 +2894,7 @@ public:
     _CONSTEXPR14_MULTIPLY static void RegMultiplyThrow( std::int32_t a, const std::int64_t& b, std::int32_t* pRet ) SAFEINT_CPP_THROW
     {
 #if SAFEINT_USE_INTRINSICS || SAFEINT_HAS_INT128
-        std::int64_t tmp;
+        std::int64_t tmp = 0;
 
         if( MultiplyInt64( a, b, &tmp ) )
         {
