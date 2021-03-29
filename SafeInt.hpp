@@ -2009,20 +2009,20 @@ _CONSTEXPR14 inline bool MultiplyInt64(std::int64_t a, std::int64_t b, std::int6
 {
     __int128 tmp = (__int128)a * (__int128)b;
     *pRet = (std::int64_t)tmp;
+    std::int64_t tmp_high = (std::int64_t)((unsigned __int128)tmp >> 64);
 
-    // Check and see what result we expect
+    // If only one input is negative, result must be negative, or zero
     if( (a ^ b) < 0 )
     {
-        // Result expected to be negative
-        if( ((tmp >> 64) == -1 && *pRet < 0) ||
-            ((tmp >> 64) == 0 && *pRet == 0))
+        if( (tmp_high == -1 && *pRet < 0) ||
+            (tmp_high == 0 && *pRet == 0))
         {
             return true;            
         } 
     }
     else
     {
-        if ((tmp >> 64) == 0)
+        if (tmp_high == 0)
         {
             return (std::uint64_t)*pRet <= (std::uint64_t)std::numeric_limits<std::int64_t>::max();
         }
