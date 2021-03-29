@@ -186,15 +186,21 @@ Please read the leading comments before using the class.
 // However, intrinsics will result in much smaller code, and should have better perf
 
 // We might have 128-bit int support, check for that, as it should work best
+#if !defined SAFEINT_HAS_INT128
+
 #if defined __SIZEOF_INT128__ && __SIZEOF_INT128__ == 16
 #define SAFEINT_HAS_INT128 1
-#define SAFEINT_USE_INTRINSICS 0
 #else
 #define SAFEINT_HAS_INT128 0
 #endif
 
-#if !defined SAFEINT_USE_INTRINSICS
+#endif
 
+#if SAFEINT_HAS_INT128
+#define SAFEINT_USE_INTRINSICS 0
+#endif
+
+#if !defined SAFEINT_USE_INTRINSICS
 // If it is the Visual Studio compiler, then it has to be 64-bit, and not ARM64EC
 #if SAFEINT_COMPILER == VISUAL_STUDIO_COMPILER
     #if defined _M_AMD64 && !defined _M_ARM64EC
@@ -214,7 +220,8 @@ Please read the leading comments before using the class.
 
 #endif
 
-#if SAFEINT_USE_INTRINSICS
+// The gcc and clang builtin functions are constexpr, but not the Microsoft intrinsics
+#if SAFEINT_USE_INTRINSICS && SAFEINT_COMPILER == VISUAL_STUDIO_COMPILER
     #define _CONSTEXPR14_MULTIPLY 
 #else
     #define _CONSTEXPR14_MULTIPLY _CONSTEXPR14
@@ -2075,12 +2082,12 @@ inline bool MultiplyInt64( std::int64_t a, std::int64_t b, std::int64_t* pRet ) 
 }
 #elif SAFEINT_COMPILER == GCC_COMPILER || SAFEINT_COMPILER == CLANG_COMPILER
 
-inline bool IntrinsicMultiplyUint64(std::uint64_t a, std::uint64_t b, std::uint64_t* pRet) SAFEINT_NOTHROW
+_CONSTEXPR14 inline bool MultiplyUint64(std::uint64_t a, std::uint64_t b, std::uint64_t* pRet) SAFEINT_NOTHROW
 {
     return !__builtin_umulll_overflow(a, b, (unsigned long long*)pRet);
 }
 
-inline bool IntrinsicMultiplyInt64(std::int64_t a, std::int64_t b, std::int64_t* pRet) SAFEINT_NOTHROW
+_CONSTEXPR14 inline bool MultiplyInt64(std::int64_t a, std::int64_t b, std::int64_t* pRet) SAFEINT_NOTHROW
 {
     return !__builtin_smulll_overflow(a, b, (long long*)pRet);
 }
