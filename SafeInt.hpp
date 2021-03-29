@@ -185,6 +185,14 @@ Please read the leading comments before using the class.
 // If it is important to get constexpr for multiplication, then define SAFEINT_USE_INTRINSICS 0
 // However, intrinsics will result in much smaller code, and should have better perf
 
+// We might have 128-bit int support, check for that, as it should work best
+#if defined __SIZEOF_INT128__ && __SIZEOF_INT128__ == 16
+#define SAFEINT_HAS_INT128 1
+#define SAFEINT_USE_INTRINSICS 0
+#else
+#define SAFEINT_HAS_INT128 0
+#endif
+
 #if !defined SAFEINT_USE_INTRINSICS
 
 // If it is the Visual Studio compiler, then it has to be 64-bit, and not ARM64EC
@@ -1982,11 +1990,48 @@ public:
 // U = right arg
 template < typename T, typename U > class LargeIntRegMultiply;
 
+#if SAFEINT_HAS_INT128
+
+_CONSTEXPR14 inline bool MultiplyUint64(std::uint64_t a, std::uint64_t b, std::uint64_t* pRet) SAFEINT_NOTHROW
+{
+    unsigned __int128 tmp = (unsigned __int128)a * (unsigned __int128)b;
+
+    if ((tmp >> 64) == 0)
+    {
+        *pRet = (std::uint64_t)tmp;
+        return true;
+    }
+
+    return false;
+}
+
+_CONSTEXPR14 inline bool MultiplyInt64(std::int64_t a, std::int64_t b, std::int64_t* pRet) SAFEINT_NOTHROW
+{
+    __int128 tmp = (__int128)a * (__int128)b;
+
+    // Top 64 bits should be either 0, or 0xffffffffffffffff, only if the lower 64 is also negative
+    if ((tmp >> 64) == 0)
+    {
+        *pRet = (std::int64_t)tmp;
+        return true;
+    }
+
+    if ((tmp >> 64) == -1 && (std::int64_t)tmp < 0)
+    {
+        *pRet = (std::int64_t)tmp;
+        return true;
+    }
+
+    return false;
+}
+
+#endif
+
 #if SAFEINT_USE_INTRINSICS
 
 #if SAFEINT_COMPILER == VISUAL_STUDIO_COMPILER
 // As usual, unsigned is easy
-inline bool IntrinsicMultiplyUint64( std::uint64_t a, std::uint64_t b, std::uint64_t* pRet ) SAFEINT_NOTHROW
+inline bool MultiplyUint64( std::uint64_t a, std::uint64_t b, std::uint64_t* pRet ) SAFEINT_NOTHROW
 {
     std::uint64_t ulHigh = 0;
     *pRet = _umul128(a , b, &ulHigh);
@@ -1994,7 +2039,7 @@ inline bool IntrinsicMultiplyUint64( std::uint64_t a, std::uint64_t b, std::uint
 }
 
 // Signed, is not so easy
-inline bool IntrinsicMultiplyInt64( std::int64_t a, std::int64_t b, std::int64_t* pRet ) SAFEINT_NOTHROW
+inline bool MultiplyInt64( std::int64_t a, std::int64_t b, std::int64_t* pRet ) SAFEINT_NOTHROW
 {
     std::int64_t llHigh = 0;
     *pRet = _mul128(a , b, &llHigh);
@@ -2046,8 +2091,8 @@ template<> class LargeIntRegMultiply< std::uint64_t, std::uint64_t >
 public:
     _CONSTEXPR14_MULTIPLY static bool RegMultiply( const std::uint64_t& a, const std::uint64_t& b, std::uint64_t* pRet ) SAFEINT_NOTHROW
     {
-#if SAFEINT_USE_INTRINSICS
-        return IntrinsicMultiplyUint64( a, b, pRet );
+#if SAFEINT_USE_INTRINSICS || SAFEINT_HAS_INT128
+        return MultiplyUint64( a, b, pRet );
 #else
         std::uint32_t aHigh = 0, aLow = 0, bHigh = 0, bLow = 0;
 
@@ -2107,8 +2152,8 @@ public:
     template < typename E >
     _CONSTEXPR14_MULTIPLY static void RegMultiplyThrow( const std::uint64_t& a, const std::uint64_t& b, std::uint64_t* pRet ) SAFEINT_CPP_THROW
     {
-#if SAFEINT_USE_INTRINSICS
-        if( !IntrinsicMultiplyUint64( a, b, pRet ) )
+#if SAFEINT_USE_INTRINSICS || SAFEINT_HAS_INT128
+        if( !MultiplyUint64( a, b, pRet ) )
             E::SafeIntOnOverflow();
 #else
         std::uint32_t aHigh = 0, aLow = 0, bHigh = 0, bLow = 0;
@@ -2171,8 +2216,8 @@ template<> class LargeIntRegMultiply< std::uint64_t, std::uint32_t >
 public:
     _CONSTEXPR14_MULTIPLY static bool RegMultiply( const std::uint64_t& a, std::uint32_t b, std::uint64_t* pRet ) SAFEINT_NOTHROW
     {
-#if SAFEINT_USE_INTRINSICS
-        return IntrinsicMultiplyUint64( a, (std::uint64_t)b, pRet );
+#if SAFEINT_USE_INTRINSICS || SAFEINT_HAS_INT128
+        return MultiplyUint64( a, (std::uint64_t)b, pRet );
 #else
         std::uint32_t aHigh = 0, aLow = 0;
 
@@ -2212,8 +2257,8 @@ public:
     template < typename E >
     _CONSTEXPR14_MULTIPLY static void RegMultiplyThrow( const std::uint64_t& a, std::uint32_t b, std::uint64_t* pRet ) SAFEINT_CPP_THROW
     {
-#if SAFEINT_USE_INTRINSICS
-        if( !IntrinsicMultiplyUint64( a, (std::uint64_t)b, pRet ) )
+#if SAFEINT_USE_INTRINSICS || SAFEINT_HAS_INT128
+        if( !MultiplyUint64( a, (std::uint64_t)b, pRet ) )
             E::SafeIntOnOverflow();
 #else
         std::uint32_t aHigh = 0, aLow = 0;
@@ -2261,8 +2306,8 @@ public:
         if( b < 0 && a != 0 )
             return false;
 
-#if SAFEINT_USE_INTRINSICS
-        return IntrinsicMultiplyUint64( a, (std::uint64_t)b, pRet );
+#if SAFEINT_USE_INTRINSICS || SAFEINT_HAS_INT128
+        return MultiplyUint64( a, (std::uint64_t)b, pRet );
 #else
         return LargeIntRegMultiply< std::uint64_t, std::uint32_t >::RegMultiply(a, (std::uint32_t)b, pRet);
 #endif
@@ -2274,8 +2319,8 @@ public:
         if( b < 0 && a != 0 )
             E::SafeIntOnOverflow();
 
-#if SAFEINT_USE_INTRINSICS
-        if( !IntrinsicMultiplyUint64( a, (std::uint64_t)b, pRet ) )
+#if SAFEINT_USE_INTRINSICS || SAFEINT_HAS_INT128
+        if( !MultiplyUint64( a, (std::uint64_t)b, pRet ) )
             E::SafeIntOnOverflow();
 #else
         LargeIntRegMultiply< std::uint64_t, std::uint32_t >::template RegMultiplyThrow< E >( a, (std::uint32_t)b, pRet );
@@ -2291,8 +2336,8 @@ public:
         if( b < 0 && a != 0 )
             return false;
 
-#if SAFEINT_USE_INTRINSICS
-        return IntrinsicMultiplyUint64( a, (std::uint64_t)b, pRet );
+#if SAFEINT_USE_INTRINSICS || SAFEINT_HAS_INT128
+        return MultiplyUint64( a, (std::uint64_t)b, pRet );
 #else
         return LargeIntRegMultiply< std::uint64_t, std::uint64_t >::RegMultiply(a, (std::uint64_t)b, pRet);
 #endif
@@ -2304,8 +2349,8 @@ public:
         if( b < 0 && a != 0 )
             E::SafeIntOnOverflow();
 
-#if SAFEINT_USE_INTRINSICS
-        if( !IntrinsicMultiplyUint64( a, (std::uint64_t)b, pRet ) )
+#if SAFEINT_USE_INTRINSICS || SAFEINT_HAS_INT128
+        if( !MultiplyUint64( a, (std::uint64_t)b, pRet ) )
             E::SafeIntOnOverflow();
 #else
         LargeIntRegMultiply< std::uint64_t, std::uint64_t >::template RegMultiplyThrow< E >( a, (std::uint64_t)b, pRet );
@@ -2477,8 +2522,8 @@ template<> class LargeIntRegMultiply< std::int64_t, std::int64_t >
 public:
     _CONSTEXPR14_MULTIPLY static bool RegMultiply( const std::int64_t& a, const std::int64_t& b, std::int64_t* pRet ) SAFEINT_NOTHROW
     {
-#if SAFEINT_USE_INTRINSICS
-        return IntrinsicMultiplyInt64( a, b, pRet );
+#if SAFEINT_USE_INTRINSICS || SAFEINT_HAS_INT128
+        return MultiplyInt64( a, b, pRet );
 #else
         bool aNegative = false;
         bool bNegative = false;
@@ -2529,8 +2574,8 @@ public:
     template < typename E >
     _CONSTEXPR14_MULTIPLY static void RegMultiplyThrow( const std::int64_t& a, const std::int64_t& b, std::int64_t* pRet ) SAFEINT_CPP_THROW
     {
-#if SAFEINT_USE_INTRINSICS
-        if( !IntrinsicMultiplyInt64( a, b, pRet ) )
+#if SAFEINT_USE_INTRINSICS || SAFEINT_HAS_INT128
+        if( !MultiplyInt64( a, b, pRet ) )
             E::SafeIntOnOverflow();
 #else
         bool aNegative = false;
@@ -2584,8 +2629,8 @@ template<> class LargeIntRegMultiply< std::int64_t, std::uint32_t >
 public:
     _CONSTEXPR14_MULTIPLY static bool RegMultiply( const std::int64_t& a, std::uint32_t b, std::int64_t* pRet ) SAFEINT_NOTHROW
     {
-#if SAFEINT_USE_INTRINSICS
-        return IntrinsicMultiplyInt64( a, (std::int64_t)b, pRet );
+#if SAFEINT_USE_INTRINSICS || SAFEINT_HAS_INT128
+        return MultiplyInt64( a, (std::int64_t)b, pRet );
 #else
         bool aNegative = false;
         std::uint64_t tmp = 0;
@@ -2627,8 +2672,8 @@ public:
     template < typename E >
     _CONSTEXPR14_MULTIPLY static void RegMultiplyThrow( const std::int64_t& a, std::uint32_t b, std::int64_t* pRet ) SAFEINT_CPP_THROW
     {
-#if SAFEINT_USE_INTRINSICS
-        if( !IntrinsicMultiplyInt64( a, (std::int64_t)b, pRet ) )
+#if SAFEINT_USE_INTRINSICS || SAFEINT_HAS_INT128
+        if( !MultiplyInt64( a, (std::int64_t)b, pRet ) )
             E::SafeIntOnOverflow();
 #else
         bool aNegative = false;
@@ -2673,8 +2718,8 @@ template<> class LargeIntRegMultiply< std::int64_t, std::int32_t >
 public:
     _CONSTEXPR14_MULTIPLY static bool RegMultiply( const std::int64_t& a, std::int32_t b, std::int64_t* pRet ) SAFEINT_NOTHROW
     {
-#if SAFEINT_USE_INTRINSICS
-        return IntrinsicMultiplyInt64( a, (std::int64_t)b, pRet );
+#if SAFEINT_USE_INTRINSICS || SAFEINT_HAS_INT128
+        return MultiplyInt64( a, (std::int64_t)b, pRet );
 #else
         bool aNegative = false;
         bool bNegative = false;
@@ -2725,8 +2770,8 @@ public:
     template < typename E >
     _CONSTEXPR14_MULTIPLY static void RegMultiplyThrow( std::int64_t a, std::int32_t b, std::int64_t* pRet ) SAFEINT_CPP_THROW
     {
-#if SAFEINT_USE_INTRINSICS
-        if( !IntrinsicMultiplyInt64( a, (std::int64_t)b, pRet ) )
+#if SAFEINT_USE_INTRINSICS || SAFEINT_HAS_INT128
+        if( !MultiplyInt64( a, (std::int64_t)b, pRet ) )
             E::SafeIntOnOverflow();
 #else
         bool aNegative = false;
@@ -2778,10 +2823,10 @@ template<> class LargeIntRegMultiply< std::int32_t, std::int64_t >
 public:
     _CONSTEXPR14_MULTIPLY static bool RegMultiply( std::int32_t a, const std::int64_t& b, std::int32_t* pRet ) SAFEINT_NOTHROW
     {
-#if SAFEINT_USE_INTRINSICS
+#if SAFEINT_USE_INTRINSICS || SAFEINT_HAS_INT128
         std::int64_t tmp = 0;
 
-        if( IntrinsicMultiplyInt64( a, b, &tmp ) )
+        if( MultiplyInt64( a, b, &tmp ) )
         {
             if( tmp > std::numeric_limits< std::int32_t >::max() ||
                 tmp < std::numeric_limits< std::int32_t >::min() )
@@ -2842,10 +2887,10 @@ public:
     template < typename E >
     _CONSTEXPR14_MULTIPLY static void RegMultiplyThrow( std::int32_t a, const std::int64_t& b, std::int32_t* pRet ) SAFEINT_CPP_THROW
     {
-#if SAFEINT_USE_INTRINSICS
+#if SAFEINT_USE_INTRINSICS || SAFEINT_HAS_INT128
         std::int64_t tmp;
 
-        if( IntrinsicMultiplyInt64( a, b, &tmp ) )
+        if( MultiplyInt64( a, b, &tmp ) )
         {
             if( tmp > std::numeric_limits< std::int32_t >::max() ||
                 tmp < std::numeric_limits< std::int32_t >::min() )
