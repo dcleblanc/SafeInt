@@ -1386,11 +1386,12 @@ public:
         return true;
     }
 
-    template < typename E >
-    _CONSTEXPR14 static void CastThrow( bool b, T& t ) SAFEINT_CPP_THROW
-    {
-        b = !!t;
-    }
+    // CastThrow is not needed.
+    // This is because CastThrow is only ever called inside various multiply, divide, add, and subtract methods, none of which make sense for one of
+    // the operands to be bool. It is also called within the various direct casts that will cast the SafeInt instance to various types, but there is nothing
+    // to check for a cast to bool, and it is implemented directly without needing this method.
+
+    // There is a call to Cast because it is used in the SafeCast non-throwing function.
 };
 
 template < typename T, typename U > class SafeCastHelper < T, U, CastCheckLTZero >
