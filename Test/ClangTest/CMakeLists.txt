@@ -15,18 +15,6 @@ set(CMAKE_CXX_STANDARD_REQUIRED True)
 # - TODO - consider adding in 17, 20 just to see if anything breaks
 # - compile without exceptions
 
-# As it turns out, libusan isn't always installed, which means that -fsanitize=undefined needs to be optional
-
-# test for libubsan
-find_library(LIBUBSAN libubsan.so.1)
-
-if(NOT LIBUBSAN)
-    message(STATUS "libubsan unavailable, disabling -fsanitze=undefined"  )
-    set(USE_SANITIZE OFF)
-else()
-    set(USE_SANITIZE ON)
-endif()
-
 # test for clang++
 find_program(CLANG_PLUS_PLUS "clang++")
 
@@ -39,9 +27,6 @@ else()
 
     # the standard level is already at C++11, which is what we need for runtime tests
     add_compile_options(-O3 -ftrapv)
-    if(USE_SANITIZE)
-#        add_compile_options(-fsanitize=undefined)
-    endif()
 
     # Note - the test matrix here is as follows:
     # int128 is available (best case)
@@ -70,6 +55,8 @@ else()
         ../../SafeInt.hpp
     )
 
+    target_compile_options(SafeIntTest_clang PUBLIC -fsanitize-trap=undefined)
+
     # Forces use of the older, less efficient code that can't use either int128 or intrinsics
     add_executable(SafeIntTest_clang_NoIntrinsic
         ../AddVerify.cpp 
@@ -85,6 +72,7 @@ else()
     )
 
     target_compile_definitions(SafeIntTest_clang_NoIntrinsic PUBLIC "SAFEINT_USE_INTRINSICS=0" "SAFEINT_HAS_INT128=0")
+    target_compile_options(SafeIntTest_clang_NoIntrinsic PUBLIC -fsanitize-trap=undefined)
 
     # Forces use of either intrinsics or the older code
     add_executable(SafeIntTest_clang_NoInt128
@@ -101,6 +89,7 @@ else()
     )
 
     target_compile_definitions(SafeIntTest_clang_NoInt128 PUBLIC "SAFEINT_HAS_INT128=0")
+    target_compile_options(SafeIntTest_clang_NoInt128 PUBLIC -fsanitize-trap=undefined)
 
     # compilation tests, these are good if they just build
     add_executable(CompileTest_clang
@@ -129,6 +118,12 @@ else()
     )
 
     target_compile_options(CompileTest_clang14_NoEH PUBLIC -Wall -std=c++14 -fno-exceptions)
+#    target_link_libraries(SafeIntTest_clang 
+#                          SafeIntTest_clang_NoIntrinsic
+#                          SafeIntTest_clang_NoInt128
+#                          PUBLIC
+#                          ${LIBUBSAN}
+#                          )
 
 endif()
 

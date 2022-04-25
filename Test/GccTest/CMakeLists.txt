@@ -22,18 +22,6 @@ set(CMAKE_CXX_STANDARD_REQUIRED True)
 # - Intel (not regularly tested)
 # other compilers on a best effort
 
-# As it turns out, libusan isn't always installed, which means that -fsanitize=undefined needs to be optional
-
-# test for libubsan
-find_library(LIBUBSAN libubsan.so.1)
-
-if(NOT LIBUBSAN)
-    message(STATUS "libubsan unavailable, disabling -fsanitze=undefined"  )
-    set(USE_SANITIZE OFF)
-else()
-    set(USE_SANITIZE ON)
-endif()
-
 # test for g++
 find_program(GCC_PLUS_PLUS "g++")
 
@@ -44,9 +32,10 @@ else()
     set(CMAKE_CXX_COMPILER ${GCC_PLUS_PLUS})
     # the standard level is already at C++11, which is what we need for runtime tests
     add_compile_options(-O3 -ftrapv)
-    if(USE_SANITIZE)
-#        add_compile_options(-fsanitize=undefined)
-    endif()
+
+    # Note - -fsanitize=undefined isn't currently working with g++ and cmake
+    # if you go build from the old makefile in Test/GccTest, it does work
+    # -fsanitize-trap=undefined does work in clang++, so we have coverage there
 
     # This will test whatever the mainline code can do, typically using int128
     add_executable(SafeIntTest_gcc 
