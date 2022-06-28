@@ -115,6 +115,30 @@ void safe_math_fail(const char* msg)
 
 #endif
 
+// Utility functions
+
+// Purpose of this is to negate an int in a way
+// where the compiler won't remove it if the input is a 
+// compile time constant MIN_INT
+inline int32_t negate32(int32_t in) { return (int32_t)(~(uint32_t)in + 1); }
+inline int64_t negate64(int64_t in) { return (int64_t)(~(uint64_t)in + 1); }
+
+inline uint32_t safe_abs32(int32_t in)
+{
+    if (in < 0)
+        return ~(uint32_t)in + 1;
+
+    return (uint32_t)in;
+}
+
+inline uint64_t safe_abs64(int64_t in)
+{
+    if (in < 0)
+        return ~(uint64_t)in + 1;
+
+    return (uint64_t)in;
+}
+
 // Checked casting functions
 // 0 if the cast is safe, non-zero if unsafe
 inline int check_cast_int8_int32(int32_t in) { return (in < INT8_MIN || in > INT8_MAX); }
@@ -334,16 +358,6 @@ inline uint64_t safe_cast_uint64_int64(int64_t in)
     return (uint64_t)in;
 }
 
-// Helper function
-// Purpose of this is to negate an int in a way
-// where the compiler won't remove it if the input is a 
-// compile time constant MIN_INT
-uint64_t safe_math_negate32(int32_t a)
-{
-    uint64_t tmp = ~(uint64_t)a;
-    return tmp + 1;
-}
-
 // Addition
 /*
     For addition and multiplication, there will be checks for the following matrix:
@@ -425,7 +439,7 @@ inline uint32_t safe_add_uint32_int64(uint32_t a, int64_t b)
 {
     if (b < 0)
     {
-        if (a >= ~(uint64_t)(b)+1) //negation is safe, since rhs is 64-bit
+        if (a >= safe_abs64(b)) //negation is safe, since rhs is 64-bit
         {
             return (uint32_t)(a + b);
         }
@@ -525,10 +539,8 @@ inline uint64_t safe_add_uint64_int32(uint64_t a, int32_t b)
 
     if (b < 0)
     {
-        uint64_t b2 = (uint64_t)b;
-
         // So we're effectively subtracting
-        tmp = ~b2 + 1;
+        tmp = safe_abs32(b);
 
         if (tmp <= a)
         {
@@ -570,7 +582,7 @@ inline uint64_t safe_add_uint64_int64(uint64_t a, int64_t b)
     if (b < 0)
     {
         // So we're effectively subtracting
-        tmp = ~(uint64_t)b + 1;
+        tmp = safe_abs64(b);
 
         if (tmp <= a)
         {
@@ -602,11 +614,11 @@ inline uint64_t safe_add_uint64_uint64(uint64_t a, uint64_t b)
     return tmp;
 }
 
-enum safe_int_mul_result
-{
-    safe_int_mul_fail = 0,
-    safe_int_mul_success,
-};
+// As we're working in C, use defines
+// It would be nice to use an enum, but the compiler 
+// will complain that it isn't a proper C++ enum
+#define SAFE_INT_MUL_FAIL 0
+#define SAFE_INT_MUL_SUCCESS 1
 
 // Multiplication primatives
 #if SAFEINT_MULTIPLY_METHOD == SAFEINT_MULTIPLY_INT128
@@ -618,10 +630,10 @@ inline int MultiplyUint64(uint64_t a, uint64_t b, uint64_t* pRet)
     if ((tmp >> 64) == 0)
     {
         *pRet = (uint64_t)tmp;
-        return safe_int_mul_success;
+        return SAFE_INT_MUL_SUCCESS;
     }
 
-    return safe_int_mul_fail;
+    return SAFE_INT_MUL_FAIL;
 }
 
 inline int MultiplyInt64(int64_t a, int64_t b, int64_t* pRet)
@@ -636,18 +648,18 @@ inline int MultiplyInt64(int64_t a, int64_t b, int64_t* pRet)
         if ((tmp_high == -1 && *pRet < 0) ||
             (tmp_high == 0 && *pRet == 0))
         {
-            return safe_int_mul_success;
+            return SAFE_INT_MUL_SUCCESS;
         }
     }
     else
     {
         if (tmp_high == 0 && (uint64_t)*pRet <= (uint64_t)INT64_MAX)
         {
-            return safe_int_mul_success;
+            return SAFE_INT_MUL_SUCCESS;
         }
     }
 
-    return safe_int_mul_fail;
+    return SAFE_INT_MUL_FAIL;
 }
 
 #elif SAFEINT_MULTIPLY_METHOD == SAFEINT_MULTIPLY_INTRINSICS // Implies Visual Studio compiler
@@ -657,7 +669,7 @@ inline int MultiplyUint64(uint64_t a, uint64_t b, uint64_t * pRet)
 {
     uint64_t ulHigh = 0;
     *pRet = _umul128(a, b, &ulHigh);
-    return ulHigh == 0 ? safe_int_mul_success : safe_int_mul_fail;
+    return ulHigh == 0 ? SAFE_INT_MUL_SUCCESS : SAFE_INT_MUL_FAIL;
 }
 
 // Signed, is not so easy
@@ -677,7 +689,7 @@ inline int MultiplyInt64(int64_t a, int64_t b, int64_t* pRet)
             llHigh == 0 && *pRet == 0)
         {
             // Everything is within range
-            return safe_int_mul_success;
+            return SAFE_INT_MUL_SUCCESS;
         }
     }
     else
@@ -685,20 +697,20 @@ inline int MultiplyInt64(int64_t a, int64_t b, int64_t* pRet)
         // Result should be positive
         // Check for overflow
         if (llHigh == 0 && (uint64_t)*pRet <= (uint64_t)INT64_MAX)
-            return safe_int_mul_success;
+            return SAFE_INT_MUL_SUCCESS;
     }
-    return safe_int_mul_fail;
+    return SAFE_INT_MUL_FAIL;
 }
 #elif SAFEINT_MULTIPLY_METHOD == SAFEINT_MULTIPLY_BUILTIN // Implies gcc or clang
 
 inline int MultiplyUint64(uint64_t a, uint64_t b, uint64_t* pRet)
 {
-    return !__builtin_umulll_overflow(a, b, (unsigned long long*)pRet) ? safe_int_mul_success : safe_int_mul_fail;
+    return !__builtin_umulll_overflow(a, b, (unsigned long long*)pRet) ? SAFE_INT_MUL_SUCCESS : SAFE_INT_MUL_FAIL;
 }
 
 inline int MultiplyInt64(int64_t a, int64_t b, int64_t* pRet)
 {
-    return !__builtin_smulll_overflow(a, b, (long long*)pRet) ? safe_int_mul_success : safe_int_mul_fail;
+    return !__builtin_smulll_overflow(a, b, (long long*)pRet) ? SAFE_INT_MUL_SUCCESS : SAFE_INT_MUL_FAIL;
 }
 
 #elif SAFEINT_MULTIPLY_METHOD == SAFEINT_MULTIPLY_MATH // Just going to have to do the math...
@@ -723,7 +735,7 @@ inline int MultiplyUint64(uint64_t a, uint64_t b, uint64_t* pRet)
 
     if (a_high > 0 && b_high > 0)
     {
-        return safe_int_mul_fail;
+        return SAFE_INT_MUL_FAIL;
     }
 
     if (a_high > 0)
@@ -737,12 +749,12 @@ inline int MultiplyUint64(uint64_t a, uint64_t b, uint64_t* pRet)
 
     if (tmp >> 32 != 0)
     {
-        return safe_int_mul_fail;
+        return SAFE_INT_MUL_FAIL;
     }
 
     tmp2 = (uint64_t)a_low * b_low;
     *pRet = (tmp << 32) + tmp2;
-    return *pRet >= tmp2 ? safe_int_mul_success : safe_int_mul_fail;
+    return *pRet >= tmp2 ? SAFE_INT_MUL_SUCCESS : SAFE_INT_MUL_FAIL;
 }
 
 inline int MultiplyInt64(int64_t a, int64_t b, int64_t* pRet)
@@ -757,13 +769,13 @@ inline int MultiplyInt64(int64_t a, int64_t b, int64_t* pRet)
     if (a1 < 0)
     {
         aNegative = true;
-        a1 = (int64_t)((uint64_t)~a1 + 1);
+        a1 = (int64_t)safe_abs64(a1);
     }
 
     if (b1 < 0)
     {
         bNegative = true;
-        b1 = (int64_t)((uint64_t)~b1 + 1);
+        b1 = (int64_t)safe_abs64(b);
     }
 
     if (MultiplyUint64((uint64_t)a1, (uint64_t)b1, &tmp))
@@ -774,8 +786,8 @@ inline int MultiplyInt64(int64_t a, int64_t b, int64_t* pRet)
             // Result must be negative
             if (tmp <= (uint64_t)INT64_MIN)
             {
-                *pRet = (int64_t)(~tmp + 1);
-                return safe_int_mul_success;
+                *pRet = negate64(tmp);
+                return SAFE_INT_MUL_SUCCESS;
             }
         }
         else
@@ -784,12 +796,12 @@ inline int MultiplyInt64(int64_t a, int64_t b, int64_t* pRet)
             if (tmp <= (uint64_t)INT64_MAX)
             {
                 *pRet = (int64_t)tmp;
-                return safe_int_mul_success;
+                return SAFE_INT_MUL_SUCCESS;
             }
         }
     }
 
-    return safe_int_mul_fail;
+    return SAFE_INT_MUL_FAIL;
 }
 
 #else // Shouldn't happen, go find out what's broken
@@ -827,8 +839,8 @@ inline int32_t safe_mul_int32_uint64(int32_t a, uint64_t b)
     if (a < 0)
     {
         // Flip sign, use the unsigned function
-        uint64_t a2 = ~(uint64_t)a + 1;
-        if (MultiplyUint64(a2, b, &tmp) == safe_int_mul_success && tmp <= (uint64_t)INT32_MAX + 1)
+        uint64_t a2 = safe_abs64(a);
+        if (MultiplyUint64(a2, b, &tmp) == SAFE_INT_MUL_SUCCESS && tmp <= (uint64_t)INT32_MAX + 1)
         {
             // Not too big, flip it back
             return (int32_t)(tmp + 1);
@@ -836,7 +848,7 @@ inline int32_t safe_mul_int32_uint64(int32_t a, uint64_t b)
     }
     else
     {
-        if (MultiplyUint64((uint64_t)a, b, &tmp) == safe_int_mul_success && tmp <= INT32_MAX)
+        if (MultiplyUint64((uint64_t)a, b, &tmp) == SAFE_INT_MUL_SUCCESS && tmp <= INT32_MAX)
         {
             return (int32_t)tmp;
         }
@@ -861,7 +873,7 @@ inline uint32_t safe_mul_uint32_int64(uint32_t a, int64_t b)
 {
     int64_t tmp = 0;
 
-    if (MultiplyInt64((int64_t)a, b, &tmp) == safe_int_mul_success && tmp <= UINT32_MAX)
+    if (MultiplyInt64((int64_t)a, b, &tmp) == SAFE_INT_MUL_SUCCESS && tmp <= UINT32_MAX)
     {
         return (uint32_t)tmp;
     }
@@ -873,7 +885,7 @@ inline uint32_t safe_mul_uint32_uint64(uint32_t a, uint64_t b)
 {
     uint64_t tmp = 0;
 
-    if (MultiplyUint64((uint64_t)a, b, &tmp) == safe_int_mul_success && tmp <= UINT32_MAX)
+    if (MultiplyUint64((uint64_t)a, b, &tmp) == SAFE_INT_MUL_SUCCESS && tmp <= UINT32_MAX)
     {
         return (uint32_t)tmp;
     }
@@ -885,7 +897,7 @@ inline int64_t safe_mul_int64_int32(int64_t a, int32_t b)
 {
     int64_t tmp = 0;
 
-    if (MultiplyInt64(a, (int64_t)b, &tmp) == safe_int_mul_success)
+    if (MultiplyInt64(a, (int64_t)b, &tmp) == SAFE_INT_MUL_SUCCESS)
     {
         return tmp;
     }
@@ -897,7 +909,7 @@ inline int64_t safe_mul_int64_uint32(int64_t a, uint32_t b)
 {
     int64_t tmp = 0;
 
-    if (MultiplyInt64(a, (int64_t)b, &tmp) == safe_int_mul_success)
+    if (MultiplyInt64(a, (int64_t)b, &tmp) == SAFE_INT_MUL_SUCCESS)
     {
         return tmp;
     }
@@ -909,7 +921,7 @@ inline int64_t safe_mul_int64_int64(int64_t a, int64_t b)
 {
     int64_t tmp = 0;
 
-    if (MultiplyInt64(a, b, &tmp) == safe_int_mul_success)
+    if (MultiplyInt64(a, b, &tmp) == SAFE_INT_MUL_SUCCESS)
     {
         return tmp;
     }
@@ -923,16 +935,16 @@ inline int64_t safe_mul_int64_uint64(int64_t a, uint64_t b)
 
     if (a < 0)
     {
-        uint64_t a2 = ~(uint64_t)a + 1;
+        uint64_t a2 = safe_abs64(a);
 
-        if (MultiplyUint64(a2, b, &tmp) == safe_int_mul_success && tmp <= (uint64_t)0x8000000000000000)
+        if (MultiplyUint64(a2, b, &tmp) == SAFE_INT_MUL_SUCCESS && tmp <= (uint64_t)0x8000000000000000)
         {
-            return (int64_t)(~(uint64_t)tmp + 1);
+            return negate64((int64_t)tmp);
         }
     }
     else
     {
-        if (MultiplyUint64((uint64_t)a, b, &tmp) == safe_int_mul_success && tmp <= (uint64_t)INT64_MAX)
+        if (MultiplyUint64((uint64_t)a, b, &tmp) == SAFE_INT_MUL_SUCCESS && tmp <= (uint64_t)INT64_MAX)
         {
             return (int64_t)tmp;
         }
@@ -953,7 +965,7 @@ inline uint64_t safe_mul_uint64_int32(uint64_t a, int32_t b)
         safe_math_fail("safe_math_fail safe_mul_uint64_int32");
     }
    
-    if (MultiplyUint64(a, (uint64_t)b, &tmp) == safe_int_mul_success)
+    if (MultiplyUint64(a, (uint64_t)b, &tmp) == SAFE_INT_MUL_SUCCESS)
     {
         return tmp;
     }
@@ -965,7 +977,7 @@ inline uint64_t safe_mul_uint64_uint32(uint64_t a, uint32_t b)
 {
     uint64_t tmp;
 
-    if (MultiplyUint64(a, (uint64_t)b, &tmp) == safe_int_mul_success)
+    if (MultiplyUint64(a, (uint64_t)b, &tmp) == SAFE_INT_MUL_SUCCESS)
     {
         return tmp;
     }
@@ -985,7 +997,7 @@ inline uint64_t safe_mul_uint64_int64(uint64_t a, int64_t b)
         safe_math_fail("safe_math_fail safe_mul_uint64_int32");
     }
 
-    if (MultiplyUint64(a, (uint64_t)b, &tmp) == safe_int_mul_success)
+    if (MultiplyUint64(a, (uint64_t)b, &tmp) == SAFE_INT_MUL_SUCCESS)
     {
         return tmp;
     }
@@ -997,7 +1009,7 @@ inline uint64_t safe_mul_uint64_uint64(uint64_t a, uint64_t b)
 {
     uint64_t tmp;
 
-    if (MultiplyUint64(a, b, &tmp) == safe_int_mul_success)
+    if (MultiplyUint64(a, b, &tmp) == SAFE_INT_MUL_SUCCESS)
     {
         return tmp;
     }
@@ -1045,9 +1057,9 @@ inline int32_t safe_div_int32_uint64(int32_t a, uint64_t b)
     }
     else
     {
-        uint64_t a2 = (uint64_t)(~(uint32_t)a + 1);
+        uint64_t a2 = (uint64_t)safe_abs32(a);
         a2 /= b;
-        return (int32_t)(~a2 + 1);
+        return (int32_t)negate32((int32_t)a2);
     }
 
     safe_math_fail("safe_math_fail safe_div_int32_uint64");
@@ -1226,7 +1238,7 @@ inline int32_t safe_sub_int32_uint64(int32_t a, uint64_t b)
 
     if (a < 0)
     {
-        if (b <= AbsMinInt32 - a < 0 ? ~(uint32_t)a + 1 : a)
+        if (b <= AbsMinInt32 - safe_abs32(a))
         {
             return (int32_t)(a - b);
         }
@@ -1272,7 +1284,7 @@ inline uint32_t safe_sub_uint32_int64(uint32_t a, int64_t b)
         // we're now effectively adding
         // since lhs is 32-bit, and rhs cannot exceed 2^63
         // this addition cannot overflow
-        uint64_t tmp = a + ~(uint64_t)b + 1; // negation safe
+        uint64_t tmp = a + (uint64_t)negate64(b); // negation safe
 
         // but we could exceed UINT32_MAX
         if (tmp <= UINT32_MAX)
@@ -1381,7 +1393,7 @@ inline uint64_t safe_sub_uint64_int32(uint64_t a, int32_t b)
     {
         uint64_t tmp = a;
         // we're now effectively adding
-        uint64_t result = a + (~(uint64_t)b + 1);
+        uint64_t result = a + safe_abs64(b);
 
         if (result >= tmp)
             return result;
@@ -1415,7 +1427,7 @@ inline uint64_t safe_sub_uint64_int64(uint64_t a, int64_t b)
     else
     {
         // we're now effectively adding
-        result = a + (~(uint64_t)(b) + 1);
+        result = a + safe_abs64(b);
 
         if (result >= a)
             return result;

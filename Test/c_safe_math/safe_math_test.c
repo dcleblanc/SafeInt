@@ -1,7 +1,10 @@
 // Licensed under the MIT License.
 // Copyright David LeBlanc - dcl@dleblanc.net
 
+#if defined _MSC_VER
 #pragma warning(disable:4464)
+#pragma warning(disable:4555)
+#endif
 
 #include <stdio.h>
 #include "../../safe_math.h"
