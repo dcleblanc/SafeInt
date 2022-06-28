@@ -1,3 +1,6 @@
+// Licensed under the MIT License.
+// Copyright David LeBlanc - dcl@dleblanc.net
+
 #if !defined SAFE_MATH_H
 #define SAFE_MATH_H
 
@@ -333,6 +336,81 @@ inline unsigned long safe_cast_ulong_longlong(long long in) { return safe_cast_u
 // And long long
 inline long long safe_cast_longlong_ulonglong(unsigned long long in) { return safe_cast_int64_uint64(in); }
 inline unsigned long long safe_cast_ulonglong_longlong(long long in) { return safe_cast_uint64_int64(in); }
+
+// Addition
+inline int safe_add_int_int(int a, int b) { return safe_add_int32_int32(a, b); }
+inline int safe_add_int_uint(int a, unsigned int b) { return safe_add_int32_uint32(a, b); }
+inline int safe_add_int_longlong(int a, long long b) { return safe_add_int32_int64(a, b); }
+inline int safe_add_int_ulonglong(int a, unsigned long long b) { return safe_add_int32_uint64(a, b); }
+
+inline unsigned int safe_add_uint_int(unsigned int a, int b) { return safe_add_uint32_int32(a, b); }
+inline unsigned int safe_add_uint_uint(unsigned int a, unsigned int b) { return safe_add_uint32_uint32(a, b); }
+inline unsigned int safe_add_uint_longlong(unsigned int a, long long b) { return safe_add_uint32_int64(a, b); }
+inline unsigned int safe_add_uint_ulonglong(unsigned int a, unsigned long long b) { return safe_add_uint32_uint64(a, b); }
+
+#if SAFE_MATH_LONG == 64
+inline int safe_add_int_long(int a, long b) { return safe_add_int32_int64(a, b); }
+inline int safe_add_int_ulong(int a, unsigned long b) { return safe_add_int32_uint64(a, b); }
+
+inline unsigned int safe_add_uint_long(unsigned int a, long b) { return safe_add_uint32_int64(a, b); }
+inline unsigned int safe_add_uint_ulong(unsigned int a, unsigned long b) { return safe_add_uint32_uint64(a, b); }
+
+inline long safe_add_long_int(long a, int b) { return safe_add_int64_int32(a, b); }
+inline long safe_add_long_uint(long a, unsigned int b) { return safe_add_int64_uint32(a, b); }
+inline long safe_add_long_long(long a, long b) { return safe_add_int64_int64(a, b); }
+inline long safe_add_long_ulong(long a, unsigned long b) { return safe_add_int64_uint64(a, b); }
+inline long safe_add_long_longlong(long a, long long b) { return safe_add_int64_int64(a, b); }
+inline long safe_add_long_ulonglong(long a, unsigned long long b) { return safe_add_int64_uint64(a, b); }
+
+inline unsigned long safe_add_ulong_int(unsigned long a, int b) { return safe_add_uint64_int32(a, b); }
+inline unsigned long safe_add_ulong_uint(unsigned long a, unsigned int b) { return safe_add_uint64_uint32(a, b); }
+inline unsigned long safe_add_ulong_long(unsigned long a, long b) { return safe_add_uint64_int64(a, b); }
+inline unsigned long safe_add_ulong_ulong(unsigned long a, unsigned long b) { return safe_add_uint64_uint64(a, b); }
+inline unsigned long safe_add_ulong_longlong(unsigned long a, long long b) { return safe_add_uint64_int64(a, b); }
+inline unsigned long safe_add_ulong_ulonglong(unsigned long a, unsigned long long b) { return safe_add_uint64_uint64(a, b); }
+
+inline long long safe_add_longlong_long(long long a, long b) { return safe_add_int64_int64(a, b); }
+inline long long safe_add_longlong_ulong(long long a, unsigned long b) { return safe_add_int64_uint64(a, b); }
+
+inline unsigned long long safe_add_ulonglong_long(unsigned long long a, long b) { return safe_add_uint64_int64(a, b); }
+inline unsigned long long safe_add_ulonglong_ulong(unsigned long long a, unsigned long b) { return safe_add_uint64_uint64(a, b); }
+#else
+inline int safe_add_int_long(int a, long b) { return safe_add_int32_int32(a, b); }
+inline int safe_add_int_ulong(int a, unsigned long b) { return safe_add_int32_uint32(a, b); }
+
+inline unsigned int safe_add_uint_long(unsigned int a, long b) { return safe_add_uint32_int32(a, b); }
+inline unsigned int safe_add_uint_ulong(unsigned int a, unsigned long b) { return safe_add_uint32_uint32(a, b); }
+
+inline long safe_add_long_int(long a, int b) { return safe_add_int32_int32(a, b); }
+inline long safe_add_long_uint(long a, unsigned int b) { return safe_add_int32_uint32(a, b); }
+inline long safe_add_long_long(long a, long b) { return safe_add_int32_int32(a, b); }
+inline long safe_add_long_ulong(long a, unsigned long b) { return safe_add_int32_uint32(a, b); }
+inline long safe_add_long_longlong(long a, long long b) { return safe_add_int32_int64(a, b); }
+inline long safe_add_long_ulonglong(long a, unsigned long long b) { return safe_add_int32_uint64(a, b); }
+
+inline unsigned long safe_add_ulong_int(unsigned long a, int b) { return safe_add_uint32_int32(a, b); }
+inline unsigned long safe_add_ulong_uint(unsigned long a, unsigned int b) { return safe_add_uint32_uint32(a, b); }
+inline unsigned long safe_add_ulong_long(unsigned long a, long b) { return safe_add_uint32_int32(a, b); }
+inline unsigned long safe_add_ulong_ulong(unsigned long a, unsigned long b) { return safe_add_uint32_uint32(a, b); }
+inline unsigned long safe_add_ulong_longlong(unsigned long a, long long b) { return safe_add_uint32_int64(a, b); }
+inline unsigned long safe_add_ulong_ulonglong(unsigned long a, unsigned long long b) { return safe_add_uint32_uint64(a, b); }
+
+inline long long safe_add_longlong_long(long long a, long b) { return safe_add_int64_int32(a, b); }
+inline long long safe_add_longlong_ulong(long long a, unsigned long b) { return safe_add_int64_uint32(a, b); }
+
+inline unsigned long long safe_add_ulonglong_long(unsigned long long a, long b) { return safe_add_uint64_int32(a, b); }
+inline unsigned long long safe_add_ulonglong_ulong(unsigned long long a, unsigned long b) { return safe_add_uint64_uint32(a, b); }
+#endif
+
+inline long long safe_add_longlong_int(long long a, int b) { return safe_add_int64_int32(a, b); }
+inline long long safe_add_longlong_uint(long long a, unsigned int b) { return safe_add_int64_uint32(a, b); }
+inline long long safe_add_longlong_longlong(long long a, long long b) { return safe_add_int64_int64(a, b); }
+inline long long safe_add_longlong_ulonglong(long long a, unsigned long long b) { return safe_add_int64_uint64(a, b); }
+
+inline unsigned long long safe_add_ulonglong_int(unsigned long long a, int b) { return safe_add_uint64_int32(a, b); }
+inline unsigned long long safe_add_ulonglong_uint(unsigned long long a, unsigned int b) { return safe_add_uint64_uint32(a, b); }
+inline unsigned long long safe_add_ulonglong_longlong(unsigned long long a, long long b) { return safe_add_uint64_int64(a, b); }
+inline unsigned long long safe_add_ulonglong_uint(unsigned long long a, unsigned long long b) { return safe_add_uint64_uint64(a, b); }
 
 
 #ifdef __cplusplus

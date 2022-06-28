@@ -1,3 +1,6 @@
+// Licensed under the MIT License.
+// Copyright David LeBlanc - dcl@dleblanc.net
+
 #pragma warning(disable:4464)
 
 #include <stdio.h>
