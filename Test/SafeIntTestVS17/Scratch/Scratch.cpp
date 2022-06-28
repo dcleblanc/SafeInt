@@ -9,19 +9,11 @@
 Use this to check specific scenarios
 */
 
-unsigned long long Foo(unsigned long long a, unsigned long long b)
-{
-    SafeInt<unsigned long long> x = SafeInt<unsigned long long>(a) * b;
-    return x;
-}
+
 int main(int argc, char** argv)
 {
-    unsigned long long a = argc;
-    unsigned long long b = 23;
+    SafeInt<uint64_t> a = 1;
+    int64_t b = 2;
 
-    unsigned long long x = Foo(a, b);
-    if (x > 300)
-        printf("Foo\n");
-
-    return 0;
+    return a - b;
 }
