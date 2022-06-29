@@ -376,9 +376,23 @@ inline int32_t safe_add_int32_int32(int32_t a, int32_t b)
     return safe_cast_int32_int64((int64_t)a + b);
 }
 
+inline bool check_add_int32_int32(int32_t a, int32_t b, int32_t* ret)
+{
+    int64_t tmp = (int64_t)a + b;
+    *ret = (int32_t)tmp;
+    return check_cast_int32_int64(tmp);
+}
+
 inline int32_t safe_add_int32_uint32(int32_t a, uint32_t b)
 {
     return safe_cast_int32_int64((int64_t)a + b);
+}
+
+inline bool check_add_int32_uint32(int32_t a, uint32_t b, int32_t* ret)
+{
+    int64_t tmp = (int64_t)a + b;
+    *ret = (int32_t)tmp;
+    return check_cast_int32_int64(tmp);
 }
 
 inline int32_t safe_add_int32_int64(int32_t a, int64_t b)
@@ -401,6 +415,27 @@ inline int32_t safe_add_int32_int64(int32_t a, int64_t b)
     return safe_cast_int32_int64(tmp);
 }
 
+inline bool check_add_int32_int64(int32_t a, int64_t b, int32_t* ret)
+{
+    int64_t tmp = (int64_t)((uint64_t)a + (uint64_t)b);
+    *ret = (int32_t)tmp;
+
+    if (a >= 0)
+    {
+        // mixed sign cannot overflow
+        if (b >= 0 && tmp < a)
+            return false;
+    }
+    else
+    {
+        // lhs negative
+        if (b < 0 && tmp > a)
+            return false;
+    }
+
+    return check_cast_int32_int64(tmp) == 0;
+}
+
 inline int32_t safe_add_int32_uint64(int32_t a, uint64_t b)
 {
     if ((uint32_t)(b >> 32) == 0)
@@ -418,9 +453,34 @@ inline int32_t safe_add_int32_uint64(int32_t a, uint64_t b)
     safe_math_fail("safe_math_fail safe_add_int32_uint64");
 }
 
+inline bool check_add_int32_uint64(int32_t a, uint64_t b, int32_t* ret)
+{
+    if ((uint32_t)(b >> 32) == 0)
+    {
+        // Now it just happens to work out that the standard behavior does what we want
+        // Adding explicit casts to show exactly what's happening here
+        uint32_t tmp = (uint32_t)a + (uint32_t)b;
+        *ret = (int32_t)tmp;
+
+        if ((int32_t)tmp >= a)
+        {
+            return true;
+        }
+    }
+
+    return false;
+}
+
 inline uint32_t safe_add_uint32_int32(uint32_t a, int32_t b)
 {
     return safe_cast_uint32_int64((int64_t)a + b);
+}
+
+inline bool check_add_uint32_int32(uint32_t a, int32_t b, uint32_t* ret)
+{
+    int64_t tmp = (int64_t)a + b;
+    *ret = (uint32_t)tmp;
+    return check_cast_uint32_int64(tmp) == 0;
 }
 
 inline uint32_t safe_add_uint32_uint32(uint32_t a, uint32_t b)
@@ -433,6 +493,13 @@ inline uint32_t safe_add_uint32_uint32(uint32_t a, uint32_t b)
     }
 
     return tmp;
+}
+
+inline bool check_add_uint32_uint32(uint32_t a, uint32_t b, uint32_t* ret)
+{
+    uint32_t tmp = a + b;
+    *ret = tmp;
+    return tmp >= a;
 }
 
 inline uint32_t safe_add_uint32_int64(uint32_t a, int64_t b)
@@ -457,6 +524,30 @@ inline uint32_t safe_add_uint32_int64(uint32_t a, int64_t b)
     safe_math_fail("safe_math_fail safe_add_uint32_int64");
 }
 
+inline bool check_add_uint32_int64(uint32_t a, int64_t b, uint32_t* ret)
+{
+    if (b < 0)
+    {
+        if (a >= safe_abs64(b)) //negation is safe, since rhs is 64-bit
+        {
+            *ret = (uint32_t)(a + b);
+            return true;
+        }
+    }
+    else
+    {
+        // now we know that rhs can be safely cast into an std::uint64_t
+        uint64_t tmp = (uint64_t)a + (uint64_t)b;
+
+        // special case - rhs cannot be larger than 0x7fffffffffffffff, lhs cannot be larger than 0xffffffff
+        // it is not possible for the operation above to overflow, so just check max
+        *ret = (uint32_t)tmp;
+        return check_cast_uint32_uint64(tmp) == 0;
+    }
+
+    return false;
+}
+
 inline uint32_t safe_add_uint32_uint64(uint32_t a, uint64_t b)
 {
     uint64_t tmp = (uint64_t)a + b;
@@ -467,6 +558,14 @@ inline uint32_t safe_add_uint32_uint64(uint32_t a, uint64_t b)
     }
 
     return (uint32_t)tmp;
+}
+
+inline bool check_add_uint32_uint64(uint32_t a, uint64_t b, uint32_t* ret)
+{
+    uint64_t tmp = (uint64_t)a + b;
+    *ret = (uint32_t)tmp;
+
+    return (tmp >= a);
 }
 
 inline int64_t safe_add_int64_int32(int64_t a, int32_t b)
@@ -489,6 +588,27 @@ inline int64_t safe_add_int64_int32(int64_t a, int32_t b)
     return tmp;
 }
 
+inline bool check_add_int64_int32(int64_t a, int32_t b, int64_t* ret)
+{
+    int64_t tmp = (int64_t)((uint64_t)a + (uint64_t)b);
+    *ret = tmp;
+
+    if (a >= 0)
+    {
+        // mixed sign cannot overflow
+        if (b >= 0 && tmp < a)
+            return false;
+    }
+    else
+    {
+        // lhs negative
+        if (b < 0 && tmp > a)
+            return false;
+    }
+
+    return true;
+}
+
 inline int64_t safe_add_int64_uint32(int64_t a, uint32_t b)
 {
     uint64_t tmp = (uint64_t)a + (uint64_t)b;
@@ -499,6 +619,14 @@ inline int64_t safe_add_int64_uint32(int64_t a, uint32_t b)
     }
 
     safe_math_fail("safe_math_fail safe_add_int64_uint32");
+}
+
+inline bool check_add_int64_uint32(int64_t a, uint32_t b, int64_t* ret)
+{
+    uint64_t tmp = (uint64_t)a + (uint64_t)b;
+    *ret = (int64_t)tmp;
+
+    return ((int64_t)tmp >= a);
 }
 
 inline int64_t safe_add_int64_int64(int64_t a, int64_t b)
@@ -521,6 +649,27 @@ inline int64_t safe_add_int64_int64(int64_t a, int64_t b)
     return tmp;
 }
 
+inline bool check_add_int64_int64(int64_t a, int64_t b, int64_t* ret)
+{
+    int64_t tmp = (int64_t)((uint64_t)a + (uint64_t)b);
+    *ret = tmp;
+
+    if (a >= 0)
+    {
+        // mixed sign cannot overflow
+        if (b >= 0 && tmp < a)
+            return false;
+    }
+    else
+    {
+        // lhs negative
+        if (b < 0 && tmp > a)
+            return false;
+    }
+
+    return true;
+}
+
 inline int64_t safe_add_int64_uint64(int64_t a, uint64_t b)
 {
     uint64_t tmp = (uint64_t)a + b;
@@ -531,6 +680,14 @@ inline int64_t safe_add_int64_uint64(int64_t a, uint64_t b)
     }
 
     safe_math_fail("safe_math_fail safe_add_int64_uint64");
+}
+
+inline bool check_add_int64_uint64(int64_t a, uint64_t b, int64_t* ret)
+{
+    uint64_t tmp = (uint64_t)a + b;
+    *ret = (int64_t)tmp;
+
+    return ((int64_t)tmp >= a);
 }
 
 inline uint64_t safe_add_uint64_int32(uint64_t a, int32_t b)
@@ -562,6 +719,38 @@ inline uint64_t safe_add_uint64_int32(uint64_t a, int32_t b)
     safe_math_fail("safe_math_fail safe_add_uint64_int32");
 }
 
+inline bool check_add_uint64_int32(uint64_t a, int32_t b, uint64_t* ret)
+{
+    uint64_t tmp = 0;
+
+    if (b < 0)
+    {
+        // So we're effectively subtracting
+        tmp = safe_abs32(b);
+
+        if (tmp <= a)
+        {
+            *ret = a - tmp;
+            return true;
+        }
+    }
+    else
+    {
+        // now we know that rhs can be safely cast into an std::uint64_t
+        tmp = (uint64_t)a + (uint64_t)b;
+
+        // We added and it did not become smaller
+        if (tmp >= a)
+        {
+            *ret = tmp;
+            return true;
+        }
+    }
+
+    return false;
+}
+
+
 inline uint64_t safe_add_uint64_uint32(uint64_t a, uint32_t b)
 {
     uint64_t tmp = (uint64_t)a + (uint64_t)b;
@@ -573,6 +762,15 @@ inline uint64_t safe_add_uint64_uint32(uint64_t a, uint32_t b)
     }
 
     safe_math_fail("safe_math_fail safe_add_uint64_uint32");
+}
+
+inline bool check_add_uint64_uint32(uint64_t a, uint32_t b, uint64_t* ret)
+{
+    uint64_t tmp = (uint64_t)a + (uint64_t)b;
+    *ret = tmp;
+
+    // We added and it didn't get smaller
+    return (tmp >= a);
 }
 
 inline uint64_t safe_add_uint64_int64(uint64_t a, int64_t b)
@@ -604,6 +802,37 @@ inline uint64_t safe_add_uint64_int64(uint64_t a, int64_t b)
     safe_math_fail("safe_math_fail safe_add_uint64_int64");
 }
 
+inline bool check_add_uint64_int64(uint64_t a, int64_t b, uint64_t* ret)
+{
+    uint64_t tmp = 0;
+
+    if (b < 0)
+    {
+        // So we're effectively subtracting
+        tmp = safe_abs64(b);
+
+        if (tmp <= a)
+        {
+            *ret = a - tmp;
+            return true;
+        }
+    }
+    else
+    {
+        // now we know that rhs can be safely cast into an std::uint64_t
+        tmp = (uint64_t)a + (uint64_t)b;
+
+        // We added and it did not become smaller
+        if (tmp >= a)
+        {
+            *ret = tmp;
+            return true;
+        }
+    }
+
+    return false;
+}
+
 inline uint64_t safe_add_uint64_uint64(uint64_t a, uint64_t b)
 {
     uint64_t tmp = a + b;
@@ -612,6 +841,13 @@ inline uint64_t safe_add_uint64_uint64(uint64_t a, uint64_t b)
         safe_math_fail("safe_math_fail safe_add_uint64_uint64");
 
     return tmp;
+}
+
+inline bool check_add_uint64_uint64(uint64_t a, uint64_t b, uint64_t* ret)
+{
+    uint64_t tmp = a + b;
+    *ret = tmp;
+    return (tmp >= a);
 }
 
 // As we're working in C, use defines
