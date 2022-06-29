@@ -1051,10 +1051,24 @@ inline int32_t safe_mul_int32_int32(int32_t a, int32_t b)
     return safe_cast_int32_int64(tmp);
 }
 
+bool check_mul_int32_int32(int32_t a, int32_t b, int32_t* ret)
+{
+    int64_t tmp = (int64_t)a * (int64_t)b;
+    *ret = (int32_t)tmp;
+    return check_cast_int32_int64(tmp) == 0;
+}
+
 inline int32_t safe_mul_int32_uint32(int32_t a, uint32_t b)
 {
     int64_t tmp = (int64_t)a * (int64_t)b;
     return safe_cast_int32_int64(tmp);
+}
+
+bool check_mul_int32_uint32(int32_t a, uint32_t b, int32_t* ret)
+{
+    int64_t tmp = (int64_t)a * (int64_t)b;
+    *ret = (int32_t)tmp;
+    return safe_cast_int32_int64(tmp) == 0;
 }
 
 inline int32_t safe_mul_int32_int64(int32_t a, int64_t b)
@@ -1067,6 +1081,19 @@ inline int32_t safe_mul_int32_int64(int32_t a, int64_t b)
     }
 
     safe_math_fail("safe_math_fail safe_mul_int32_int64");
+}
+
+bool check_mul_int32_int64(int32_t a, int64_t b, int32_t* ret)
+{
+    int64_t tmp = 0;
+
+    if (MultiplyInt64((int64_t)a, b, &tmp))
+    {
+        *ret = (int32_t)tmp;
+        return safe_cast_int32_int64(tmp) == 0;
+    }
+
+    return false;
 }
 
 inline int32_t safe_mul_int32_uint64(int32_t a, uint64_t b)
@@ -1091,6 +1118,32 @@ inline int32_t safe_mul_int32_uint64(int32_t a, uint64_t b)
     }
  
     safe_math_fail("safe_math_fail safe_mul_int32_uint64");
+}
+
+bool check_mul_int32_uint64(int32_t a, uint64_t b, int32_t* ret)
+{
+    uint64_t tmp = 0;
+    if (a < 0)
+    {
+        // Flip sign, use the unsigned function
+        uint64_t a2 = safe_abs64(a);
+        if (MultiplyUint64(a2, b, &tmp) == SAFE_INT_MUL_SUCCESS && tmp <= (uint64_t)INT32_MAX + 1)
+        {
+            // Not too big, flip it back
+            *ret = (int32_t)(tmp + 1);
+            return true;
+        }
+    }
+    else
+    {
+        if (MultiplyUint64((uint64_t)a, b, &tmp) == SAFE_INT_MUL_SUCCESS && tmp <= INT32_MAX)
+        {
+            *ret = (int32_t)tmp;
+            return true;
+        }
+    }
+
+    return false;
 }
 
 inline uint32_t safe_mul_uint32_int32(uint32_t a, int32_t b)
