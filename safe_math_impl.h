@@ -46,7 +46,7 @@ extern "C"
 // Figure out if we should use intrinsics
 // If the user has already decided, let that override
 #define SAFEINT_MULTIPLY_MATH        0 // no intrinsics, no built in, no 128-bit
-#define SAFEINT_MULTIPLY_INTRINSICS  1
+#define SAFEINT_MULTIPLY_INTRINSICS  1 // 64-bit Visual Studio
 #define SAFEINT_MULTIPLY_BUILTIN     2 // gcc, clang
 #define SAFEINT_MULTIPLY_INT128      3 // Best case
 
@@ -1152,10 +1152,24 @@ inline uint32_t safe_mul_uint32_int32(uint32_t a, int32_t b)
     return safe_cast_uint32_int64(tmp);
 }
 
+bool check_mul_uint32_int32(uint32_t a, int32_t b, uint32_t* ret)
+{
+    int64_t tmp = (int64_t)a * (int64_t)b;
+    *ret = (uint32_t)tmp;
+    return check_cast_uint32_int64(tmp) == 0;
+}
+
 inline uint32_t safe_mul_uint32_uint32(uint32_t a, uint32_t b)
 {
     uint64_t tmp = (uint64_t)a * (uint64_t)b;
     return safe_cast_uint32_uint64(tmp);
+}
+
+bool check_mul_uint32_uint32(uint32_t a, uint32_t b, uint32_t* ret)
+{
+    uint64_t tmp = (uint64_t)a * (uint64_t)b;
+    *ret = (uint32_t)tmp;
+    return check_cast_uint32_uint64(tmp) == 0;
 }
 
 inline uint32_t safe_mul_uint32_int64(uint32_t a, int64_t b)
@@ -1170,6 +1184,19 @@ inline uint32_t safe_mul_uint32_int64(uint32_t a, int64_t b)
     safe_math_fail("safe_math_fail safe_mul_uint32_int64");
 }
 
+bool check_mul_uint32_int64(uint32_t a, int64_t b, uint32_t* ret)
+{
+    int64_t tmp = 0;
+
+    if (MultiplyInt64((int64_t)a, b, &tmp) == SAFE_INT_MUL_SUCCESS && tmp <= UINT32_MAX)
+    {
+        *ret = (uint32_t)tmp;
+        return true;
+    }
+
+    return false;
+}
+
 inline uint32_t safe_mul_uint32_uint64(uint32_t a, uint64_t b)
 {
     uint64_t tmp = 0;
@@ -1180,6 +1207,19 @@ inline uint32_t safe_mul_uint32_uint64(uint32_t a, uint64_t b)
     }
 
     safe_math_fail("safe_math_fail safe_mul_uint32_uint64");
+}
+
+bool check_mul_uint32_uint64(uint32_t a, uint64_t b, uint32_t* ret)
+{
+    uint64_t tmp = 0;
+
+    if (MultiplyUint64((uint64_t)a, b, &tmp) == SAFE_INT_MUL_SUCCESS && tmp <= UINT32_MAX)
+    {
+        *ret = (uint32_t)tmp;
+        return true;
+    }
+
+    return false;
 }
 
 inline int64_t safe_mul_int64_int32(int64_t a, int32_t b)
@@ -1194,6 +1234,19 @@ inline int64_t safe_mul_int64_int32(int64_t a, int32_t b)
     safe_math_fail("safe_math_fail safe_mul_int64_int32");
 }
 
+bool check_mul_int64_int32(int64_t a, int32_t b, int64_t* ret)
+{
+    int64_t tmp = 0;
+
+    if (MultiplyInt64(a, (int64_t)b, &tmp) == SAFE_INT_MUL_SUCCESS)
+    {
+        *ret = tmp;
+        return true;
+    }
+
+    return false;
+}
+
 inline int64_t safe_mul_int64_uint32(int64_t a, uint32_t b)
 {
     int64_t tmp = 0;
@@ -1206,6 +1259,19 @@ inline int64_t safe_mul_int64_uint32(int64_t a, uint32_t b)
     safe_math_fail("safe_math_fail safe_mul_int64_uint32");
 }
 
+bool check_mul_int64_uint32(int64_t a, uint32_t b, int64_t* ret)
+{
+    int64_t tmp = 0;
+
+    if (MultiplyInt64(a, (int64_t)b, &tmp) == SAFE_INT_MUL_SUCCESS)
+    {
+        *ret = tmp;
+        return true;
+    }
+
+    return false;
+}
+
 inline int64_t safe_mul_int64_int64(int64_t a, int64_t b)
 {
     int64_t tmp = 0;
@@ -1216,6 +1282,19 @@ inline int64_t safe_mul_int64_int64(int64_t a, int64_t b)
     }
 
     safe_math_fail("safe_math_fail safe_mul_int64_int64");
+}
+
+bool check_mul_int64_int64(int64_t a, int64_t b, int64_t* ret)
+{
+    int64_t tmp = 0;
+
+    if (MultiplyInt64(a, b, &tmp) == SAFE_INT_MUL_SUCCESS)
+    {
+        *ret = tmp;
+        return true;
+    }
+
+    return false;
 }
 
 inline int64_t safe_mul_int64_uint64(int64_t a, uint64_t b)
@@ -1242,6 +1321,32 @@ inline int64_t safe_mul_int64_uint64(int64_t a, uint64_t b)
     safe_math_fail("safe_math_fail safe_mul_int64_uint64");
 }
 
+bool check_mul_int64_uint64(int64_t a, uint64_t b, int64_t* ret)
+{
+    uint64_t tmp = 0;
+
+    if (a < 0)
+    {
+        uint64_t a2 = safe_abs64(a);
+
+        if (MultiplyUint64(a2, b, &tmp) == SAFE_INT_MUL_SUCCESS && tmp <= (uint64_t)0x8000000000000000)
+        {
+            *ret = negate64((int64_t)tmp);
+            return true;
+        }
+    }
+    else
+    {
+        if (MultiplyUint64((uint64_t)a, b, &tmp) == SAFE_INT_MUL_SUCCESS && tmp <= (uint64_t)INT64_MAX)
+        {
+            *ret = (int64_t)tmp;
+            return true;
+        }
+    }
+
+    return false;
+}
+
 inline uint64_t safe_mul_uint64_int32(uint64_t a, int32_t b)
 {
     uint64_t tmp;
@@ -1262,6 +1367,30 @@ inline uint64_t safe_mul_uint64_int32(uint64_t a, int32_t b)
     safe_math_fail("safe_math_fail safe_mul_uint64_int32");
 }
 
+bool check_mul_uint64_int32(uint64_t a, int32_t b, uint64_t* ret)
+{
+    uint64_t tmp;
+
+    if (b < 0)
+    {
+        if (a == 0)
+        {
+            *ret = 0;
+            return true;
+        }
+
+        return false;
+    }
+
+    if (MultiplyUint64(a, (uint64_t)b, &tmp) == SAFE_INT_MUL_SUCCESS)
+    {
+        *ret = tmp;
+        return true;
+    }
+
+    return false;
+}
+
 inline uint64_t safe_mul_uint64_uint32(uint64_t a, uint32_t b)
 {
     uint64_t tmp;
@@ -1272,6 +1401,19 @@ inline uint64_t safe_mul_uint64_uint32(uint64_t a, uint32_t b)
     }
 
     safe_math_fail("safe_math_fail safe_mul_uint64_uint32");
+}
+
+bool check_mul_uint64_uint32(uint64_t a, uint32_t b, uint64_t* ret)
+{
+    uint64_t tmp;
+
+    if (MultiplyUint64(a, (uint64_t)b, &tmp) == SAFE_INT_MUL_SUCCESS)
+    {
+        *ret = tmp;
+        return true;
+    }
+
+    return false;
 }
 
 inline uint64_t safe_mul_uint64_int64(uint64_t a, int64_t b)
@@ -1294,6 +1436,30 @@ inline uint64_t safe_mul_uint64_int64(uint64_t a, int64_t b)
     safe_math_fail("safe_math_fail safe_mul_uint64_int64");
 }
 
+bool check_mul_uint64_int64(uint64_t a, int64_t b, uint64_t* ret)
+{
+    uint64_t tmp;
+
+    if (b < 0)
+    {
+        if (a == 0)
+        {
+            *ret = 0;
+            return true;
+        }
+
+        return false;
+    }
+
+    if (MultiplyUint64(a, (uint64_t)b, &tmp) == SAFE_INT_MUL_SUCCESS)
+    {
+        *ret = tmp;
+        return true;
+    }
+
+    return false;
+}
+
 inline uint64_t safe_mul_uint64_uint64(uint64_t a, uint64_t b)
 {
     uint64_t tmp;
@@ -1304,6 +1470,11 @@ inline uint64_t safe_mul_uint64_uint64(uint64_t a, uint64_t b)
     }
 
     safe_math_fail("safe_math_fail safe_mul_uint64_uint64");
+}
+
+bool check_mul_uint64_uint64(uint64_t a, uint64_t b, uint64_t* ret)
+{
+    return (MultiplyUint64(a, b, ret) == SAFE_INT_MUL_SUCCESS);
 }
 
 inline int32_t safe_div_int32_int32(int32_t a, int32_t b)

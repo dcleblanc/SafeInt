@@ -4,6 +4,7 @@
 #if defined _MSC_VER
 #pragma warning(disable:4464)
 #pragma warning(disable:4555)
+#pragma warning(disable:5045)
 #endif
 
 #include <stdio.h>
@@ -13,10 +14,6 @@ int main(int argc, char* argv[])
 {
 	argc;
 	argv;
-
-#if defined _CRT_SECURE_INVALID_PARAMETER
-	printf("Has _CRT_SECURE_INVALID_PARAMETER\n");
-#endif
 
 	printf("SAFEINT_MULTIPLY_METHOD = %d\n", SAFEINT_MULTIPLY_METHOD);
 
