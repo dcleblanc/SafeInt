@@ -1486,6 +1486,16 @@ inline int32_t safe_div_int32_int32(int32_t a, int32_t b)
     safe_math_fail("safe_math_fail safe_div_int32_int32");
 }
 
+inline bool check_div_int32_int32(int32_t a, int32_t b, int32_t* ret)
+{
+    if (b != 0 && !(a == INT32_MIN && b == -1))
+    {
+        *ret = a / b;
+        return true;
+    }
+    return false;
+}
+
 inline int32_t safe_div_int32_uint32(int32_t a, uint32_t b)
 {
     if (b != 0)
@@ -1495,6 +1505,17 @@ inline int32_t safe_div_int32_uint32(int32_t a, uint32_t b)
     safe_math_fail("safe_math_fail safe_div_int32_uint32");
 }
 
+inline bool check_div_int32_uint32(int32_t a, uint32_t b, int32_t* ret)
+{
+    if (b != 0)
+    {
+        *ret = (int64_t)a / (int64_t)b;
+        return true;
+    }
+
+    return false;
+}
+
 inline int32_t safe_div_int32_int64(int32_t a, int64_t b)
 {
     if (b != 0 && !(a == INT32_MIN && b == -1))
@@ -1502,6 +1523,17 @@ inline int32_t safe_div_int32_int64(int32_t a, int64_t b)
         return (int32_t)(a / b);
     }
     safe_math_fail("safe_math_fail safe_div_int32_int64");
+}
+
+inline bool check_div_int32_int64(int32_t a, int64_t b, int32_t* ret)
+{
+    if (b != 0 && !(a == INT32_MIN && b == -1))
+    {
+        *ret = (int32_t)(a / b);
+        return true;
+    }
+
+    return false;
 }
 
 inline int32_t safe_div_int32_uint64(int32_t a, uint64_t b)
@@ -1525,6 +1557,29 @@ inline int32_t safe_div_int32_uint64(int32_t a, uint64_t b)
     safe_math_fail("safe_math_fail safe_div_int32_uint64");
 }
 
+inline bool check_div_int32_uint64(int32_t a, uint64_t b, int32_t* ret)
+{
+    if (b == 0)
+    {
+        return false;
+    }
+
+    if (a > 0)
+    {
+        *ret = (int32_t)((uint64_t)a / b);
+        return true;
+    }
+    else
+    {
+        uint64_t a2 = (uint64_t)safe_abs32(a);
+        a2 /= b;
+        *ret = (int32_t)negate32((int32_t)a2);
+        return true;
+    }
+
+    return false;
+}
+
 inline uint32_t safe_div_uint32_int32(uint32_t a, int32_t b)
 {
     if (b > 0)
@@ -1532,6 +1587,16 @@ inline uint32_t safe_div_uint32_int32(uint32_t a, int32_t b)
         return a / b;
     }
     safe_math_fail("safe_math_fail safe_div_uint32_uint64");
+}
+
+inline bool check_div_uint32_int32(uint32_t a, int32_t b, uint32_t* ret)
+{
+    if (b > 0)
+    {
+        *ret = a / b;
+        return true;
+    }
+    return false;
 }
 
 inline uint32_t safe_div_uint32_uint32(uint32_t a, uint32_t b)
@@ -1543,6 +1608,17 @@ inline uint32_t safe_div_uint32_uint32(uint32_t a, uint32_t b)
     safe_math_fail("safe_math_fail safe_div_uint32_uint32");
 }
 
+inline bool check_div_uint32_uint32(uint32_t a, uint32_t b, uint32_t* ret)
+{
+    if (b > 0)
+    {
+        *ret = (uint32_t)(a / b);
+        return true;
+    }
+
+    return false;
+}
+
 inline uint32_t safe_div_uint32_int64(uint32_t a, int64_t b)
 {
     if (b > 0)
@@ -1550,6 +1626,16 @@ inline uint32_t safe_div_uint32_int64(uint32_t a, int64_t b)
         return (uint32_t)(a / b);
     }
     safe_math_fail("safe_math_fail safe_div_uint32_uint64");
+}
+
+inline bool check_div_uint32_int64(uint32_t a, int64_t b, uint32_t* ret)
+{
+    if (b > 0)
+    {
+        *ret = (uint32_t)(a / b);
+        return true;
+    }
+    return false;
 }
 
 inline uint32_t safe_div_uint32_uint64(uint32_t a, uint64_t b)
@@ -1561,12 +1647,31 @@ inline uint32_t safe_div_uint32_uint64(uint32_t a, uint64_t b)
     safe_math_fail("safe_math_fail safe_div_uint32_uint64");
 }
 
+inline bool check_div_uint32_uint64(uint32_t a, uint64_t b, uint32_t* ret)
+{
+    if (b > 0)
+    {
+        *ret = (uint32_t)(a / b);
+        return true;
+    }
+    return false;
+}
+
 inline int64_t safe_div_int64_int32(int64_t a, int32_t b)
 {
     if(b == 0 || (b == -1 && a == INT64_MIN))
         safe_math_fail("safe_math_fail safe_div_int64_int32");
 
     return a / b;
+}
+
+inline bool check_div_int64_int32(int64_t a, int32_t b, int64_t* ret)
+{
+    if (b == 0 || (b == -1 && a == INT64_MIN))
+        return false;
+
+    *ret = a / b;
+    return true;
 }
 
 inline int64_t safe_div_int64_uint32(int64_t a, uint32_t b)
@@ -1577,12 +1682,31 @@ inline int64_t safe_div_int64_uint32(int64_t a, uint32_t b)
     return a / b;
 }
 
+inline bool check_div_int64_uint32(int64_t a, uint32_t b, int64_t* ret)
+{
+    if (b == 0)
+        return false;
+
+    *ret = a / b;
+    return true;
+}
+
 inline int64_t safe_div_int64_int64(int64_t a, int64_t b)
 {
     if (b == 0 || (b == -1 && a == INT64_MIN))
         safe_math_fail("safe_math_fail safe_div_int64_int32");
 
     return a / b;
+}
+
+inline bool check_div_int64_int64(int64_t a, int64_t b, int64_t* ret)
+{
+    if (b == 0 || (b == -1 && a == INT64_MIN))
+        return false;
+
+    *ret = a / b;
+    return true;
+
 }
 
 inline int64_t safe_div_int64_uint64(int64_t a, uint64_t b)
@@ -1593,12 +1717,32 @@ inline int64_t safe_div_int64_uint64(int64_t a, uint64_t b)
     return a / b;
 }
 
+inline bool check_div_int64_uint64(int64_t a, uint64_t b, int64_t* ret)
+{
+    if (b == 0)
+        return false;
+
+    *ret = a / b;
+    return true;
+}
+
 inline uint64_t safe_div_uint64_int32(uint64_t a, int32_t b)
 {
     if (b > 0)
         return a / b;
 
     safe_math_fail("safe_math_fail safe_div_int64_int32");
+}
+
+inline bool check_div_uint64_int32(uint64_t a, int32_t b, uint64_t* ret)
+{
+    if (b > 0)
+    {
+        *ret = a / b;
+        return true;
+    }
+
+    return false;
 }
 
 inline uint64_t safe_div_uint64_uint32(uint64_t a, uint32_t b)
@@ -1609,6 +1753,17 @@ inline uint64_t safe_div_uint64_uint32(uint64_t a, uint32_t b)
     safe_math_fail("safe_math_fail safe_div_int64_uint32");
 }
 
+inline bool check_div_uint64_uint32(uint64_t a, uint32_t b, uint64_t* ret)
+{
+    if (b != 0)
+    {
+        *ret = a / b;
+        return true;
+    }
+    
+    return false;
+}
+
 inline uint64_t safe_div_uint64_int64(uint64_t a, int64_t b)
 {
     if (b > 0)
@@ -1617,12 +1772,34 @@ inline uint64_t safe_div_uint64_int64(uint64_t a, int64_t b)
     safe_math_fail("safe_math_fail safe_div_int64_int64");
 }
 
+inline bool check_div_uint64_int64(uint64_t a, int64_t b, uint64_t* ret)
+{
+    if (b > 0)
+    {
+        *ret = a / b;
+        return true;
+    }
+
+    return false;
+}
+
 inline uint64_t safe_div_uint64_uint64(uint64_t a, uint64_t b)
 {
     if (b != 0)
         return a / b;
 
     safe_math_fail("safe_math_fail safe_div_int64_uint32");
+}
+
+inline bool check_div_uint64_uint64(uint64_t a, uint64_t b, uint64_t* ret)
+{
+    if (b != 0)
+    {
+        *ret = a / b;
+        return true;
+    }
+
+    return false;
 }
 
 inline int32_t safe_sub_int32_int32(int32_t a, int32_t b)
