@@ -140,10 +140,12 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="safe_math_test.c" />
+    <ClCompile Include="safe_math_test_add.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\safe_math.h" />
     <ClInclude Include="..\..\safe_math_impl.h" />
+    <ClInclude Include="safe_math_test.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -4,6 +4,10 @@
 #if !defined SAFE_MATH_H
 #define SAFE_MATH_H
 
+#if defined SAFEINT_HPP
+#error use either the C++ SafeInt, or safe_math, not both
+#endif
+
 #include "safe_math_impl.h"
 
 #ifdef __cplusplus
@@ -103,6 +107,10 @@ extern "C"
 	// 32-bit type of the same signedness
 
 	// Addition functions, all of these abort on failure
+	// For all of the below, there are also non-aborting versions
+	// that have the signature of:
+	//
+	// bool check_op_intXX_intYY(intXX a, intYY b, intXX* ret)
 
 	int32_t safe_add_int32_int32(int32_t a, int32_t b)
 	int32_t safe_add_int32_uint32(int32_t a, uint32_t b)
@@ -203,8 +211,8 @@ extern "C"
 #endif
 
 // Not going to support odd sizes of things
-extern char __CHECK_SHORT_IS_16__[1 / !(sizeof(short)-2)];
-extern char __CHECK_INT_IS_32__[1 / !(sizeof(int) - 4)];
+extern char __CHECK_SHORT_IS_16__[1 / ((sizeof(short)-2) ? 0 : 1)];
+extern char __CHECK_INT_IS_32__[1 / ((sizeof(int) - 4) ? 0 : 1)];
 
 // In order to help keep people from making mistakes by 
 // incorrectly guessing which types match which of the intXX types,

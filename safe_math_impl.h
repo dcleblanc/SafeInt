@@ -39,6 +39,19 @@ extern "C"
 #define SAFEINT_COMPILER UNKNOWN_COMPILER
 #endif
 
+// Various defines to help make working with multiple compilers easier - from SafeInt.hpp
+#if SAFEINT_COMPILER == GCC_COMPILER || SAFEINT_COMPILER == CLANG_COMPILER
+#define SAFEINT_NORETURN __attribute__((noreturn))
+#define SAFEINT_STDCALL
+#define SAFEINT_VISIBLE __attribute__ ((__visibility__("default")))
+#define SAFEINT_WEAK __attribute__ ((weak))
+#else
+#define SAFEINT_NORETURN __declspec(noreturn)
+#define SAFEINT_STDCALL __stdcall
+#define SAFEINT_VISIBLE
+#define SAFEINT_WEAK
+#endif
+
 #include <stdint.h>
 #include <stdbool.h>
 #include <limits.h>
@@ -88,15 +101,23 @@ extern "C"
 #endif // SAFEINT_USE_INTRINSICS
 #endif // SAFEINT_HAS_INT128
 
-// TODO This needs to be replaceable
+/*
+    To replace safe_math_fail, wrap this header,
+    implement safe_math_fail how you prefer,
+    and set SAFE_MATH_FAIL_DEFINED
+*/
+
+#if !defined SAFE_MATH_FAIL_DEFINED
+#define SAFE_MATH_FAIL_DEFINED
 #include <stdlib.h>
 
-void safe_math_fail(const char* msg)
+SAFEINT_NORETURN void safe_math_fail(const char* msg)
 {
     const char* not_used = msg;
     not_used = (const char*)0;
     abort();
 }
+#endif
 
 #if !defined UINT64_MAX
 
@@ -380,7 +401,7 @@ inline bool check_add_int32_int32(int32_t a, int32_t b, int32_t* ret)
 {
     int64_t tmp = (int64_t)a + b;
     *ret = (int32_t)tmp;
-    return check_cast_int32_int64(tmp);
+    return check_cast_int32_int64(tmp) == 0;
 }
 
 inline int32_t safe_add_int32_uint32(int32_t a, uint32_t b)
@@ -392,7 +413,7 @@ inline bool check_add_int32_uint32(int32_t a, uint32_t b, int32_t* ret)
 {
     int64_t tmp = (int64_t)a + b;
     *ret = (int32_t)tmp;
-    return check_cast_int32_int64(tmp);
+    return check_cast_int32_int64(tmp) == 0;
 }
 
 inline int32_t safe_add_int32_int64(int32_t a, int64_t b)
@@ -1022,7 +1043,7 @@ inline int MultiplyInt64(int64_t a, int64_t b, int64_t* pRet)
             // Result must be negative
             if (tmp <= (uint64_t)INT64_MIN)
             {
-                *pRet = negate64(tmp);
+                *pRet = (int64_t)negate64((int64_t)tmp);
                 return SAFE_INT_MUL_SUCCESS;
             }
         }
@@ -1714,7 +1735,7 @@ inline int64_t safe_div_int64_uint64(int64_t a, uint64_t b)
     if (b == 0)
         safe_math_fail("safe_math_fail safe_div_int64_int32");
 
-    return a / b;
+    return (int64_t)(a / b);
 }
 
 inline bool check_div_int64_uint64(int64_t a, uint64_t b, int64_t* ret)
@@ -1722,7 +1743,7 @@ inline bool check_div_int64_uint64(int64_t a, uint64_t b, int64_t* ret)
     if (b == 0)
         return false;
 
-    *ret = a / b;
+    *ret = (int64_t)(a / b);
     return true;
 }
 
@@ -1824,7 +1845,7 @@ inline int32_t safe_sub_int32_uint32(int32_t a, uint32_t b)
 inline bool check_sub_int32_uint32(int32_t a, uint32_t b, int32_t* ret)
 {
     int64_t tmp = (int64_t)a - (int64_t)b;
-    *ret = (uint32_t)tmp;
+    *ret = (int32_t)tmp;
     return check_cast_int32_int64(tmp) == 0;
 }
 

@@ -8,14 +8,16 @@
 #endif
 
 #include <stdio.h>
-#include "../../safe_math.h"
+//#include "../../safe_math.h"
+
+void add_test(void);
 
 int main(int argc, char* argv[])
 {
 	argc;
 	argv;
 
-	printf("SAFEINT_MULTIPLY_METHOD = %d\n", SAFEINT_MULTIPLY_METHOD);
+	add_test();
 
 	return 0;
 }
