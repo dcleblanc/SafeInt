@@ -1808,10 +1808,24 @@ inline int32_t safe_sub_int32_int32(int32_t a, int32_t b)
     return safe_cast_int32_int64(tmp);
 }
 
+inline bool check_sub_int32_int32(int32_t a, int32_t b, int32_t* ret)
+{
+    int64_t tmp = (int64_t)a - (int64_t)b;
+    *ret = (int32_t)tmp;
+    return check_cast_int32_int64(tmp) == 0;
+}
+
 inline int32_t safe_sub_int32_uint32(int32_t a, uint32_t b)
 {
     int64_t tmp = (int64_t)a - (int64_t)b;
     return safe_cast_int32_int64(tmp);
+}
+
+inline bool check_sub_int32_uint32(int32_t a, uint32_t b, int32_t* ret)
+{
+    int64_t tmp = (int64_t)a - (int64_t)b;
+    *ret = (uint32_t)tmp;
+    return check_cast_int32_int64(tmp) == 0;
 }
 
 inline int32_t safe_sub_int32_int64(int32_t a, int64_t b)
@@ -1867,6 +1881,58 @@ inline int32_t safe_sub_int32_int64(int32_t a, int64_t b)
     safe_math_fail("safe_math_fail safe_sub_int32_int64");
 }
 
+inline bool check_sub_int32_int64(int32_t a, int64_t b, int32_t* ret)
+{
+    // See above for documentation
+    int64_t tmp = (int64_t)((uint64_t)a - (uint64_t)b);
+
+    if (a >= 0)
+    {
+        // first case
+        if (b >= 0)
+        {
+            if (tmp >= INT32_MIN)
+            {
+                *ret = (int32_t)tmp;
+                return true;
+            }
+        }
+        else
+        {
+            // second case
+            if (tmp >= a && tmp <= INT32_MAX)
+            {
+                *ret = (int32_t)tmp;
+                return true;
+            }
+        }
+    }
+    else
+    {
+        // lhs < 0
+        // third case
+        if (b >= 0)
+        {
+            if (tmp <= a && tmp >= INT32_MIN)
+            {
+                *ret = (int32_t)tmp;
+                return true;
+            }
+        }
+        else
+        {
+            // fourth case
+            if (tmp <= INT32_MAX)
+            {
+                *ret = (int32_t)tmp;
+                return true;
+            }
+        }
+    }
+
+    return false;
+}
+
 inline int32_t safe_sub_int32_uint64(int32_t a, uint64_t b)
 {
     // We need the absolute value of INT32_MIN
@@ -1889,7 +1955,32 @@ inline int32_t safe_sub_int32_uint64(int32_t a, uint64_t b)
     }
 
     safe_math_fail("safe_math_fail safe_sub_int32_uint64");
+}
 
+inline bool check_sub_int32_uint64(int32_t a, uint64_t b, int32_t* ret)
+{
+    // We need the absolute value of INT32_MIN
+    // This will give it to us without extraneous compiler warnings
+    const uint64_t AbsMinInt32 = (uint64_t)INT32_MAX + 1;
+
+    if (a < 0)
+    {
+        if (b <= AbsMinInt32 - safe_abs32(a))
+        {
+            *ret = (int32_t)(a - b);
+            return true;
+        }
+    }
+    else
+    {
+        if (b <= AbsMinInt32 + (uint64_t)a)
+        {
+            *ret = (int32_t)(a - b);
+            return true;
+        }
+    }
+
+    return false;
 }
 
 inline uint32_t safe_sub_uint32_int32(uint32_t a, int32_t b)
@@ -1898,12 +1989,30 @@ inline uint32_t safe_sub_uint32_int32(uint32_t a, int32_t b)
     return safe_cast_uint32_int64(tmp);
 }
 
+inline bool check_sub_uint32_int32(uint32_t a, int32_t b, uint32_t* ret)
+{
+    int64_t tmp = (int64_t)a - (int64_t)b;
+    *ret = (uint32_t)tmp;
+    return check_cast_uint32_int64(tmp) == 0;
+}
+
 inline uint32_t safe_sub_uint32_uint32(uint32_t a, uint32_t b)
 {
     if (a >= b)
         return a - b;
 
     safe_math_fail("safe_math_fail safe_sub_uint32_uint32");
+}
+
+inline bool check_sub_uint32_uint32(uint32_t a, uint32_t b, uint32_t* ret)
+{
+    if (a >= b)
+    {
+        *ret = a - b;
+        return true;
+    }
+
+    return false;
 }
 
 inline uint32_t safe_sub_uint32_int64(uint32_t a, int64_t b)
@@ -1933,12 +2042,51 @@ inline uint32_t safe_sub_uint32_int64(uint32_t a, int64_t b)
     safe_math_fail("safe_math_fail safe_sub_uint32_int64");
 }
 
+inline bool check_sub_uint32_int64(uint32_t a, int64_t b, uint32_t* ret)
+{
+    // must first see if rhs is positive or negative
+    if (b >= 0)
+    {
+        if ((uint64_t)b <= a)
+        {
+            *ret = (uint32_t)(a - (uint32_t)b);
+            return true;
+        }
+    }
+    else
+    {
+        // we're now effectively adding
+        // since lhs is 32-bit, and rhs cannot exceed 2^63
+        // this addition cannot overflow
+        uint64_t tmp = a + (uint64_t)negate64(b); // negation safe
+
+        // but we could exceed UINT32_MAX
+        if (tmp <= UINT32_MAX)
+        {
+            *ret = (uint32_t)tmp;
+            return true;
+        }
+    }
+
+    return false;
+}
+
 inline uint32_t safe_sub_uint32_uint64(uint32_t a, uint64_t b)
 {
     if (a >= b)
         return (uint32_t)(a - b);
 
     safe_math_fail("safe_math_fail safe_sub_uint32_uint64");
+}
+
+inline bool check_sub_uint32_uint64(uint32_t a, uint64_t b, uint32_t* ret)
+{
+    if (a >= b)
+    {
+        *ret = (uint32_t)(a - b);
+        return true;
+    }
+    return false;
 }
 
 inline int64_t safe_sub_int64_int32(int64_t a, int32_t b)
@@ -1964,6 +2112,23 @@ inline int64_t safe_sub_int64_int32(int64_t a, int32_t b)
     return tmp;
 }
 
+inline bool check_sub_int64_int32(int64_t a, int32_t b, int64_t* ret)
+{
+    int64_t tmp = (int64_t)((uint64_t)a - (uint64_t)b);
+
+    // Note - ideally, we can order these so that true conditionals
+    // lead to success, which enables better pipelining
+    // It isn't practical here
+    if ((a >= 0 && b < 0 && tmp < a) || // condition 2
+        (b >= 0 && tmp > a))              // condition 3
+    {
+        return false;
+    }
+
+    *ret = tmp;
+    return true;
+}
+
 inline int64_t safe_sub_int64_uint32(int64_t a, uint32_t b)
 {
     // lhs is a 64-bit int, rhs unsigned int32 or smaller
@@ -1976,6 +2141,19 @@ inline int64_t safe_sub_int64_uint32(int64_t a, uint32_t b)
     }
 
     safe_math_fail("safe_math_fail safe_sub_int64_int64");
+}
+
+inline bool check_sub_int64_uint32(int64_t a, uint32_t b, int64_t* ret)
+{
+    uint64_t tmp = (uint64_t)a - (uint64_t)b;
+
+    if ((int64_t)tmp <= a)
+    {
+        *ret = (int64_t)tmp;
+        return true;
+    }
+
+    return false;
 }
 
 inline int64_t safe_sub_int64_int64(int64_t a, int64_t b)
@@ -2001,6 +2179,23 @@ inline int64_t safe_sub_int64_int64(int64_t a, int64_t b)
     return tmp;
 }
 
+inline bool check_sub_int64_int64(int64_t a, int64_t b, int64_t* ret)
+{
+    int64_t tmp = (int64_t)((uint64_t)a - (uint64_t)b);
+
+    // Note - ideally, we can order these so that true conditionals
+    // lead to success, which enables better pipelining
+    // It isn't practical here
+    if ((a >= 0 && b < 0 && tmp < a) || // condition 2
+        (b >= 0 && tmp > a))              // condition 3
+    {
+        return false;
+    }
+
+    *ret = tmp;
+    return true;
+}
+
 inline int64_t safe_sub_int64_uint64(int64_t a, uint64_t b)
 {
     // if we subtract, and it gets larger, there's a problem
@@ -2013,6 +2208,14 @@ inline int64_t safe_sub_int64_uint64(int64_t a, uint64_t b)
     }
 
     safe_math_fail("safe_math_fail safe_sub_int64_uint64");
+}
+
+inline bool check_sub_int64_uint64(int64_t a, uint64_t b, int64_t* ret)
+{
+    uint64_t tmp = (uint64_t)a - b;
+    *ret = (int64_t)tmp;
+
+    return ((int64_t)tmp <= a);
 }
 
 inline uint64_t safe_sub_uint64_int32(uint64_t a, int32_t b)
@@ -2039,6 +2242,32 @@ inline uint64_t safe_sub_uint64_int32(uint64_t a, int32_t b)
     safe_math_fail("safe_math_fail safe_sub_uint64_int32");
 }
 
+inline bool check_sub_uint64_int32(uint64_t a, int32_t b, uint64_t* ret)
+{
+    if (b >= 0)
+    {
+        if ((uint64_t)b <= a)
+        {
+            *ret = (uint64_t)(a - (uint64_t)b);
+            return true;
+        }
+    }
+    else
+    {
+        uint64_t tmp = a;
+        // we're now effectively adding
+        uint64_t result = a + safe_abs64(b);
+
+        if (result >= tmp)
+        {
+            *ret = result;
+            return true;
+        }
+    }
+
+    return false;
+}
+
 inline uint64_t safe_sub_uint64_uint32(uint64_t a, uint32_t b)
 {
     uint64_t tmp = a - b;
@@ -2047,6 +2276,13 @@ inline uint64_t safe_sub_uint64_uint32(uint64_t a, uint32_t b)
         return tmp;
 
     safe_math_fail("safe_math_fail safe_sub_uint64_uint32");
+}
+
+inline bool check_sub_uint64_uint32(uint64_t a, uint32_t b, uint64_t* ret)
+{
+    uint64_t tmp = a - b;
+    *ret = tmp;
+    return (tmp <= a);
 }
 
 inline uint64_t safe_sub_uint64_int64(uint64_t a, int64_t b)
@@ -2073,6 +2309,34 @@ inline uint64_t safe_sub_uint64_int64(uint64_t a, int64_t b)
     safe_math_fail("safe_math_fail safe_sub_uint64_int64");
 }
 
+inline bool check_sub_uint64_int64(uint64_t a, int64_t b, uint64_t* ret)
+{
+    uint64_t result = 0;
+
+    // must first see if rhs is positive or negative
+    if (b >= 0)
+    {
+        if ((uint64_t)b <= a)
+        {
+            *ret = (a - (uint64_t)b);
+            return false;
+        }
+    }
+    else
+    {
+        // we're now effectively adding
+        result = a + safe_abs64(b);
+
+        if (result >= a)
+        {
+            *ret = result;
+            return true;
+        }
+    }
+
+    return false;
+}
+
 inline uint64_t safe_sub_uint64_uint64(uint64_t a, uint64_t b)
 {
     uint64_t tmp = a - b;
@@ -2081,6 +2345,13 @@ inline uint64_t safe_sub_uint64_uint64(uint64_t a, uint64_t b)
         return tmp;
 
     safe_math_fail("safe_math_fail safe_sub_uint64_uint64");
+}
+
+inline bool check_sub_uint64_uint64(uint64_t a, uint64_t b, uint64_t* ret)
+{
+    uint64_t tmp = a - b;
+    *ret = tmp;
+    return (tmp <= a);
 }
 
 #ifdef __cplusplus
