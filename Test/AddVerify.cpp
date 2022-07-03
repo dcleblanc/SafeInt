@@ -5117,6 +5117,370 @@ void AddVerifyInt32Uint32()
 	}
 }
 
+static const AddTest< std::int32_t, std::int64_t > int32_int64[] =
+{
+	{ 0x00000000, 0x0000000000000000, true},
+	{ 0x00000001, 0x0000000000000000, true},
+	{ 0x00000002, 0x0000000000000000, true},
+	{ 0x7ffffffe, 0x0000000000000000, true},
+	{ 0x7fffffff, 0x0000000000000000, true},
+	{ 0x80000000, 0x0000000000000000, true},
+	{ 0x80000001, 0x0000000000000000, true},
+	{ 0xfffffffe, 0x0000000000000000, true},
+	{ 0xffffffff, 0x0000000000000000, true},
+
+	{ 0x00000000, 0x0000000000000001, true},
+	{ 0x00000001, 0x0000000000000001, true},
+	{ 0x00000002, 0x0000000000000001, true},
+	{ 0x7ffffffe, 0x0000000000000001, true},
+	{ 0x7fffffff, 0x0000000000000001, false},
+	{ 0x80000000, 0x0000000000000001, true},
+	{ 0x80000001, 0x0000000000000001, true},
+	{ 0xfffffffe, 0x0000000000000001, true},
+	{ 0xffffffff, 0x0000000000000001, true},
+
+	{ 0x00000000, 0x0000000000000002, true},
+	{ 0x00000001, 0x0000000000000002, true},
+	{ 0x00000002, 0x0000000000000002, true},
+	{ 0x7ffffffe, 0x0000000000000002, false},
+	{ 0x7fffffff, 0x0000000000000002, false},
+	{ 0x80000000, 0x0000000000000002, true},
+	{ 0x80000001, 0x0000000000000002, true},
+	{ 0xfffffffe, 0x0000000000000002, true},
+	{ 0xffffffff, 0x0000000000000002, true},
+
+	{ 0x00000000, 0x000000007ffffffe, true},
+	{ 0x00000001, 0x000000007ffffffe, true},
+	{ 0x00000002, 0x000000007ffffffe, false},
+	{ 0x7ffffffe, 0x000000007ffffffe, false},
+	{ 0x7fffffff, 0x000000007ffffffe, false},
+	{ 0x80000000, 0x000000007ffffffe, true},
+	{ 0x80000001, 0x000000007ffffffe, true},
+	{ 0xfffffffe, 0x000000007ffffffe, true},
+	{ 0xffffffff, 0x000000007ffffffe, true},
+
+	{ 0x00000001, 0x000000007fffffff, false},
+	{ 0x00000002, 0x000000007fffffff, false},
+	{ 0x7ffffffe, 0x000000007fffffff, false},
+	{ 0x7fffffff, 0x000000007fffffff, false},
+	{ 0x80000000, 0x000000007fffffff, true},
+	{ 0x80000000, 0x000000007fffffff, true},
+	{ 0x80000001, 0x000000007fffffff, true},
+	{ 0xfffffffe, 0x000000007fffffff, true},
+	{ 0xffffffff, 0x000000007fffffff, true},
+
+	{ 0x00000000, 0x0000000080000000, false},
+	{ 0x00000001, 0x0000000080000000, false},
+	{ 0x00000002, 0x0000000080000000, false},
+	{ 0x7ffffffe, 0x0000000080000000, false},
+	{ 0x7fffffff, 0x0000000080000000, false},
+	{ 0x80000000, 0x0000000080000000, true},
+	{ 0x80000001, 0x0000000080000000, true},
+	{ 0xfffffffe, 0x0000000080000000, true},
+	{ 0xffffffff, 0x0000000080000000, true},
+
+	{ 0x00000000, 0x0000000080000001, false},
+	{ 0x00000001, 0x0000000080000001, false},
+	{ 0x00000002, 0x0000000080000001, false},
+	{ 0x7ffffffe, 0x0000000080000001, false},
+	{ 0x7fffffff, 0x0000000080000001, false},
+	{ 0x80000000, 0x0000000080000001, true},
+	{ 0x80000001, 0x0000000080000001, true},
+	{ 0xfffffffe, 0x0000000080000001, true},
+	{ 0xffffffff, 0x0000000080000001, false},
+
+	{ 0x00000000, 0x00000000fffffffe, false},
+	{ 0x00000001, 0x00000000fffffffe, false},
+	{ 0x00000002, 0x00000000fffffffe, false},
+	{ 0x7ffffffe, 0x00000000fffffffe, false},
+	{ 0x7fffffff, 0x00000000fffffffe, false},
+	{ 0x80000000, 0x00000000fffffffe, true},
+	{ 0x80000001, 0x00000000fffffffe, true},
+	{ 0xfffffffe, 0x00000000fffffffe, false},
+	{ 0xffffffff, 0x00000000fffffffe, false},
+
+	{ 0x00000000, 0x00000000ffffffff, false},
+	{ 0x00000001, 0x00000000ffffffff, false},
+	{ 0x00000002, 0x00000000ffffffff, false},
+	{ 0x7ffffffe, 0x00000000ffffffff, false},
+	{ 0x7fffffff, 0x00000000ffffffff, false},
+	{ 0x80000000, 0x00000000ffffffff, true},
+	{ 0x80000001, 0x00000000ffffffff, false},
+	{ 0xfffffffe, 0x00000000ffffffff, false},
+	{ 0xffffffff, 0x00000000ffffffff, false},
+
+	{ 0x00000000, 0x0000000100000000, false},
+	{ 0x00000001, 0x0000000100000000, false},
+	{ 0x00000002, 0x0000000100000000, false},
+	{ 0x7ffffffe, 0x0000000100000000, false},
+	{ 0x7fffffff, 0x0000000100000000, false},
+	{ 0x80000000, 0x0000000100000000, false},
+	{ 0x80000001, 0x0000000100000000, false},
+	{ 0xfffffffe, 0x0000000100000000, false},
+	{ 0xffffffff, 0x0000000100000000, false},
+
+	{ 0x00000000, 0x0000000200000000, false},
+	{ 0x00000001, 0x0000000200000000, false},
+	{ 0x00000002, 0x0000000200000000, false},
+	{ 0x7ffffffe, 0x0000000200000000, false},
+	{ 0x7fffffff, 0x0000000200000000, false},
+	{ 0x80000000, 0x0000000200000000, false},
+	{ 0x80000001, 0x0000000200000000, false},
+	{ 0xfffffffe, 0x0000000200000000, false},
+	{ 0xffffffff, 0x0000000200000000, false},
+
+	{ 0x00000000, 0x7ffffffffffffffe, false},
+	{ 0x00000001, 0x7ffffffffffffffe, false},
+	{ 0x00000002, 0x7ffffffffffffffe, false},
+	{ 0x7ffffffe, 0x7ffffffffffffffe, false},
+	{ 0x7fffffff, 0x7ffffffffffffffe, false},
+	{ 0x80000000, 0x7ffffffffffffffe, false},
+	{ 0x80000001, 0x7ffffffffffffffe, false},
+	{ 0xfffffffe, 0x7ffffffffffffffe, false},
+	{ 0xffffffff, 0x7ffffffffffffffe, false},
+
+	{ 0x00000000, 0x7fffffffffffffff, false},
+	{ 0x00000001, 0x7fffffffffffffff, false},
+	{ 0x00000002, 0x7fffffffffffffff, false},
+	{ 0x7ffffffe, 0x7fffffffffffffff, false},
+	{ 0x7fffffff, 0x7fffffffffffffff, false},
+	{ 0x80000000, 0x7fffffffffffffff, false},
+	{ 0x80000001, 0x7fffffffffffffff, false},
+	{ 0xfffffffe, 0x7fffffffffffffff, false},
+	{ 0xffffffff, 0x7fffffffffffffff, false},
+
+	{ 0x00000000, 0x8000000000000000, false},
+	{ 0x00000001, 0x8000000000000000, false},
+	{ 0x00000002, 0x8000000000000000, false},
+	{ 0x7ffffffe, 0x8000000000000000, false},
+	{ 0x7fffffff, 0x8000000000000000, false},
+	{ 0x80000000, 0x8000000000000000, false},
+	{ 0x80000001, 0x8000000000000000, false},
+	{ 0xfffffffe, 0x8000000000000000, false},
+	{ 0xffffffff, 0x8000000000000000, false},
+
+	{ 0x00000000, 0x8000000000000001, false },
+	{ 0x00000001, 0x8000000000000001, false },
+	{ 0x00000002, 0x8000000000000001, false },
+	{ 0x7ffffffe, 0x8000000000000001, false },
+	{ 0x7fffffff, 0x8000000000000001, false },
+	{ 0x80000000, 0x8000000000000001, false },
+	{ 0x80000001, 0x8000000000000001, false },
+	{ 0xfffffffe, 0x8000000000000001, false },
+	{ 0xffffffff, 0x8000000000000001, false },
+
+	{ 0x00000000, 0xfffffffffffffffe, true },
+	{ 0x00000001, 0xfffffffffffffffe, true },
+	{ 0x00000002, 0xfffffffffffffffe, true },
+	{ 0x7ffffffe, 0xfffffffffffffffe, true },
+	{ 0x7fffffff, 0xfffffffffffffffe, true },
+	{ 0x80000000, 0xfffffffffffffffe, false },
+	{ 0x80000001, 0xfffffffffffffffe, false },
+	{ 0xfffffffe, 0xfffffffffffffffe, true },
+	{ 0xffffffff, 0xfffffffffffffffe, true },
+
+	{ 0x00000000, 0xffffffffffffffff, true },
+	{ 0x00000001, 0xffffffffffffffff, true },
+	{ 0x00000002, 0xffffffffffffffff, true },
+	{ 0x7ffffffe, 0xffffffffffffffff, true },
+	{ 0x7fffffff, 0xffffffffffffffff, true },
+	{ 0x80000000, 0xffffffffffffffff, false },
+	{ 0x80000001, 0xffffffffffffffff, true },
+	{ 0xfffffffe, 0xffffffffffffffff, true },
+	{ 0xffffffff, 0xffffffffffffffff, true },
+};
+
+void AddVerifyInt32Int64()
+{
+	size_t i;
+
+	for (i = 0; i < COUNTOF(int32_int64); ++i)
+	{
+		std::int32_t ret;
+		if (SafeAdd(int32_int64[i].x, int32_int64[i].y, ret) != int32_int64[i].fExpected)
+		{
+			err_msg("Error in case uint32_uint64: ", int32_int64[i].x, int32_int64[i].y, int32_int64[i].fExpected);
+		}
+
+		// Now test throwing version
+		bool fSuccess = true;
+		try
+		{
+			SafeInt<std::int32_t> si(int32_int64[i].x);
+			si += int32_int64[i].y;
+		}
+		catch (...)
+		{
+			fSuccess = false;
+		}
+
+		if (fSuccess != int32_int64[i].fExpected)
+		{
+			err_msg("Error in case int32_uint64 throw (1): ", int32_int64[i].x, int32_int64[i].y, int32_int64[i].fExpected);
+		}
+
+		// Also need to test the version that assigns back out
+		// to a plain int, as it has different logic
+		fSuccess = true;
+		try
+		{
+			std::int32_t x(int32_uint64[i].x);
+			x += SafeInt<std::int64_t>(int32_int64[i].y);
+		}
+		catch (...)
+		{
+			fSuccess = false;
+		}
+
+		if (fSuccess != int32_int64[i].fExpected)
+		{
+			err_msg("Error in case int32_uint64 throw (2): ", int32_int64[i].x, int32_int64[i].y, int32_int64[i].fExpected);
+		}
+	}
+}
+
+static const AddTest< std::int32_t, std::int32_t > int32_int32[] =
+{
+	{ 0x00000000, 0x00000000, true},
+	{ 0x00000001, 0x00000000, true},
+	{ 0x00000002, 0x00000000, true},
+	{ 0x7ffffffe, 0x00000000, true},
+	{ 0x7fffffff, 0x00000000, true},
+	{ 0x80000000, 0x00000000, true},
+	{ 0x80000001, 0x00000000, true},
+	{ 0xfffffffe, 0x00000000, true},
+	{ 0xffffffff, 0x00000000, true},
+
+	{ 0x00000000, 0x00000001, true},
+	{ 0x00000001, 0x00000001, true},
+	{ 0x00000002, 0x00000001, true},
+	{ 0x7ffffffe, 0x00000001, true},
+	{ 0x7fffffff, 0x00000001, false},
+	{ 0x80000000, 0x00000001, true},
+	{ 0x80000001, 0x00000001, true},
+	{ 0xfffffffe, 0x00000001, true},
+	{ 0xffffffff, 0x00000001, true},
+
+	{ 0x00000000, 0x00000002, true},
+	{ 0x00000001, 0x00000002, true},
+	{ 0x00000002, 0x00000002, true},
+	{ 0x7ffffffe, 0x00000002, false},
+	{ 0x7fffffff, 0x00000002, false},
+	{ 0x80000000, 0x00000002, true},
+	{ 0x80000001, 0x00000002, true},
+	{ 0xfffffffe, 0x00000002, true},
+	{ 0xffffffff, 0x00000002, true},
+
+	{ 0x00000000, 0x7ffffffe, true},
+	{ 0x00000001, 0x7ffffffe, true},
+	{ 0x00000002, 0x7ffffffe, false},
+	{ 0x7ffffffe, 0x7ffffffe, false},
+	{ 0x7fffffff, 0x7ffffffe, false},
+	{ 0x80000000, 0x7ffffffe, true},
+	{ 0x80000001, 0x7ffffffe, true},
+	{ 0xfffffffe, 0x7ffffffe, true},
+	{ 0xffffffff, 0x7ffffffe, true},
+
+	{ 0x00000001, 0x7fffffff, false},
+	{ 0x00000002, 0x7fffffff, false},
+	{ 0x7ffffffe, 0x7fffffff, false},
+	{ 0x7fffffff, 0x7fffffff, false},
+	{ 0x80000000, 0x7fffffff, true},
+	{ 0x80000000, 0x7fffffff, true},
+	{ 0x80000001, 0x7fffffff, true},
+	{ 0xfffffffe, 0x7fffffff, true},
+	{ 0xffffffff, 0x7fffffff, true},
+
+	{ 0x00000000, 0x80000000, true},
+	{ 0x00000001, 0x80000000, true},
+	{ 0x00000002, 0x80000000, true},
+	{ 0x7ffffffe, 0x80000000, true},
+	{ 0x7fffffff, 0x80000000, true},
+	{ 0x80000000, 0x80000000, false},
+	{ 0x80000001, 0x80000000, false},
+	{ 0xfffffffe, 0x80000000, false},
+	{ 0xffffffff, 0x80000000, false},
+
+	{ 0x00000000, 0x80000001, true},
+	{ 0x00000001, 0x80000001, true},
+	{ 0x00000002, 0x80000001, true},
+	{ 0x7ffffffe, 0x80000001, true},
+	{ 0x7fffffff, 0x80000001, true},
+	{ 0x80000000, 0x80000001, false},
+	{ 0x80000001, 0x80000001, false},
+	{ 0xfffffffe, 0x80000001, false},
+	{ 0xffffffff, 0x80000001, true},
+
+	{ 0x00000000, 0xfffffffe, true},
+	{ 0x00000001, 0xfffffffe, true},
+	{ 0x00000002, 0xfffffffe, true},
+	{ 0x7ffffffe, 0xfffffffe, true},
+	{ 0x7fffffff, 0xfffffffe, true},
+	{ 0x80000000, 0xfffffffe, false},
+	{ 0x80000001, 0xfffffffe, false},
+	{ 0xfffffffe, 0xfffffffe, true},
+	{ 0xffffffff, 0xfffffffe, true},
+
+	{ 0x00000000, 0xffffffff, true},
+	{ 0x00000001, 0xffffffff, true},
+	{ 0x00000002, 0xffffffff, true},
+	{ 0x7ffffffe, 0xffffffff, true},
+	{ 0x7fffffff, 0xffffffff, true},
+	{ 0x80000000, 0xffffffff, false},
+	{ 0x80000001, 0xffffffff, true},
+	{ 0xfffffffe, 0xffffffff, true},
+	{ 0xffffffff, 0xffffffff, true},
+};
+
+void AddVerifyInt32Int32()
+{
+	size_t i;
+
+	for (i = 0; i < COUNTOF(int32_int32); ++i)
+	{
+		std::int32_t ret;
+		if (SafeAdd(int32_int32[i].x, int32_int32[i].y, ret) != int32_int32[i].fExpected)
+		{
+			err_msg("Error in case int32_uint32: ", int32_int32[i].x, int32_int32[i].y, int32_int32[i].fExpected);
+		}
+
+		// Now test throwing version
+		bool fSuccess = true;
+		try
+		{
+			SafeInt<std::int32_t> si(int32_int32[i].x);
+			si += int32_int32[i].y;
+		}
+		catch (...)
+		{
+			fSuccess = false;
+		}
+
+		if (fSuccess != int32_int32[i].fExpected)
+		{
+			err_msg("Error in case int32_int32 throw (1): ", int32_int32[i].x, int32_int32[i].y, int32_int32[i].fExpected);
+		}
+
+		// Also need to test the version that assigns back out
+		// to a plain int, as it has different logic
+		fSuccess = true;
+		try
+		{
+			std::int32_t x(int32_int32[i].x);
+			x += SafeInt<std::int32_t>(int32_int32[i].y);
+		}
+		catch (...)
+		{
+			fSuccess = false;
+		}
+
+		if (fSuccess != int32_int32[i].fExpected)
+		{
+			err_msg("Error in case int32_int32 throw (2): ", int32_int32[i].x, int32_int32[i].y, int32_int32[i].fExpected);
+		}
+	}
+}
+
 static const AddTest< std::uint8_t, std::uint64_t > uint8_uint64[] = 
 { 
 	{ 0x00, 0x0000000000000000, true},
@@ -7752,6 +8116,10 @@ void AddVerify()
 	AddVerifyInt32Uint32();
 	// TBD - 16, 8-bit
 
+	// Signed int32, signed cases
+	AddVerifyInt32Int64();
+	AddVerifyInt32Int32();
+	// TBD - 16, 8-bit
 
 	// Unsigned int8, unsigned cases
     AddVerifyUint8Uint64();
