@@ -2235,6 +2235,1413 @@ void add_test_int64_int32()
 	}
 }
 
+struct add_test_uint32_uint64
+{
+	uint32_t x;
+	uint64_t y;
+	bool fExpected;
+};
+
+static const struct add_test_uint32_uint64 uint32_uint64[] =
+{
+	{ 0x00000000, 0x0000000000000000, true},
+	{ 0x00000001, 0x0000000000000000, true},
+	{ 0x00000002, 0x0000000000000000, true},
+	{ 0x7ffffffe, 0x0000000000000000, true},
+	{ 0x7fffffff, 0x0000000000000000, true},
+	{ 0x80000000, 0x0000000000000000, true},
+	{ 0x80000001, 0x0000000000000000, true},
+	{ 0xfffffffe, 0x0000000000000000, true},
+	{ 0xffffffff, 0x0000000000000000, true},
+
+	{ 0x00000000, 0x0000000000000001, true},
+	{ 0x00000001, 0x0000000000000001, true},
+	{ 0x00000002, 0x0000000000000001, true},
+	{ 0x7ffffffe, 0x0000000000000001, true},
+	{ 0x7fffffff, 0x0000000000000001, true},
+	{ 0x80000000, 0x0000000000000001, true},
+	{ 0x80000001, 0x0000000000000001, true},
+	{ 0xfffffffe, 0x0000000000000001, true},
+	{ 0xffffffff, 0x0000000000000001, false},
+
+	{ 0x00000000, 0x0000000000000002, true},
+	{ 0x00000001, 0x0000000000000002, true},
+	{ 0x00000002, 0x0000000000000002, true},
+	{ 0x7ffffffe, 0x0000000000000002, true},
+	{ 0x7fffffff, 0x0000000000000002, true},
+	{ 0x80000000, 0x0000000000000002, true},
+	{ 0x80000001, 0x0000000000000002, true},
+	{ 0xfffffffe, 0x0000000000000002, false},
+	{ 0xffffffff, 0x0000000000000002, false},
+
+	{ 0x00000000, 0x000000007ffffffe, true},
+	{ 0x00000001, 0x000000007ffffffe, true},
+	{ 0x00000002, 0x000000007ffffffe, true},
+	{ 0x7ffffffe, 0x000000007ffffffe, true},
+	{ 0x7fffffff, 0x000000007ffffffe, true},
+	{ 0x80000000, 0x000000007ffffffe, true},
+	{ 0x80000001, 0x000000007ffffffe, true},
+	{ 0xfffffffe, 0x000000007ffffffe, false},
+	{ 0xffffffff, 0x000000007ffffffe, false},
+
+	{ 0x00000001, 0x000000007fffffff, true},
+	{ 0x00000002, 0x000000007fffffff, true},
+	{ 0x7ffffffe, 0x000000007fffffff, true},
+	{ 0x7fffffff, 0x000000007fffffff, true},
+	{ 0x80000000, 0x000000007fffffff, true},
+	{ 0x80000000, 0x000000007fffffff, true},
+	{ 0x80000001, 0x000000007fffffff, false},
+	{ 0xfffffffe, 0x000000007fffffff, false},
+	{ 0xffffffff, 0x000000007fffffff, false},
+
+	{ 0x00000000, 0x0000000080000000, true},
+	{ 0x00000001, 0x0000000080000000, true},
+	{ 0x00000002, 0x0000000080000000, true},
+	{ 0x7ffffffe, 0x0000000080000000, true},
+	{ 0x7fffffff, 0x0000000080000000, true},
+	{ 0x80000000, 0x0000000080000000, false},
+	{ 0x80000001, 0x0000000080000000, false},
+	{ 0xfffffffe, 0x0000000080000000, false},
+	{ 0xffffffff, 0x0000000080000000, false},
+
+	{ 0x00000000, 0x0000000080000001, true},
+	{ 0x00000001, 0x0000000080000001, true},
+	{ 0x00000002, 0x0000000080000001, true},
+	{ 0x7ffffffe, 0x0000000080000001, true},
+	{ 0x7fffffff, 0x0000000080000001, false},
+	{ 0x80000000, 0x0000000080000001, false},
+	{ 0x80000001, 0x0000000080000001, false},
+	{ 0xfffffffe, 0x0000000080000001, false},
+	{ 0xffffffff, 0x0000000080000001, false},
+
+	{ 0x00000000, 0x00000000fffffffe, true},
+	{ 0x00000001, 0x00000000fffffffe, true},
+	{ 0x00000002, 0x00000000fffffffe, false},
+	{ 0x7ffffffe, 0x00000000fffffffe, false},
+	{ 0x7fffffff, 0x00000000fffffffe, false},
+	{ 0x80000000, 0x00000000fffffffe, false},
+	{ 0x80000001, 0x00000000fffffffe, false},
+	{ 0xfffffffe, 0x00000000fffffffe, false},
+	{ 0xffffffff, 0x00000000fffffffe, false},
+
+	{ 0x00000000, 0x00000000ffffffff, true},
+	{ 0x00000001, 0x00000000ffffffff, false},
+	{ 0x00000002, 0x00000000ffffffff, false},
+	{ 0x7ffffffe, 0x00000000ffffffff, false},
+	{ 0x7fffffff, 0x00000000ffffffff, false},
+	{ 0x80000000, 0x00000000ffffffff, false},
+	{ 0x80000001, 0x00000000ffffffff, false},
+	{ 0xfffffffe, 0x00000000ffffffff, false},
+	{ 0xffffffff, 0x00000000ffffffff, false},
+
+	{ 0x00000000, 0x0000000100000000, false},
+	{ 0x00000001, 0x0000000100000000, false},
+	{ 0x00000002, 0x0000000100000000, false},
+	{ 0x7ffffffe, 0x0000000100000000, false},
+	{ 0x7fffffff, 0x0000000100000000, false},
+	{ 0x80000000, 0x0000000100000000, false},
+	{ 0x80000001, 0x0000000100000000, false},
+	{ 0xfffffffe, 0x0000000100000000, false},
+	{ 0xffffffff, 0x0000000100000000, false},
+
+	{ 0x00000000, 0x0000000200000000, false},
+	{ 0x00000001, 0x0000000200000000, false},
+	{ 0x00000002, 0x0000000200000000, false},
+	{ 0x7ffffffe, 0x0000000200000000, false},
+	{ 0x7fffffff, 0x0000000200000000, false},
+	{ 0x80000000, 0x0000000200000000, false},
+	{ 0x80000001, 0x0000000200000000, false},
+	{ 0xfffffffe, 0x0000000200000000, false},
+	{ 0xffffffff, 0x0000000200000000, false},
+
+	{ 0x00000000, 0x7ffffffffffffffe, false},
+	{ 0x00000001, 0x7ffffffffffffffe, false},
+	{ 0x00000002, 0x7ffffffffffffffe, false},
+	{ 0x7ffffffe, 0x7ffffffffffffffe, false},
+	{ 0x7fffffff, 0x7ffffffffffffffe, false},
+	{ 0x80000000, 0x7ffffffffffffffe, false},
+	{ 0x80000001, 0x7ffffffffffffffe, false},
+	{ 0xfffffffe, 0x7ffffffffffffffe, false},
+	{ 0xffffffff, 0x7ffffffffffffffe, false},
+
+	{ 0x00000000, 0x7fffffffffffffff, false},
+	{ 0x00000001, 0x7fffffffffffffff, false},
+	{ 0x00000002, 0x7fffffffffffffff, false},
+	{ 0x7ffffffe, 0x7fffffffffffffff, false},
+	{ 0x7fffffff, 0x7fffffffffffffff, false},
+	{ 0x80000000, 0x7fffffffffffffff, false},
+	{ 0x80000001, 0x7fffffffffffffff, false},
+	{ 0xfffffffe, 0x7fffffffffffffff, false},
+	{ 0xffffffff, 0x7fffffffffffffff, false},
+
+	{ 0x00000000, 0x8000000000000000, false},
+	{ 0x00000001, 0x8000000000000000, false},
+	{ 0x00000002, 0x8000000000000000, false},
+	{ 0x7ffffffe, 0x8000000000000000, false},
+	{ 0x7fffffff, 0x8000000000000000, false},
+	{ 0x80000000, 0x8000000000000000, false},
+	{ 0x80000001, 0x8000000000000000, false},
+	{ 0xfffffffe, 0x8000000000000000, false},
+	{ 0xffffffff, 0x8000000000000000, false},
+
+	{ 0x00000000, 0x8000000000000001, false },
+	{ 0x00000001, 0x8000000000000001, false },
+	{ 0x00000002, 0x8000000000000001, false },
+	{ 0x7ffffffe, 0x8000000000000001, false },
+	{ 0x7fffffff, 0x8000000000000001, false },
+	{ 0x80000000, 0x8000000000000001, false },
+	{ 0x80000001, 0x8000000000000001, false },
+	{ 0xfffffffe, 0x8000000000000001, false },
+	{ 0xffffffff, 0x8000000000000001, false },
+
+	{ 0x00000000, 0xfffffffffffffffe, false },
+	{ 0x00000001, 0xfffffffffffffffe, false},
+	{ 0x00000002, 0xfffffffffffffffe, false},
+	{ 0x7ffffffe, 0xfffffffffffffffe, false},
+	{ 0x7fffffff, 0xfffffffffffffffe, false},
+	{ 0x80000000, 0xfffffffffffffffe, false},
+	{ 0x80000001, 0xfffffffffffffffe, false},
+	{ 0xfffffffe, 0xfffffffffffffffe, false},
+	{ 0xffffffff, 0xfffffffffffffffe, false},
+
+	{ 0x00000000, 0xffffffffffffffff, false},
+	{ 0x00000001, 0xffffffffffffffff, false},
+	{ 0x00000002, 0xffffffffffffffff, false},
+	{ 0x7ffffffe, 0xffffffffffffffff, false},
+	{ 0x7fffffff, 0xffffffffffffffff, false},
+	{ 0x80000000, 0xffffffffffffffff, false},
+	{ 0x80000001, 0xffffffffffffffff, false},
+	{ 0xfffffffe, 0xffffffffffffffff, false},
+	{ 0xffffffff, 0xffffffffffffffff, false},
+	{ 0x00000000, 0xffffffffffffffff, false},
+	{ 0x00000000, 0xffffffffffffffff, false},
+	{ 0xfffffffe, 0xffffffffffffffff, false},
+	{ 0xffffffff, 0xffffffffffffffff, false},
+	{ 0x00000000, 0xffffffffffffffff, false},
+	{ 0x00000001, 0xffffffffffffffff, false},
+	{ 0xfffffffe, 0xffffffffffffffff, false},
+	{ 0xffffffff, 0xffffffffffffffff, false},
+};
+
+void add_test_uint32_uint64()
+{
+	for (size_t i = 0; i < sizeof(uint32_uint64) / sizeof(struct add_test_uint32_uint64); ++i)
+	{
+		const struct add_test_uint32_uint64& test_val = uint32_uint64[i];
+		uint32_t ret;
+
+		bool result = check_add_uint32_uint64(test_val.x, test_val.y, &ret);
+
+		if (!!result != test_val.fExpected)
+		{
+			assert(false);
+			throw std::exception("Failure in add_test_uint32_uint64");
+		}
+
+		bool actual;
+		try
+		{
+			ret = safe_add_uint32_uint64(test_val.x, test_val.y);
+			actual = true;
+		}
+		catch (...)
+		{
+			actual = false;
+		}
+
+		if (actual != test_val.fExpected)
+		{
+			assert(false);
+			throw std::exception("Failure in add_test_uint32_uint64");
+		}
+	}
+}
+
+struct add_test_uint32_uint32
+{
+	uint32_t x;
+	uint32_t y;
+	bool fExpected;
+};
+
+static const struct add_test_uint32_uint32 uint32_uint32[] =
+{
+	{ 0x00000000, 0x00000000, true},
+	{ 0x00000001, 0x00000000, true},
+	{ 0x00000002, 0x00000000, true},
+	{ 0x7ffffffe, 0x00000000, true},
+	{ 0x7fffffff, 0x00000000, true},
+	{ 0x80000000, 0x00000000, true},
+	{ 0x80000001, 0x00000000, true},
+	{ 0xfffffffe, 0x00000000, true},
+	{ 0xffffffff, 0x00000000, true},
+
+	{ 0x00000000, 0x00000001, true},
+	{ 0x00000001, 0x00000001, true},
+	{ 0x00000002, 0x00000001, true},
+	{ 0x7ffffffe, 0x00000001, true},
+	{ 0x7fffffff, 0x00000001, true},
+	{ 0x80000000, 0x00000001, true},
+	{ 0x80000001, 0x00000001, true},
+	{ 0xfffffffe, 0x00000001, true},
+	{ 0xffffffff, 0x00000001, false},
+
+	{ 0x00000000, 0x00000002, true},
+	{ 0x00000001, 0x00000002, true},
+	{ 0x00000002, 0x00000002, true},
+	{ 0x7ffffffe, 0x00000002, true},
+	{ 0x7fffffff, 0x00000002, true},
+	{ 0x80000000, 0x00000002, true},
+	{ 0x80000001, 0x00000002, true},
+	{ 0xfffffffe, 0x00000002, false},
+	{ 0xffffffff, 0x00000002, false},
+
+	{ 0x00000000, 0x7ffffffe, true},
+	{ 0x00000001, 0x7ffffffe, true},
+	{ 0x00000002, 0x7ffffffe, true},
+	{ 0x7ffffffe, 0x7ffffffe, true},
+	{ 0x7fffffff, 0x7ffffffe, true},
+	{ 0x80000000, 0x7ffffffe, true},
+	{ 0x80000001, 0x7ffffffe, true},
+	{ 0xfffffffe, 0x7ffffffe, false},
+	{ 0xffffffff, 0x7ffffffe, false},
+
+	{ 0x00000001, 0x7fffffff, true},
+	{ 0x00000002, 0x7fffffff, true},
+	{ 0x7ffffffe, 0x7fffffff, true},
+	{ 0x7fffffff, 0x7fffffff, true},
+	{ 0x80000000, 0x7fffffff, true},
+	{ 0x80000000, 0x7fffffff, true},
+	{ 0x80000001, 0x7fffffff, false},
+	{ 0xfffffffe, 0x7fffffff, false},
+	{ 0xffffffff, 0x7fffffff, false},
+
+	{ 0x00000000, 0x80000000, true},
+	{ 0x00000001, 0x80000000, true},
+	{ 0x00000002, 0x80000000, true},
+	{ 0x7ffffffe, 0x80000000, true},
+	{ 0x7fffffff, 0x80000000, true},
+	{ 0x80000000, 0x80000000, false},
+	{ 0x80000001, 0x80000000, false},
+	{ 0xfffffffe, 0x80000000, false},
+	{ 0xffffffff, 0x80000000, false},
+
+	{ 0x00000000, 0x80000001, true},
+	{ 0x00000001, 0x80000001, true},
+	{ 0x00000002, 0x80000001, true},
+	{ 0x7ffffffe, 0x80000001, true},
+	{ 0x7fffffff, 0x80000001, false},
+	{ 0x80000000, 0x80000001, false},
+	{ 0x80000001, 0x80000001, false},
+	{ 0xfffffffe, 0x80000001, false},
+	{ 0xffffffff, 0x80000001, false},
+
+	{ 0x00000000, 0xfffffffe, true},
+	{ 0x00000001, 0xfffffffe, true},
+	{ 0x00000002, 0xfffffffe, false},
+	{ 0x7ffffffe, 0xfffffffe, false},
+	{ 0x7fffffff, 0xfffffffe, false},
+	{ 0x80000000, 0xfffffffe, false},
+	{ 0x80000001, 0xfffffffe, false},
+	{ 0xfffffffe, 0xfffffffe, false},
+	{ 0xffffffff, 0xfffffffe, false},
+
+	{ 0x00000000, 0xffffffff, true},
+	{ 0x00000001, 0xffffffff, false},
+	{ 0x00000002, 0xffffffff, false},
+	{ 0x7ffffffe, 0xffffffff, false},
+	{ 0x7fffffff, 0xffffffff, false},
+	{ 0x80000000, 0xffffffff, false},
+	{ 0x80000001, 0xffffffff, false},
+	{ 0xfffffffe, 0xffffffff, false},
+	{ 0xffffffff, 0xffffffff, false},
+};
+
+void add_test_uint32_uint32()
+{
+
+	for (size_t i = 0; i < sizeof(uint32_uint32) / sizeof(struct add_test_uint32_uint32); ++i)
+	{
+		const struct add_test_uint32_uint32& test_val = uint32_uint32[i];
+		uint32_t ret;
+
+		bool result = check_add_uint32_uint32(test_val.x, test_val.y, &ret);
+
+		if (!!result != test_val.fExpected)
+		{
+			assert(false);
+			throw std::exception("Failure in add_test_uint32_uint32");
+		}
+
+		bool actual;
+		try
+		{
+			ret = safe_add_uint32_uint32(test_val.x, test_val.y);
+			actual = true;
+		}
+		catch (...)
+		{
+			actual = false;
+		}
+
+		if (actual != test_val.fExpected)
+		{
+			assert(false);
+			throw std::exception("Failure in add_test_uint32_uint32");
+		}
+	}
+}
+
+struct add_test_uint32_int64
+{
+	uint32_t x;
+	int64_t y;
+	bool fExpected;
+};
+
+static const struct add_test_uint32_int64 uint32_int64[] =
+{
+	{ 0x00000000, 0x0000000000000000, true},
+	{ 0x00000001, 0x0000000000000000, true},
+	{ 0x00000002, 0x0000000000000000, true},
+	{ 0x7ffffffe, 0x0000000000000000, true},
+	{ 0x7fffffff, 0x0000000000000000, true},
+	{ 0x80000000, 0x0000000000000000, true},
+	{ 0x80000001, 0x0000000000000000, true},
+	{ 0xfffffffe, 0x0000000000000000, true},
+	{ 0xffffffff, 0x0000000000000000, true},
+
+	{ 0x00000000, 0x0000000000000001, true},
+	{ 0x00000001, 0x0000000000000001, true},
+	{ 0x00000002, 0x0000000000000001, true},
+	{ 0x7ffffffe, 0x0000000000000001, true},
+	{ 0x7fffffff, 0x0000000000000001, true},
+	{ 0x80000000, 0x0000000000000001, true},
+	{ 0x80000001, 0x0000000000000001, true},
+	{ 0xfffffffe, 0x0000000000000001, true},
+	{ 0xffffffff, 0x0000000000000001, false},
+
+	{ 0x00000000, 0x0000000000000002, true},
+	{ 0x00000001, 0x0000000000000002, true},
+	{ 0x00000002, 0x0000000000000002, true},
+	{ 0x7ffffffe, 0x0000000000000002, true},
+	{ 0x7fffffff, 0x0000000000000002, true},
+	{ 0x80000000, 0x0000000000000002, true},
+	{ 0x80000001, 0x0000000000000002, true},
+	{ 0xfffffffe, 0x0000000000000002, false},
+	{ 0xffffffff, 0x0000000000000002, false},
+
+	{ 0x00000000, 0x000000007ffffffe, true},
+	{ 0x00000001, 0x000000007ffffffe, true},
+	{ 0x00000002, 0x000000007ffffffe, true},
+	{ 0x7ffffffe, 0x000000007ffffffe, true},
+	{ 0x7fffffff, 0x000000007ffffffe, true},
+	{ 0x80000000, 0x000000007ffffffe, true},
+	{ 0x80000001, 0x000000007ffffffe, true},
+	{ 0xfffffffe, 0x000000007ffffffe, false},
+	{ 0xffffffff, 0x000000007ffffffe, false},
+
+	{ 0x00000001, 0x000000007fffffff, true},
+	{ 0x00000002, 0x000000007fffffff, true},
+	{ 0x7ffffffe, 0x000000007fffffff, true},
+	{ 0x7fffffff, 0x000000007fffffff, true},
+	{ 0x80000000, 0x000000007fffffff, true},
+	{ 0x80000000, 0x000000007fffffff, true},
+	{ 0x80000001, 0x000000007fffffff, false},
+	{ 0xfffffffe, 0x000000007fffffff, false},
+	{ 0xffffffff, 0x000000007fffffff, false},
+
+	{ 0x00000000, 0x0000000080000000, true},
+	{ 0x00000001, 0x0000000080000000, true},
+	{ 0x00000002, 0x0000000080000000, true},
+	{ 0x7ffffffe, 0x0000000080000000, true},
+	{ 0x7fffffff, 0x0000000080000000, true},
+	{ 0x80000000, 0x0000000080000000, false},
+	{ 0x80000001, 0x0000000080000000, false},
+	{ 0xfffffffe, 0x0000000080000000, false},
+	{ 0xffffffff, 0x0000000080000000, false},
+
+	{ 0x00000000, 0x0000000080000001, true},
+	{ 0x00000001, 0x0000000080000001, true},
+	{ 0x00000002, 0x0000000080000001, true},
+	{ 0x7ffffffe, 0x0000000080000001, true},
+	{ 0x7fffffff, 0x0000000080000001, false},
+	{ 0x80000000, 0x0000000080000001, false},
+	{ 0x80000001, 0x0000000080000001, false},
+	{ 0xfffffffe, 0x0000000080000001, false},
+	{ 0xffffffff, 0x0000000080000001, false},
+
+	{ 0x00000000, 0x00000000fffffffe, true},
+	{ 0x00000001, 0x00000000fffffffe, true},
+	{ 0x00000002, 0x00000000fffffffe, false},
+	{ 0x7ffffffe, 0x00000000fffffffe, false},
+	{ 0x7fffffff, 0x00000000fffffffe, false},
+	{ 0x80000000, 0x00000000fffffffe, false},
+	{ 0x80000001, 0x00000000fffffffe, false},
+	{ 0xfffffffe, 0x00000000fffffffe, false},
+	{ 0xffffffff, 0x00000000fffffffe, false},
+
+	{ 0x00000000, 0x00000000ffffffff, true},
+	{ 0x00000001, 0x00000000ffffffff, false},
+	{ 0x00000002, 0x00000000ffffffff, false},
+	{ 0x7ffffffe, 0x00000000ffffffff, false},
+	{ 0x7fffffff, 0x00000000ffffffff, false},
+	{ 0x80000000, 0x00000000ffffffff, false},
+	{ 0x80000001, 0x00000000ffffffff, false},
+	{ 0xfffffffe, 0x00000000ffffffff, false},
+	{ 0xffffffff, 0x00000000ffffffff, false},
+
+	{ 0x00000000, 0x0000000100000000, false},
+	{ 0x00000001, 0x0000000100000000, false},
+	{ 0x00000002, 0x0000000100000000, false},
+	{ 0x7ffffffe, 0x0000000100000000, false},
+	{ 0x7fffffff, 0x0000000100000000, false},
+	{ 0x80000000, 0x0000000100000000, false},
+	{ 0x80000001, 0x0000000100000000, false},
+	{ 0xfffffffe, 0x0000000100000000, false},
+	{ 0xffffffff, 0x0000000100000000, false},
+
+	{ 0x00000000, 0x0000000200000000, false},
+	{ 0x00000001, 0x0000000200000000, false},
+	{ 0x00000002, 0x0000000200000000, false},
+	{ 0x7ffffffe, 0x0000000200000000, false},
+	{ 0x7fffffff, 0x0000000200000000, false},
+	{ 0x80000000, 0x0000000200000000, false},
+	{ 0x80000001, 0x0000000200000000, false},
+	{ 0xfffffffe, 0x0000000200000000, false},
+	{ 0xffffffff, 0x0000000200000000, false},
+
+	{ 0x00000000, 0x7ffffffffffffffe, false},
+	{ 0x00000001, 0x7ffffffffffffffe, false},
+	{ 0x00000002, 0x7ffffffffffffffe, false},
+	{ 0x7ffffffe, 0x7ffffffffffffffe, false},
+	{ 0x7fffffff, 0x7ffffffffffffffe, false},
+	{ 0x80000000, 0x7ffffffffffffffe, false},
+	{ 0x80000001, 0x7ffffffffffffffe, false},
+	{ 0xfffffffe, 0x7ffffffffffffffe, false},
+	{ 0xffffffff, 0x7ffffffffffffffe, false},
+
+	{ 0x00000000, 0x7fffffffffffffff, false},
+	{ 0x00000001, 0x7fffffffffffffff, false},
+	{ 0x00000002, 0x7fffffffffffffff, false},
+	{ 0x7ffffffe, 0x7fffffffffffffff, false},
+	{ 0x7fffffff, 0x7fffffffffffffff, false},
+	{ 0x80000000, 0x7fffffffffffffff, false},
+	{ 0x80000001, 0x7fffffffffffffff, false},
+	{ 0xfffffffe, 0x7fffffffffffffff, false},
+	{ 0xffffffff, 0x7fffffffffffffff, false},
+
+	{ 0x00000000, 0x8000000000000000, false},
+	{ 0x00000001, 0x8000000000000000, false},
+	{ 0x00000002, 0x8000000000000000, false},
+	{ 0x7ffffffe, 0x8000000000000000, false},
+	{ 0x7fffffff, 0x8000000000000000, false},
+	{ 0x80000000, 0x8000000000000000, false},
+	{ 0x80000001, 0x8000000000000000, false},
+	{ 0xfffffffe, 0x8000000000000000, false},
+	{ 0xffffffff, 0x8000000000000000, false},
+
+	{ 0x00000000, 0x8000000000000001, false },
+	{ 0x00000001, 0x8000000000000001, false },
+	{ 0x00000002, 0x8000000000000001, false },
+	{ 0x7ffffffe, 0x8000000000000001, false },
+	{ 0x7fffffff, 0x8000000000000001, false },
+	{ 0x80000000, 0x8000000000000001, false },
+	{ 0x80000001, 0x8000000000000001, false },
+	{ 0xfffffffe, 0x8000000000000001, false },
+	{ 0xffffffff, 0x8000000000000001, false },
+
+	{ 0x00000000, 0xfffffffffffffffe, false },
+	{ 0x00000001, 0xfffffffffffffffe, false},
+	{ 0x00000002, 0xfffffffffffffffe, true},
+	{ 0x7ffffffe, 0xfffffffffffffffe, true },
+	{ 0x7fffffff, 0xfffffffffffffffe, true },
+	{ 0x80000000, 0xfffffffffffffffe, true },
+	{ 0x80000001, 0xfffffffffffffffe, true },
+	{ 0xfffffffe, 0xfffffffffffffffe, true },
+	{ 0xffffffff, 0xfffffffffffffffe, true },
+
+	{ 0x00000000, 0xffffffffffffffff, false},
+	{ 0x00000001, 0xffffffffffffffff, true },
+	{ 0x00000002, 0xffffffffffffffff, true },
+	{ 0x7ffffffe, 0xffffffffffffffff, true },
+	{ 0x7fffffff, 0xffffffffffffffff, true },
+	{ 0x80000000, 0xffffffffffffffff, true },
+	{ 0x80000001, 0xffffffffffffffff, true },
+	{ 0xfffffffe, 0xffffffffffffffff, true },
+	{ 0xffffffff, 0xffffffffffffffff, true },
+};
+
+void add_test_uint32_int64()
+{
+
+	for (size_t i = 0; i < sizeof(uint32_int64) / sizeof(struct add_test_uint32_int64); ++i)
+	{
+		const struct add_test_uint32_int64& test_val = uint32_int64[i];
+		uint32_t ret;
+
+		bool result = check_add_uint32_int64(test_val.x, test_val.y, &ret);
+
+		if (!!result != test_val.fExpected)
+		{
+			assert(false);
+			throw std::exception("Failure in add_test_uint32_int64");
+		}
+
+		bool actual;
+		try
+		{
+			ret = safe_add_uint32_int64(test_val.x, test_val.y);
+			actual = true;
+		}
+		catch (...)
+		{
+			actual = false;
+		}
+
+		if (actual != test_val.fExpected)
+		{
+			assert(false);
+			throw std::exception("Failure in add_test_uint32_int64");
+		}
+	}
+}
+
+struct add_test_uint32_int32
+{
+	uint32_t x;
+	int32_t y;
+	bool fExpected;
+};
+
+static const struct add_test_uint32_int32 uint32_int32[] =
+{
+	{ 0x00000000, 0x00000000, true},
+	{ 0x00000001, 0x00000000, true},
+	{ 0x00000002, 0x00000000, true},
+	{ 0x7ffffffe, 0x00000000, true},
+	{ 0x7fffffff, 0x00000000, true},
+	{ 0x80000000, 0x00000000, true},
+	{ 0x80000001, 0x00000000, true},
+	{ 0xfffffffe, 0x00000000, true},
+	{ 0xffffffff, 0x00000000, true},
+
+	{ 0x00000000, 0x00000001, true},
+	{ 0x00000001, 0x00000001, true},
+	{ 0x00000002, 0x00000001, true},
+	{ 0x7ffffffe, 0x00000001, true},
+	{ 0x7fffffff, 0x00000001, true},
+	{ 0x80000000, 0x00000001, true},
+	{ 0x80000001, 0x00000001, true},
+	{ 0xfffffffe, 0x00000001, true},
+	{ 0xffffffff, 0x00000001, false},
+
+	{ 0x00000000, 0x00000002, true},
+	{ 0x00000001, 0x00000002, true},
+	{ 0x00000002, 0x00000002, true},
+	{ 0x7ffffffe, 0x00000002, true},
+	{ 0x7fffffff, 0x00000002, true},
+	{ 0x80000000, 0x00000002, true},
+	{ 0x80000001, 0x00000002, true},
+	{ 0xfffffffe, 0x00000002, false},
+	{ 0xffffffff, 0x00000002, false},
+
+	{ 0x00000000, 0x7ffffffe, true},
+	{ 0x00000001, 0x7ffffffe, true},
+	{ 0x00000002, 0x7ffffffe, true},
+	{ 0x7ffffffe, 0x7ffffffe, true},
+	{ 0x7fffffff, 0x7ffffffe, true},
+	{ 0x80000000, 0x7ffffffe, true},
+	{ 0x80000001, 0x7ffffffe, true},
+	{ 0xfffffffe, 0x7ffffffe, false},
+	{ 0xffffffff, 0x7ffffffe, false},
+
+	{ 0x00000001, 0x7fffffff, true},
+	{ 0x00000002, 0x7fffffff, true},
+	{ 0x7ffffffe, 0x7fffffff, true},
+	{ 0x7fffffff, 0x7fffffff, true},
+	{ 0x80000000, 0x7fffffff, true},
+	{ 0x80000000, 0x7fffffff, true},
+	{ 0x80000001, 0x7fffffff, false},
+	{ 0xfffffffe, 0x7fffffff, false},
+	{ 0xffffffff, 0x7fffffff, false},
+
+	{ 0x00000000, 0x80000000, false},
+	{ 0x00000001, 0x80000000, false},
+	{ 0x00000002, 0x80000000, false},
+	{ 0x7ffffffe, 0x80000000, false},
+	{ 0x7fffffff, 0x80000000, false},
+	{ 0x80000000, 0x80000000, true},
+	{ 0x80000001, 0x80000000, true},
+	{ 0xfffffffe, 0x80000000, true},
+	{ 0xffffffff, 0x80000000, true},
+
+	{ 0x00000000, 0x80000001, false},
+	{ 0x00000001, 0x80000001, false},
+	{ 0x00000002, 0x80000001, false},
+	{ 0x7ffffffe, 0x80000001, false},
+	{ 0x7fffffff, 0x80000001, true},
+	{ 0x80000000, 0x80000001, true},
+	{ 0x80000001, 0x80000001, true},
+	{ 0xfffffffe, 0x80000001, true},
+	{ 0xffffffff, 0x80000001, true},
+
+	{ 0x00000000, 0xfffffffe, false},
+	{ 0x00000001, 0xfffffffe, false},
+	{ 0x00000002, 0xfffffffe, true},
+	{ 0x7ffffffe, 0xfffffffe, true},
+	{ 0x7fffffff, 0xfffffffe, true},
+	{ 0x80000000, 0xfffffffe, true},
+	{ 0x80000001, 0xfffffffe, true},
+	{ 0xfffffffe, 0xfffffffe, true},
+	{ 0xffffffff, 0xfffffffe, true},
+
+	{ 0x00000000, 0xffffffff, false},
+	{ 0x00000001, 0xffffffff, true},
+	{ 0x00000002, 0xffffffff, true},
+	{ 0x7ffffffe, 0xffffffff, true},
+	{ 0x7fffffff, 0xffffffff, true},
+	{ 0x80000000, 0xffffffff, true},
+	{ 0x80000001, 0xffffffff, true},
+	{ 0xfffffffe, 0xffffffff, true},
+	{ 0xffffffff, 0xffffffff, true},
+};
+
+void add_test_uint32_int32()
+{
+
+	for (size_t i = 0; i < sizeof(uint32_int32) / sizeof(struct add_test_uint32_int32); ++i)
+	{
+		const struct add_test_uint32_int32& test_val = uint32_int32[i];
+		uint32_t ret;
+
+		bool result = check_add_uint32_int32(test_val.x, test_val.y, &ret);
+
+		if (!!result != test_val.fExpected)
+		{
+			assert(false);
+			throw std::exception("Failure in add_test_uint32_int32");
+		}
+
+		bool actual;
+		try
+		{
+			ret = safe_add_uint32_int32(test_val.x, test_val.y);
+			actual = true;
+		}
+		catch (...)
+		{
+			actual = false;
+		}
+
+		if (actual != test_val.fExpected)
+		{
+			assert(false);
+			throw std::exception("Failure in add_test_uint32_int32");
+		}
+	}
+}
+
+struct add_test_int32_uint64
+{
+	int32_t x;
+	uint64_t y;
+	bool fExpected;
+};
+
+static const struct add_test_int32_uint64 int32_uint64[] =
+{
+	{ 0x00000000, 0x0000000000000000, true},
+	{ 0x00000001, 0x0000000000000000, true},
+	{ 0x00000002, 0x0000000000000000, true},
+	{ 0x7ffffffe, 0x0000000000000000, true},
+	{ 0x7fffffff, 0x0000000000000000, true},
+	{ 0x80000000, 0x0000000000000000, true},
+	{ 0x80000001, 0x0000000000000000, true},
+	{ 0xfffffffe, 0x0000000000000000, true},
+	{ 0xffffffff, 0x0000000000000000, true},
+
+	{ 0x00000000, 0x0000000000000001, true},
+	{ 0x00000001, 0x0000000000000001, true},
+	{ 0x00000002, 0x0000000000000001, true},
+	{ 0x7ffffffe, 0x0000000000000001, true},
+	{ 0x7fffffff, 0x0000000000000001, false},
+	{ 0x80000000, 0x0000000000000001, true},
+	{ 0x80000001, 0x0000000000000001, true},
+	{ 0xfffffffe, 0x0000000000000001, true},
+	{ 0xffffffff, 0x0000000000000001, true},
+
+	{ 0x00000000, 0x0000000000000002, true},
+	{ 0x00000001, 0x0000000000000002, true},
+	{ 0x00000002, 0x0000000000000002, true},
+	{ 0x7ffffffe, 0x0000000000000002, false},
+	{ 0x7fffffff, 0x0000000000000002, false},
+	{ 0x80000000, 0x0000000000000002, true},
+	{ 0x80000001, 0x0000000000000002, true},
+	{ 0xfffffffe, 0x0000000000000002, true},
+	{ 0xffffffff, 0x0000000000000002, true},
+
+	{ 0x00000000, 0x000000007ffffffe, true},
+	{ 0x00000001, 0x000000007ffffffe, true},
+	{ 0x00000002, 0x000000007ffffffe, false},
+	{ 0x7ffffffe, 0x000000007ffffffe, false},
+	{ 0x7fffffff, 0x000000007ffffffe, false},
+	{ 0x80000000, 0x000000007ffffffe, true},
+	{ 0x80000001, 0x000000007ffffffe, true},
+	{ 0xfffffffe, 0x000000007ffffffe, true},
+	{ 0xffffffff, 0x000000007ffffffe, true},
+
+	{ 0x00000001, 0x000000007fffffff, false},
+	{ 0x00000002, 0x000000007fffffff, false},
+	{ 0x7ffffffe, 0x000000007fffffff, false},
+	{ 0x7fffffff, 0x000000007fffffff, false},
+	{ 0x80000000, 0x000000007fffffff, true},
+	{ 0x80000000, 0x000000007fffffff, true},
+	{ 0x80000001, 0x000000007fffffff, true},
+	{ 0xfffffffe, 0x000000007fffffff, true},
+	{ 0xffffffff, 0x000000007fffffff, true},
+
+	{ 0x00000000, 0x0000000080000000, false},
+	{ 0x00000001, 0x0000000080000000, false},
+	{ 0x00000002, 0x0000000080000000, false},
+	{ 0x7ffffffe, 0x0000000080000000, false},
+	{ 0x7fffffff, 0x0000000080000000, false},
+	{ 0x80000000, 0x0000000080000000, true},
+	{ 0x80000001, 0x0000000080000000, true},
+	{ 0xfffffffe, 0x0000000080000000, true},
+	{ 0xffffffff, 0x0000000080000000, true},
+
+	{ 0x00000000, 0x0000000080000001, false},
+	{ 0x00000001, 0x0000000080000001, false},
+	{ 0x00000002, 0x0000000080000001, false},
+	{ 0x7ffffffe, 0x0000000080000001, false},
+	{ 0x7fffffff, 0x0000000080000001, false},
+	{ 0x80000000, 0x0000000080000001, true},
+	{ 0x80000001, 0x0000000080000001, true},
+	{ 0xfffffffe, 0x0000000080000001, true},
+	{ 0xffffffff, 0x0000000080000001, false},
+
+	{ 0x00000000, 0x00000000fffffffe, false},
+	{ 0x00000001, 0x00000000fffffffe, false},
+	{ 0x00000002, 0x00000000fffffffe, false},
+	{ 0x7ffffffe, 0x00000000fffffffe, false},
+	{ 0x7fffffff, 0x00000000fffffffe, false},
+	{ 0x80000000, 0x00000000fffffffe, true},
+	{ 0x80000001, 0x00000000fffffffe, true},
+	{ 0xfffffffe, 0x00000000fffffffe, false},
+	{ 0xffffffff, 0x00000000fffffffe, false},
+
+	{ 0x00000000, 0x00000000ffffffff, false},
+	{ 0x00000001, 0x00000000ffffffff, false},
+	{ 0x00000002, 0x00000000ffffffff, false},
+	{ 0x7ffffffe, 0x00000000ffffffff, false},
+	{ 0x7fffffff, 0x00000000ffffffff, false},
+	{ 0x80000000, 0x00000000ffffffff, true},
+	{ 0x80000001, 0x00000000ffffffff, false},
+	{ 0xfffffffe, 0x00000000ffffffff, false},
+	{ 0xffffffff, 0x00000000ffffffff, false},
+
+	{ 0x00000000, 0x0000000100000000, false},
+	{ 0x00000001, 0x0000000100000000, false},
+	{ 0x00000002, 0x0000000100000000, false},
+	{ 0x7ffffffe, 0x0000000100000000, false},
+	{ 0x7fffffff, 0x0000000100000000, false},
+	{ 0x80000000, 0x0000000100000000, false},
+	{ 0x80000001, 0x0000000100000000, false},
+	{ 0xfffffffe, 0x0000000100000000, false},
+	{ 0xffffffff, 0x0000000100000000, false},
+
+	{ 0x00000000, 0x0000000200000000, false},
+	{ 0x00000001, 0x0000000200000000, false},
+	{ 0x00000002, 0x0000000200000000, false},
+	{ 0x7ffffffe, 0x0000000200000000, false},
+	{ 0x7fffffff, 0x0000000200000000, false},
+	{ 0x80000000, 0x0000000200000000, false},
+	{ 0x80000001, 0x0000000200000000, false},
+	{ 0xfffffffe, 0x0000000200000000, false},
+	{ 0xffffffff, 0x0000000200000000, false},
+
+	{ 0x00000000, 0x7ffffffffffffffe, false},
+	{ 0x00000001, 0x7ffffffffffffffe, false},
+	{ 0x00000002, 0x7ffffffffffffffe, false},
+	{ 0x7ffffffe, 0x7ffffffffffffffe, false},
+	{ 0x7fffffff, 0x7ffffffffffffffe, false},
+	{ 0x80000000, 0x7ffffffffffffffe, false},
+	{ 0x80000001, 0x7ffffffffffffffe, false},
+	{ 0xfffffffe, 0x7ffffffffffffffe, false},
+	{ 0xffffffff, 0x7ffffffffffffffe, false},
+
+	{ 0x00000000, 0x7fffffffffffffff, false},
+	{ 0x00000001, 0x7fffffffffffffff, false},
+	{ 0x00000002, 0x7fffffffffffffff, false},
+	{ 0x7ffffffe, 0x7fffffffffffffff, false},
+	{ 0x7fffffff, 0x7fffffffffffffff, false},
+	{ 0x80000000, 0x7fffffffffffffff, false},
+	{ 0x80000001, 0x7fffffffffffffff, false},
+	{ 0xfffffffe, 0x7fffffffffffffff, false},
+	{ 0xffffffff, 0x7fffffffffffffff, false},
+
+	{ 0x00000000, 0x8000000000000000, false},
+	{ 0x00000001, 0x8000000000000000, false},
+	{ 0x00000002, 0x8000000000000000, false},
+	{ 0x7ffffffe, 0x8000000000000000, false},
+	{ 0x7fffffff, 0x8000000000000000, false},
+	{ 0x80000000, 0x8000000000000000, false},
+	{ 0x80000001, 0x8000000000000000, false},
+	{ 0xfffffffe, 0x8000000000000000, false},
+	{ 0xffffffff, 0x8000000000000000, false},
+
+	{ 0x00000000, 0x8000000000000001, false },
+	{ 0x00000001, 0x8000000000000001, false },
+	{ 0x00000002, 0x8000000000000001, false },
+	{ 0x7ffffffe, 0x8000000000000001, false },
+	{ 0x7fffffff, 0x8000000000000001, false },
+	{ 0x80000000, 0x8000000000000001, false },
+	{ 0x80000001, 0x8000000000000001, false },
+	{ 0xfffffffe, 0x8000000000000001, false },
+	{ 0xffffffff, 0x8000000000000001, false },
+
+	{ 0x00000000, 0xfffffffffffffffe, false },
+	{ 0x00000001, 0xfffffffffffffffe, false},
+	{ 0x00000002, 0xfffffffffffffffe, false },
+	{ 0x7ffffffe, 0xfffffffffffffffe, false },
+	{ 0x7fffffff, 0xfffffffffffffffe, false },
+	{ 0x80000000, 0xfffffffffffffffe, false },
+	{ 0x80000001, 0xfffffffffffffffe, false },
+	{ 0xfffffffe, 0xfffffffffffffffe, false },
+	{ 0xffffffff, 0xfffffffffffffffe, false },
+
+	{ 0x00000000, 0xffffffffffffffff, false},
+	{ 0x00000001, 0xffffffffffffffff, false },
+	{ 0x00000002, 0xffffffffffffffff, false },
+	{ 0x7ffffffe, 0xffffffffffffffff, false },
+	{ 0x7fffffff, 0xffffffffffffffff, false },
+	{ 0x80000000, 0xffffffffffffffff, false },
+	{ 0x80000001, 0xffffffffffffffff, false },
+	{ 0xfffffffe, 0xffffffffffffffff, false },
+	{ 0xffffffff, 0xffffffffffffffff, false },
+};
+
+void add_test_int32_uint64()
+{
+
+	for (size_t i = 0; i < sizeof(int32_uint64) / sizeof(struct add_test_int32_uint64); ++i)
+	{
+		const struct add_test_int32_uint64& test_val = int32_uint64[i];
+		int32_t ret;
+
+		bool result = check_add_int32_uint64(test_val.x, test_val.y, &ret);
+
+		if (!!result != test_val.fExpected)
+		{
+			assert(false);
+			throw std::exception("Failure in add_test_int32_uint64");
+		}
+
+		bool actual;
+		try
+		{
+			ret = safe_add_int32_uint64(test_val.x, test_val.y);
+			actual = true;
+		}
+		catch (...)
+		{
+			actual = false;
+		}
+
+		if (actual != test_val.fExpected)
+		{
+			assert(false);
+			throw std::exception("Failure in add_test_int32_uint64");
+		}
+	}
+}
+
+struct add_test_int32_uint32
+{
+	int32_t x;
+	uint32_t y;
+	bool fExpected;
+};
+
+static const struct add_test_int32_uint32 int32_uint32[] =
+{
+	{ 0x00000000, 0x00000000, true},
+	{ 0x00000001, 0x00000000, true},
+	{ 0x00000002, 0x00000000, true},
+	{ 0x7ffffffe, 0x00000000, true},
+	{ 0x7fffffff, 0x00000000, true},
+	{ 0x80000000, 0x00000000, true},
+	{ 0x80000001, 0x00000000, true},
+	{ 0xfffffffe, 0x00000000, true},
+	{ 0xffffffff, 0x00000000, true},
+
+	{ 0x00000000, 0x00000001, true},
+	{ 0x00000001, 0x00000001, true},
+	{ 0x00000002, 0x00000001, true},
+	{ 0x7ffffffe, 0x00000001, true},
+	{ 0x7fffffff, 0x00000001, false},
+	{ 0x80000000, 0x00000001, true},
+	{ 0x80000001, 0x00000001, true},
+	{ 0xfffffffe, 0x00000001, true},
+	{ 0xffffffff, 0x00000001, true},
+
+	{ 0x00000000, 0x00000002, true},
+	{ 0x00000001, 0x00000002, true},
+	{ 0x00000002, 0x00000002, true},
+	{ 0x7ffffffe, 0x00000002, false},
+	{ 0x7fffffff, 0x00000002, false},
+	{ 0x80000000, 0x00000002, true},
+	{ 0x80000001, 0x00000002, true},
+	{ 0xfffffffe, 0x00000002, true},
+	{ 0xffffffff, 0x00000002, true},
+
+	{ 0x00000000, 0x7ffffffe, true},
+	{ 0x00000001, 0x7ffffffe, true},
+	{ 0x00000002, 0x7ffffffe, false},
+	{ 0x7ffffffe, 0x7ffffffe, false},
+	{ 0x7fffffff, 0x7ffffffe, false},
+	{ 0x80000000, 0x7ffffffe, true},
+	{ 0x80000001, 0x7ffffffe, true},
+	{ 0xfffffffe, 0x7ffffffe, true},
+	{ 0xffffffff, 0x7ffffffe, true},
+
+	{ 0x00000001, 0x7fffffff, false},
+	{ 0x00000002, 0x7fffffff, false},
+	{ 0x7ffffffe, 0x7fffffff, false},
+	{ 0x7fffffff, 0x7fffffff, false},
+	{ 0x80000000, 0x7fffffff, true},
+	{ 0x80000000, 0x7fffffff, true},
+	{ 0x80000001, 0x7fffffff, true},
+	{ 0xfffffffe, 0x7fffffff, true},
+	{ 0xffffffff, 0x7fffffff, true},
+
+	{ 0x00000000, 0x80000000, false},
+	{ 0x00000001, 0x80000000, false},
+	{ 0x00000002, 0x80000000, false},
+	{ 0x7ffffffe, 0x80000000, false},
+	{ 0x7fffffff, 0x80000000, false},
+	{ 0x80000000, 0x80000000, true},
+	{ 0x80000001, 0x80000000, true},
+	{ 0xfffffffe, 0x80000000, true},
+	{ 0xffffffff, 0x80000000, true},
+
+	{ 0x00000000, 0x80000001, false},
+	{ 0x00000001, 0x80000001, false},
+	{ 0x00000002, 0x80000001, false},
+	{ 0x7ffffffe, 0x80000001, false},
+	{ 0x7fffffff, 0x80000001, false},
+	{ 0x80000000, 0x80000001, true},
+	{ 0x80000001, 0x80000001, true},
+	{ 0xfffffffe, 0x80000001, true},
+	{ 0xffffffff, 0x80000001, false},
+
+	{ 0x00000000, 0xfffffffe, false},
+	{ 0x00000001, 0xfffffffe, false},
+	{ 0x00000002, 0xfffffffe, false},
+	{ 0x7ffffffe, 0xfffffffe, false},
+	{ 0x7fffffff, 0xfffffffe, false},
+	{ 0x80000000, 0xfffffffe, true},
+	{ 0x80000001, 0xfffffffe, true},
+	{ 0xfffffffe, 0xfffffffe, false},
+	{ 0xffffffff, 0xfffffffe, false},
+
+	{ 0x00000000, 0xffffffff, false},
+	{ 0x00000001, 0xffffffff, false},
+	{ 0x00000002, 0xffffffff, false},
+	{ 0x7ffffffe, 0xffffffff, false},
+	{ 0x7fffffff, 0xffffffff, false},
+	{ 0x80000000, 0xffffffff, true},
+	{ 0x80000001, 0xffffffff, false},
+	{ 0xfffffffe, 0xffffffff, false},
+	{ 0xffffffff, 0xffffffff, false},
+};
+
+void add_test_int32_uint32()
+{
+
+	for (size_t i = 0; i < sizeof(int32_uint32) / sizeof(struct add_test_int32_uint32); ++i)
+	{
+		const struct add_test_int32_uint32& test_val = int32_uint32[i];
+		int32_t ret;
+
+		bool result = check_add_int32_uint32(test_val.x, test_val.y, &ret);
+
+		if (!!result != test_val.fExpected)
+		{
+			assert(false);
+			throw std::exception("Failure in add_test_int32_uint32");
+		}
+
+		bool actual;
+		try
+		{
+			ret = safe_add_int32_uint32(test_val.x, test_val.y);
+			actual = true;
+		}
+		catch (...)
+		{
+			actual = false;
+		}
+
+		if (actual != test_val.fExpected)
+		{
+			assert(false);
+			throw std::exception("Failure in add_test_int32_uint32");
+		}
+	}
+}
+
+struct add_test_int32_int64
+{
+	int32_t x;
+	int64_t y;
+	bool fExpected;
+};
+
+static const struct add_test_int32_int64 int32_int64[] =
+{
+	{ 0x00000000, 0x0000000000000000, true},
+	{ 0x00000001, 0x0000000000000000, true},
+	{ 0x00000002, 0x0000000000000000, true},
+	{ 0x7ffffffe, 0x0000000000000000, true},
+	{ 0x7fffffff, 0x0000000000000000, true},
+	{ 0x80000000, 0x0000000000000000, true},
+	{ 0x80000001, 0x0000000000000000, true},
+	{ 0xfffffffe, 0x0000000000000000, true},
+	{ 0xffffffff, 0x0000000000000000, true},
+
+	{ 0x00000000, 0x0000000000000001, true},
+	{ 0x00000001, 0x0000000000000001, true},
+	{ 0x00000002, 0x0000000000000001, true},
+	{ 0x7ffffffe, 0x0000000000000001, true},
+	{ 0x7fffffff, 0x0000000000000001, false},
+	{ 0x80000000, 0x0000000000000001, true},
+	{ 0x80000001, 0x0000000000000001, true},
+	{ 0xfffffffe, 0x0000000000000001, true},
+	{ 0xffffffff, 0x0000000000000001, true},
+
+	{ 0x00000000, 0x0000000000000002, true},
+	{ 0x00000001, 0x0000000000000002, true},
+	{ 0x00000002, 0x0000000000000002, true},
+	{ 0x7ffffffe, 0x0000000000000002, false},
+	{ 0x7fffffff, 0x0000000000000002, false},
+	{ 0x80000000, 0x0000000000000002, true},
+	{ 0x80000001, 0x0000000000000002, true},
+	{ 0xfffffffe, 0x0000000000000002, true},
+	{ 0xffffffff, 0x0000000000000002, true},
+
+	{ 0x00000000, 0x000000007ffffffe, true},
+	{ 0x00000001, 0x000000007ffffffe, true},
+	{ 0x00000002, 0x000000007ffffffe, false},
+	{ 0x7ffffffe, 0x000000007ffffffe, false},
+	{ 0x7fffffff, 0x000000007ffffffe, false},
+	{ 0x80000000, 0x000000007ffffffe, true},
+	{ 0x80000001, 0x000000007ffffffe, true},
+	{ 0xfffffffe, 0x000000007ffffffe, true},
+	{ 0xffffffff, 0x000000007ffffffe, true},
+
+	{ 0x00000001, 0x000000007fffffff, false},
+	{ 0x00000002, 0x000000007fffffff, false},
+	{ 0x7ffffffe, 0x000000007fffffff, false},
+	{ 0x7fffffff, 0x000000007fffffff, false},
+	{ 0x80000000, 0x000000007fffffff, true},
+	{ 0x80000000, 0x000000007fffffff, true},
+	{ 0x80000001, 0x000000007fffffff, true},
+	{ 0xfffffffe, 0x000000007fffffff, true},
+	{ 0xffffffff, 0x000000007fffffff, true},
+
+	{ 0x00000000, 0x0000000080000000, false},
+	{ 0x00000001, 0x0000000080000000, false},
+	{ 0x00000002, 0x0000000080000000, false},
+	{ 0x7ffffffe, 0x0000000080000000, false},
+	{ 0x7fffffff, 0x0000000080000000, false},
+	{ 0x80000000, 0x0000000080000000, true},
+	{ 0x80000001, 0x0000000080000000, true},
+	{ 0xfffffffe, 0x0000000080000000, true},
+	{ 0xffffffff, 0x0000000080000000, true},
+
+	{ 0x00000000, 0x0000000080000001, false},
+	{ 0x00000001, 0x0000000080000001, false},
+	{ 0x00000002, 0x0000000080000001, false},
+	{ 0x7ffffffe, 0x0000000080000001, false},
+	{ 0x7fffffff, 0x0000000080000001, false},
+	{ 0x80000000, 0x0000000080000001, true},
+	{ 0x80000001, 0x0000000080000001, true},
+	{ 0xfffffffe, 0x0000000080000001, true},
+	{ 0xffffffff, 0x0000000080000001, false},
+
+	{ 0x00000000, 0x00000000fffffffe, false},
+	{ 0x00000001, 0x00000000fffffffe, false},
+	{ 0x00000002, 0x00000000fffffffe, false},
+	{ 0x7ffffffe, 0x00000000fffffffe, false},
+	{ 0x7fffffff, 0x00000000fffffffe, false},
+	{ 0x80000000, 0x00000000fffffffe, true},
+	{ 0x80000001, 0x00000000fffffffe, true},
+	{ 0xfffffffe, 0x00000000fffffffe, false},
+	{ 0xffffffff, 0x00000000fffffffe, false},
+
+	{ 0x00000000, 0x00000000ffffffff, false},
+	{ 0x00000001, 0x00000000ffffffff, false},
+	{ 0x00000002, 0x00000000ffffffff, false},
+	{ 0x7ffffffe, 0x00000000ffffffff, false},
+	{ 0x7fffffff, 0x00000000ffffffff, false},
+	{ 0x80000000, 0x00000000ffffffff, true},
+	{ 0x80000001, 0x00000000ffffffff, false},
+	{ 0xfffffffe, 0x00000000ffffffff, false},
+	{ 0xffffffff, 0x00000000ffffffff, false},
+
+	{ 0x00000000, 0x0000000100000000, false},
+	{ 0x00000001, 0x0000000100000000, false},
+	{ 0x00000002, 0x0000000100000000, false},
+	{ 0x7ffffffe, 0x0000000100000000, false},
+	{ 0x7fffffff, 0x0000000100000000, false},
+	{ 0x80000000, 0x0000000100000000, false},
+	{ 0x80000001, 0x0000000100000000, false},
+	{ 0xfffffffe, 0x0000000100000000, false},
+	{ 0xffffffff, 0x0000000100000000, false},
+
+	{ 0x00000000, 0x0000000200000000, false},
+	{ 0x00000001, 0x0000000200000000, false},
+	{ 0x00000002, 0x0000000200000000, false},
+	{ 0x7ffffffe, 0x0000000200000000, false},
+	{ 0x7fffffff, 0x0000000200000000, false},
+	{ 0x80000000, 0x0000000200000000, false},
+	{ 0x80000001, 0x0000000200000000, false},
+	{ 0xfffffffe, 0x0000000200000000, false},
+	{ 0xffffffff, 0x0000000200000000, false},
+
+	{ 0x00000000, 0x7ffffffffffffffe, false},
+	{ 0x00000001, 0x7ffffffffffffffe, false},
+	{ 0x00000002, 0x7ffffffffffffffe, false},
+	{ 0x7ffffffe, 0x7ffffffffffffffe, false},
+	{ 0x7fffffff, 0x7ffffffffffffffe, false},
+	{ 0x80000000, 0x7ffffffffffffffe, false},
+	{ 0x80000001, 0x7ffffffffffffffe, false},
+	{ 0xfffffffe, 0x7ffffffffffffffe, false},
+	{ 0xffffffff, 0x7ffffffffffffffe, false},
+
+	{ 0x00000000, 0x7fffffffffffffff, false},
+	{ 0x00000001, 0x7fffffffffffffff, false},
+	{ 0x00000002, 0x7fffffffffffffff, false},
+	{ 0x7ffffffe, 0x7fffffffffffffff, false},
+	{ 0x7fffffff, 0x7fffffffffffffff, false},
+	{ 0x80000000, 0x7fffffffffffffff, false},
+	{ 0x80000001, 0x7fffffffffffffff, false},
+	{ 0xfffffffe, 0x7fffffffffffffff, false},
+	{ 0xffffffff, 0x7fffffffffffffff, false},
+
+	{ 0x00000000, 0x8000000000000000, false},
+	{ 0x00000001, 0x8000000000000000, false},
+	{ 0x00000002, 0x8000000000000000, false},
+	{ 0x7ffffffe, 0x8000000000000000, false},
+	{ 0x7fffffff, 0x8000000000000000, false},
+	{ 0x80000000, 0x8000000000000000, false},
+	{ 0x80000001, 0x8000000000000000, false},
+	{ 0xfffffffe, 0x8000000000000000, false},
+	{ 0xffffffff, 0x8000000000000000, false},
+
+	{ 0x00000000, 0x8000000000000001, false },
+	{ 0x00000001, 0x8000000000000001, false },
+	{ 0x00000002, 0x8000000000000001, false },
+	{ 0x7ffffffe, 0x8000000000000001, false },
+	{ 0x7fffffff, 0x8000000000000001, false },
+	{ 0x80000000, 0x8000000000000001, false },
+	{ 0x80000001, 0x8000000000000001, false },
+	{ 0xfffffffe, 0x8000000000000001, false },
+	{ 0xffffffff, 0x8000000000000001, false },
+
+	{ 0x00000000, 0xfffffffffffffffe, true },
+	{ 0x00000001, 0xfffffffffffffffe, true },
+	{ 0x00000002, 0xfffffffffffffffe, true },
+	{ 0x7ffffffe, 0xfffffffffffffffe, true },
+	{ 0x7fffffff, 0xfffffffffffffffe, true },
+	{ 0x80000000, 0xfffffffffffffffe, false },
+	{ 0x80000001, 0xfffffffffffffffe, false },
+	{ 0xfffffffe, 0xfffffffffffffffe, true },
+	{ 0xffffffff, 0xfffffffffffffffe, true },
+
+	{ 0x00000000, 0xffffffffffffffff, true },
+	{ 0x00000001, 0xffffffffffffffff, true },
+	{ 0x00000002, 0xffffffffffffffff, true },
+	{ 0x7ffffffe, 0xffffffffffffffff, true },
+	{ 0x7fffffff, 0xffffffffffffffff, true },
+	{ 0x80000000, 0xffffffffffffffff, false },
+	{ 0x80000001, 0xffffffffffffffff, true },
+	{ 0xfffffffe, 0xffffffffffffffff, true },
+	{ 0xffffffff, 0xffffffffffffffff, true },
+};
+
+void add_test_int32_int64()
+{
+
+	for (size_t i = 0; i < sizeof(int32_int64) / sizeof(struct add_test_int32_int64); ++i)
+	{
+		const struct add_test_int32_int64& test_val = int32_int64[i];
+		int32_t ret;
+
+		bool result = check_add_int32_int64(test_val.x, test_val.y, &ret);
+
+		if (!!result != test_val.fExpected)
+		{
+			assert(false);
+			throw std::exception("Failure in add_test_int32_int64");
+		}
+
+		bool actual;
+		try
+		{
+			ret = safe_add_int32_int64(test_val.x, test_val.y);
+			actual = true;
+		}
+		catch (...)
+		{
+			actual = false;
+		}
+
+		if (actual != test_val.fExpected)
+		{
+			assert(false);
+			throw std::exception("Failure in add_test_int32_int64");
+		}
+	}
+}
+
+struct add_test_int32_int32
+{
+	int32_t x;
+	int32_t y;
+	bool fExpected;
+};
+
+static const struct add_test_int32_int32 int32_int32[] =
+{
+	{ 0x00000000, 0x00000000, true},
+	{ 0x00000001, 0x00000000, true},
+	{ 0x00000002, 0x00000000, true},
+	{ 0x7ffffffe, 0x00000000, true},
+	{ 0x7fffffff, 0x00000000, true},
+	{ 0x80000000, 0x00000000, true},
+	{ 0x80000001, 0x00000000, true},
+	{ 0xfffffffe, 0x00000000, true},
+	{ 0xffffffff, 0x00000000, true},
+
+	{ 0x00000000, 0x00000001, true},
+	{ 0x00000001, 0x00000001, true},
+	{ 0x00000002, 0x00000001, true},
+	{ 0x7ffffffe, 0x00000001, true},
+	{ 0x7fffffff, 0x00000001, false},
+	{ 0x80000000, 0x00000001, true},
+	{ 0x80000001, 0x00000001, true},
+	{ 0xfffffffe, 0x00000001, true},
+	{ 0xffffffff, 0x00000001, true},
+
+	{ 0x00000000, 0x00000002, true},
+	{ 0x00000001, 0x00000002, true},
+	{ 0x00000002, 0x00000002, true},
+	{ 0x7ffffffe, 0x00000002, false},
+	{ 0x7fffffff, 0x00000002, false},
+	{ 0x80000000, 0x00000002, true},
+	{ 0x80000001, 0x00000002, true},
+	{ 0xfffffffe, 0x00000002, true},
+	{ 0xffffffff, 0x00000002, true},
+
+	{ 0x00000000, 0x7ffffffe, true},
+	{ 0x00000001, 0x7ffffffe, true},
+	{ 0x00000002, 0x7ffffffe, false},
+	{ 0x7ffffffe, 0x7ffffffe, false},
+	{ 0x7fffffff, 0x7ffffffe, false},
+	{ 0x80000000, 0x7ffffffe, true},
+	{ 0x80000001, 0x7ffffffe, true},
+	{ 0xfffffffe, 0x7ffffffe, true},
+	{ 0xffffffff, 0x7ffffffe, true},
+
+	{ 0x00000001, 0x7fffffff, false},
+	{ 0x00000002, 0x7fffffff, false},
+	{ 0x7ffffffe, 0x7fffffff, false},
+	{ 0x7fffffff, 0x7fffffff, false},
+	{ 0x80000000, 0x7fffffff, true},
+	{ 0x80000000, 0x7fffffff, true},
+	{ 0x80000001, 0x7fffffff, true},
+	{ 0xfffffffe, 0x7fffffff, true},
+	{ 0xffffffff, 0x7fffffff, true},
+
+	{ 0x00000000, 0x80000000, true},
+	{ 0x00000001, 0x80000000, true},
+	{ 0x00000002, 0x80000000, true},
+	{ 0x7ffffffe, 0x80000000, true},
+	{ 0x7fffffff, 0x80000000, true},
+	{ 0x80000000, 0x80000000, false},
+	{ 0x80000001, 0x80000000, false},
+	{ 0xfffffffe, 0x80000000, false},
+	{ 0xffffffff, 0x80000000, false},
+
+	{ 0x00000000, 0x80000001, true},
+	{ 0x00000001, 0x80000001, true},
+	{ 0x00000002, 0x80000001, true},
+	{ 0x7ffffffe, 0x80000001, true},
+	{ 0x7fffffff, 0x80000001, true},
+	{ 0x80000000, 0x80000001, false},
+	{ 0x80000001, 0x80000001, false},
+	{ 0xfffffffe, 0x80000001, false},
+	{ 0xffffffff, 0x80000001, true},
+
+	{ 0x00000000, 0xfffffffe, true},
+	{ 0x00000001, 0xfffffffe, true},
+	{ 0x00000002, 0xfffffffe, true},
+	{ 0x7ffffffe, 0xfffffffe, true},
+	{ 0x7fffffff, 0xfffffffe, true},
+	{ 0x80000000, 0xfffffffe, false},
+	{ 0x80000001, 0xfffffffe, false},
+	{ 0xfffffffe, 0xfffffffe, true},
+	{ 0xffffffff, 0xfffffffe, true},
+
+	{ 0x00000000, 0xffffffff, true},
+	{ 0x00000001, 0xffffffff, true},
+	{ 0x00000002, 0xffffffff, true},
+	{ 0x7ffffffe, 0xffffffff, true},
+	{ 0x7fffffff, 0xffffffff, true},
+	{ 0x80000000, 0xffffffff, false},
+	{ 0x80000001, 0xffffffff, true},
+	{ 0xfffffffe, 0xffffffff, true},
+	{ 0xffffffff, 0xffffffff, true},
+};
+
+void add_test_int32_int32()
+{
+
+	for (size_t i = 0; i < sizeof(int32_int32) / sizeof(struct add_test_int32_int32); ++i)
+	{
+		const struct add_test_int32_int32& test_val = int32_int32[i];
+		int32_t ret;
+
+		bool result = check_add_int32_int32(test_val.x, test_val.y, &ret);
+
+		if (!!result != test_val.fExpected)
+		{
+			assert(false);
+			throw std::exception("Failure in add_test_int32_int32");
+		}
+
+		bool actual;
+		try
+		{
+			ret = safe_add_int32_int32(test_val.x, test_val.y);
+			actual = true;
+		}
+		catch (...)
+		{
+			actual = false;
+		}
+
+		if (actual != test_val.fExpected)
+		{
+			assert(false);
+			throw std::exception("Failure in add_test_int32_int32");
+		}
+	}
+}
+
 extern "C" void add_test()
 {
 	try 
@@ -2248,6 +3655,16 @@ extern "C" void add_test()
 		add_test_int64_uint32();
 		add_test_int64_int64();
 		add_test_int64_int32();
+
+		add_test_uint32_uint64();
+		add_test_uint32_uint32();
+		add_test_uint32_int64();
+		add_test_uint32_int32();
+
+		add_test_int32_uint64();
+		add_test_int32_uint32();
+		add_test_int32_int64();
+		add_test_int32_int32();
 
 		std::cout << "Addition tests completed" << std::endl;
 	}

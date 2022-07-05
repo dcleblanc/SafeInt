@@ -573,12 +573,12 @@ inline uint32_t safe_add_uint32_uint64(uint32_t a, uint64_t b)
 {
     uint64_t tmp = (uint64_t)a + b;
     
-    if (tmp < a)
+    if (tmp >= a && tmp <= UINT32_MAX)
     {
-        safe_math_fail("safe_math_fail safe_add_uint32_uint64");
+        return (uint32_t)tmp;
     }
 
-    return (uint32_t)tmp;
+    safe_math_fail("safe_math_fail safe_add_uint32_uint64");
 }
 
 inline bool check_add_uint32_uint64(uint32_t a, uint64_t b, uint32_t* ret)
@@ -586,7 +586,7 @@ inline bool check_add_uint32_uint64(uint32_t a, uint64_t b, uint32_t* ret)
     uint64_t tmp = (uint64_t)a + b;
     *ret = (uint32_t)tmp;
 
-    return (tmp >= a);
+    return (tmp >= a && tmp <= UINT32_MAX);
 }
 
 inline int64_t safe_add_int64_int32(int64_t a, int32_t b)
