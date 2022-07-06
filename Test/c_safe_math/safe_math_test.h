@@ -16,7 +16,7 @@
 #endif
 
 // This has to be done in C++ so we can catch exceptions, not abort
-NORETURN void safe_math_fail(const char* msg)
+NORETURN inline void safe_math_fail(const char* msg)
 {
 	throw std::exception(msg);
 }

@@ -139,8 +139,10 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\MultVerify.cpp" />
     <ClCompile Include="safe_math_test.c" />
     <ClCompile Include="safe_math_test_add.cpp" />
+    <ClCompile Include="safe_math_test_mult.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\safe_math.h" />

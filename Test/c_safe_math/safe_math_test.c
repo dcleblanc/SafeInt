@@ -11,6 +11,7 @@
 //#include "../../safe_math.h"
 
 void add_test(void);
+void mult_test(void);
 
 int main(int argc, char* argv[])
 {
@@ -18,6 +19,7 @@ int main(int argc, char* argv[])
 	argv;
 
 	add_test();
+	mult_test();
 
 	return 0;
 }

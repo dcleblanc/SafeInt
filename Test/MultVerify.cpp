@@ -2,6 +2,7 @@
 // Licensed under the MIT License.
 
 #include "TestMain.h"
+#include "MultVerify.h"
 
 /*
 * Interesting numbers:
@@ -16,14 +17,6 @@
 
 namespace mult_verify
 {
-
-template <typename T, typename U>
-struct MultTest
-{
-	T x;
-	U y;
-	bool fExpected;
-};
 
 static const MultTest< std::uint64_t, std::uint64_t > uint64_uint64[] = 
 {
@@ -152,35 +145,44 @@ static const MultTest< std::uint64_t, std::uint64_t > uint64_uint64[] =
 	{ 0xffffffff,            0x100000002, false }
 };
 
+MultTestCase< std::uint64_t, std::uint64_t>::MultTestCase() : current(0)
+{
+	this->test_cases = uint64_uint64;
+	this->count = COUNTOF(uint64_uint64);
+}
+
 void MultVerifyUint64Uint64()
 {
-	size_t i;
+	MultTestCase< std::uint64_t, std::uint64_t> tests;
+	MultTest<std::uint64_t, std::uint64_t> test = tests.GetNext();
 
-	for( i = 0; i < COUNTOF(uint64_uint64); ++i )
+	while( !tests.Done() )
 	{
 		std::uint64_t ret;
-		if( SafeMultiply(uint64_uint64[i].x, uint64_uint64[i].y, ret) != uint64_uint64[i].fExpected )
+		if( SafeMultiply(test.x, test.y, ret) != test.fExpected )
 		{
 			//assert(false);
-			err_msg( "Error in case uint64_uint64: ", uint64_uint64[i].x, uint64_uint64[i].y, uint64_uint64[i].fExpected );
+			err_msg( "Error in case uint64_uint64: ", test.x, test.y, test.fExpected );
 		}
 
 		// Now test throwing version
 		bool fSuccess = true;
 		try
 		{
-			SafeInt<std::uint64_t> si(uint64_uint64[i].x);
-			si *= uint64_uint64[i].y;
+			SafeInt<std::uint64_t> si(test.x);
+			si *= test.y;
 		}
 		catch(...)
 		{
 			fSuccess = false;
 		}
 
-		if( fSuccess != uint64_uint64[i].fExpected )
+		if( fSuccess != test.fExpected )
 		{
-			err_msg( "Error in case uint64_uint64 throw: ", uint64_uint64[i].x, uint64_uint64[i].y, uint64_uint64[i].fExpected );
+			err_msg( "Error in case uint64_uint64 throw: ", test.x, test.y, test.fExpected );
 		}
+
+		test = tests.GetNext();
 	}
 }
 
@@ -254,34 +256,43 @@ static const MultTest< std::uint64_t, std::uint32_t > uint64_uint32[] =
 	{ 0xffffffffffffffff,    0xffffffff, false }
 };
 
+MultTestCase< std::uint64_t, std::uint32_t>::MultTestCase() : current(0)
+{
+	this->test_cases = uint64_uint32;
+	this->count = COUNTOF(uint64_uint32);
+}
+
 void MultVerifyUint64Uint()
 {
-	size_t i;
+	MultTestCase< std::uint64_t, std::uint32_t> tests;
+	MultTest<std::uint64_t, std::uint32_t> test = tests.GetNext();
 
-	for( i = 0; i < COUNTOF(uint64_uint32); ++i )
+	while (!tests.Done())
 	{
 		std::uint64_t ret;
-		if( SafeMultiply(uint64_uint32[i].x, uint64_uint32[i].y, ret) != uint64_uint32[i].fExpected )
+		if( SafeMultiply(test.x, test.y, ret) != test.fExpected )
 		{
 			//assert(false);
-			err_msg( "Error in case uint64_uint32: ", uint64_uint32[i].x, uint64_uint32[i].y, uint64_uint32[i].fExpected );
+			err_msg( "Error in case uint64_uint32: ", test.x, test.y, test.fExpected );
 		}
 
 		bool fSuccess = true;
 		try
 		{
-			SafeInt<std::uint64_t> si(uint64_uint32[i].x);
-			si *= uint64_uint32[i].y;
+			SafeInt<std::uint64_t> si(test.x);
+			si *= test.y;
 		}
 		catch(...)
 		{
 			fSuccess = false;
 		}
 
-		if( fSuccess != uint64_uint32[i].fExpected )
+		if( fSuccess != test.fExpected )
 		{
-			err_msg( "Error in case uint64_uint32 throw: ", uint64_uint32[i].x, uint64_uint32[i].y, uint64_uint32[i].fExpected );
+			err_msg( "Error in case uint64_uint32 throw: ", test.x, test.y, test.fExpected );
 		}
+
+		test = tests.GetNext();
 	}
 }
 
