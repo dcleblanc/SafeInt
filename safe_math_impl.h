@@ -1197,7 +1197,7 @@ inline uint32_t safe_mul_uint32_int64(uint32_t a, int64_t b)
 {
     int64_t tmp = 0;
 
-    if (MultiplyInt64((int64_t)a, b, &tmp) == SAFE_INT_MUL_SUCCESS && tmp <= UINT32_MAX)
+    if (MultiplyInt64((int64_t)a, b, &tmp) == SAFE_INT_MUL_SUCCESS && tmp <= UINT32_MAX && tmp >= 0)
     {
         return (uint32_t)tmp;
     }
@@ -1209,7 +1209,7 @@ inline bool check_mul_uint32_int64(uint32_t a, int64_t b, uint32_t* ret)
 {
     int64_t tmp = 0;
 
-    if (MultiplyInt64((int64_t)a, b, &tmp) == SAFE_INT_MUL_SUCCESS && tmp <= UINT32_MAX)
+    if (MultiplyInt64((int64_t)a, b, &tmp) == SAFE_INT_MUL_SUCCESS && tmp <= UINT32_MAX && tmp >= 0)
     {
         *ret = (uint32_t)tmp;
         return true;

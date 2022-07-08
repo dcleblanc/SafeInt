@@ -139,7 +139,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\MultVerify.cpp" />
+    <ClCompile Include="..\MultTestCase.cpp" />
     <ClCompile Include="safe_math_test.c" />
     <ClCompile Include="safe_math_test_add.cpp" />
     <ClCompile Include="safe_math_test_mult.cpp" />

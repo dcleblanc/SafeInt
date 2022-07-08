@@ -124,6 +124,7 @@
     <ClCompile Include="..\..\DivVerify.cpp" />
     <ClCompile Include="..\..\IncDecVerify.cpp" />
     <ClCompile Include="..\..\ModVerify.cpp" />
+    <ClCompile Include="..\..\MultTestCase.cpp" />
     <ClCompile Include="..\..\MultVerify.cpp" />
     <ClCompile Include="..\..\SubVerify.cpp" />
     <ClCompile Include="..\..\TestMain.cpp" />

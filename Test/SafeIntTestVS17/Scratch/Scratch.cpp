@@ -9,9 +9,12 @@
 Use this to check specific scenarios
 */
 
+#include <string>
 
 int main(int argc, char** argv)
 {
+    std::string s = "12345678";
+
     SafeInt<uint64_t> a = 1;
     int64_t b = 2;
 
