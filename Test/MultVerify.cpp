@@ -416,209 +416,139 @@ void MultVerifyInt64Uint32()
 	}
 }
 
-static const MultTest< std::int32_t, std::int64_t > int_int64[] = 
+void MultVerifyInt32Int64()
 {
-	{ 0,                     0, true },
-	{ 1,                     0, true },
-	{ 2,                     0, true },
-	{ 0x7fffffff,            0, true },
-	{ 0x80000000,            0, true },
-	{ 0xffffffff,            0, true },
-	{ 0,                     1, true },
-	{ 1,                     1, true },
-	{ 2,                     1, true },
-	{ 0x7fffffff,            1, true },
-	{ 0x80000000,            1, true },
-	{ 0xffffffff,            1, true },
-	{ 0,                     2, true },
-	{ 1,                     2, true },
-	{ 2,                     2, true },
-	{ 0x7fffffff,            2, false },
-	{ 0x80000000,            2, false },
-	{ 0xffffffff,            2, true },
-	{ 0,                     0x7fffffff, true },
-	{ 1,                     0x7fffffff, true },
-	{ 2,                     0x7fffffff, false },
-	{ 0x7fffffff,            0x7fffffff, false },
-	{ 0x80000000,            0x7fffffff, false },
-	{ 0xffffffff,            0x7fffffff, true },
-	{ 0,                     0x80000000, true },
-	{ 1,                     0x80000000, false },
-	{ 2,                     0x80000000, false },
-	{ 0x7fffffff,            0x80000000, false },
-	{ 0x80000000,            0x80000000, false },
-	{ 0xffffffff,            0x80000000, true },
-	{ 0,                     0xffffffff, true },
-	{ 1,                     0xffffffff, false },
-	{ 2,                     0xffffffff, false },
-	{ 0x7fffffff,            0xffffffff, false },
-	{ 0x80000000,            0xffffffff, false },
-	{ 0xffffffff,            0xffffffff, false },
-	{ 0,                     0x100000000, true },
-	{ 1,                     0x100000000, false },
-	{ 2,                     0x100000000, false },
-	{ 0x7fffffff,            0x100000000, false },
-	{ 0x80000000,            0x100000000, false },
-	{ 0xffffffff,            0x100000000, false },
-	{ 0,                     0x200000000, true },
-	{ 1,                     0x200000000, false },
-	{ 2,                     0x200000000, false },
-	{ 0x7fffffff,            0x200000000, false },
-	{ 0x80000000,            0x200000000, false },
-	{ 0xffffffff,            0x200000000, false },
-	{ 0,                     0x7fffffffffffffff, true },
-	{ 1,                     0x7fffffffffffffff, false },
-	{ 2,                     0x7fffffffffffffff, false },
-	{ 0x7fffffff,            0x7fffffffffffffff, false },
-	{ 0x80000000,            0x7fffffffffffffff, false },
-	{ 0xffffffff,            0x7fffffffffffffff, false },
-	{ 0,                     0x8000000000000000, true },
-	{ 1,                     0x8000000000000000, false },
-	{ 2,                     0x8000000000000000, false },
-	{ 0x7fffffff,            0x8000000000000000, false },
-	{ 0x80000000,            0x8000000000000000, false },
-	{ 0xffffffff,            0x8000000000000000, false },
-	{ 0,                     0xffffffffffffffff, true },
-	{ 1,                     0xffffffffffffffff, true },
-	{ 2,                     0xffffffffffffffff, true },
-	{ 0x7fffffff,            0xffffffffffffffff, true },
-	{ 0x80000000,            0xffffffffffffffff, false },
-	{ 0xffffffff,            0xffffffffffffffff, true },
-	// Special case - force addition overflow case
-	{ 0xffffffff,            0x100000002, false }
-};
+	MultTestCase< std::int32_t, std::int64_t> tests;
+	MultTest<std::int32_t, std::int64_t> test = tests.GetNext();
 
-void MultVerifyIntInt64()
-{
-	size_t i;
-
-	for( i = 0; i < COUNTOF(int_int64); ++i )
+	while (!tests.Done())
 	{
 		std::int32_t ret;
-		if( SafeMultiply(int_int64[i].x, int_int64[i].y, ret) != int_int64[i].fExpected )
+		if( SafeMultiply(test.x, test.y, ret) != test.fExpected )
 		{
 			//assert(false);
-			err_msg( "Error in case int_int64: ", int_int64[i].x, int_int64[i].y, int_int64[i].fExpected );
+			err_msg( "Error in case int_int64: ", test.x, test.y, test.fExpected );
 		}
 
 		bool fSuccess = true;
 		try
 		{
-			SafeInt<std::int32_t> si(int_int64[i].x);
-			si *= int_int64[i].y;
+			SafeInt<std::int32_t> si(test.x);
+			si *= test.y;
 		}
 		catch(...)
 		{
 			fSuccess = false;
 		}
 
-		if( fSuccess != int_int64[i].fExpected )
+		if( fSuccess != test.fExpected )
 		{
-			err_msg( "Error in case int_int64 throw: ", int_int64[i].x, int_int64[i].y, int_int64[i].fExpected );
+			err_msg( "Error in case int_int64 throw: ", test.x, test.y, test.fExpected );
 		}
+
+		test = tests.GetNext();
 	}
 }
 
-static const MultTest< std::int32_t, std::uint64_t > int_uint64[] = 
+void MultVerifyInt32Int32()
 {
-	{ 0,                     0, true },
-	{ 1,                     0, true },
-	{ 2,                     0, true },
-	{ 0x7fffffff,            0, true },
-	{ 0x80000000,            0, true },
-	{ 0xffffffff,            0, true },
-	{ 0,                     1, true },
-	{ 1,                     1, true },
-	{ 2,                     1, true },
-	{ 0x7fffffff,            1, true },
-	{ 0x80000000,            1, true },
-	{ 0xffffffff,            1, true },
-	{ 0,                     2, true },
-	{ 1,                     2, true },
-	{ 2,                     2, true },
-	{ 0x7fffffff,            2, false },
-	{ 0x80000000,            2, false },
-	{ 0xffffffff,            2, true },
-	{ 0,                     0x7fffffff, true },
-	{ 1,                     0x7fffffff, true },
-	{ 2,                     0x7fffffff, false },
-	{ 0x7fffffff,            0x7fffffff, false },
-	{ 0x80000000,            0x7fffffff, false },
-	{ 0xffffffff,            0x7fffffff, true },
-	{ 0,                     0x80000000, true },
-	{ 1,                     0x80000000, false },
-	{ 2,                     0x80000000, false },
-	{ 0x7fffffff,            0x80000000, false },
-	{ 0x80000000,            0x80000000, false },
-	{ 0xffffffff,            0x80000000, true },
-	{ 0,                     0xffffffff, true },
-	{ 1,                     0xffffffff, false },
-	{ 2,                     0xffffffff, false },
-	{ 0x7fffffff,            0xffffffff, false },
-	{ 0x80000000,            0xffffffff, false },
-	{ 0xffffffff,            0xffffffff, false },
-	{ 0,                     0x100000000, true },
-	{ 1,                     0x100000000, false },
-	{ 2,                     0x100000000, false },
-	{ 0x7fffffff,            0x100000000, false },
-	{ 0x80000000,            0x100000000, false },
-	{ 0xffffffff,            0x100000000, false },
-	{ 0,                     0x200000000, true },
-	{ 1,                     0x200000000, false },
-	{ 2,                     0x200000000, false },
-	{ 0x7fffffff,            0x200000000, false },
-	{ 0x80000000,            0x200000000, false },
-	{ 0xffffffff,            0x200000000, false },
-	{ 0,                     0x7fffffffffffffff, true },
-	{ 1,                     0x7fffffffffffffff, false },
-	{ 2,                     0x7fffffffffffffff, false },
-	{ 0x7fffffff,            0x7fffffffffffffff, false },
-	{ 0x80000000,            0x7fffffffffffffff, false },
-	{ 0xffffffff,            0x7fffffffffffffff, false },
-	{ 0,                     0x8000000000000000, true },
-	{ 1,                     0x8000000000000000, false },
-	{ 2,                     0x8000000000000000, false },
-	{ 0x7fffffff,            0x8000000000000000, false },
-	{ 0x80000000,            0x8000000000000000, false },
-	{ 0xffffffff,            0x8000000000000000, false },
-	{ 0,                     0xffffffffffffffff, true },
-	{ 1,                     0xffffffffffffffff, false },
-	{ 2,                     0xffffffffffffffff, false },
-	{ 0x7fffffff,            0xffffffffffffffff, false },
-	{ 0x80000000,            0xffffffffffffffff, false },
-	{ 0xffffffff,            0xffffffffffffffff, false },
-	// Special case - force addition overflow case
-	{ 0xffffffff,            0x100000002, false }
-};
+	MultTestCase< std::int32_t, std::int32_t> tests;
+	MultTest<std::int32_t, std::int32_t> test = tests.GetNext();
 
-void MultVerifyIntUint64()
-{
-	size_t i;
-
-	for( i = 0; i < COUNTOF(int_uint64); ++i )
+	while (!tests.Done())
 	{
 		std::int32_t ret;
-		if( SafeMultiply(int_uint64[i].x, int_uint64[i].y, ret) != int_uint64[i].fExpected )
+		if (SafeMultiply(test.x, test.y, ret) != test.fExpected)
 		{
 			//assert(false);
-			err_msg( "Error in case int_uint64: ", int_uint64[i].x, int_uint64[i].y, int_uint64[i].fExpected );
+			err_msg("Error in case int32_int32: ", test.x, test.y, test.fExpected);
 		}
 
 		bool fSuccess = true;
 		try
 		{
-			SafeInt<std::int32_t> si(int_uint64[i].x);
-			si *= int_uint64[i].y;
+			SafeInt<std::int32_t> si(test.x);
+			si *= test.y;
+		}
+		catch (...)
+		{
+			fSuccess = false;
+		}
+
+		if (fSuccess != test.fExpected)
+		{
+			err_msg("Error in case int32_int32 throw: ", test.x, test.y, test.fExpected);
+		}
+
+		test = tests.GetNext();
+	}
+}
+
+void MultVerifyInt32Uint64()
+{
+	MultTestCase< std::int32_t, std::uint64_t> tests;
+	MultTest<std::int32_t, std::uint64_t> test = tests.GetNext();
+
+	while (!tests.Done())
+	{
+		std::int32_t ret;
+		if( SafeMultiply(test.x, test.y, ret) != test.fExpected )
+		{
+			//assert(false);
+			err_msg( "Error in case int_uint64: ", test.x, test.y, test.fExpected );
+		}
+
+		bool fSuccess = true;
+		try
+		{
+			SafeInt<std::int32_t> si(test.x);
+			si *= test.y;
 		}
 		catch(...)
 		{
 			fSuccess = false;
 		}
 
-		if( fSuccess != int_uint64[i].fExpected )
+		if( fSuccess != test.fExpected )
 		{
-			err_msg( "Error in case int_uint64 throw: ", int_uint64[i].x, int_uint64[i].y, int_uint64[i].fExpected );
+			err_msg( "Error in case int_uint64 throw: ", test.x, test.y, test.fExpected );
 		}
+
+		test = tests.GetNext();
+	}
+}
+
+void MultVerifyInt32Uint32()
+{
+	MultTestCase< std::int32_t, std::uint32_t> tests;
+	MultTest<std::int32_t, std::uint32_t> test = tests.GetNext();
+
+	while (!tests.Done())
+	{
+		std::int32_t ret;
+		if (SafeMultiply(test.x, test.y, ret) != test.fExpected)
+		{
+			//assert(false);
+			err_msg("Error in case int_uint32: ", test.x, test.y, test.fExpected);
+		}
+
+		bool fSuccess = true;
+		try
+		{
+			SafeInt<std::int32_t> si(test.x);
+			si *= test.y;
+		}
+		catch (...)
+		{
+			fSuccess = false;
+		}
+
+		if (fSuccess != test.fExpected)
+		{
+			err_msg("Error in case int_uint32 throw: ", test.x, test.y, test.fExpected);
+		}
+
+		test = tests.GetNext();
 	}
 }
 
@@ -1002,9 +932,12 @@ void MultVerify()
 	MultVerifyInt64Int();
 	MultVerifyInt64Uint32();
 
-	MultVerifyIntInt64();
-	MultVerifyIntUint64();
+	MultVerifyInt32Uint64();
+	MultVerifyInt32Uint32();
+	MultVerifyInt32Int64();
+	MultVerifyInt32Int32();
 
+	// TBD 16 and 8-bit complete
 	MultVerifyInt8Int8();
 	MultVerifyUint8Uint8();
 }

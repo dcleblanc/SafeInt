@@ -1089,7 +1089,7 @@ inline bool check_mul_int32_uint32(int32_t a, uint32_t b, int32_t* ret)
 {
     int64_t tmp = (int64_t)a * (int64_t)b;
     *ret = (int32_t)tmp;
-    return safe_cast_int32_int64(tmp) == 0;
+    return check_cast_int32_int64(tmp) == 0;
 }
 
 inline int32_t safe_mul_int32_int64(int32_t a, int64_t b)
@@ -1111,7 +1111,7 @@ inline bool check_mul_int32_int64(int32_t a, int64_t b, int32_t* ret)
     if (MultiplyInt64((int64_t)a, b, &tmp))
     {
         *ret = (int32_t)tmp;
-        return safe_cast_int32_int64(tmp) == 0;
+        return check_cast_int32_int64(tmp) == 0;
     }
 
     return false;

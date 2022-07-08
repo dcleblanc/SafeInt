@@ -1094,4 +1094,253 @@ namespace mult_verify
 		this->test_cases = uint32_int32;
 		this->count = COUNTOF(uint32_int32);
 	}
+
+	static const MultTest< std::int32_t, std::uint64_t > int32_uint64[] =
+	{
+		{ 0,                     0, true },
+		{ 1,                     0, true },
+		{ 2,                     0, true },
+		{ 0x7fffffff,            0, true },
+		{ 0x80000000,            0, true },
+		{ 0xffffffff,            0, true },
+		{ 0,                     1, true },
+		{ 1,                     1, true },
+		{ 2,                     1, true },
+		{ 0x7fffffff,            1, true },
+		{ 0x80000000,            1, true },
+		{ 0xffffffff,            1, true },
+		{ 0,                     2, true },
+		{ 1,                     2, true },
+		{ 2,                     2, true },
+		{ 0x7fffffff,            2, false },
+		{ 0x80000000,            2, false },
+		{ 0xffffffff,            2, true },
+		{ 0,                     0x7fffffff, true },
+		{ 1,                     0x7fffffff, true },
+		{ 2,                     0x7fffffff, false },
+		{ 0x7fffffff,            0x7fffffff, false },
+		{ 0x80000000,            0x7fffffff, false },
+		{ 0xffffffff,            0x7fffffff, true },
+		{ 0,                     0x80000000, true },
+		{ 1,                     0x80000000, false },
+		{ 2,                     0x80000000, false },
+		{ 0x7fffffff,            0x80000000, false },
+		{ 0x80000000,            0x80000000, false },
+		{ 0xffffffff,            0x80000000, true },
+		{ 0,                     0xffffffff, true },
+		{ 1,                     0xffffffff, false },
+		{ 2,                     0xffffffff, false },
+		{ 0x7fffffff,            0xffffffff, false },
+		{ 0x80000000,            0xffffffff, false },
+		{ 0xffffffff,            0xffffffff, false },
+		{ 0,                     0x100000000, true },
+		{ 1,                     0x100000000, false },
+		{ 2,                     0x100000000, false },
+		{ 0x7fffffff,            0x100000000, false },
+		{ 0x80000000,            0x100000000, false },
+		{ 0xffffffff,            0x100000000, false },
+		{ 0,                     0x200000000, true },
+		{ 1,                     0x200000000, false },
+		{ 2,                     0x200000000, false },
+		{ 0x7fffffff,            0x200000000, false },
+		{ 0x80000000,            0x200000000, false },
+		{ 0xffffffff,            0x200000000, false },
+		{ 0,                     0x7fffffffffffffff, true },
+		{ 1,                     0x7fffffffffffffff, false },
+		{ 2,                     0x7fffffffffffffff, false },
+		{ 0x7fffffff,            0x7fffffffffffffff, false },
+		{ 0x80000000,            0x7fffffffffffffff, false },
+		{ 0xffffffff,            0x7fffffffffffffff, false },
+		{ 0,                     0x8000000000000000, true },
+		{ 1,                     0x8000000000000000, false },
+		{ 2,                     0x8000000000000000, false },
+		{ 0x7fffffff,            0x8000000000000000, false },
+		{ 0x80000000,            0x8000000000000000, false },
+		{ 0xffffffff,            0x8000000000000000, false },
+		{ 0,                     0xffffffffffffffff, true },
+		{ 1,                     0xffffffffffffffff, false },
+		{ 2,                     0xffffffffffffffff, false },
+		{ 0x7fffffff,            0xffffffffffffffff, false },
+		{ 0x80000000,            0xffffffffffffffff, false },
+		{ 0xffffffff,            0xffffffffffffffff, false },
+		// Special case - force addition overflow case
+		{ 0xffffffff,            0x100000002, false }
+	};
+
+	MultTestCase< std::int32_t, std::uint64_t>::MultTestCase() : current(0)
+	{
+		this->test_cases = int32_uint64;
+		this->count = COUNTOF(int32_uint64);
+	}
+
+	static const MultTest< std::int32_t, std::uint32_t > int32_uint32[] =
+	{
+		{ 0,                     0, true },
+		{ 1,                     0, true },
+		{ 2,                     0, true },
+		{ 0x7fffffff,            0, true },
+		{ 0x80000000,            0, true },
+		{ 0xffffffff,            0, true },
+		{ 0,                     1, true },
+		{ 1,                     1, true },
+		{ 2,                     1, true },
+		{ 0x7fffffff,            1, true },
+		{ 0x80000000,            1, true },
+		{ 0xffffffff,            1, true },
+		{ 0,                     2, true },
+		{ 1,                     2, true },
+		{ 2,                     2, true },
+		{ 0x7fffffff,            2, false },
+		{ 0x80000000,            2, false },
+		{ 0xffffffff,            2, true },
+		{ 0,                     0x7fffffff, true },
+		{ 1,                     0x7fffffff, true },
+		{ 2,                     0x7fffffff, false },
+		{ 0x7fffffff,            0x7fffffff, false },
+		{ 0x80000000,            0x7fffffff, false },
+		{ 0xffffffff,            0x7fffffff, true },
+		{ 0,                     0x80000000, true },
+		{ 1,                     0x80000000, false },
+		{ 2,                     0x80000000, false },
+		{ 0x7fffffff,            0x80000000, false },
+		{ 0x80000000,            0x80000000, false },
+		{ 0xffffffff,            0x80000000, true },
+		{ 0,                     0xffffffff, true },
+		{ 1,                     0xffffffff, false },
+		{ 2,                     0xffffffff, false },
+		{ 0x7fffffff,            0xffffffff, false },
+		{ 0x80000000,            0xffffffff, false },
+		{ 0xffffffff,            0xffffffff, false },
+	};
+
+	MultTestCase< std::int32_t, std::uint32_t>::MultTestCase() : current(0)
+	{
+		this->test_cases = int32_uint32;
+		this->count = COUNTOF(int32_uint32);
+	}
+
+	static const MultTest< std::int32_t, std::int64_t > int32_int64[] =
+	{
+		{ 0,                     0, true },
+		{ 1,                     0, true },
+		{ 2,                     0, true },
+		{ 0x7fffffff,            0, true },
+		{ 0x80000000,            0, true },
+		{ 0xffffffff,            0, true },
+		{ 0,                     1, true },
+		{ 1,                     1, true },
+		{ 2,                     1, true },
+		{ 0x7fffffff,            1, true },
+		{ 0x80000000,            1, true },
+		{ 0xffffffff,            1, true },
+		{ 0,                     2, true },
+		{ 1,                     2, true },
+		{ 2,                     2, true },
+		{ 0x7fffffff,            2, false },
+		{ 0x80000000,            2, false },
+		{ 0xffffffff,            2, true },
+		{ 0,                     0x7fffffff, true },
+		{ 1,                     0x7fffffff, true },
+		{ 2,                     0x7fffffff, false },
+		{ 0x7fffffff,            0x7fffffff, false },
+		{ 0x80000000,            0x7fffffff, false },
+		{ 0xffffffff,            0x7fffffff, true },
+		{ 0,                     0x80000000, true },
+		{ 1,                     0x80000000, false },
+		{ 2,                     0x80000000, false },
+		{ 0x7fffffff,            0x80000000, false },
+		{ 0x80000000,            0x80000000, false },
+		{ 0xffffffff,            0x80000000, true },
+		{ 0,                     0xffffffff, true },
+		{ 1,                     0xffffffff, false },
+		{ 2,                     0xffffffff, false },
+		{ 0x7fffffff,            0xffffffff, false },
+		{ 0x80000000,            0xffffffff, false },
+		{ 0xffffffff,            0xffffffff, false },
+		{ 0,                     0x100000000, true },
+		{ 1,                     0x100000000, false },
+		{ 2,                     0x100000000, false },
+		{ 0x7fffffff,            0x100000000, false },
+		{ 0x80000000,            0x100000000, false },
+		{ 0xffffffff,            0x100000000, false },
+		{ 0,                     0x200000000, true },
+		{ 1,                     0x200000000, false },
+		{ 2,                     0x200000000, false },
+		{ 0x7fffffff,            0x200000000, false },
+		{ 0x80000000,            0x200000000, false },
+		{ 0xffffffff,            0x200000000, false },
+		{ 0,                     0x7fffffffffffffff, true },
+		{ 1,                     0x7fffffffffffffff, false },
+		{ 2,                     0x7fffffffffffffff, false },
+		{ 0x7fffffff,            0x7fffffffffffffff, false },
+		{ 0x80000000,            0x7fffffffffffffff, false },
+		{ 0xffffffff,            0x7fffffffffffffff, false },
+		{ 0,                     0x8000000000000000, true },
+		{ 1,                     0x8000000000000000, false },
+		{ 2,                     0x8000000000000000, false },
+		{ 0x7fffffff,            0x8000000000000000, false },
+		{ 0x80000000,            0x8000000000000000, false },
+		{ 0xffffffff,            0x8000000000000000, false },
+		{ 0,                     0xffffffffffffffff, true },
+		{ 1,                     0xffffffffffffffff, true },
+		{ 2,                     0xffffffffffffffff, true },
+		{ 0x7fffffff,            0xffffffffffffffff, true },
+		{ 0x80000000,            0xffffffffffffffff, false },
+		{ 0xffffffff,            0xffffffffffffffff, true },
+		// Special case - force addition overflow case
+		{ 0xffffffff,            0x100000002, false }
+	};
+
+	MultTestCase< std::int32_t, std::int64_t>::MultTestCase() : current(0)
+	{
+		this->test_cases = int32_int64;
+		this->count = COUNTOF(int32_int64);
+	}
+
+	static const MultTest< std::int32_t, std::int32_t > int32_int32[] =
+	{
+		{ 0,                     0, true },
+		{ 1,                     0, true },
+		{ 2,                     0, true },
+		{ 0x7fffffff,            0, true },
+		{ 0x80000000,            0, true },
+		{ 0xffffffff,            0, true },
+		{ 0,                     1, true },
+		{ 1,                     1, true },
+		{ 2,                     1, true },
+		{ 0x7fffffff,            1, true },
+		{ 0x80000000,            1, true },
+		{ 0xffffffff,            1, true },
+		{ 0,                     2, true },
+		{ 1,                     2, true },
+		{ 2,                     2, true },
+		{ 0x7fffffff,            2, false },
+		{ 0x80000000,            2, false },
+		{ 0xffffffff,            2, true },
+		{ 0,                     0x7fffffff, true },
+		{ 1,                     0x7fffffff, true },
+		{ 2,                     0x7fffffff, false },
+		{ 0x7fffffff,            0x7fffffff, false },
+		{ 0x80000000,            0x7fffffff, false },
+		{ 0xffffffff,            0x7fffffff, true },
+		{ 0,                     0x80000000, true },
+		{ 1,                     0x80000000, true },
+		{ 2,                     0x80000000, false },
+		{ 0x7fffffff,            0x80000000, false },
+		{ 0x80000000,            0x80000000, false },
+		{ 0xffffffff,            0x80000000, false },
+		{ 0,                     0xffffffff, true },
+		{ 1,                     0xffffffff, true },
+		{ 2,                     0xffffffff, true },
+		{ 0x7fffffff,            0xffffffff, true },
+		{ 0x80000000,            0xffffffff, false },
+		{ 0xffffffff,            0xffffffff, true },
+	};
+
+	MultTestCase< std::int32_t, std::int32_t>::MultTestCase() : current(0)
+	{
+		this->test_cases = int32_int32;
+		this->count = COUNTOF(int32_int32);
+	}
+
 }
