@@ -27,8 +27,8 @@ struct safe_test
 template <typename T, typename U, typename F1, typename F2>
 void mult_test_base(const char* type_str, F1 fcn1, F2 fcn2)
 {
-	MultTestCase< T, U> tests;
-	MultTest<T, U> test = tests.GetNext();
+	TestCase< T, U> tests;
+	Test<T, U> test = tests.GetNext();
 
 	while (!tests.Done())
 	{

@@ -2,15 +2,15 @@
 // Licensed under the MIT License.
 
 #include "TestMain.h"
-#include "MultVerify.h"
+#include "TestCase.h"
 
 namespace mult_verify
 {
 
 void MultVerifyUint64Uint64()
 {
-	MultTestCase< std::uint64_t, std::uint64_t> tests;
-	MultTest<std::uint64_t, std::uint64_t> test = tests.GetNext();
+	TestVector< std::uint64_t, std::uint64_t, OpType::Mult > tests;
+	TestCase<std::uint64_t, std::uint64_t, OpType::Mult > test = tests.GetNext();
 
 	while( !tests.Done() )
 	{
@@ -44,8 +44,8 @@ void MultVerifyUint64Uint64()
 
 void MultVerifyUint64Uint()
 {
-	MultTestCase< std::uint64_t, std::uint32_t> tests;
-	MultTest<std::uint64_t, std::uint32_t> test = tests.GetNext();
+	TestVector< std::uint64_t, std::uint32_t, OpType::Mult > tests;
+	TestCase<std::uint64_t, std::uint32_t, OpType::Mult > test = tests.GetNext();
 
 	while (!tests.Done())
 	{
@@ -78,8 +78,8 @@ void MultVerifyUint64Uint()
 
 void MultVerifyUintUint64()
 {
-	MultTestCase< std::uint32_t, std::uint64_t> tests;
-	MultTest<std::uint32_t, std::uint64_t> test = tests.GetNext();
+	TestVector< std::uint32_t, std::uint64_t, OpType::Mult > tests;
+	TestCase<std::uint32_t, std::uint64_t, OpType::Mult > test = tests.GetNext();
 
 	while (!tests.Done())
 	{
@@ -112,8 +112,8 @@ void MultVerifyUintUint64()
 
 void MultVerifyUint32Uint32()
 {
-	MultTestCase< std::uint32_t, std::uint32_t> tests;
-	MultTest<std::uint32_t, std::uint32_t> test = tests.GetNext();
+	TestVector< std::uint32_t, std::uint32_t, OpType::Mult > tests;
+	TestCase<std::uint32_t, std::uint32_t, OpType::Mult > test = tests.GetNext();
 
 	while (!tests.Done())
 	{
@@ -146,8 +146,8 @@ void MultVerifyUint32Uint32()
 
 void MultVerifyUintInt64()
 {
-	MultTestCase< std::uint32_t, std::int64_t> tests;
-	MultTest<std::uint32_t, std::int64_t> test = tests.GetNext();
+	TestVector< std::uint32_t, std::int64_t, OpType::Mult > tests;
+	TestCase<std::uint32_t, std::int64_t, OpType::Mult > test = tests.GetNext();
 
 	while (!tests.Done())
 	{
@@ -180,8 +180,8 @@ void MultVerifyUintInt64()
 
 void MultVerifyUint32Int32()
 {
-	MultTestCase< std::uint32_t, std::int32_t> tests;
-	MultTest<std::uint32_t, std::int32_t> test = tests.GetNext();
+	TestVector< std::uint32_t, std::int32_t, OpType::Mult > tests;
+	TestCase<std::uint32_t, std::int32_t, OpType::Mult > test = tests.GetNext();
 
 	while (!tests.Done())
 	{
@@ -214,8 +214,8 @@ void MultVerifyUint32Int32()
 
 void MultVerifyUint64Int64()
 {
-	MultTestCase< std::uint64_t, std::uint32_t> tests;
-	MultTest<std::uint64_t, std::uint32_t> test = tests.GetNext();
+	TestVector< std::uint64_t, std::uint32_t, OpType::Mult > tests;
+	TestCase<std::uint64_t, std::uint32_t, OpType::Mult > test = tests.GetNext();
 
 	while (!tests.Done())
 	{
@@ -248,8 +248,8 @@ void MultVerifyUint64Int64()
 
 void MultVerifyUint64Int()
 {
-	MultTestCase< std::uint64_t, std::int32_t> tests;
-	MultTest<std::uint64_t, std::int32_t> test = tests.GetNext();
+	TestVector< std::uint64_t, std::int32_t, OpType::Mult > tests;
+	TestCase<std::uint64_t, std::int32_t, OpType::Mult > test = tests.GetNext();
 
 	while (!tests.Done())
 	{
@@ -281,8 +281,8 @@ void MultVerifyUint64Int()
 
 void MultVerifyInt64Int64()
 {
-	MultTestCase< std::int64_t, std::int64_t> tests;
-	MultTest<std::int64_t, std::int64_t> test = tests.GetNext();
+	TestVector< std::int64_t, std::int64_t, OpType::Mult > tests;
+	TestCase<std::int64_t, std::int64_t, OpType::Mult > test = tests.GetNext();
 
 	while (!tests.Done())
 	{
@@ -315,8 +315,8 @@ void MultVerifyInt64Int64()
 
 void MultVerifyInt64Uint64()
 {
-	MultTestCase< std::int64_t, std::uint64_t> tests;
-	MultTest<std::int64_t, std::uint64_t> test = tests.GetNext();
+	TestVector< std::int64_t, std::uint64_t, OpType::Mult > tests;
+	TestCase<std::int64_t, std::uint64_t, OpType::Mult > test = tests.GetNext();
 
 	while (!tests.Done())
 	{
@@ -349,8 +349,8 @@ void MultVerifyInt64Uint64()
 
 void MultVerifyInt64Int()
 {
-	MultTestCase< std::int64_t, std::int64_t> tests;
-	MultTest<std::int64_t, std::int64_t> test = tests.GetNext();
+	TestVector< std::int64_t, std::int64_t, OpType::Mult > tests;
+	TestCase<std::int64_t, std::int64_t, OpType::Mult > test = tests.GetNext();
 
 	while (!tests.Done())
 	{
@@ -384,8 +384,8 @@ void MultVerifyInt64Int()
 
 void MultVerifyInt64Uint32()
 {
-	MultTestCase< std::int64_t, std::int32_t> tests;
-	MultTest<std::int64_t, std::int32_t> test = tests.GetNext();
+	TestVector< std::int64_t, std::int32_t, OpType::Mult > tests;
+	TestCase<std::int64_t, std::int32_t, OpType::Mult > test = tests.GetNext();
 
 	while (!tests.Done())
 	{
@@ -418,8 +418,8 @@ void MultVerifyInt64Uint32()
 
 void MultVerifyInt32Int64()
 {
-	MultTestCase< std::int32_t, std::int64_t> tests;
-	MultTest<std::int32_t, std::int64_t> test = tests.GetNext();
+	TestVector< std::int32_t, std::int64_t, OpType::Mult > tests;
+	TestCase<std::int32_t, std::int64_t, OpType::Mult > test = tests.GetNext();
 
 	while (!tests.Done())
 	{
@@ -452,8 +452,8 @@ void MultVerifyInt32Int64()
 
 void MultVerifyInt32Int32()
 {
-	MultTestCase< std::int32_t, std::int32_t> tests;
-	MultTest<std::int32_t, std::int32_t> test = tests.GetNext();
+	TestVector< std::int32_t, std::int32_t, OpType::Mult > tests;
+	TestCase<std::int32_t, std::int32_t, OpType::Mult > test = tests.GetNext();
 
 	while (!tests.Done())
 	{
@@ -486,8 +486,8 @@ void MultVerifyInt32Int32()
 
 void MultVerifyInt32Uint64()
 {
-	MultTestCase< std::int32_t, std::uint64_t> tests;
-	MultTest<std::int32_t, std::uint64_t> test = tests.GetNext();
+	TestVector< std::int32_t, std::uint64_t, OpType::Mult > tests;
+	TestCase<std::int32_t, std::uint64_t, OpType::Mult > test = tests.GetNext();
 
 	while (!tests.Done())
 	{
@@ -520,8 +520,8 @@ void MultVerifyInt32Uint64()
 
 void MultVerifyInt32Uint32()
 {
-	MultTestCase< std::int32_t, std::uint32_t> tests;
-	MultTest<std::int32_t, std::uint32_t> test = tests.GetNext();
+	TestVector< std::int32_t, std::uint32_t, OpType::Mult > tests;
+	TestCase<std::int32_t, std::uint32_t, OpType::Mult > test = tests.GetNext();
 
 	while (!tests.Done())
 	{
@@ -552,7 +552,7 @@ void MultVerifyInt32Uint32()
 	}
 }
 
-static const MultTest< std::uint8_t, std::uint8_t > uint8_uint8[] = 
+static const TestCase< std::uint8_t, std::uint8_t, OpType::Mult > uint8_uint8[] =
 {
 	{ 0,	0, true },
 	{ 1,	0, true },
@@ -716,7 +716,7 @@ void MultVerifyUint8Uint8()
 #pragma warning( disable: 4309 )
 #endif
 
-static const MultTest< std::int8_t, std::int8_t > int8_int8[] = 
+static const TestCase< std::int8_t, std::int8_t, OpType::Mult > int8_int8[] =
 {
 	{ 0,	0, true },
 	{ 1,	0, true },

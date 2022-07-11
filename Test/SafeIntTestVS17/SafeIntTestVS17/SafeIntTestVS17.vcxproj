@@ -131,6 +131,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\MultVerify.h" />
+    <ClInclude Include="..\..\TestCase.h" />
     <ClInclude Include="..\..\TestMain.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
