@@ -42,12 +42,12 @@
     <ClCompile Include="..\..\MultTestCase.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\DivTestCase.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\TestMain.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\MultVerify.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\TestCase.h">

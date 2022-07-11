@@ -121,6 +121,7 @@
   <ItemGroup>
     <ClCompile Include="..\..\AddVerify.cpp" />
     <ClCompile Include="..\..\CastVerify.cpp" />
+    <ClCompile Include="..\..\DivTestCase.cpp" />
     <ClCompile Include="..\..\DivVerify.cpp" />
     <ClCompile Include="..\..\IncDecVerify.cpp" />
     <ClCompile Include="..\..\ModVerify.cpp" />
@@ -130,7 +131,6 @@
     <ClCompile Include="..\..\TestMain.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\MultVerify.h" />
     <ClInclude Include="..\..\TestCase.h" />
     <ClInclude Include="..\..\TestMain.h" />
   </ItemGroup>
