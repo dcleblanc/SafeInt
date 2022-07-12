@@ -12,6 +12,7 @@
 
 void add_test(void);
 void mult_test(void);
+void div_test(void);
 
 int main(int argc, char* argv[])
 {
@@ -20,6 +21,7 @@ int main(int argc, char* argv[])
 
 	add_test();
 	mult_test();
+	div_test();
 
 	return 0;
 }

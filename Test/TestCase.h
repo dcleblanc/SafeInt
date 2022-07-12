@@ -9,6 +9,27 @@ enum OpType
 	Sub
 };
 
+struct OpName
+{
+	static const char* op_name(int op) 
+	{
+		switch (op)
+		{
+		case OpType::Mult:
+			return "Mult";
+		case OpType::Div:
+		case OpType::Div2:
+			return "Div";
+		case OpType::Add:
+			return "Add";
+		case OpType::Sub:
+			return "Sub";
+		default:
+			return "";
+		}
+	};
+};
+
 template <typename T, typename U, int op>
 struct TestCase
 {
@@ -54,3 +75,4 @@ private:
 	size_t count;
 	size_t current;
 };
+

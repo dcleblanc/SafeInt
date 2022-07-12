@@ -1574,8 +1574,6 @@ inline int32_t safe_div_int32_uint64(int32_t a, uint64_t b)
         a2 /= b;
         return (int32_t)negate32((int32_t)a2);
     }
-
-    safe_math_fail("safe_math_fail safe_div_int32_uint64");
 }
 
 inline bool check_div_int32_uint64(int32_t a, uint64_t b, int32_t* ret)
@@ -1597,26 +1595,68 @@ inline bool check_div_int32_uint64(int32_t a, uint64_t b, int32_t* ret)
         *ret = (int32_t)negate32((int32_t)a2);
         return true;
     }
-
-    return false;
 }
 
 inline uint32_t safe_div_uint32_int32(uint32_t a, int32_t b)
 {
-    if (b > 0)
+    // Follow original SafeInt logic for this case
+    if (b == 0) // div 0 always a problem
     {
-        return a / b;
+        safe_math_fail("safe_math_fail safe_div_uint32_int32");
     }
-    safe_math_fail("safe_math_fail safe_div_uint32_uint64");
+
+    if (a == 0) // zero divided by anything is zero
+    {
+        return 0;
+    }
+
+    if (b > 0) // if b is positive, just do the math
+    {
+        return (uint32_t)(a / b);
+    }
+    else // now have to check magnitude
+    {
+        uint32_t tmp = safe_abs32(b);
+
+        if (a < tmp)
+        {
+            return 0;
+        }
+    }
+
+    safe_math_fail("safe_math_fail safe_div_uint32_int32");
 }
 
 inline bool check_div_uint32_int32(uint32_t a, int32_t b, uint32_t* ret)
 {
-    if (b > 0)
+    // Follow original SafeInt logic for this case
+    if (b == 0) // div 0 always a problem
     {
-        *ret = a / b;
+        return false;
+    }
+
+    if (a == 0) // zero divided by anything is zero
+    {
+        *ret = 0;
         return true;
     }
+
+    if (b > 0) // if b is positive, just do the math
+    {
+        *ret = (uint32_t)(a / b);
+        return true;
+    }
+    else // now have to check magnitude
+    {
+        uint32_t tmp = safe_abs32(b);
+
+        if (a < tmp)
+        {
+            *ret = 0;
+            return true;
+        }
+    }
+
     return false;
 }
 
@@ -1642,20 +1682,64 @@ inline bool check_div_uint32_uint32(uint32_t a, uint32_t b, uint32_t* ret)
 
 inline uint32_t safe_div_uint32_int64(uint32_t a, int64_t b)
 {
-    if (b > 0)
+    // Follow original SafeInt logic for this case
+    if (b == 0) // div 0 always a problem
+    {
+        safe_math_fail("safe_math_fail safe_div_uint32_int64");
+    }
+
+    if (a == 0) // zero divided by anything is zero
+    {
+        return 0;
+    }
+
+    if (b > 0) // if b is positive, just do the math
     {
         return (uint32_t)(a / b);
     }
-    safe_math_fail("safe_math_fail safe_div_uint32_uint64");
+    else // now have to check magnitude
+    {
+        uint64_t tmp = safe_abs64(b);
+
+        if (a < tmp)
+        {
+            return 0;
+        }
+    }
+
+    safe_math_fail("safe_math_fail safe_div_uint32_int64");
 }
 
 inline bool check_div_uint32_int64(uint32_t a, int64_t b, uint32_t* ret)
 {
-    if (b > 0)
+    // Follow original SafeInt logic for this case
+    if (b == 0) // div 0 always a problem
+    {
+        return false;
+    }
+
+    if (a == 0) // zero divided by anything is zero
+    {
+        *ret = 0;
+        return true;
+    }
+
+    if (b > 0) // if b is positive, just do the math
     {
         *ret = (uint32_t)(a / b);
         return true;
     }
+    else // now have to check magnitude
+    {
+        uint64_t tmp = safe_abs64(b);
+
+        if (a < tmp)
+        {
+            *ret = 0;
+            return true;
+        }
+    }
+
     return false;
 }
 
@@ -1749,18 +1833,62 @@ inline bool check_div_int64_uint64(int64_t a, uint64_t b, int64_t* ret)
 
 inline uint64_t safe_div_uint64_int32(uint64_t a, int32_t b)
 {
-    if (b > 0)
+    // Follow original SafeInt logic for this case
+    if (b == 0) // div 0 always a problem
+    {
+        safe_math_fail("safe_math_fail safe_div_int64_int32");
+    }
+
+    if (a == 0) // zero divided by anything is zero
+    {
+        return 0;
+    }
+
+    if (b > 0) // if b is positive, just do the math
+    {
         return a / b;
+    }
+    else // now have to check magnitude
+    {
+        uint32_t tmp = safe_abs32(b);
+
+        if (a < tmp)
+        {
+            return 0;
+        }
+    }
 
     safe_math_fail("safe_math_fail safe_div_int64_int32");
 }
 
 inline bool check_div_uint64_int32(uint64_t a, int32_t b, uint64_t* ret)
 {
-    if (b > 0)
+    // Follow original SafeInt logic for this case
+    if (b == 0) // div 0 always a problem
+    {
+        return false;
+    }
+
+    if (a == 0) // zero divided by anything is zero
+    {
+        *ret = 0;
+        return true;
+    }
+
+    if (b > 0) // if b is positive, just do the math
     {
         *ret = a / b;
         return true;
+    }
+    else // now have to check magnitude
+    {
+        uint32_t tmp = safe_abs32(b);
+
+        if (a < tmp)
+        {
+            *ret = 0;
+            return true;
+        }
     }
 
     return false;
@@ -1787,18 +1915,62 @@ inline bool check_div_uint64_uint32(uint64_t a, uint32_t b, uint64_t* ret)
 
 inline uint64_t safe_div_uint64_int64(uint64_t a, int64_t b)
 {
-    if (b > 0)
-        return a / b;
+    // Follow original SafeInt logic for this case
+    if (b == 0) // div 0 always a problem
+    {
+        safe_math_fail("safe_math_fail safe_div_int64_int32");
+    }
 
-    safe_math_fail("safe_math_fail safe_div_int64_int64");
+    if (a == 0) // zero divided by anything is zero
+    {
+        return 0;
+    }
+
+    if (b > 0) // if b is positive, just do the math
+    {
+        return a / b;
+    }
+    else // now have to check magnitude
+    {
+        uint64_t tmp = safe_abs64(b);
+
+        if (a < tmp)
+        {
+            return 0;
+        }
+    }
+
+    safe_math_fail("safe_math_fail safe_div_int64_int32");
 }
 
 inline bool check_div_uint64_int64(uint64_t a, int64_t b, uint64_t* ret)
 {
-    if (b > 0)
+    // Follow original SafeInt logic for this case
+    if (b == 0) // div 0 always a problem
+    {
+        return false;
+    }
+
+    if (a == 0) // zero divided by anything is zero
+    {
+        *ret = 0;
+        return true;
+    }
+
+    if (b > 0) // if b is positive, just do the math
     {
         *ret = a / b;
         return true;
+    }
+    else // now have to check magnitude
+    {
+        uint64_t tmp = safe_abs64(b);
+
+        if (a < tmp)
+        {
+            *ret = 0;
+            return true;
+        }
     }
 
     return false;
