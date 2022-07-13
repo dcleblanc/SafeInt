@@ -114,10 +114,12 @@ void sub_test_int32_uint64()
 
 void sub_test_int32_uint32()
 {
+	trace t(false);
 	typedef bool (*test_fcn)(std::int32_t, std::uint32_t, std::int32_t*);
 	typedef std::int32_t(*check_fcn)(std::int32_t, std::uint32_t);
 
 	test_base<std::int32_t, std::uint32_t, test_fcn, check_fcn, OpType::Sub>("int32_uint32", &check_sub_int32_uint32, &safe_sub_int32_uint32);
+	t.trace_msg("completed sub_test_int32_uint64");
 }
 
 void sub_test_int32_int64()

@@ -118,8 +118,7 @@ extern "C"
 
 SAFEINT_NORETURN void safe_math_fail(const char* msg)
 {
-    const char* not_used = msg;
-    not_used = (const char*)0;
+    (void)msg;
     abort();
 }
 #endif
@@ -2161,14 +2160,14 @@ inline int32_t safe_sub_int32_uint64(int32_t a, uint64_t b)
     {
         if (b <= AbsMinInt32 - safe_abs32(a))
         {
-            return (int32_t)(a - (int32_t)b);
+            return (int32_t)(a - (int64_t)b);
         }
     }
     else
     {
         if (b <= AbsMinInt32 + (uint64_t)a)
         {
-            return (int32_t)(a - (int32_t)b);
+            return (int32_t)(a - (int64_t)b);
         }
     }
 
@@ -2185,7 +2184,7 @@ inline bool check_sub_int32_uint64(int32_t a, uint64_t b, int32_t* ret)
     {
         if (b <= AbsMinInt32 - safe_abs32(a))
         {
-            *ret = (int32_t)(a - (int32_t)b);
+            *ret = (int32_t)(a - (int64_t)b);
             return true;
         }
     }
@@ -2193,7 +2192,7 @@ inline bool check_sub_int32_uint64(int32_t a, uint64_t b, int32_t* ret)
     {
         if (b <= AbsMinInt32 + (uint64_t)a)
         {
-            *ret = (int32_t)(a - (int32_t)b);
+            *ret = (int32_t)((int64_t)a - (int64_t)b);
             return true;
         }
     }

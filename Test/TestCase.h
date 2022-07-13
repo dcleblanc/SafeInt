@@ -127,3 +127,25 @@ void err_msg(const std::string& msg, T t, bool expected)
 {
 	std::cerr << msg << to_hex(t) << ", expected = " << expected << std::endl;
 }
+
+class trace 
+{
+public:
+
+	trace(bool f = false) : enable(f){}
+
+	void trace_msg(const std::string& msg)
+	{
+		if(enable)
+			std::cout << msg << std::endl;
+	}
+
+	void trace_msg(const char* msg)
+	{
+		if(enable)
+			trace_msg(std::string(msg));
+	}
+
+	bool enable;
+};
+

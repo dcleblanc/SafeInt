@@ -132,7 +132,7 @@ else()
 
     target_compile_options(CompileTest_clang14_NoEH PUBLIC -Wall -std=c++14 -fno-exceptions)
 
-    add_executable(safe_math_test
+    add_executable(safe_math_test_clang
         ../c_safe_math/safe_math_test.c
         ../c_safe_math/safe_math_test.h
         ../c_safe_math/safe_math_test_add.cpp
@@ -143,11 +143,21 @@ else()
         ../DivTestCase.cpp
         ../MultTestCase.cpp
         ../SubTestCase.cpp
+        ../../safe_math.h
+        ../../safe_math_impl.h
         )
 
-    target_compile_definitions(safe_math_test PUBLIC)
-    target_compile_options(safe_math_test PUBLIC)
-    
+    target_compile_definitions(safe_math_test_clang PUBLIC)
+    target_compile_options(safe_math_test_clang PUBLIC)
+
+    add_executable(safe_math_compile_clang
+        ../c_safe_math/safe_math_compile.c
+        ../../safe_math.h
+        ../../safe_math_impl.h
+    )
+
+    target_compile_options(safe_math_compile_clang PUBLIC -Wall)
+
 endif()
 
 enable_testing()
@@ -156,7 +166,7 @@ if(CLANG_PLUS_PLUS)
     add_test(NAME SafeIntTest_clang COMMAND SafeIntTest_clang)
     add_test(NAME SafeIntTest_clang_NoIntrinsic COMMAND SafeIntTest_clang_NoIntrinsic)
     add_test(NAME SafeIntTest_clang_NoInt128 COMMAND SafeIntTest_clang_NoInt128)
-    add_test(NAME safe_math_test_clang COMMAND safe_math_test)
+    add_test(NAME safe_math_test_clang COMMAND safe_math_test_clang)
 
 
     set_tests_properties(SafeIntTest_clang 

@@ -62,13 +62,15 @@ void test_base(const char* type_str, F1 fcn1, F2 fcn2)
 	{
 		T ret;
 
+		// err_msg(std::string(OpName::op_name(op)) + "_test_" + type_str + " enter: ", test.x, test.y, test.fExpected);
+
 		check_test<T, U> ct;
 		bool result = ct.operator()(fcn1, test.x, test.y, &ret);
 
 		if (!!result != test.fExpected)
 		{
 			std::string msg = std::string("Failure in ") + OpName::op_name(op) + "_test_" + type_str;
-			err_msg(msg, test.x, test.y, test.fExpected);
+			// err_msg(msg, test.x, test.y, test.fExpected);
 			throw std::runtime_error(msg.c_str());
 		}
 
@@ -87,10 +89,11 @@ void test_base(const char* type_str, F1 fcn1, F2 fcn2)
 		if (actual != test.fExpected)
 		{
 			std::string msg = std::string("Failure in ") + OpName::op_name(op) + "_test_" + type_str;
-			err_msg(msg, test.x, test.y, test.fExpected);
+			// err_msg(msg, test.x, test.y, test.fExpected);
 			throw std::runtime_error(msg.c_str());
 		}
 
+		// err_msg(std::string(OpName::op_name(op)) + "_test_" + type_str + " completed: ", test.x, test.y, test.fExpected);
 		test = tests.GetNext();
 	}
 }

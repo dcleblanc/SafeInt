@@ -123,7 +123,7 @@ else()
 
     target_compile_options(CompileTest_gcc14_NoEH PUBLIC -Wall -std=c++14 -fno-exceptions)
 
-    add_executable(safe_math_test
+    add_executable(safe_math_test_gcc
     ../c_safe_math/safe_math_test.c
     ../c_safe_math/safe_math_test.h
     ../c_safe_math/safe_math_test_add.cpp
@@ -136,8 +136,16 @@ else()
     ../SubTestCase.cpp
     )
 
-    target_compile_definitions(safe_math_test PUBLIC)
-    target_compile_options(safe_math_test PUBLIC)
+    target_compile_definitions(safe_math_test_gcc PUBLIC)
+    target_compile_options(safe_math_test_gcc PUBLIC)
+
+    add_executable(safe_math_compile_gcc
+    ../c_safe_math/safe_math_compile.c
+    ../../safe_math.h
+    ../../safe_math_impl.h
+)
+
+target_compile_options(safe_math_compile_gcc PUBLIC -Wall)
 
 
 endif()
@@ -149,7 +157,7 @@ if(GCC_PLUS_PLUS)
     add_test(NAME SafeIntTest_gcc COMMAND SafeIntTest_gcc)
     add_test(NAME SafeIntTest_gcc_NoIntrinsic COMMAND SafeIntTest_gcc_NoIntrinsic)
     add_test(NAME SafeIntTest_gcc_NoInt128 COMMAND SafeIntTest_gcc_NoInt128)
-    add_test(NAME safe_math_test_gcc COMMAND safe_math_test)
+    add_test(NAME safe_math_test_gcc COMMAND safe_math_test_gcc)
 
     set_tests_properties(SafeIntTest_gcc 
                         SafeIntTest_gcc_NoIntrinsic 
