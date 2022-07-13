@@ -1,3 +1,6 @@
+// Licensed under the MIT License.
+// Copyright David LeBlanc - dcl@dleblanc.net
+
 #pragma warning(push)
 #pragma warning(disable: 4365) // signed/unsigned mismatch in iostream
 #include <exception>

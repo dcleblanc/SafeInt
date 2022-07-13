@@ -1,5 +1,11 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
+
+#if defined _MSC_VER
+// Inline expansion warnings
+#pragma warning(disable:4710 4711)
+#endif
+
 #include "TestMain.h"
 #include "TestCase.h"
 /*

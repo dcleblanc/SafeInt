@@ -15,6 +15,11 @@ and are originally copyrighted to Microsoft.
 #ifndef C_SAFE_MATH_IMPL
 #define C_SAFE_MATH_IMPL
 
+#if defined _MSC_VER
+// Inline expansion warnings
+#pragma warning(disable:4710 4711)
+#endif
+
 #ifdef __cplusplus
 extern "C"
 {

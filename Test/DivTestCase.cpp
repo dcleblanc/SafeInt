@@ -1,3 +1,10 @@
+// Licensed under the MIT License.
+// Copyright David LeBlanc - dcl@dleblanc.net
+#if defined _MSC_VER
+// Inline expansion warnings
+#pragma warning(disable:4710 4711)
+#endif
+
 #include "TestMain.h"
 #include "TestCase.h"
 

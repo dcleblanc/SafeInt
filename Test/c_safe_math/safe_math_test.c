@@ -8,7 +8,6 @@
 #endif
 
 #include <stdio.h>
-//#include "../../safe_math.h"
 
 void add_test(void);
 void mult_test(void);
