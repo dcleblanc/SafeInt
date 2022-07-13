@@ -22,7 +22,7 @@
 // This has to be done in C++ so we can catch exceptions, not abort
 NORETURN inline void safe_math_fail(const char* msg)
 {
-	throw std::exception(msg);
+	throw std::runtime_error(msg);
 }
 
 #define SAFE_MATH_FAIL_DEFINED
@@ -70,7 +70,7 @@ void test_base(const char* type_str, F1 fcn1, F2 fcn2)
 			std::string msg = std::string("Failure in ") + OpName::op_name(op) + "_test_" + type_str;
 
 			assert(false);
-			throw std::exception(msg.c_str());
+			throw std::runtime_error(msg.c_str());
 		}
 
 		bool actual;
@@ -90,7 +90,7 @@ void test_base(const char* type_str, F1 fcn1, F2 fcn2)
 			std::string msg = std::string("Failure in ") + OpName::op_name(op) + "_test_" + type_str;
 
 			assert(false);
-			throw std::exception(msg.c_str());
+			throw std::runtime_error(msg.c_str());
 		}
 
 		test = tests.GetNext();

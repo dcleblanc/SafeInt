@@ -317,6 +317,7 @@ static const TestCase< std::uint64_t, std::uint64_t, OpType::Add > uint64_uint64
 	{ 0xffffffffffffffff, 0xffffffffffffffff, false},
 };
 
+template<>
 TestVector< std::uint64_t, std::uint64_t, OpType::Add >::TestVector() : current(0)
 {
 	this->test_cases = uint64_uint64;
@@ -488,6 +489,7 @@ static const TestCase< std::uint64_t, std::uint32_t, OpType::Add > uint64_uint32
 	{ 0xffffffffffffffff, 0xffffffff, false},
 };
 
+template<>
 TestVector< std::uint64_t, std::uint32_t, OpType::Add >::TestVector() : current(0)
 {
 	this->test_cases = uint64_uint32;
@@ -659,6 +661,7 @@ static const TestCase< std::uint64_t, std::uint16_t, OpType::Add > uint64_uint16
 	{ 0xffffffffffffffff, 0xffff, false},
 };
 
+template<>
 TestVector< std::uint64_t, std::uint16_t, OpType::Add >::TestVector() : current(0)
 {
 	this->test_cases = uint64_uint16;
@@ -830,6 +833,7 @@ static const TestCase< std::uint64_t, std::uint8_t, OpType::Add > uint64_uint8[]
 	{ 0xffffffffffffffff, 0xff, false},
 };
 
+template<>
 TestVector< std::uint64_t, std::uint8_t, OpType::Add >::TestVector() : current(0)
 {
 	this->test_cases = uint64_uint8;
@@ -1145,6 +1149,7 @@ static const TestCase< std::uint64_t, std::int64_t, OpType::Add > uint64_int64[]
 	{ 0xffffffffffffffff, (std::int64_t)0xffffffffffffffff, true},
 };
 
+template<>
 TestVector< std::uint64_t, std::int64_t, OpType::Add >::TestVector() : current(0)
 {
 	this->test_cases = uint64_int64;
@@ -1316,6 +1321,7 @@ static const TestCase< std::uint64_t, std::int32_t, OpType::Add > uint64_int32[]
 	{ 0xffffffffffffffff, (std::int32_t)0xffffffff, true},
 };
 
+template<>
 TestVector< std::uint64_t, std::int32_t, OpType::Add >::TestVector() : current(0)
 {
 	this->test_cases = uint64_int32;
@@ -1487,6 +1493,7 @@ static const TestCase< std::uint64_t, std::int16_t, OpType::Add > uint64_int16[]
 	{ 0xffffffffffffffff, (std::int16_t)0xffff, true},
 };
 
+template<>
 TestVector< std::uint64_t, std::int16_t, OpType::Add >::TestVector() : current(0)
 {
 	this->test_cases = uint64_int16;
@@ -1658,6 +1665,7 @@ static const TestCase< std::uint64_t, std::int8_t, OpType::Add > uint64_int8[] =
 	{ 0xffffffffffffffff, (std::int8_t)0xff, true},
 };
 
+template<>
 TestVector< std::uint64_t, std::int8_t, OpType::Add >::TestVector() : current(0)
 {
 	this->test_cases = uint64_int8;
@@ -1973,6 +1981,7 @@ static const TestCase< std::int64_t, std::uint64_t, OpType::Add > int64_uint64[]
 	{ 0xffffffffffffffff, 0xffffffffffffffff, false},
 };
 
+template<>
 TestVector< std::int64_t, std::uint64_t, OpType::Add >::TestVector() : current(0)
 {
 	this->test_cases = int64_uint64;
@@ -2144,6 +2153,7 @@ static const TestCase< std::int64_t, std::uint32_t, OpType::Add > int64_uint32[]
 	{ 0xffffffffffffffff, 0xffffffff, true},
 };
 
+template<>
 TestVector< std::int64_t, std::uint32_t, OpType::Add >::TestVector() : current(0)
 {
 	this->test_cases = int64_uint32;
@@ -2315,6 +2325,7 @@ static const TestCase< std::int64_t, std::uint16_t, OpType::Add > int64_uint16[]
 	{ 0xffffffffffffffff, 0xffff, true},
 };
 
+template<>
 TestVector< std::int64_t, std::uint16_t, OpType::Add >::TestVector() : current(0)
 {
 	this->test_cases = int64_uint16;
@@ -2486,6 +2497,7 @@ static const TestCase< std::int64_t, std::uint8_t, OpType::Add > int64_uint8[] =
 	{ 0xffffffffffffffff, 0xff, true},
 };
 
+template<>
 TestVector< std::int64_t, std::uint8_t, OpType::Add >::TestVector() : current(0)
 {
 	this->test_cases = int64_uint8;
@@ -2801,6 +2813,7 @@ static const TestCase< std::int64_t, std::int64_t, OpType::Add > int64_int64[] =
 	{ 0xffffffffffffffff, 0xffffffffffffffff, true},
 };
 
+template<>
 TestVector< std::int64_t, std::int64_t, OpType::Add >::TestVector() : current(0)
 {
 	this->test_cases = int64_int64;
@@ -2972,6 +2985,7 @@ static const TestCase< std::int64_t, std::int32_t, OpType::Add > int64_int32[] =
 	{ 0xffffffffffffffff, 0xffffffff, true},
 };
 
+template<>
 TestVector< std::int64_t, std::int32_t, OpType::Add >::TestVector() : current(0)
 {
 	this->test_cases = int64_int32;
@@ -3143,6 +3157,7 @@ static const TestCase< std::int64_t, std::int16_t, OpType::Add > int64_int16[] =
 	{ 0xffffffffffffffff, 0xffff, true},
 };
 
+template<>
 TestVector< std::int64_t, std::int16_t, OpType::Add >::TestVector() : current(0)
 {
 	this->test_cases = int64_int16;
@@ -3314,6 +3329,7 @@ static const TestCase< std::int64_t, std::int8_t, OpType::Add > int64_int8[] =
 	{ 0xffffffffffffffff, 0xff, true},
 };
 
+template<>
 TestVector< std::int64_t, std::int8_t, OpType::Add >::TestVector() : current(0)
 {
 	this->test_cases = int64_int8;
@@ -3501,6 +3517,7 @@ static const TestCase< std::uint32_t, std::uint64_t, OpType::Add > uint32_uint64
 	{ 0xffffffff, 0xffffffffffffffff, false},
 };
 
+template<>
 TestVector< std::uint32_t, std::uint64_t, OpType::Add >::TestVector() : current(0)
 {
 	this->test_cases = uint32_uint64;
@@ -3600,6 +3617,7 @@ static const TestCase< std::uint32_t, std::uint32_t, OpType::Add > uint32_uint32
 	{ 0xffffffff, 0xffffffff, false},
 };
 
+template<>
 TestVector< std::uint32_t, std::uint32_t, OpType::Add >::TestVector() : current(0)
 {
 	this->test_cases = uint32_uint32;
@@ -3779,6 +3797,7 @@ static const TestCase< std::uint32_t, std::int64_t, OpType::Add > uint32_int64[]
 	{ 0xffffffff, 0xffffffffffffffff, true },
 };
 
+template<>
 TestVector< std::uint32_t, std::int64_t, OpType::Add >::TestVector() : current(0)
 {
 	this->test_cases = uint32_int64;
@@ -3878,6 +3897,7 @@ static const TestCase< std::uint32_t, std::int32_t, OpType::Add > uint32_int32[]
 	{ 0xffffffff, 0xffffffff, true},
 };
 
+template<>
 TestVector< std::uint32_t, std::int32_t, OpType::Add >::TestVector() : current(0)
 {
 	this->test_cases = uint32_int32;
@@ -4057,6 +4077,7 @@ static const TestCase< std::int32_t, std::uint64_t, OpType::Add > int32_uint64[]
 	{ 0xffffffff, 0xffffffffffffffff, false },
 };
 
+template<>
 TestVector< std::int32_t, std::uint64_t, OpType::Add >::TestVector() : current(0)
 {
 	this->test_cases = int32_uint64;
@@ -4156,6 +4177,7 @@ static const TestCase< std::int32_t, std::uint32_t, OpType::Add > int32_uint32[]
 	{ 0xffffffff, 0xffffffff, false},
 };
 
+template<>
 TestVector< std::int32_t, std::uint32_t, OpType::Add >::TestVector() : current(0)
 {
 	this->test_cases = int32_uint32;
@@ -4335,6 +4357,7 @@ static const TestCase< std::int32_t, std::int64_t, OpType::Add > int32_int64[] =
 	{ 0xffffffff, 0xffffffffffffffff, true },
 };
 
+template<>
 TestVector< std::int32_t, std::int64_t, OpType::Add >::TestVector() : current(0)
 {
 	this->test_cases = int32_int64;
@@ -4434,6 +4457,7 @@ static const TestCase< std::int32_t, std::int32_t, OpType::Add > int32_int32[] =
 	{ 0xffffffff, 0xffffffff, true},
 };
 
+template<>
 TestVector< std::int32_t, std::int32_t, OpType::Add >::TestVector() : current(0)
 {
 	this->test_cases = int32_int32;
@@ -4613,6 +4637,7 @@ static const TestCase< std::uint8_t, std::uint64_t, OpType::Add > uint8_uint64[]
 	{ 0xff, 0xffffffffffffffff, false},
 };
 
+template<>
 TestVector< std::uint8_t, std::uint64_t, OpType::Add >::TestVector() : current(0)
 {
 	this->test_cases = uint8_uint64;
@@ -4712,6 +4737,7 @@ static const TestCase< std::uint8_t, std::uint32_t, OpType::Add > uint8_uint32[]
 	{ 0xff, 0xffffffff, false},
 };
 
+template<>
 TestVector< std::uint8_t, std::uint32_t, OpType::Add >::TestVector() : current(0)
 {
 	this->test_cases = uint8_uint32;
@@ -4811,6 +4837,7 @@ static const TestCase< std::uint8_t, std::uint16_t, OpType::Add > uint8_uint16[]
 	{ 0xff, 0xffff, false},
 };
 
+template<>
 TestVector< std::uint8_t, std::uint16_t, OpType::Add >::TestVector() : current(0)
 {
 	this->test_cases = uint8_uint16;
@@ -4910,6 +4937,7 @@ static const TestCase< std::uint8_t, std::uint8_t, OpType::Add > uint8_uint8[] =
 	{ 0xff, 0xff, false},
 };
 
+template<>
 TestVector< std::uint8_t, std::uint8_t, OpType::Add >::TestVector() : current(0)
 {
 	this->test_cases = uint8_uint8;
@@ -5089,6 +5117,7 @@ static const TestCase< std::uint8_t, std::int64_t, OpType::Add > uint8_int64[] =
 	{ 0xff, 0xffffffffffffffff, true},
 };
 
+template<>
 TestVector< std::uint8_t, std::int64_t, OpType::Add >::TestVector() : current(0)
 {
 	this->test_cases = uint8_int64;
@@ -5188,6 +5217,7 @@ static const TestCase< std::uint8_t, std::int32_t, OpType::Add > uint8_int32[] =
 	{ 0xff, 0xffffffff, true},
 };
 
+template<>
 TestVector< std::uint8_t, std::int32_t, OpType::Add >::TestVector() : current(0)
 {
 	this->test_cases = uint8_int32;
@@ -5287,6 +5317,7 @@ static const TestCase< std::uint8_t, std::int16_t, OpType::Add > uint8_int16[] =
 	{ 0xff, 0xffff, true},
 };
 
+template<>
 TestVector< std::uint8_t, std::int16_t, OpType::Add >::TestVector() : current(0)
 {
 	this->test_cases = uint8_int16;
@@ -5386,6 +5417,7 @@ static const TestCase< std::uint8_t, std::int8_t, OpType::Add > uint8_int8[] =
 	{ 0xff, 0xff, true},
 };
 
+template<>
 TestVector< std::uint8_t, std::int8_t, OpType::Add >::TestVector() : current(0)
 {
 	this->test_cases = uint8_int8;
@@ -5565,6 +5597,7 @@ static const TestCase< std::int8_t, std::uint64_t, OpType::Add > int8_uint64[] =
 	{ 0xff, 0xffffffffffffffff, false},
 };
 
+template<>
 TestVector< std::int8_t, std::uint64_t, OpType::Add >::TestVector() : current(0)
 {
 	this->test_cases = int8_uint64;
@@ -5664,6 +5697,7 @@ static const TestCase< std::int8_t, std::uint32_t, OpType::Add > int8_uint32[] =
 	{ 0xff, 0xffffffff, false},
 };
 
+template<>
 TestVector< std::int8_t, std::uint32_t, OpType::Add >::TestVector() : current(0)
 {
 	this->test_cases = int8_uint32;
@@ -5763,6 +5797,7 @@ static const TestCase< std::int8_t, std::uint16_t, OpType::Add > int8_uint16[] =
 	{ 0xff, 0xffff, false},
 };
 
+template<>
 TestVector< std::int8_t, std::uint16_t, OpType::Add >::TestVector() : current(0)
 {
 	this->test_cases = int8_uint16;
@@ -5862,6 +5897,7 @@ static const TestCase< std::int8_t, std::uint8_t, OpType::Add > int8_uint8[] =
 	{ 0xff, 0xff, false},
 };
 
+template<>
 TestVector< std::int8_t, std::uint8_t, OpType::Add >::TestVector() : current(0)
 {
 	this->test_cases = int8_uint8;
@@ -6041,6 +6077,7 @@ static const TestCase< std::int8_t, std::int64_t, OpType::Add > int8_int64[] =
 	{ 0xff, 0xffffffffffffffff, true},
 };
 
+template<>
 TestVector< std::int8_t, std::int64_t, OpType::Add >::TestVector() : current(0)
 {
 	this->test_cases = int8_int64;
@@ -6140,6 +6177,7 @@ static const TestCase< std::int8_t, std::int32_t, OpType::Add > int8_int32[] =
 	{ 0xff, 0xffffffff, true},
 };
 
+template<>
 TestVector< std::int8_t, std::int32_t, OpType::Add >::TestVector() : current(0)
 {
 	this->test_cases = int8_int32;
@@ -6239,6 +6277,7 @@ static const TestCase< std::int8_t, std::int16_t, OpType::Add > int8_int16[] =
 	{ 0xff, 0xffff, true},
 };
 
+template<>
 TestVector< std::int8_t, std::int16_t, OpType::Add >::TestVector() : current(0)
 {
 	this->test_cases = int8_int16;
@@ -6338,6 +6377,7 @@ static const TestCase< std::int8_t, std::int8_t, OpType::Add > int8_int8[] =
 	{ 0xff, 0xff, true},
 };
 
+template<>
 TestVector< std::int8_t, std::int8_t, OpType::Add >::TestVector() : current(0)
 {
 	this->test_cases = int8_int8;

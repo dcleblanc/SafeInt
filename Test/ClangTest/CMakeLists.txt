@@ -44,12 +44,16 @@ else()
     # This will test whatever the mainline code can do, typically using int128
     add_executable(SafeIntTest_clang 
         ../AddVerify.cpp 
+        ../AddTestCase.cpp
         ../CastVerify.cpp 
         ../DivVerify.cpp 
+        ../DivTestCase.cpp
         ../IncDecVerify.cpp 
         ../ModVerify.cpp 
         ../MultVerify.cpp 
+        ../MultTestCase.cpp
         ../SubVerify.cpp 
+        ../SubTestCase.cpp
         ../TestMain.cpp
         ../TestMain.h
         ../../SafeInt.hpp
@@ -57,36 +61,45 @@ else()
 
     target_compile_options(SafeIntTest_clang PUBLIC -fsanitize-trap=undefined)
 
+
     # Forces use of the older, less efficient code that can't use either int128 or intrinsics
     add_executable(SafeIntTest_clang_NoIntrinsic
-        ../AddVerify.cpp 
-        ../CastVerify.cpp 
-        ../DivVerify.cpp 
-        ../IncDecVerify.cpp 
-        ../ModVerify.cpp 
-        ../MultVerify.cpp 
-        ../SubVerify.cpp 
-        ../TestMain.cpp
-        ../TestMain.h
-        ../../SafeInt.hpp
-    )
+    ../AddVerify.cpp 
+    ../AddTestCase.cpp
+    ../CastVerify.cpp 
+    ../DivVerify.cpp 
+    ../DivTestCase.cpp
+    ../IncDecVerify.cpp 
+    ../ModVerify.cpp 
+    ../MultVerify.cpp 
+    ../MultTestCase.cpp
+    ../SubVerify.cpp 
+    ../SubTestCase.cpp
+    ../TestMain.cpp
+    ../TestMain.h
+    ../../SafeInt.hpp
+)
 
     target_compile_definitions(SafeIntTest_clang_NoIntrinsic PUBLIC "SAFEINT_USE_INTRINSICS=0" "SAFEINT_HAS_INT128=0")
     target_compile_options(SafeIntTest_clang_NoIntrinsic PUBLIC -fsanitize-trap=undefined)
 
     # Forces use of either intrinsics or the older code
     add_executable(SafeIntTest_clang_NoInt128
-        ../AddVerify.cpp 
-        ../CastVerify.cpp 
-        ../DivVerify.cpp 
-        ../IncDecVerify.cpp 
-        ../ModVerify.cpp 
-        ../MultVerify.cpp 
-        ../SubVerify.cpp 
-        ../TestMain.cpp
-        ../TestMain.h
-        ../../SafeInt.hpp
-    )
+    ../AddVerify.cpp 
+    ../AddTestCase.cpp
+    ../CastVerify.cpp 
+    ../DivVerify.cpp 
+    ../DivTestCase.cpp
+    ../IncDecVerify.cpp 
+    ../ModVerify.cpp 
+    ../MultVerify.cpp 
+    ../MultTestCase.cpp
+    ../SubVerify.cpp 
+    ../SubTestCase.cpp
+    ../TestMain.cpp
+    ../TestMain.h
+    ../../SafeInt.hpp
+)
 
     target_compile_definitions(SafeIntTest_clang_NoInt128 PUBLIC "SAFEINT_HAS_INT128=0")
     target_compile_options(SafeIntTest_clang_NoInt128 PUBLIC -fsanitize-trap=undefined)
@@ -118,13 +131,23 @@ else()
     )
 
     target_compile_options(CompileTest_clang14_NoEH PUBLIC -Wall -std=c++14 -fno-exceptions)
-#    target_link_libraries(SafeIntTest_clang 
-#                          SafeIntTest_clang_NoIntrinsic
-#                          SafeIntTest_clang_NoInt128
-#                          PUBLIC
-#                          ${LIBUBSAN}
-#                          )
 
+    add_executable(safe_math_test
+        ../c_safe_math/safe_math_test.c
+        ../c_safe_math/safe_math_test.h
+        ../c_safe_math/safe_math_test_add.cpp
+        ../c_safe_math/safe_math_test_div.cpp
+        ../c_safe_math/safe_math_test_mult.cpp
+        ../c_safe_math/safe_math_test_sub.cpp
+        ../AddTestCase.cpp
+        ../DivTestCase.cpp
+        ../MultTestCase.cpp
+        ../SubTestCase.cpp
+        )
+
+    target_compile_definitions(safe_math_test PUBLIC)
+    target_compile_options(safe_math_test PUBLIC)
+    
 endif()
 
 enable_testing()
@@ -133,11 +156,13 @@ if(CLANG_PLUS_PLUS)
     add_test(NAME SafeIntTest_clang COMMAND SafeIntTest_clang)
     add_test(NAME SafeIntTest_clang_NoIntrinsic COMMAND SafeIntTest_clang_NoIntrinsic)
     add_test(NAME SafeIntTest_clang_NoInt128 COMMAND SafeIntTest_clang_NoInt128)
+    add_test(NAME safe_math_test_clang COMMAND safe_math_test)
 
 
     set_tests_properties(SafeIntTest_clang 
                         SafeIntTest_clang_NoIntrinsic 
                         SafeIntTest_clang_NoInt128 
+                        safe_math_test_clang
                         PROPERTIES FAIL_REGULAR_EXPRESSION "Error")
 endif()
 

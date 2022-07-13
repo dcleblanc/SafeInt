@@ -146,7 +146,7 @@ static const TestCase< std::uint64_t, std::uint64_t, OpType::Div > uint64_uint64
    { 0xffffffffffffffff,    0xffffffffffffffff, true },
 };
 
-TestVector< std::uint64_t, std::uint64_t, OpType::Div>::TestVector() : current(0)
+template<> TestVector< std::uint64_t, std::uint64_t, OpType::Div>::TestVector() : current(0)
 {
     this->test_cases = uint64_uint64;
     this->count = COUNTOF(uint64_uint64);
@@ -222,7 +222,7 @@ static const TestCase< std::uint64_t, std::uint32_t, OpType::Div > uint64_uint32
    { 0xffffffffffffffff,    0xffffffff, true },
 };
 
-TestVector< std::uint64_t, std::uint32_t, OpType::Div>::TestVector() : current(0)
+template<> TestVector< std::uint64_t, std::uint32_t, OpType::Div>::TestVector() : current(0)
 {
     this->test_cases = uint64_uint32;
     this->count = COUNTOF(uint64_uint32);
@@ -265,7 +265,7 @@ static const TestCase< std::uint64_t, std::uint16_t, OpType::Div > uint64_uint16
    { 0xffffffffffffffff,    2, true },
 };
 
-TestVector< std::uint64_t, std::uint16_t, OpType::Div>::TestVector() : current(0)
+template<> TestVector< std::uint64_t, std::uint16_t, OpType::Div>::TestVector() : current(0)
 {
     this->test_cases = uint64_uint16;
     this->count = COUNTOF(uint64_uint16);
@@ -308,7 +308,7 @@ static const TestCase< std::uint64_t, std::uint8_t, OpType::Div > uint64_uint8[]
    { 0xffffffffffffffff,    2, true },
 };
 
-TestVector< std::uint64_t, std::uint8_t, OpType::Div>::TestVector() : current(0)
+template<> TestVector< std::uint64_t, std::uint8_t, OpType::Div>::TestVector() : current(0)
 {
     this->test_cases = uint64_uint8;
     this->count = COUNTOF(uint64_uint8);
@@ -442,7 +442,7 @@ static const TestCase< std::uint64_t, std::int64_t, OpType::Div > uint64_int64[]
    { 0xffffffffffffffff,    0xffffffffffffffff, false },
 };
 
-TestVector< std::uint64_t, std::int64_t, OpType::Div>::TestVector() : current(0)
+template<> TestVector< std::uint64_t, std::int64_t, OpType::Div>::TestVector() : current(0)
 {
     this->test_cases = uint64_int64;
     this->count = COUNTOF(uint64_int64);
@@ -573,7 +573,7 @@ static const TestCase< std::int64_t, std::uint64_t, OpType::Div2 > int64_uint64_
    { 0xffffffffffffffff,    0xffffffffffffffff, false },
 };
 
-TestVector< std::int64_t, std::uint64_t, OpType::Div2 >::TestVector() : current(0)
+template<> TestVector< std::int64_t, std::uint64_t, OpType::Div2 >::TestVector() : current(0)
 {
     this->test_cases = int64_uint64_2;
     this->count = COUNTOF(int64_uint64_2);
@@ -649,7 +649,7 @@ static const TestCase< std::uint64_t, std::int32_t, OpType::Div > uint64_int32[]
    { 0xffffffffffffffff,    0xffffffff, false },
 };
 
-TestVector< std::uint64_t, std::int32_t, OpType::Div >::TestVector() : current(0)
+template<> TestVector< std::uint64_t, std::int32_t, OpType::Div >::TestVector() : current(0)
 {
     this->test_cases = uint64_int32;
     this->count = COUNTOF(uint64_int32);
@@ -725,7 +725,7 @@ static const TestCase< std::int32_t, std::uint64_t, OpType::Div2 > int32_uint64_
    { 0xffffffff,            0xffffffffffffffff, false },
 };
 
-TestVector< std::int32_t, std::uint64_t, OpType::Div2 >::TestVector() : current(0)
+template<> TestVector< std::int32_t, std::uint64_t, OpType::Div2 >::TestVector() : current(0)
 {
     this->test_cases = int32_uint64_2;
     this->count = COUNTOF(int32_uint64_2);
@@ -780,7 +780,7 @@ static const TestCase< std::uint64_t, std::int16_t, OpType::Div > uint64_int16[]
    { 0xffffffffffffffff,    -1, false },
 };
 
-TestVector< std::uint64_t, std::int16_t, OpType::Div >::TestVector() : current(0)
+template<> TestVector< std::uint64_t, std::int16_t, OpType::Div >::TestVector() : current(0)
 {
     this->test_cases = uint64_int16;
     this->count = COUNTOF(uint64_int16);
@@ -856,7 +856,7 @@ static const TestCase< std::int16_t, std::uint64_t, OpType::Div2 > int16_uint64_
    { 0xffff,                0xffffffffffffffff, false },
 };
 
-TestVector< std::int16_t, std::uint64_t, OpType::Div2 >::TestVector() : current(0)
+template<> TestVector< std::int16_t, std::uint64_t, OpType::Div2 >::TestVector() : current(0)
 {
     this->test_cases = int16_uint64_2;
     this->count = COUNTOF(int16_uint64_2);
@@ -910,7 +910,7 @@ static const TestCase< std::uint64_t, std::int8_t, OpType::Div > uint64_int8[] =
    { 0xffffffffffffffff,    -1, false },
 };
 
-TestVector< std::uint64_t, std::int8_t, OpType::Div >::TestVector() : current(0)
+template<> TestVector< std::uint64_t, std::int8_t, OpType::Div >::TestVector() : current(0)
 {
     this->test_cases = uint64_int8;
     this->count = COUNTOF(uint64_int8);
@@ -986,7 +986,7 @@ static const TestCase< std::int8_t, std::uint64_t, OpType::Div2 > int8_uint64_2[
    { 0xff,                  0xffffffffffffffff, false },
 };
 
-TestVector< std::int8_t, std::uint64_t, OpType::Div2 >::TestVector() : current(0)
+template<> TestVector< std::int8_t, std::uint64_t, OpType::Div2 >::TestVector() : current(0)
 {
     this->test_cases = int8_uint64_2;
     this->count = COUNTOF(int8_uint64_2);
@@ -1117,7 +1117,7 @@ static const TestCase< std::int64_t, std::int64_t, OpType::Div > int64_int64[] =
    { 0xffffffffffffffff,    0xffffffffffffffff, true },
 };
 
-TestVector< std::int64_t, std::int64_t, OpType::Div >::TestVector() : current(0)
+template<> TestVector< std::int64_t, std::int64_t, OpType::Div >::TestVector() : current(0)
 {
     this->test_cases = int64_int64;
     this->count = COUNTOF(int64_int64);
@@ -1193,7 +1193,7 @@ static const TestCase< std::int64_t, std::int32_t, OpType::Div > int64_int32[] =
    { 0xffffffffffffffff,    0xffffffff, true },
 };
 
-TestVector< std::int64_t, std::int32_t, OpType::Div >::TestVector() : current(0)
+template<> TestVector< std::int64_t, std::int32_t, OpType::Div >::TestVector() : current(0)
 {
     this->test_cases = int64_int32;
     this->count = COUNTOF(int64_int32);
@@ -1269,7 +1269,7 @@ static const TestCase< std::int64_t, std::int32_t, OpType::Div2 > int64_int32_2[
    { 0xffffffffffffffff,    0xffffffff, true },
 };
 
-TestVector< std::int64_t, std::int32_t, OpType::Div2 >::TestVector() : current(0)
+template<> TestVector< std::int64_t, std::int32_t, OpType::Div2 >::TestVector() : current(0)
 {
     this->test_cases = int64_int32_2;
     this->count = COUNTOF(int64_int32_2);
@@ -1400,7 +1400,7 @@ static const TestCase< std::int64_t, std::uint64_t, OpType::Div > int64_uint64[]
    { 0xffffffffffffffff,    0xffffffffffffffff, true },
 };
 
-TestVector< std::int64_t, std::uint64_t, OpType::Div >::TestVector() : current(0)
+template<> TestVector< std::int64_t, std::uint64_t, OpType::Div >::TestVector() : current(0)
 {
     this->test_cases = int64_uint64;
     this->count = COUNTOF(int64_uint64);
@@ -1531,7 +1531,7 @@ static const TestCase< std::uint64_t, std::int64_t, OpType::Div2 > uint64_int64_
    {0xffffffffffffffff, 0xffffffffffffffff, true },
 };
 
-TestVector< std::uint64_t, std::int64_t, OpType::Div2 >::TestVector() : current(0)
+template<> TestVector< std::uint64_t, std::int64_t, OpType::Div2 >::TestVector() : current(0)
 {
     this->test_cases = uint64_int64_2;
     this->count = COUNTOF(uint64_int64_2);
@@ -1607,7 +1607,7 @@ static const TestCase< std::int64_t, std::uint32_t, OpType::Div > int64_uint32[]
    { 0xffffffffffffffff,    0xffffffff, true },
 };
 
-TestVector< std::int64_t, std::uint32_t, OpType::Div >::TestVector() : current(0)
+template<> TestVector< std::int64_t, std::uint32_t, OpType::Div >::TestVector() : current(0)
 {
     this->test_cases = int64_uint32;
     this->count = COUNTOF(int64_uint32);
@@ -1683,7 +1683,7 @@ static const TestCase< std::int64_t, std::uint32_t, OpType::Div2 > int64_uint32_
    { 0xffffffffffffffff,    0xffffffff, true },
 };
 
-TestVector< std::int64_t, std::uint32_t, OpType::Div2 >::TestVector() : current(0)
+template<> TestVector< std::int64_t, std::uint32_t, OpType::Div2 >::TestVector() : current(0)
 {
     this->test_cases = int64_uint32_2;
     this->count = COUNTOF(int64_uint32_2);
@@ -1759,7 +1759,7 @@ static const TestCase< std::uint32_t, std::uint64_t, OpType::Div > uint32_uint64
    { 0xffffffff,            0xffffffffffffffff, true },
 };
 
-TestVector< std::uint32_t, std::uint64_t, OpType::Div>::TestVector() : current(0)
+template<> TestVector< std::uint32_t, std::uint64_t, OpType::Div>::TestVector() : current(0)
 {
     this->test_cases = uint32_uint64;
     this->count = COUNTOF(uint32_uint64);
@@ -1805,7 +1805,7 @@ static const TestCase< std::uint32_t, std::uint32_t, OpType::Div > uint32_uint32
    { 0xffffffff,            0xffffffff, true },
 };
 
-TestVector< std::uint32_t, std::uint32_t, OpType::Div>::TestVector() : current(0)
+template<> TestVector< std::uint32_t, std::uint32_t, OpType::Div>::TestVector() : current(0)
 {
     this->test_cases = uint32_uint32;
     this->count = COUNTOF(uint32_uint32);
@@ -1881,7 +1881,7 @@ static const TestCase< std::uint32_t, std::int64_t, OpType::Div > uint32_int64[]
    { 0xffffffff,            0xffffffffffffffff, false },
 };
 
-TestVector< std::uint32_t, std::int64_t, OpType::Div>::TestVector() : current(0)
+template<> TestVector< std::uint32_t, std::int64_t, OpType::Div>::TestVector() : current(0)
 {
     this->test_cases = uint32_int64;
     this->count = COUNTOF(uint32_int64);
@@ -1927,7 +1927,7 @@ static const TestCase< std::uint32_t, std::int32_t, OpType::Div > uint32_int32[]
    { 0xffffffff,            0xffffffff, false },
 };
 
-TestVector< std::uint32_t, std::int32_t, OpType::Div>::TestVector() : current(0)
+template<> TestVector< std::uint32_t, std::int32_t, OpType::Div>::TestVector() : current(0)
 {
     this->test_cases = uint32_int32;
     this->count = COUNTOF(uint32_int32);
@@ -2003,7 +2003,7 @@ static const TestCase< std::int32_t, std::uint64_t, OpType::Div > int32_uint64[]
    { 0xffffffff,            0xffffffffffffffff, true },
 };
 
-TestVector< std::int32_t, std::uint64_t, OpType::Div>::TestVector() : current(0)
+template<> TestVector< std::int32_t, std::uint64_t, OpType::Div>::TestVector() : current(0)
 {
     this->test_cases = int32_uint64;
     this->count = COUNTOF(int32_uint64);
@@ -2049,7 +2049,7 @@ static const TestCase< std::int32_t, std::uint32_t, OpType::Div > int32_uint32[]
    { 0xffffffff,            0xffffffff, true },
 };
 
-TestVector< std::int32_t, std::uint32_t, OpType::Div>::TestVector() : current(0)
+template<> TestVector< std::int32_t, std::uint32_t, OpType::Div>::TestVector() : current(0)
 {
     this->test_cases = int32_uint32;
     this->count = COUNTOF(int32_uint32);
@@ -2125,7 +2125,7 @@ static const TestCase< std::int32_t, std::int64_t, OpType::Div > int32_int64[] =
    { 0xffffffff,            0xffffffffffffffff, true },
 };
 
-TestVector< std::int32_t, std::int64_t, OpType::Div>::TestVector() : current(0)
+template<> TestVector< std::int32_t, std::int64_t, OpType::Div>::TestVector() : current(0)
 {
     this->test_cases = int32_int64;
     this->count = COUNTOF(int32_int64);
@@ -2171,7 +2171,7 @@ static const TestCase< std::int32_t, std::int32_t, OpType::Div > int32_int32[] =
    { 0xffffffff,            0xffffffff, true },
 };
 
-TestVector< std::int32_t, std::int32_t, OpType::Div>::TestVector() : current(0)
+template<> TestVector< std::int32_t, std::int32_t, OpType::Div>::TestVector() : current(0)
 {
     this->test_cases = int32_int32;
     this->count = COUNTOF(int32_int32);
