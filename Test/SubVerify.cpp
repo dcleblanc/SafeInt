@@ -80,6 +80,15 @@ void SubVerify()
     SubVerifyBase< std::uint64_t, std::int8_t >("uint64_int8");
 
     /////////////////////////////////////
+    SubVerifyBase< std::uint32_t, std::uint64_t >("uint32_uint64");
+    SubVerifyBase< std::uint32_t, std::uint32_t >("uint32_uint32");
+    SubVerifyBase< std::uint32_t, std::int64_t >("uint32_int64");
+    SubVerifyBase< std::uint32_t, std::int32_t >("uint32_int32");
+
+    SubVerifyBase< std::int32_t, std::uint64_t >("int32_uint64");
+    SubVerifyBase< std::int32_t, std::uint32_t >("int32_uint32");
+    SubVerifyBase< std::int32_t, std::int64_t >("int32_int64");
+    SubVerifyBase< std::int32_t, std::int32_t >("int32_int32");
 
     // Unsigned int8, unsigned cases
     SubVerifyBase< std::uint8_t, std::uint64_t >("uint8_uint64");

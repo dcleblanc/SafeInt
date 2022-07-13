@@ -2512,7 +2512,7 @@ inline bool check_sub_uint64_int64(uint64_t a, int64_t b, uint64_t* ret)
         if ((uint64_t)b <= a)
         {
             *ret = (a - (uint64_t)b);
-            return false;
+            return true;
         }
     }
     else
