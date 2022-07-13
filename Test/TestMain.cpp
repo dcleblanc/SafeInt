@@ -2,6 +2,7 @@
 // Licensed under the MIT License.
 
 #include "TestMain.h"
+#include "TestCase.h"
 
 #if !defined __GNUC__
 #pragma warning( disable: 4711 4514 4820 )

@@ -1,13 +1,15 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.27130.2027
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.32228.343
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SafeIntTestVS17", "SafeIntTestVS17\SafeIntTestVS17.vcxproj", "{1D3628DA-8471-4F50-86B6-3B04B3CC6D5F}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CompileTest", "CompileTest\CompileTest.vcxproj", "{1E55B5E4-2A0D-4782-82E7-58F508A7CC80}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Scratch", "Scratch\Scratch.vcxproj", "{A431887C-4B24-47F9-9A23-392FB44C2952}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "c_safe_math", "..\c_safe_math\c_safe_math.vcxproj", "{124BCCF0-4D8D-429B-B10D-53B5A191F398}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -41,6 +43,14 @@ Global
 		{A431887C-4B24-47F9-9A23-392FB44C2952}.Release|x64.Build.0 = Release|x64
 		{A431887C-4B24-47F9-9A23-392FB44C2952}.Release|x86.ActiveCfg = Release|Win32
 		{A431887C-4B24-47F9-9A23-392FB44C2952}.Release|x86.Build.0 = Release|Win32
+		{124BCCF0-4D8D-429B-B10D-53B5A191F398}.Debug|x64.ActiveCfg = Debug|x64
+		{124BCCF0-4D8D-429B-B10D-53B5A191F398}.Debug|x64.Build.0 = Debug|x64
+		{124BCCF0-4D8D-429B-B10D-53B5A191F398}.Debug|x86.ActiveCfg = Debug|Win32
+		{124BCCF0-4D8D-429B-B10D-53B5A191F398}.Debug|x86.Build.0 = Debug|Win32
+		{124BCCF0-4D8D-429B-B10D-53B5A191F398}.Release|x64.ActiveCfg = Release|x64
+		{124BCCF0-4D8D-429B-B10D-53B5A191F398}.Release|x64.Build.0 = Release|x64
+		{124BCCF0-4D8D-429B-B10D-53B5A191F398}.Release|x86.ActiveCfg = Release|Win32
+		{124BCCF0-4D8D-429B-B10D-53B5A191F398}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

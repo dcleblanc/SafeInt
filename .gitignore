@@ -1,1 +1,7 @@
+/Test/c_safe_math/Debug
+/Test/c_safe_math/x64/Debug
+/Test/c_safe_math/c_safe_math.vcxproj.filters
+/Test/c_safe_math/c_safe_math.vcxproj.user
+/Test/c_safe_math/Release
+/Test/c_safe_math/x64/Release
 build/

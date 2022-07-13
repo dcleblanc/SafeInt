@@ -10,11 +10,6 @@
 #include <crtdbg.h>
 #endif
 
-#include <iostream>
-#include <ios>
-#include <iomanip>
-#include <sstream>
-
 #include "../SafeInt.hpp"
 
 // Suppress warnings in test files, but not in source header
@@ -26,50 +21,6 @@
 #elif SAFEINT_COMPILER == GCC_COMPILER
 #pragma GCC diagnostic ignored "-Wnarrowing"
 #endif
-
-#if !defined(COUNTOF)
-# if defined(_countof)
-#  define COUNTOF(x) _countof(x)
-# else
-#  define COUNTOF(x) (sizeof(x)/sizeof((x)[0]))
-# endif
-#endif
-
-template <typename T>
-std::string to_hex(T t)
-{
-	std::ostringstream ostm;
-	ostm << "0x" << std::setfill('0') << std::hex << std::setw(sizeof(t) <= 4 ? 8 : 16) << t;
-	return ostm.str();
-}
-
-template <>
-inline std::string to_hex< uint8_t >(uint8_t t)
-{
-	std::ostringstream ostm;
-	ostm << "0x" << std::setfill('0') << std::hex << std::setw(2) << static_cast<uint16_t>( t ) ;
-	return ostm.str();
-}
-
-template <>
-inline std::string to_hex< int8_t >(int8_t t)
-{
-	std::ostringstream ostm;
-	ostm << "0x" << std::setfill('0') << std::hex << std::setw(2) << static_cast<uint16_t>( t );
-	return ostm.str();
-}
-
-template <typename T, typename U>
-void err_msg(const std::string& msg, T t, U u, bool expected)
-{
-	std::cerr << msg << to_hex(t) << ", " << to_hex(u) << ", expected = " << expected << std::endl;
-}
-
-template <typename T>
-void err_msg(const std::string& msg, T t, bool expected)
-{
-	std::cerr << msg << to_hex(t) << ", expected = " << expected << std::endl;
-}
 
 namespace mult_verify { void MultVerify(); }
 namespace div_verify { void DivVerify(); }
