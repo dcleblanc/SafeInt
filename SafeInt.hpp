@@ -196,7 +196,7 @@ Please read the leading comments before using the class.
 
 #endif
 
-#if SAFEINT_HAS_INT128
+#if SAFEINT_HAS_INT128 
 #define SAFEINT_USE_INTRINSICS 0
 #endif
 

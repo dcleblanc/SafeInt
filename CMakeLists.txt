@@ -1,33 +1,28 @@
-cmake_minimum_required(VERSION 3.0)
+cmake_minimum_required(VERSION 3.10)
+project(SafeInt VERSION 3.0.26)
 
-project(SafeInt CXX)
+set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD_REQUIRED True)
 
-if(POLICY CMP0054)
-    cmake_policy(SET CMP0054 NEW)
-endif()
+# Runtime tests are:
+# - default
+# - without built-in 128-bit support
+# - without intrinsics
 
-option(SAFEINT_TESTS "compile the tests" OFF)
-option(SAFEINT_NO_EXCEPTIONS "disable exceptions" OFF)
-option(SAFEINT_SANITIZE "sanitize undefined behaviour" OFF)
+# Compile time tests are:
+# - default C++11
+# - C++14
+# - TODO - consider adding in 17, 20 just to see if anything breaks
+# - compile without exceptions
 
-add_library(SafeInt INTERFACE)
-target_include_directories(SafeInt INTERFACE .)
-install(FILES SafeInt.hpp DESTINATION include)
-install(FILES LICENSE DESTINATION share)
+# Supported compilers:
+# - Microsoft
+# - clang
+# - gcc
+# - Intel (not regularly tested)
+# other compilers on a best effort
 
-if(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
-    if(MSVC_VERSION LESS 1900)
-        # Visual Studio compilers prior to 2015 don't support noexcept:
-        target_compile_definitions(SafeInt INTERFACE SAFEINT_REMOVE_NOTHROW)
-    endif()
-endif()
+add_subdirectory(Test/ClangTest)
+add_subdirectory(Test/GccTest)
 
-if(SAFEINT_NO_EXCEPTIONS)
-    if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
-        target_compile_options(SafeInt INTERFACE -fno-exceptions)
-    endif()
-endif()
-
-if(SAFEINT_TESTS)
-    add_subdirectory(Test)
-endif()
+enable_testing()
