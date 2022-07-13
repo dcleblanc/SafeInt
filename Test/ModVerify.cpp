@@ -2,6 +2,7 @@
 // Licensed under the MIT License.
 
 #include "TestMain.h"
+#include "TestCase.h"
 
 #if defined(__GNUC__)
 # include <stdint.h>

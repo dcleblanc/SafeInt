@@ -2,6 +2,7 @@
 // Licensed under the MIT License.
 
 #include "TestMain.h"
+#include "TestCase.h"
 
 namespace incdec_verify
 {

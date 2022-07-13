@@ -2,6 +2,7 @@
 // Licensed under the MIT License.
 
 #include "TestMain.h"
+#include "TestCase.h"
 #include <math.h>
 
 #if !defined _countof

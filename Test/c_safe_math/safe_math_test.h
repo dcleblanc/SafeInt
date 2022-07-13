@@ -68,8 +68,7 @@ void test_base(const char* type_str, F1 fcn1, F2 fcn2)
 		if (!!result != test.fExpected)
 		{
 			std::string msg = std::string("Failure in ") + OpName::op_name(op) + "_test_" + type_str;
-
-			assert(false);
+			err_msg(msg, test.x, test.y, test.fExpected);
 			throw std::runtime_error(msg.c_str());
 		}
 
@@ -88,8 +87,7 @@ void test_base(const char* type_str, F1 fcn1, F2 fcn2)
 		if (actual != test.fExpected)
 		{
 			std::string msg = std::string("Failure in ") + OpName::op_name(op) + "_test_" + type_str;
-
-			assert(false);
+			err_msg(msg, test.x, test.y, test.fExpected);
 			throw std::runtime_error(msg.c_str());
 		}
 
