@@ -8,6 +8,9 @@
 #error use either the C++ SafeInt, or safe_math, not both
 #endif
 
+// C wants a prototype, if all warnings enabled
+void safe_math_fail(const char* msg);
+
 #include "safe_math_impl.h"
 
 #ifdef __cplusplus
@@ -330,7 +333,7 @@ inline long safe_cast_long_ulonglong(unsigned long long in) { return safe_cast_i
 
 inline unsigned long safe_cast_ulong_long(long in) { return safe_cast_uint64_int64(in); }
 inline unsigned long safe_cast_ulong_ulonglong(unsigned long long in) { return in; }
-inline unsigned long safe_cast_ulong_longlong(unsigned long long in) { return safe_cast_uint64_int64(in); }
+inline unsigned long safe_cast_ulong_longlong(unsigned long long in) { return in; }
 #else
 inline long safe_cast_long_ulong(unsigned long in) { return safe_cast_int32_uint32(in); }
 inline long safe_cast_long_longlong(long long in) { return safe_cast_int32_int64(in); }

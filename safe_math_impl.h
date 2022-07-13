@@ -1526,7 +1526,7 @@ inline int32_t safe_div_int32_uint32(int32_t a, uint32_t b)
 {
     if (b != 0)
     {
-        return (int64_t)a / (int64_t)b;
+        return (int32_t)((int64_t)a / (int64_t)b);
     }
     safe_math_fail("safe_math_fail safe_div_int32_uint32");
 }
@@ -1535,7 +1535,7 @@ inline bool check_div_int32_uint32(int32_t a, uint32_t b, int32_t* ret)
 {
     if (b != 0)
     {
-        *ret = (int64_t)a / (int64_t)b;
+        *ret = (int32_t)((int64_t)a / (int64_t)b);
         return true;
     }
 
@@ -1617,7 +1617,7 @@ inline uint32_t safe_div_uint32_int32(uint32_t a, int32_t b)
 
     if (b > 0) // if b is positive, just do the math
     {
-        return (uint32_t)(a / b);
+        return (a / (uint32_t)b);
     }
     else // now have to check magnitude
     {
@@ -1648,7 +1648,7 @@ inline bool check_div_uint32_int32(uint32_t a, int32_t b, uint32_t* ret)
 
     if (b > 0) // if b is positive, just do the math
     {
-        *ret = (uint32_t)(a / b);
+        *ret = (a / (uint32_t)b);
         return true;
     }
     else // now have to check magnitude
@@ -1824,7 +1824,17 @@ inline int64_t safe_div_int64_uint64(int64_t a, uint64_t b)
     if (b == 0)
         safe_math_fail("safe_math_fail safe_div_int64_int32");
 
-    return (int64_t)(a / b);
+    if(a >= 0)
+    {
+        return (int64_t)((uint64_t)a / b);
+    }
+    else
+    {
+        // Need to get the magnitude, divide, and then negate
+        uint64_t tmp = safe_abs64(a);
+        tmp /= b;
+        return negate64((int64_t)tmp);
+    }
 }
 
 inline bool check_div_int64_uint64(int64_t a, uint64_t b, int64_t* ret)
@@ -1832,8 +1842,18 @@ inline bool check_div_int64_uint64(int64_t a, uint64_t b, int64_t* ret)
     if (b == 0)
         return false;
 
-    *ret = (int64_t)(a / b);
-    return true;
+    if(a >= 0)
+    {
+        *ret = (int64_t)((uint64_t)a / b);
+    }
+    else
+    {
+        // Need to get the magnitude, divide, and then negate
+        uint64_t tmp = safe_abs64(a);
+        tmp /= b;
+        *ret = negate64((int64_t)tmp);
+    }
+        return true;
 }
 
 inline uint64_t safe_div_uint64_int32(uint64_t a, int32_t b)
@@ -1851,7 +1871,7 @@ inline uint64_t safe_div_uint64_int32(uint64_t a, int32_t b)
 
     if (b > 0) // if b is positive, just do the math
     {
-        return a / b;
+        return a / (uint64_t)b;
     }
     else // now have to check magnitude
     {
@@ -1882,7 +1902,7 @@ inline bool check_div_uint64_int32(uint64_t a, int32_t b, uint64_t* ret)
 
     if (b > 0) // if b is positive, just do the math
     {
-        *ret = a / b;
+        *ret = a / (uint64_t)b;
         return true;
     }
     else // now have to check magnitude
@@ -1933,7 +1953,7 @@ inline uint64_t safe_div_uint64_int64(uint64_t a, int64_t b)
 
     if (b > 0) // if b is positive, just do the math
     {
-        return a / b;
+        return a / (uint64_t)b;
     }
     else // now have to check magnitude
     {
@@ -1964,7 +1984,7 @@ inline bool check_div_uint64_int64(uint64_t a, int64_t b, uint64_t* ret)
 
     if (b > 0) // if b is positive, just do the math
     {
-        *ret = a / b;
+        *ret = a / (uint64_t)b;
         return true;
     }
     else // now have to check magnitude
@@ -2141,14 +2161,14 @@ inline int32_t safe_sub_int32_uint64(int32_t a, uint64_t b)
     {
         if (b <= AbsMinInt32 - safe_abs32(a))
         {
-            return (int32_t)(a - b);
+            return (int32_t)(a - (int32_t)b);
         }
     }
     else
     {
         if (b <= AbsMinInt32 + (uint64_t)a)
         {
-            return (int32_t)(a - b);
+            return (int32_t)(a - (int32_t)b);
         }
     }
 
@@ -2165,7 +2185,7 @@ inline bool check_sub_int32_uint64(int32_t a, uint64_t b, int32_t* ret)
     {
         if (b <= AbsMinInt32 - safe_abs32(a))
         {
-            *ret = (int32_t)(a - b);
+            *ret = (int32_t)(a - (int32_t)b);
             return true;
         }
     }
@@ -2173,7 +2193,7 @@ inline bool check_sub_int32_uint64(int32_t a, uint64_t b, int32_t* ret)
     {
         if (b <= AbsMinInt32 + (uint64_t)a)
         {
-            *ret = (int32_t)(a - b);
+            *ret = (int32_t)(a - (int32_t)b);
             return true;
         }
     }
