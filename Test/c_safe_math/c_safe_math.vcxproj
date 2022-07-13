@@ -139,6 +139,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\AddTestCase.cpp" />
     <ClCompile Include="..\DivTestCase.cpp" />
     <ClCompile Include="..\MultTestCase.cpp" />
     <ClCompile Include="..\SubTestCase.cpp" />
