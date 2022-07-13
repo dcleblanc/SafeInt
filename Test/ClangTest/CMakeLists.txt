@@ -61,7 +61,6 @@ else()
 
     target_compile_options(SafeIntTest_clang PUBLIC -fsanitize-trap=undefined)
 
-
     # Forces use of the older, less efficient code that can't use either int128 or intrinsics
     add_executable(SafeIntTest_clang_NoIntrinsic
     ../AddVerify.cpp 
