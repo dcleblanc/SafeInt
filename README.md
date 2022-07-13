@@ -1,6 +1,8 @@
 # SafeInt
 SafeInt is a class library for C++ that manages integer overflows.
 
+As of July, 2022, there is also a C library that checks casting, multiplication, division, addition and subtraction for all combinations of signed and unsigned 32-bit and 64-bit integers. The C library has been validated against the same test vectors as SafeInt. It consists of two files, safe_math.h, and safe_math_impl.h.
+
 Now updated to keep the entire history of the class from the time it first was checked into CodePlex. 
 
 March, 2018 - added support for constexpr, also enforcing a requirement that --std=c++11 or --std=c++14
