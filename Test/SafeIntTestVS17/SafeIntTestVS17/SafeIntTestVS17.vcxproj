@@ -119,6 +119,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\AddTestCase.cpp" />
     <ClCompile Include="..\..\AddVerify.cpp" />
     <ClCompile Include="..\..\CastVerify.cpp" />
     <ClCompile Include="..\..\DivTestCase.cpp" />
