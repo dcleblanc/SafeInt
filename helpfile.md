@@ -470,7 +470,10 @@ to
 
     SafeInt<int> x = fcn();
 
-Further operations on variable x will be checked. As an additional example, consider the case where we have a variable length structure, and a user-supplied count of objects, and then wish to calculate the space needed. We might have code like the following:
+Further operations on variable x will be checked. 
+
+### Variable length structure allocation
+Consider the case where we have a variable length structure, and a user-supplied count of objects, and then wish to calculate the space needed. We might have code like the following:
 
     struct foo
     {
@@ -509,7 +512,7 @@ We get the following:
 3) The addition would then be checked for overflow.
 4) Assigning an int to a size_t causes a check for a negative value.
 
-There's still a problem, which is that if count were zero, we'd try to allocate sizeof(foo)-2, which might not be enough. This depends on how the code treats the structure, some code might treat it as not having a data member. A better fix would might be:
+There's still a problem, which is that if count were zero, we'd try to allocate sizeof(foo)-2, which might not be enough. Even worse, if count were -3, the overall result would be zero, and we'd allocate a zero-length buffer, which is a typical exploit pattern. This depends on how the code treats the structure, some code might treat it as not having a data member. A better fix would might be:
 
         size_t cb = sizeof(short) * (SafeInt<size_t>(count) - 1) + sizeof(foo);
 
@@ -521,11 +524,39 @@ Another approach is:
 
 This is not correct, because the multiplication isn't checked, only the addition and assignment.
 
-It should go without saying, but this has been seen in code and doesn't check anything:
+### Array index
+Choice of type to use can have some interesting considerations. Let's look at the following code:
+
+    char buffer[0x4000];
+    int offset = fcn1();
+    int advance = fcn2();
+
+    char test = buffer[offset + advance];
+
+This is clearly dangerous, depending on the values of offset and advance, we could be accessing memory well outside the buffer in both directions. It's sometimes good to use the same types as the compiler would, and the accessing an array takes a ptrdiff_t as an argument (32-bit or 64-bit signed). Consider this fix:
+
+    char test = buffer[SafeInt<ptrdiff_t>(offset) + advance];
+
+The addition is now checked, but if you're compiling for x64, ptrdiff_t is an int64_t, which can't overflow. Let's try again:
+
+    char test = buffer[SafeInt<size_t>(offset) + advance];
+
+This at least won't access memory before the buffer, but might go well beyond the buffer. A better fix would be:
+
+    size_t index = SafeInt<size_t>(offset) + advance;
+    char test = index < sizeof(buffer) ? buffer[index] : '\0';
+
+Alternately, if offset and advance shouldn't be negative, and you'd like to throw if index is invalid, this works:
+
+    SafeInt<size_t> index = SafeInt<size_t>(offset) + SafeInt<size_t>(advance);
+    index = index < sizeof(buffer) ? index : -1; // force an exception
+    char test = buffer[index];
+
+### Counter-examples
+It should go without saying, but this has been seen in code and doesn't check the addition:
 
     SafeInt<int> x(a+b);
 
-### Counter-examples
 A common (but untidy) thing a developer might do is to put the following in a header:
 
     #define BAD_ERROR -1
@@ -599,5 +630,25 @@ Supported binary operations are:
 
 
 ## safe_math C library
+The safe_math library is a recent addition to SafeInt, and leverages much of the code within SafeInt to check integer operations. An important benefit from re-use of SafeInt code is that 64-bit multiplication uses the most efficient approach, whether that's 128-bit integers, builtin functions, or intrinsics. As a fallback there's also just doing the math. While the effect isn't as dramatic, other operations also benefit from performance improvements SafeInt offers.
 
-TBD
+A drawback to many integer overflow libraries for C is that they do not support mixed types. Unfortunately, mixed types happen often in everyday code, and the programmer is expected to understand casting behavior in order to use the library correctly. The safe_math library provides for the following types:
+
+    uint64_t
+    int64_t
+    uint32_t
+    int32_t
+
+When combined, there's 16 functions for each of addition, subtraction, multiplication, and division. Casting checks do cover all types. In addition to providing for fixed-width types, the standard types of signed and unsigned int, long, and long long are also given wrappers. This is particularly useful for the long type, which varies in size by both architecture and platform. There are currently no wrappers for size_t or ptrdiff_t, but these can be added in an update if requested.
+
+Each operation and type combination has two signatures:
+
+    int32_t safe_add_int32_int32(int32_t a, int32_t b)
+    bool check_add_int32_int32(int32_t a, int32_t b, int32_t* ret)
+
+The safe_ will call abort (or your replacement) if the operation would overflow, and the check_ version just returns false if the operation would overflow.
+
+Note: Do _not_ depend on the value placed in ret if the function returns false. Depending on the code flow, it might be the result of an overflow, or might be not set.
+
+Note: An oddity of the C (and C++) standard is that the only guaranteed size type is char, which is 1 byte, and otherwise only guarantees that sizeof(char) \<= sizeof(short) \<= sizeof(int) \<= sizeof(long) \<= sizeof(long long). It would be within the standard to have all of these be 1 byte. SafeInt will sort out these issues and do the right thing. The safe_math library makes some assumptions in order to keep the code readable, which is that a short is 16-bit, an int is 32-bit, and a long long is 64-bit. In accordance with the most recent C standards, two's complement negative numbers are also assumed.
+
