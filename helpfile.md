@@ -1,3 +1,6 @@
+Licensed under the MIT License.
+Copyright David LeBlanc - dcl@dleblanc.net
+
 # SafeInt Documentation
 SafeInt is an integer overflow library that was originally created in Microsoft Office in 2003, and later was made open source on CodePlex using the MS-PL license. After CodePlex was deprecated, the project was moved to GitHub and is located at https://github.com/dcleblanc/SafeInt. The original code from CodePlex is located in the Archive folder. After moving the code to GitHub, the license was changed to the MIT license.
 
