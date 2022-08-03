@@ -19,6 +19,9 @@ SafeIntTest_NoIntrinsic: ../AddVerify.cpp ../CastVerify.cpp ../DivVerify.cpp ../
 SafeIntTest_NoInt128: ../AddVerify.cpp ../CastVerify.cpp ../DivVerify.cpp ../IncDecVerify.cpp ../ModVerify.cpp ../MultVerify.cpp ../SubVerify.cpp ../TestMain.cpp ../TestMain.h ../../SafeInt.hpp
 	clang++ --std=c++11 -O3 -D SAFEINT_HAS_INT128=0 -fsanitize=undefined -ftrapv ../AddVerify.cpp ../CastVerify.cpp ../DivVerify.cpp ../IncDecVerify.cpp ../ModVerify.cpp ../MultVerify.cpp ../SubVerify.cpp ../TestMain.cpp -o SafeIntTest_NoInt128 2> SafeIntTest_NoInt128.err
 
+CompileTest98: ../CompileTest.cpp ../../SafeInt.hpp ../ConstExpr.cpp ../CleanCompile.cpp
+	clang++ -Wall -D SAFEINT_USE_CPLUSCPLUS_98 -O3 ../CompileTest.cpp ../ConstExpr.cpp ../CleanCompile.cpp -o CompileTest 2> CompileTest.err
+
 CompileTest: ../CompileTest.cpp ../../SafeInt.hpp ../ConstExpr.cpp ../CleanCompile.cpp
 	clang++ -Wall --std=c++11 -O3 ../CompileTest.cpp ../ConstExpr.cpp ../CleanCompile.cpp -o CompileTest 2> CompileTest.err
 

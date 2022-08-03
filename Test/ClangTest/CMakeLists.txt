@@ -131,6 +131,15 @@ else()
 
     target_compile_options(CompileTest_clang14_NoEH PUBLIC -Wall -std=c++14 -fno-exceptions)
 
+    add_executable(CompileTest_clang98
+        ../CompileTest.cpp
+        ../ConstExpr.cpp 
+        ../CleanCompile.cpp
+        ../../SafeInt.hpp
+    )
+
+    target_compile_options(CompileTest_clang98 PUBLIC -D SAFEINT_USE_CPLUSCPLUS_98 -Wall -std=c++98 -fno-exceptions)
+
     add_executable(safe_math_test_clang
         ../c_safe_math/safe_math_test.c
         ../c_safe_math/safe_math_test.h
