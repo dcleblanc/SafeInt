@@ -241,17 +241,11 @@ Please read the leading comments before using the class.
 #pragma warning( pop )
 #endif
 
-#if !defined _CRT_SECURE_INVALID_PARAMETER
-// Calling fail fast is somewhat more robust than calling abort, 
-// but abort is the closest we can manage without Visual Studio support
-// Need the header for abort()
-#include <stdlib.h>
-#define _CRT_SECURE_INVALID_PARAMETER(msg) abort()
-#endif
-
 // Let's test some assumptions
 // We're assuming two's complement negative numbers
 static_assert( -1 == static_cast<int>(0xffffffff), "Two's complement signed numbers are required" );
+
+// For current documentation, see helpfile.md
 
 /************* Compiler Options *****************************************************************************************************
 
@@ -635,15 +629,6 @@ SAFEINT_DISABLE_ADDRESS_OPERATOR   - Disables the overload of the & operator, wh
 *
 */
 
-// Warning - this very old work-around will be deprecated in future releases. 
-#if defined VISUAL_STUDIO_SAFEINT_COMPAT
-namespace msl
-{
-
-namespace utilities
-{
-#endif
-
 // catch these to handle errors
 // Currently implemented code values:
 // ERROR_ARITHMETIC_OVERFLOW
@@ -654,12 +639,6 @@ enum SafeIntError
     SafeIntArithmeticOverflow,
     SafeIntDivideByZero
 };
-
-#if defined VISUAL_STUDIO_SAFEINT_COMPAT
-} // utilities
-} // msl
-#endif
-
 
 /*
 * Error handler classes
@@ -728,44 +707,83 @@ enum SafeIntError
 *    Overall, this is probably the best approach.
 * */
 
-#if defined VISUAL_STUDIO_SAFEINT_COMPAT
-namespace msl
-{
+/*
+    Exception options - 
+    1) You have your own exception handler
+    2) You want to use the built-in SafeIntException class
+        2a) TBD, support for std::exception of some sort would be nice to have
+    3) You don't want C++ exceptions
+        3a) Use abort()
+        3b) Use failfast
+    4) Use Win32 API structured exceptions (legacy, not recommened)
+*/
 
-namespace utilities
-{
-#endif
+// This library will use conditional noexcept soon, but not in this release
+// Some users might mix exception handlers, which is not advised, but is supported
 
-#if defined SAFEINT_ASSERT_ON_EXCEPTION
-    inline void SafeIntExceptionAssert() SAFEINT_NOTHROW { SAFEINT_ASSERT(false); }
+// If the user has already defined an exception handler, we don't need any of the following code
+#if defined SafeIntDefaultExceptionHandler
+
+// If the user has defined a custom exception handler, assume it is a C++
+// exception handler, unless user tell us it isn't, or we already know
+// we can't have exceptions
+#if !defined SAFEINT_EXCEPTION_HANDLER_CPP
+
+#if SAFE_INT_HAS_EXCEPTIONS
+#define SAFEINT_EXCEPTION_HANDLER_CPP 1
 #else
-    inline void SafeIntExceptionAssert() SAFEINT_NOTHROW {}
+#define SAFEINT_EXCEPTION_HANDLER_CPP 0
 #endif
 
-// Note - removed weak annotation on class due to gcc complaints
-// This was the only place in the file that used it, need to better understand 
-// whether it was put there correctly in the first place
+#endif
+
+#else // Use one of the built-in exception approaches
+
+// If you'd like to prevent platform-specific code,
+// define SAFE_INT_USE_STDLIB
+
+// Now we need to define an exception handler
+// Internally defined exception handlers might assert
+#if defined SAFEINT_ASSERT_ON_EXCEPTION
+inline void SafeIntExceptionAssert() SAFEINT_NOTHROW { SAFEINT_ASSERT(false); }
+#else
+inline void SafeIntExceptionAssert() SAFEINT_NOTHROW {}
+#endif
+
+#define SAFEINT_EXCEPTION_WIN32 0
+#define SAFEINT_EXCEPTION_ABORT 1
+#define SAFEINT_EXCEPTION_CPP   2
+
+#if defined SAFEINT_RAISE_EXCEPTION && !defined SAFE_INT_USE_STDLIB // Win32 structured exceptions
+#define SAFEINT_EXCEPTION_METHOD SAFEINT_EXCEPTION_WIN32
+#elif defined SAFEINT_FAILFAST      // Call __failfast or abort, depending on platform
+#define SAFEINT_EXCEPTION_METHOD SAFEINT_EXCEPTION_ABORT
+#else
+    #if SAFE_INT_HAS_EXCEPTIONS     // Use the built-in C++ exceptions
+    #define SAFEINT_EXCEPTION_METHOD SAFEINT_EXCEPTION_CPP
+    #else                           // Must use same as SAFEINT_FAILFAST
+    #define SAFEINT_EXCEPTION_METHOD SAFEINT_EXCEPTION_ABORT
+    #endif
+#endif
+
+template < typename E > class SafeIntExceptionHandler;
+
+#if SAFEINT_EXCEPTION_METHOD == SAFEINT_EXCEPTION_CPP
 
 class SAFEINT_VISIBLE SafeIntException
 {
 public:
-    _CONSTEXPR11 SafeIntException( SafeIntError code = SafeIntNoError) SAFEINT_NOTHROW  : m_code(code)
+    _CONSTEXPR11 SafeIntException(SafeIntError code = SafeIntNoError) SAFEINT_NOTHROW : m_code(code)
     {
     }
     SafeIntError m_code;
 };
 
-namespace SafeIntInternal
+// Note - removed weak annotation on class due to gcc complaints
+// This was the only place in the file that used it, need to better understand 
+// whether it was put there correctly in the first place
+namespace safeInt_exception_handlers
 {
-    // Visual Studio version of SafeInt provides for two possible error
-    // handlers:
-    // SafeIntErrorPolicy_SafeIntException - C++ exception, default if not otherwise defined
-    // SafeIntErrorPolicy_InvalidParameter - Calls fail fast (Windows-specific), bypasses any exception handlers, 
-    //                                       exits the app with a crash
-    template < typename E > class SafeIntExceptionHandler;
-
-#if SAFE_INT_HAS_EXCEPTIONS
-
     // Some users may have applications that do not use C++ exceptions
     // and cannot compile the following class. If that is the case,
     // either SafeInt_InvalidParameter must be defined as the default,
@@ -778,102 +796,89 @@ namespace SafeIntInternal
         static SAFEINT_NORETURN void SAFEINT_STDCALL SafeIntOnOverflow()
         {
             SafeIntExceptionAssert();
-            throw SafeIntException( SafeIntArithmeticOverflow );
+            throw SafeIntException(SafeIntArithmeticOverflow);
         }
 
         static SAFEINT_NORETURN void SAFEINT_STDCALL SafeIntOnDivZero()
         {
             SafeIntExceptionAssert();
-            throw SafeIntException( SafeIntDivideByZero );
+            throw SafeIntException(SafeIntDivideByZero);
         }
     };
 
+    typedef SafeIntExceptionHandler < SafeIntException > CPlusPlusExceptionHandler;
+}
+
+#define SafeIntDefaultExceptionHandler safeInt_exception_handlers::CPlusPlusExceptionHandler
+#define SAFEINT_EXCEPTION_HANDLER_CPP 1
+
+#endif // SAFEINT_EXCEPTION_CPP
+
+#if SAFEINT_EXCEPTION_METHOD == SAFEINT_EXCEPTION_WIN32
+
+// Must have Windows to use this
+#if !defined _WINDOWS_
+#error Include windows.h in order to use Win32 exceptions
 #endif
-
-   class SafeInt_InvalidParameter
-   {
-   public:
-       static SAFEINT_NORETURN void SafeIntOnOverflow() SAFEINT_NOTHROW
-       {
-           SafeIntExceptionAssert();
-           _CRT_SECURE_INVALID_PARAMETER("SafeInt Arithmetic Overflow");
-       }
-
-       static SAFEINT_NORETURN void SafeIntOnDivZero() SAFEINT_NOTHROW
-       {
-           SafeIntExceptionAssert();
-           _CRT_SECURE_INVALID_PARAMETER("SafeInt Divide By Zero");
-       }
-   };
-
-#if defined _WINDOWS_ 
-
-    class SafeIntWin32ExceptionHandler 
+namespace safeInt_exception_handlers
+{
+    class SafeIntWin32ExceptionHandler
     {
     public:
         static SAFEINT_NORETURN void SAFEINT_STDCALL SafeIntOnOverflow() SAFEINT_NOTHROW
         {
             SafeIntExceptionAssert();
-            RaiseException( static_cast<DWORD>(EXCEPTION_INT_OVERFLOW), EXCEPTION_NONCONTINUABLE, 0, 0);
+            RaiseException(static_cast<DWORD>(EXCEPTION_INT_OVERFLOW), EXCEPTION_NONCONTINUABLE, 0, 0);
         }
 
         static SAFEINT_NORETURN void SAFEINT_STDCALL SafeIntOnDivZero() SAFEINT_NOTHROW
         {
             SafeIntExceptionAssert();
-            RaiseException( static_cast<DWORD>(EXCEPTION_INT_DIVIDE_BY_ZERO), EXCEPTION_NONCONTINUABLE, 0, 0);
+            RaiseException(static_cast<DWORD>(EXCEPTION_INT_DIVIDE_BY_ZERO), EXCEPTION_NONCONTINUABLE, 0, 0);
         }
     };
 
+}
+
+typedef safeInt_exception_handlers::SafeIntWin32ExceptionHandler Win32ExceptionHandler;
+#define SafeIntDefaultExceptionHandler Win32ExceptionHandler
+#define SAFEINT_EXCEPTION_HANDLER_CPP 0
+#endif // SAFEINT_EXCEPTION_WIN32
+
+#if SAFEINT_EXCEPTION_METHOD == SAFEINT_EXCEPTION_ABORT
+// This has two possible implementations - one is failfast, the other is abort
+#if defined _CRT_SECURE_INVALID_PARAMETER && !defined SAFE_INT_USE_STDLIB
+    #define SAFE_INT_ABORT(msg) _CRT_SECURE_INVALID_PARAMETER(msg)
+#else
+    // Calling fail fast is somewhat more robust than calling abort, 
+    // but abort is the closest we can manage without Visual Studio support
+    // Need the header for abort()
+    #include <stdlib.h>
+    #define SAFE_INT_ABORT(msg) abort()
+
 #endif
 
-} // namespace SafeIntInternal
+namespace safeInt_exception_handlers
+{
+    class SafeInt_InvalidParameter
+    {
+    public:
+        static SAFEINT_NORETURN void SafeIntOnOverflow() SAFEINT_NOTHROW
+        {
+            SafeIntExceptionAssert();
+            SAFE_INT_ABORT("SafeInt Arithmetic Overflow");
+        }
 
-// both of these have cross-platform support
-#if SAFE_INT_HAS_EXCEPTIONS
-typedef SafeIntInternal::SafeIntExceptionHandler < SafeIntException > CPlusPlusExceptionHandler;
-#endif
+        static SAFEINT_NORETURN void SafeIntOnDivZero() SAFEINT_NOTHROW
+        {
+            SafeIntExceptionAssert();
+            SAFE_INT_ABORT("SafeInt Divide By Zero");
+        }
+   };
+}
 
-typedef SafeIntInternal::SafeInt_InvalidParameter InvalidParameterExceptionHandler;
-
-// This exception handler is no longer recommended, but is left here in order not to break existing users
-#if defined _WINDOWS_ 
-typedef SafeIntInternal::SafeIntWin32ExceptionHandler Win32ExceptionHandler;
-#endif
-
-// For Visual Studio compatibility
-#if defined VISUAL_STUDIO_SAFEINT_COMPAT 
-    typedef CPlusPlusExceptionHandler  SafeIntErrorPolicy_SafeIntException;
-    typedef InvalidParameterExceptionHandler SafeIntErrorPolicy_InvalidParameter;
-#endif
-
-// If the user hasn't defined a default exception handler,
-// define one now, depending on whether they would like Win32 or C++ exceptions
-
-// This library will use conditional noexcept soon, but not in this release
-// Some users might mix exception handlers, which is not advised, but is supported
-#if !defined SafeIntDefaultExceptionHandler
-    #if defined SAFEINT_RAISE_EXCEPTION
-        #if !defined _WINDOWS_
-        #error Include windows.h in order to use Win32 exceptions
-        #endif
-
-        #define SafeIntDefaultExceptionHandler Win32ExceptionHandler
-    #elif defined SAFEINT_FAILFAST
-        #define SafeIntDefaultExceptionHandler InvalidParameterExceptionHandler
-    #else
-        #if SAFE_INT_HAS_EXCEPTIONS
-            #define SafeIntDefaultExceptionHandler CPlusPlusExceptionHandler
-        #else
-            #define SafeIntDefaultExceptionHandler InvalidParameterExceptionHandler
-        #endif
-
-        #if !defined SAFEINT_EXCEPTION_HANDLER_CPP
-        #define SAFEINT_EXCEPTION_HANDLER_CPP 1
-        #endif
-    #endif
-#endif
-
-#if !defined SAFEINT_EXCEPTION_HANDLER_CPP
+typedef safeInt_exception_handlers::SafeInt_InvalidParameter InvalidParameterExceptionHandler;
+#define SafeIntDefaultExceptionHandler InvalidParameterExceptionHandler
 #define SAFEINT_EXCEPTION_HANDLER_CPP 0
 #endif
 
@@ -885,6 +890,8 @@ typedef SafeIntInternal::SafeIntWin32ExceptionHandler Win32ExceptionHandler;
 #else
 #define SAFEINT_CPP_THROW SAFEINT_NOTHROW
 #endif
+
+#endif // defined SafeIntDefaultExceptionHandler
 
 namespace safeint_internal
 {
@@ -3711,7 +3718,7 @@ public:
 
         // Must test for corner case
         if( t == std::numeric_limits<T>::min() && u == (U)-1 )
-            return SafeIntError::SafeIntArithmeticOverflow;
+            return SafeIntArithmeticOverflow;
 
         result = (T)( t/u );
         return SafeIntNoError;
@@ -7279,10 +7286,5 @@ _CONSTEXPR11 SafeInt< T, E > operator |( U lhs, SafeInt< T, E > rhs ) SAFEINT_NO
 {
     return SafeInt< T, E >( BinaryOrHelper< T, U, BinaryMethod< T, U >::method >::Or( (T)rhs, lhs ) );
 }
-
-#if defined VISUAL_STUDIO_SAFEINT_COMPAT
-} // utilities
-} // msl
-#endif
 
 #endif //SAFEINT_HPP
