@@ -252,7 +252,7 @@ void CompileType()
 	T x = 1;
 	T result;
 
-	SafeNegation(x, result);
+	(void)SafeNegation(x, result);
 
 }
 
