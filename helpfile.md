@@ -19,12 +19,11 @@ Support for constexpr varies with compiler, version of compiler, and the version
 ### Supported C++ Versions
 This library was originally developed under a compiler which only supported the C++98 standard and should theoretically still compile under some very old compilers, assuming that template support was sufficient. Some of the compilers used circa 2003 didn't have enough template support, but hopefully you're not compiling your code with antique unsupported compilers.
 
-Practically, recently supported versions of gcc and clang require C++11 in order for the standard library headers to compile correctly, which has forced the minimum C++ version for these compilers to be C++11. As explained in Compiler Features, for best results, compile with C++14 or higher.
-
-Note that compilation with C++ versions higher than C++14 are not currently part of the test suite, but shouldn't cause issues. If problems do occur when compiling with more recent C++ versions, please file an issue on GitHub.
+Note that compilation with C++ versions higher than C++17 are not currently part of the test suite, but shouldn't cause issues. If problems do occur when compiling with more recent C++ versions, please file an issue on GitHub.
 
 ### Disabling Exceptions
 Some environments do not support exceptions. The library will attempt to detect whether exceptions are enabled and if not enabled, will by default use the InvalidParameterExceptionHandler. The InvalidParameterExceptionHandler calls __failfast when compiled with the Microsoft Visual Studio Compiler, and calls abort() otherwise. If you would prefer some other mechanism, see User-supplied Exceptions.
+
 ### User-supplied Exceptions
 Replacing the exception handler is a common customization. Many teams have their own well-developed exception classes and would like to use that infrastructure with SafeInt. For example, if you wanted std::runtime_error instead of SafeIntException, create a wrapper header with the following code:
 
@@ -449,8 +448,6 @@ SAFEINT_REMOVE_NOTHROW - the noexcept attribute behavior varies across compilers
 SAFEINT_HAS_INT128, SAFEINT_USE_INTRINSICS - SafeInt has four approaches to 64-bit multiplication - upcast to int128, intrinsics on the Visual Studio compiler with x64 code, builtin functions on gcc and clang, and if all else fails, just do the math. If you would like to force an approach to this, these defines will allow you to that.
 
 SAFEINT_ASSERT - SafeInt will assert various cases that might represent either implementation-dependent or behavior that should get inspected. The default is to use assert(), but you may replace this if your code base has a different set of assert functions.
-
-VISUAL_STUDIO_SAFEINT_COMPAT - there is a very old version of SafeInt that was shipped with Visual Studio, and never updated. It uses the msl::utilities namespace, and it is possible that references to these namespaces have leaked out into your code. If so, define this and you'll have an easier time porting. It is recommended that you just go fix these references, as compatibility hasn't been tested recently, and this will eventually get deprecated.
 
 SAFEINT_ASSERT_ON_EXCEPTION - defining this will cause an assert to be called before an exception is thrown, which may make issues easier to debug.
 
