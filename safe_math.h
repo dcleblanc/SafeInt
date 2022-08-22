@@ -226,102 +226,172 @@ extern char __CHECK_INT_IS_32__[1 / ((sizeof(int) - 4) ? 0 : 1)];
 inline char safe_cast_char_int(int in) { return safe_cast_int8_int32(in); }
 inline char safe_cast_char_uint(unsigned int in) { return safe_cast_int8_uint32(in); }
 
+inline int check_cast_char_int(int in) { return safe_cast_int8_int32(in); }
+inline int check_cast_char_uint(unsigned int in) { return safe_cast_int8_uint32(in); }
+
 #if SAFE_MATH_LONG == 64
 inline char safe_cast_char_long(long in) { return safe_cast_int8_int64(in); }
+inline int check_cast_char_long(long in) { return check_cast_int8_int64(in); }
 #else
 inline char safe_cast_char_long(long in) { return safe_cast_int8_int32(in); }
+inline int check_cast_char_long(long in) { return check_cast_int8_int32(in); }
 #endif
 
 inline char safe_cast_char_longlong(long long in) { return safe_cast_int8_int64(in); }
 inline char safe_cast_char_ulonglong(unsigned long long in) { return safe_cast_int8_uint64(in); }
+
+inline int check_cast_char_longlong(long long in) { return check_cast_int8_int64(in); }
+inline int check_cast_char_ulonglong(unsigned long long in) { return check_cast_int8_uint64(in); }
 #else
 inline char safe_cast_char_int(int in) { return safe_cast_uint8_int32(in); }
 inline char safe_cast_char_uint(unsigned int in) { return safe_cast_uint8_uint32(in); }
 
+inline int check_cast_char_int(int in) { return check_cast_uint8_int32(in); }
+inline int check_cast_char_uint(unsigned int in) { return check_cast_uint8_uint32(in); }
+
 #if SAFE_MATH_LONG == 64
 inline char safe_cast_char_long(long in) { return safe_cast_uint8_int64(in); }
+inline int check_cast_char_long(long in) { return check_cast_uint8_int64(in); }
 #else
 inline char safe_cast_char_long(long in) { return safe_cast_uint8_int32(in); }
+inline int check_cast_char_long(long in) { return check_cast_uint8_int32(in); }
 #endif
 
 inline char safe_cast_char_longlong(long long in) { return safe_cast_uint8_int64(in); }
 inline char safe_cast_char_ulonglong(unsigned long long in) { return safe_cast_uint8_uint64(in); }
+
+inline int check_cast_char_longlong(long long in) { return check_cast_uint8_int64(in); }
+inline int check_cast_char_ulonglong(unsigned long long in) { return check_cast_uint8_uint64(in); }
 #endif
 
 // Signed char
 inline signed char safe_cast_schar_int(int in) { return safe_cast_int8_int32(in); }
 inline signed char safe_cast_schar_uint(unsigned int in) { return safe_cast_int8_uint32(in); }
 
+inline int check_cast_schar_int(int in) { return check_cast_int8_int32(in); }
+inline int check_cast_schar_uint(unsigned int in) { return check_cast_int8_uint32(in); }
+
 #if SAFE_MATH_LONG == 64
 inline signed char safe_cast_schar_long(long in) { return safe_cast_int8_int64(in); }
+inline int check_cast_schar_long(long in) { return check_cast_int8_int64(in); }
 #else
 inline signed char safe_cast_schar_long(long in) { return safe_cast_int8_int32(in); }
+inline int check_cast_schar_long(long in) { return check_cast_int8_int32(in); }
 #endif
 
 inline signed char safe_cast_schar_longlong(long long in) { return safe_cast_int8_int64(in); }
 inline signed char safe_cast_schar_ulonglong(unsigned long long in) { return safe_cast_int8_uint64(in); }
 
+inline int check_cast_schar_longlong(long long in) { return check_cast_int8_int64(in); }
+inline int check_cast_schar_ulonglong(unsigned long long in) { return check_cast_int8_uint64(in); }
+
 // Unsigned char
 inline unsigned char safe_cast_uchar_int(int in) { return safe_cast_uint8_int32(in); }
 inline unsigned char safe_cast_uchar_uint(unsigned int in) { return safe_cast_uint8_uint32(in); }
 
+inline int check_cast_uchar_int(int in) { return check_cast_uint8_int32(in); }
+inline int check_cast_uchar_uint(unsigned int in) { return check_cast_uint8_uint32(in); }
+
 #if SAFE_MATH_LONG == 64
 inline unsigned char safe_cast_uchar_long(long in) { return safe_cast_uint8_int64(in); }
+inline int check_cast_uchar_long(long in) { return check_cast_uint8_int64(in); }
 #else
 inline unsigned char safe_cast_uchar_long(long in) { return safe_cast_uint8_int32(in); }
+inline int check_cast_uchar_long(long in) { return check_cast_uint8_int32(in); }
 #endif
 
 inline unsigned char safe_cast_uchar_longlong(long long in) { return safe_cast_uint8_int64(in); }
 inline unsigned char safe_cast_uchar_ulonglong(unsigned long long in) { return safe_cast_uint8_uint64(in); }
 
+inline int check_cast_uchar_longlong(long long in) { return check_cast_uint8_int64(in); }
+inline int check_cast_uchar_ulonglong(unsigned long long in) { return check_cast_uint8_uint64(in); }
+
 // 16-bit signed casting
 inline short safe_cast_short_int(int in) { return safe_cast_int16_int32(in); }
 inline short safe_cast_short_uint(unsigned int in) { return safe_cast_int16_uint32(in); }
+
+inline int check_cast_short_int(int in) { return check_cast_int16_int32(in); }
+inline int check_cast_short_uint(unsigned int in) { return check_cast_int16_uint32(in); }
 #if SAFE_MATH_LONG == 64
 inline short safe_cast_short_long(long in) { return safe_cast_int16_int64(in); }
+inline int check_cast_short_long(long in) { return check_cast_int16_int64(in); }
 #else
 inline short safe_cast_short_long(long in) { return safe_cast_int16_int32(in); }
+inline int check_cast_short_long(long in) { return check_cast_int16_int32(in); }
 #endif
 
 inline short safe_cast_short_longlong(long long in) { return safe_cast_int16_int64(in); }
 inline short safe_cast_short_ulonglong(unsigned long long in) { return safe_cast_int16_uint64(in); }
 
+inline int check_cast_short_longlong(long long in) { return check_cast_int16_int64(in); }
+inline int check_cast_short_ulonglong(unsigned long long in) { return check_cast_int16_uint64(in); }
+
 // 16-bit unsigned casting
 inline unsigned short safe_cast_ushort_int(int in) { return safe_cast_uint16_int32(in); }
 inline unsigned short safe_cast_ushort_uint(unsigned int in) { return safe_cast_uint16_uint32(in); }
+
+inline int check_cast_ushort_int(int in) { return check_cast_uint16_int32(in); }
+inline int check_cast_ushort_uint(unsigned int in) { return check_cast_uint16_uint32(in); }
 #if SAFE_MATH_LONG == 64
 inline unsigned short safe_cast_ushort_long(long in) { return safe_cast_uint16_int64(in); }
+inline int check_cast_ushort_long(long in) { return check_cast_uint16_int64(in); }
 #else
 inline unsigned short safe_cast_ushort_long(long in) { return safe_cast_uint16_int32(in); }
+inline int check_cast_ushort_long(long in) { return check_cast_uint16_int32(in); }
 #endif
 
 inline unsigned short safe_cast_ushort_longlong(long long in) { return safe_cast_uint16_int64(in); }
 inline unsigned short safe_cast_ushort_ulonglong(unsigned long long in) { return safe_cast_uint16_uint64(in); }
 
+inline int check_cast_ushort_longlong(long long in) { return check_cast_uint16_int64(in); }
+inline int check_cast_ushort_ulonglong(unsigned long long in) { return check_cast_uint16_uint64(in); }
+
 // Cast to int
 inline int safe_cast_int_uint(unsigned int in) { return safe_cast_int32_uint32(in); }
+inline int check_cast_int_uint(unsigned int in) { return check_cast_int32_uint32(in); }
+
 #if SAFE_MATH_LONG == 64
 inline int safe_cast_int_long(long in) { return safe_cast_int32_int64(in); }
 inline int safe_cast_int_ulong(unsigned long in) { return safe_cast_int32_uint64(in); }
+
+inline int check_cast_int_long(long in) { return check_cast_int32_int64(in); }
+inline int check_cast_int_ulong(unsigned long in) { return check_cast_int32_uint64(in); }
 #else
+inline int safe_cast_int_long(long in) { return in; }
 inline int safe_cast_int_ulong(unsigned long in) { return safe_cast_int32_uint32(in); }
+
+inline int check_cast_int_long(long in) { (void)in;  return 0; }
+inline int check_cast_int_ulong(unsigned long in) { return check_cast_int32_uint32(in); }
 #endif
 
 inline int safe_cast_int_longlong(long long in) { return safe_cast_int32_int64(in); }
 inline int safe_cast_int_ulonglong(unsigned long long in) { return safe_cast_int32_uint64(in); }
 
+inline int check_cast_int_longlong(long long in) { return check_cast_int32_int64(in); }
+inline int check_cast_int_ulonglong(unsigned long long in) { return check_cast_int32_uint64(in); }
+
 // Cast to unsigned int
 inline unsigned int safe_cast_uint_int(int in) { return safe_cast_uint32_int32(in); }
+inline int check_cast_uint_int(int in) { return check_cast_uint32_int32(in); }
 #if SAFE_MATH_LONG == 64
 inline unsigned int safe_cast_uint_long(long in) { return safe_cast_uint32_int64(in); }
 inline unsigned int safe_cast_uint_ulong(unsigned long in) { return safe_cast_uint32_uint64(in); }
+
+inline int check_cast_uint_long(long in) { return check_cast_uint32_int64(in); }
+inline int check_cast_uint_ulong(unsigned long in) { return check_cast_uint32_uint64(in); }
 #else
 inline unsigned int safe_cast_uint_long(long in) { return safe_cast_uint32_int32(in); }
 inline unsigned int safe_cast_uint_ulong(unsigned long in) { return in; }
+
+inline int check_cast_uint_long(long in) { return check_cast_uint32_int32(in); }
+inline int check_cast_uint_ulong(unsigned long in) { (void)in; return 0; }
 #endif
 
 inline unsigned int safe_cast_uint_longlong(long long in) { return safe_cast_uint32_int64(in); }
 inline unsigned int safe_cast_uint_ulonglong(unsigned long long in) { return safe_cast_uint32_uint64(in); }
+
+inline int check_cast_uint_longlong(long long in) { return check_cast_uint32_int64(in); }
+inline int check_cast_uint_ulonglong(unsigned long long in) { return check_cast_uint32_uint64(in); }
 
 // Cast to long
 // Also have to keep parity in the case of different compilations
@@ -331,22 +401,41 @@ inline long safe_cast_long_ulong(unsigned long in) { return safe_cast_int64_uint
 inline long safe_cast_long_longlong(long long in) { return in; }
 inline long safe_cast_long_ulonglong(unsigned long long in) { return safe_cast_int64_uint64(in); }
 
+inline int check_cast_long_ulong(unsigned long in) { return check_cast_int64_uint64(in); }
+inline int check_cast_long_longlong(long long in) { return 0; }
+inline int check_cast_long_ulonglong(unsigned long long in) { return check_cast_int64_uint64(in); }
+
 inline unsigned long safe_cast_ulong_long(long in) { return safe_cast_uint64_int64(in); }
 inline unsigned long safe_cast_ulong_ulonglong(unsigned long long in) { return in; }
 inline unsigned long safe_cast_ulong_longlong(unsigned long long in) { return in; }
+
+inline int check_cast_ulong_long(long in) { return check_cast_uint64_int64(in); }
+inline int check_cast_ulong_ulonglong(unsigned long long in) { return 0; }
+inline int check_cast_ulong_longlong(unsigned long long in) { return 0; }
 #else
 inline long safe_cast_long_ulong(unsigned long in) { return safe_cast_int32_uint32(in); }
 inline long safe_cast_long_longlong(long long in) { return safe_cast_int32_int64(in); }
 inline long safe_cast_long_ulonglong(unsigned long long in) { return safe_cast_int32_uint64(in); }
 
+inline int check_cast_long_ulong(unsigned long in) { return check_cast_int32_uint32(in); }
+inline int check_cast_long_longlong(long long in) { return check_cast_int32_int64(in); }
+inline int check_cast_long_ulonglong(unsigned long long in) { return check_cast_int32_uint64(in); }
+
 inline unsigned long safe_cast_ulong_long(long in) { return safe_cast_uint32_int32(in); }
 inline unsigned long safe_cast_ulong_ulonglong(unsigned long long in) { return safe_cast_uint32_uint64(in); }
 inline unsigned long safe_cast_ulong_longlong(long long in) { return safe_cast_uint32_int64(in); }
+
+inline int check_cast_ulong_long(long in) { return check_cast_uint32_int32(in); }
+inline int check_cast_ulong_ulonglong(unsigned long long in) { return check_cast_uint32_uint64(in); }
+inline int check_cast_ulong_longlong(long long in) { return check_cast_uint32_int64(in); }
 #endif
 
 // And long long
 inline long long safe_cast_longlong_ulonglong(unsigned long long in) { return safe_cast_int64_uint64(in); }
 inline unsigned long long safe_cast_ulonglong_longlong(long long in) { return safe_cast_uint64_int64(in); }
+
+inline int check_cast_longlong_ulonglong(unsigned long long in) { return check_cast_int64_uint64(in); }
+inline int check_cast_ulonglong_longlong(long long in) { return check_cast_uint64_int64(in); }
 
 // Addition
 inline int safe_add_int_int(int a, int b) { return safe_add_int32_int32(a, b); }
@@ -354,17 +443,33 @@ inline int safe_add_int_uint(int a, unsigned int b) { return safe_add_int32_uint
 inline int safe_add_int_longlong(int a, long long b) { return safe_add_int32_int64(a, b); }
 inline int safe_add_int_ulonglong(int a, unsigned long long b) { return safe_add_int32_uint64(a, b); }
 
+inline bool check_add_int_int(int a, int b, int* ret) { return check_add_int32_int32(a, b, ret); }
+inline bool check_add_int_uint(int a, unsigned int b, int* ret) { return check_add_int32_uint32(a, b, ret); }
+inline bool check_add_int_longlong(int a, long long b, int* ret) { return check_add_int32_int64(a, b, ret); }
+inline bool check_add_int_ulonglong(int a, unsigned long long b, int* ret) { return check_add_int32_uint64(a, b, ret); }
+
 inline unsigned int safe_add_uint_int(unsigned int a, int b) { return safe_add_uint32_int32(a, b); }
 inline unsigned int safe_add_uint_uint(unsigned int a, unsigned int b) { return safe_add_uint32_uint32(a, b); }
 inline unsigned int safe_add_uint_longlong(unsigned int a, long long b) { return safe_add_uint32_int64(a, b); }
 inline unsigned int safe_add_uint_ulonglong(unsigned int a, unsigned long long b) { return safe_add_uint32_uint64(a, b); }
 
+inline bool check_add_uint_int(unsigned int a, int b, unsigned int* ret) { return check_add_uint32_int32(a, b, ret); }
+inline bool check_add_uint_uint(unsigned int a, unsigned int b, unsigned int* ret) { return check_add_uint32_uint32(a, b, ret); }
+inline bool check_add_uint_longlong(unsigned int a, long long b, unsigned int* ret) { return check_add_uint32_int64(a, b, ret); }
+inline bool check_add_uint_ulonglong(unsigned int a, unsigned long long b, unsigned int* ret) { return check_add_uint32_uint64(a, b, ret); }
+
 #if SAFE_MATH_LONG == 64
 inline int safe_add_int_long(int a, long b) { return safe_add_int32_int64(a, b); }
 inline int safe_add_int_ulong(int a, unsigned long b) { return safe_add_int32_uint64(a, b); }
 
+inline bool check_add_int_long(int a, long b, int* ret) { return check_add_int32_int64(a, b, ret); }
+inline bool check_add_int_ulong(int a, unsigned long b, int* ret) { return check_add_int32_uint64(a, b, ret); }
+
 inline unsigned int safe_add_uint_long(unsigned int a, long b) { return safe_add_uint32_int64(a, b); }
 inline unsigned int safe_add_uint_ulong(unsigned int a, unsigned long b) { return safe_add_uint32_uint64(a, b); }
+
+inline bool check_add_uint_long(unsigned int a, long b, unsigned int* ret) { return check_add_uint32_int64(a, b, ret); }
+inline bool check_add_uint_ulong(unsigned int a, unsigned long b, unsigned int* ret) { return check_add_uint32_uint64(a, b, ret); }
 
 inline long safe_add_long_int(long a, int b) { return safe_add_int64_int32(a, b); }
 inline long safe_add_long_uint(long a, unsigned int b) { return safe_add_int64_uint32(a, b); }
@@ -373,6 +478,13 @@ inline long safe_add_long_ulong(long a, unsigned long b) { return safe_add_int64
 inline long safe_add_long_longlong(long a, long long b) { return safe_add_int64_int64(a, b); }
 inline long safe_add_long_ulonglong(long a, unsigned long long b) { return safe_add_int64_uint64(a, b); }
 
+inline bool check_add_long_int(long a, int b, long* ret) { return check_add_int64_int32(a, b, ret); }
+inline bool check_add_long_uint(long a, unsigned int b, long* ret) { return check_add_int64_uint32(a, b, ret); }
+inline bool check_add_long_long(long a, long b, long* ret) { return check_add_int64_int64(a, b, ret); }
+inline bool check_add_long_ulong(long a, unsigned long b, long* ret) { return check_add_int64_uint64(a, b, ret); }
+inline bool check_add_long_longlong(long a, long long b, long* ret) { return check_add_int64_int64(a, b, ret); }
+inline bool check_add_long_ulonglong(long a, unsigned long long b, long* ret) { return check_add_int64_uint64(a, b, ret); }
+
 inline unsigned long safe_add_ulong_int(unsigned long a, int b) { return safe_add_uint64_int32(a, b); }
 inline unsigned long safe_add_ulong_uint(unsigned long a, unsigned int b) { return safe_add_uint64_uint32(a, b); }
 inline unsigned long safe_add_ulong_long(unsigned long a, long b) { return safe_add_uint64_int64(a, b); }
@@ -380,17 +492,36 @@ inline unsigned long safe_add_ulong_ulong(unsigned long a, unsigned long b) { re
 inline unsigned long safe_add_ulong_longlong(unsigned long a, long long b) { return safe_add_uint64_int64(a, b); }
 inline unsigned long safe_add_ulong_ulonglong(unsigned long a, unsigned long long b) { return safe_add_uint64_uint64(a, b); }
 
+inline bool check_add_ulong_int(unsigned long a, int b, unsigned long* ret) { return check_add_uint64_int32(a, b, ret); }
+inline bool check_add_ulong_uint(unsigned long a, unsigned int b, unsigned long* ret) { return check_add_uint64_uint32(a, b, ret); }
+inline bool check_add_ulong_long(unsigned long a, long b, unsigned long* ret) { return check_add_uint64_int64(a, b, ret); }
+inline bool check_add_ulong_ulong(unsigned long a, unsigned long b, unsigned long* ret) { return check_add_uint64_uint64(a, b, ret); }
+inline bool check_add_ulong_longlong(unsigned long a, long long b, unsigned long* ret) { return check_add_uint64_int64(a, b, ret); }
+inline bool check_add_ulong_ulonglong(unsigned long a, unsigned long long b, unsigned long* ret) { return check_add_uint64_uint64(a, b, ret); }
+
 inline long long safe_add_longlong_long(long long a, long b) { return safe_add_int64_int64(a, b); }
 inline long long safe_add_longlong_ulong(long long a, unsigned long b) { return safe_add_int64_uint64(a, b); }
 
+inline bool check_add_longlong_long(long long a, long b, long long* ret) { return check_add_int64_int64(a, b, ret); }
+inline bool check_add_longlong_ulong(long long a, unsigned long b, long long* ret) { return check_add_int64_uint64(a, b, ret); }
+
 inline unsigned long long safe_add_ulonglong_long(unsigned long long a, long b) { return safe_add_uint64_int64(a, b); }
 inline unsigned long long safe_add_ulonglong_ulong(unsigned long long a, unsigned long b) { return safe_add_uint64_uint64(a, b); }
+
+inline bool check_add_ulonglong_long(unsigned long long a, long b, unsigned long long* ret) { return check_add_uint64_int64(a, b, ret); }
+inline bool check_add_ulonglong_ulong(unsigned long long a, unsigned long b, unsigned long long* ret) { return check_add_uint64_uint64(a, b, ret); }
 #else
 inline int safe_add_int_long(int a, long b) { return safe_add_int32_int32(a, b); }
 inline int safe_add_int_ulong(int a, unsigned long b) { return safe_add_int32_uint32(a, b); }
 
+inline bool check_add_int_long(int a, long b, int* ret) { return check_add_int32_int32(a, b, ret); }
+inline bool check_add_int_ulong(int a, unsigned long b, int* ret) { return check_add_int32_uint32(a, b, ret); }
+
 inline unsigned int safe_add_uint_long(unsigned int a, long b) { return safe_add_uint32_int32(a, b); }
 inline unsigned int safe_add_uint_ulong(unsigned int a, unsigned long b) { return safe_add_uint32_uint32(a, b); }
+
+inline bool check_add_uint_long(unsigned int a, long b, unsigned int* ret) { return check_add_uint32_int32(a, b, ret); }
+inline bool check_add_uint_ulong(unsigned int a, unsigned long b, unsigned int* ret) { return check_add_uint32_uint32(a, b, ret); }
 
 inline long safe_add_long_int(long a, int b) { return safe_add_int32_int32(a, b); }
 inline long safe_add_long_uint(long a, unsigned int b) { return safe_add_int32_uint32(a, b); }
@@ -399,6 +530,13 @@ inline long safe_add_long_ulong(long a, unsigned long b) { return safe_add_int32
 inline long safe_add_long_longlong(long a, long long b) { return safe_add_int32_int64(a, b); }
 inline long safe_add_long_ulonglong(long a, unsigned long long b) { return safe_add_int32_uint64(a, b); }
 
+inline bool check_add_long_int(long a, int b, long* ret) { return check_add_int32_int32(a, b, (int32_t*)ret); }
+inline bool check_add_long_uint(long a, unsigned int b, long* ret) { return check_add_int32_uint32(a, b, (int32_t*)ret); }
+inline bool check_add_long_long(long a, long b, long* ret) { return check_add_int32_int32(a, b, (int32_t*)ret); }
+inline bool check_add_long_ulong(long a, unsigned long b, long* ret) { return check_add_int32_uint32(a, b, (int32_t*)ret); }
+inline bool check_add_long_longlong(long a, long long b, long* ret) { return check_add_int32_int64(a, b, (int32_t*)ret); }
+inline bool check_add_long_ulonglong(long a, unsigned long long b, long* ret) { return check_add_int32_uint64(a, b, (int32_t*)ret); }
+
 inline unsigned long safe_add_ulong_int(unsigned long a, int b) { return safe_add_uint32_int32(a, b); }
 inline unsigned long safe_add_ulong_uint(unsigned long a, unsigned int b) { return safe_add_uint32_uint32(a, b); }
 inline unsigned long safe_add_ulong_long(unsigned long a, long b) { return safe_add_uint32_int32(a, b); }
@@ -406,11 +544,24 @@ inline unsigned long safe_add_ulong_ulong(unsigned long a, unsigned long b) { re
 inline unsigned long safe_add_ulong_longlong(unsigned long a, long long b) { return safe_add_uint32_int64(a, b); }
 inline unsigned long safe_add_ulong_ulonglong(unsigned long a, unsigned long long b) { return safe_add_uint32_uint64(a, b); }
 
+inline bool check_add_ulong_int(unsigned long a, int b, unsigned long* ret) { return check_add_uint32_int32(a, b, (uint32_t*)ret); }
+inline bool check_add_ulong_uint(unsigned long a, unsigned int b, unsigned long* ret) { return check_add_uint32_uint32(a, b, (uint32_t*)ret); }
+inline bool check_add_ulong_long(unsigned long a, long b, unsigned long* ret) { return check_add_uint32_int32(a, b, (uint32_t*)ret); }
+inline bool check_add_ulong_ulong(unsigned long a, unsigned long b, unsigned long* ret) { return check_add_uint32_uint32(a, b, (uint32_t*)ret); }
+inline bool check_add_ulong_longlong(unsigned long a, long long b, unsigned long* ret) { return check_add_uint32_int64(a, b, (uint32_t*)ret); }
+inline bool check_add_ulong_ulonglong(unsigned long a, unsigned long long b, unsigned long* ret) { return check_add_uint32_uint64(a, b, (uint32_t*)ret); }
+
 inline long long safe_add_longlong_long(long long a, long b) { return safe_add_int64_int32(a, b); }
 inline long long safe_add_longlong_ulong(long long a, unsigned long b) { return safe_add_int64_uint32(a, b); }
 
+inline bool check_add_longlong_long(long long a, long b, long long* ret) { return check_add_int64_int32(a, b, ret); }
+inline bool check_add_longlong_ulong(long long a, unsigned long b, long long* ret) { return check_add_int64_uint32(a, b, ret); }
+
 inline unsigned long long safe_add_ulonglong_long(unsigned long long a, long b) { return safe_add_uint64_int32(a, b); }
 inline unsigned long long safe_add_ulonglong_ulong(unsigned long long a, unsigned long b) { return safe_add_uint64_uint32(a, b); }
+
+inline bool check_add_ulonglong_long(unsigned long long a, long b, unsigned long long* ret) { return check_add_uint64_int32(a, b, ret); }
+inline bool check_add_ulonglong_ulong(unsigned long long a, unsigned long b, unsigned long long* ret) { return check_add_uint64_uint32(a, b, ret); }
 #endif
 
 inline long long safe_add_longlong_int(long long a, int b) { return safe_add_int64_int32(a, b); }
@@ -418,10 +569,20 @@ inline long long safe_add_longlong_uint(long long a, unsigned int b) { return sa
 inline long long safe_add_longlong_longlong(long long a, long long b) { return safe_add_int64_int64(a, b); }
 inline long long safe_add_longlong_ulonglong(long long a, unsigned long long b) { return safe_add_int64_uint64(a, b); }
 
+inline bool check_add_longlong_int(long long a, int b, long long* ret) { return check_add_int64_int32(a, b, ret); }
+inline bool check_add_longlong_uint(long long a, unsigned int b, long long* ret) { return check_add_int64_uint32(a, b, ret); }
+inline bool check_add_longlong_longlong(long long a, long long b, long long* ret) { return check_add_int64_int64(a, b, ret); }
+inline bool check_add_longlong_ulonglong(long long a, unsigned long long b, long long* ret) { return check_add_int64_uint64(a, b, ret); }
+
 inline unsigned long long safe_add_ulonglong_int(unsigned long long a, int b) { return safe_add_uint64_int32(a, b); }
 inline unsigned long long safe_add_ulonglong_uint(unsigned long long a, unsigned int b) { return safe_add_uint64_uint32(a, b); }
 inline unsigned long long safe_add_ulonglong_longlong(unsigned long long a, long long b) { return safe_add_uint64_int64(a, b); }
 inline unsigned long long safe_add_ulonglong_ulonglong(unsigned long long a, unsigned long long b) { return safe_add_uint64_uint64(a, b); }
+
+inline bool check_add_ulonglong_int(unsigned long long a, int b, unsigned long long* ret) { return check_add_uint64_int32(a, b, ret); }
+inline bool check_add_ulonglong_uint(unsigned long long a, unsigned int b, unsigned long long* ret) { return check_add_uint64_uint32(a, b, ret); }
+inline bool check_add_ulonglong_longlong(unsigned long long a, long long b, unsigned long long* ret) { return check_add_uint64_int64(a, b, ret); }
+inline bool check_add_ulonglong_ulonglong(unsigned long long a, unsigned long long b, unsigned long long* ret) { return check_add_uint64_uint64(a, b, ret); }
 
 // Multiplication
 inline int safe_mul_int_int(int a, int b) { return safe_mul_int32_int32(a, b); }
@@ -429,17 +590,33 @@ inline int safe_mul_int_uint(int a, unsigned int b) { return safe_mul_int32_uint
 inline int safe_mul_int_longlong(int a, long long b) { return safe_mul_int32_int64(a, b); }
 inline int safe_mul_int_ulonglong(int a, unsigned long long b) { return safe_mul_int32_uint64(a, b); }
 
+inline bool check_mul_int_int(int a, int b, int* ret) { return check_mul_int32_int32(a, b, ret); }
+inline bool check_mul_int_uint(int a, unsigned int b, int* ret) { return check_mul_int32_uint32(a, b, ret); }
+inline bool check_mul_int_longlong(int a, long long b, int* ret) { return check_mul_int32_int64(a, b, ret); }
+inline bool check_mul_int_ulonglong(int a, unsigned long long b, int* ret) { return check_mul_int32_uint64(a, b, ret); }
+
 inline unsigned int safe_mul_uint_int(unsigned int a, int b) { return safe_mul_uint32_int32(a, b); }
 inline unsigned int safe_mul_uint_uint(unsigned int a, unsigned int b) { return safe_mul_uint32_uint32(a, b); }
 inline unsigned int safe_mul_uint_longlong(unsigned int a, long long b) { return safe_mul_uint32_int64(a, b); }
 inline unsigned int safe_mul_uint_ulonglong(unsigned int a, unsigned long long b) { return safe_mul_uint32_uint64(a, b); }
 
+inline bool check_mul_uint_int(unsigned int a, int b, unsigned int* ret) { return check_mul_uint32_int32(a, b, ret); }
+inline bool check_mul_uint_uint(unsigned int a, unsigned int b, unsigned int* ret) { return check_mul_uint32_uint32(a, b, ret); }
+inline bool check_mul_uint_longlong(unsigned int a, long long b, unsigned int* ret) { return check_mul_uint32_int64(a, b, ret); }
+inline bool check_mul_uint_ulonglong(unsigned int a, unsigned long long b, unsigned int* ret) { return check_mul_uint32_uint64(a, b, ret); }
+
 #if SAFE_MATH_LONG == 64
 inline int safe_mul_int_long(int a, long b) { return safe_mul_int32_int64(a, b); }
 inline int safe_mul_int_ulong(int a, unsigned long b) { return safe_mul_int32_uint64(a, b); }
 
+inline bool check_mul_int_long(int a, long b, int* ret) { return check_mul_int32_int64(a, b, ret); }
+inline bool check_mul_int_ulong(int a, unsigned long b, int* ret) { return check_mul_int32_uint64(a, b, ret); }
+
 inline unsigned int safe_mul_uint_long(unsigned int a, long b) { return safe_mul_uint32_int64(a, b); }
 inline unsigned int safe_mul_uint_ulong(unsigned int a, unsigned long b) { return safe_mul_uint32_uint64(a, b); }
+
+inline bool check_mul_uint_long(unsigned int a, long b, unsigned int* ret) { return check_mul_uint32_int64(a, b, ret); }
+inline bool check_mul_uint_ulong(unsigned int a, unsigned long b, unsigned int* ret) { return check_mul_uint32_uint64(a, b, ret); }
 
 inline long safe_mul_long_int(long a, int b) { return safe_mul_int64_int32(a, b); }
 inline long safe_mul_long_uint(long a, unsigned int b) { return safe_mul_int64_uint32(a, b); }
@@ -448,6 +625,13 @@ inline long safe_mul_long_ulong(long a, unsigned long b) { return safe_mul_int64
 inline long safe_mul_long_longlong(long a, long long b) { return safe_mul_int64_int64(a, b); }
 inline long safe_mul_long_ulonglong(long a, unsigned long long b) { return safe_mul_int64_uint64(a, b); }
 
+inline bool check_mul_long_int(long a, int b, long* ret) { return check_mul_int64_int32(a, b, ret); }
+inline bool check_mul_long_uint(long a, unsigned int b, long* ret) { return check_mul_int64_uint32(a, b, ret); }
+inline bool check_mul_long_long(long a, long b, long* ret) { return check_mul_int64_int64(a, b, ret); }
+inline bool check_mul_long_ulong(long a, unsigned long b, long* ret) { return check_mul_int64_uint64(a, b, ret); }
+inline bool check_mul_long_longlong(long a, long long b, long* ret) { return check_mul_int64_int64(a, b, ret); }
+inline bool check_mul_long_ulonglong(long a, unsigned long long b, long* ret) { return check_mul_int64_uint64(a, b, ret); }
+
 inline unsigned long safe_mul_ulong_int(unsigned long a, int b) { return safe_mul_uint64_int32(a, b); }
 inline unsigned long safe_mul_ulong_uint(unsigned long a, unsigned int b) { return safe_mul_uint64_uint32(a, b); }
 inline unsigned long safe_mul_ulong_long(unsigned long a, long b) { return safe_mul_uint64_int64(a, b); }
@@ -455,17 +639,36 @@ inline unsigned long safe_mul_ulong_ulong(unsigned long a, unsigned long b) { re
 inline unsigned long safe_mul_ulong_longlong(unsigned long a, long long b) { return safe_mul_uint64_int64(a, b); }
 inline unsigned long safe_mul_ulong_ulonglong(unsigned long a, unsigned long long b) { return safe_mul_uint64_uint64(a, b); }
 
+inline bool check_mul_ulong_int(unsigned long a, int b, unsigned long* ret) { return check_mul_uint64_int32(a, b, ret); }
+inline bool check_mul_ulong_uint(unsigned long a, unsigned int b, unsigned long* ret) { return check_mul_uint64_uint32(a, b, ret); }
+inline bool check_mul_ulong_long(unsigned long a, long b, unsigned long* ret) { return check_mul_uint64_int64(a, b, ret); }
+inline bool check_mul_ulong_ulong(unsigned long a, unsigned long b, unsigned long* ret) { return check_mul_uint64_uint64(a, b, ret); }
+inline bool check_mul_ulong_longlong(unsigned long a, long long b, unsigned long* ret) { return check_mul_uint64_int64(a, b, ret); }
+inline bool check_mul_ulong_ulonglong(unsigned long a, unsigned long long b, unsigned long* ret) { return check_mul_uint64_uint64(a, b,ret); }
+
 inline long long safe_mul_longlong_long(long long a, long b) { return safe_mul_int64_int64(a, b); }
 inline long long safe_mul_longlong_ulong(long long a, unsigned long b) { return safe_mul_int64_uint64(a, b); }
 
+inline bool check_mul_longlong_long(long long a, long b, long long* ret) { return check_mul_int64_int64(a, b, ret); }
+inline bool check_mul_longlong_ulong(long long a, unsigned long b, long long* ret) { return check_mul_int64_uint64(a, b, ret); }
+
 inline unsigned long long safe_mul_ulonglong_long(unsigned long long a, long b) { return safe_mul_uint64_int64(a, b); }
 inline unsigned long long safe_mul_ulonglong_ulong(unsigned long long a, unsigned long b) { return safe_mul_uint64_uint64(a, b); }
+
+inline bool check_mul_ulonglong_long(unsigned long long a, long b, unsigned long long* ret) { return check_mul_uint64_int64(a, b, ret); }
+inline bool check_mul_ulonglong_ulong(unsigned long long a, unsigned long b, unsigned long long* ret) { return check_mul_uint64_uint64(a, b, ret); }
 #else
 inline int safe_mul_int_long(int a, long b) { return safe_mul_int32_int32(a, b); }
 inline int safe_mul_int_ulong(int a, unsigned long b) { return safe_mul_int32_uint32(a, b); }
 
+inline bool check_mul_int_long(int a, long b, int* ret) { return check_mul_int32_int32(a, b, ret); }
+inline bool check_mul_int_ulong(int a, unsigned long b, int* ret) { return check_mul_int32_uint32(a, b, ret); }
+
 inline unsigned int safe_mul_uint_long(unsigned int a, long b) { return safe_mul_uint32_int32(a, b); }
 inline unsigned int safe_mul_uint_ulong(unsigned int a, unsigned long b) { return safe_mul_uint32_uint32(a, b); }
+
+inline bool check_mul_uint_long(unsigned int a, long b, unsigned int* ret) { return check_mul_uint32_int32(a, b, ret); }
+inline bool check_mul_uint_ulong(unsigned int a, unsigned long b, unsigned int* ret) { return check_mul_uint32_uint32(a, b, ret); }
 
 inline long safe_mul_long_int(long a, int b) { return safe_mul_int32_int32(a, b); }
 inline long safe_mul_long_uint(long a, unsigned int b) { return safe_mul_int32_uint32(a, b); }
@@ -474,6 +677,13 @@ inline long safe_mul_long_ulong(long a, unsigned long b) { return safe_mul_int32
 inline long safe_mul_long_longlong(long a, long long b) { return safe_mul_int32_int64(a, b); }
 inline long safe_mul_long_ulonglong(long a, unsigned long long b) { return safe_mul_int32_uint64(a, b); }
 
+inline bool check_mul_long_int(long a, int b, long* ret) { return check_mul_int32_int32(a, b, (int32_t*)ret); }
+inline bool check_mul_long_uint(long a, unsigned int b, long* ret) { return check_mul_int32_uint32(a, b, (int32_t*)ret); }
+inline bool check_mul_long_long(long a, long b, long* ret) { return check_mul_int32_int32(a, b, (int32_t*)ret); }
+inline bool check_mul_long_ulong(long a, unsigned long b, long* ret) { return check_mul_int32_uint32(a, b, (int32_t*)ret); }
+inline bool check_mul_long_longlong(long a, long long b, long* ret) { return check_mul_int32_int64(a, b, (int32_t*)ret); }
+inline bool check_mul_long_ulonglong(long a, unsigned long long b, long* ret) { return check_mul_int32_uint64(a, b, (int32_t*)ret); }
+
 inline unsigned long safe_mul_ulong_int(unsigned long a, int b) { return safe_mul_uint32_int32(a, b); }
 inline unsigned long safe_mul_ulong_uint(unsigned long a, unsigned int b) { return safe_mul_uint32_uint32(a, b); }
 inline unsigned long safe_mul_ulong_long(unsigned long a, long b) { return safe_mul_uint32_int32(a, b); }
@@ -481,11 +691,24 @@ inline unsigned long safe_mul_ulong_ulong(unsigned long a, unsigned long b) { re
 inline unsigned long safe_mul_ulong_longlong(unsigned long a, long long b) { return safe_mul_uint32_int64(a, b); }
 inline unsigned long safe_mul_ulong_ulonglong(unsigned long a, unsigned long long b) { return safe_mul_uint32_uint64(a, b); }
 
+inline bool check_mul_ulong_int(unsigned long a, int b, unsigned long* ret) { return check_mul_uint32_int32(a, b, (uint32_t*)ret); }
+inline bool check_mul_ulong_uint(unsigned long a, unsigned int b, unsigned long* ret) { return check_mul_uint32_uint32(a, b, (uint32_t*)ret); }
+inline bool check_mul_ulong_long(unsigned long a, long b, unsigned long* ret) { return check_mul_uint32_int32(a, b, (uint32_t*)ret); }
+inline bool check_mul_ulong_ulong(unsigned long a, unsigned long b, unsigned long* ret) { return check_mul_uint32_uint32(a, b, (uint32_t*)ret); }
+inline bool check_mul_ulong_longlong(unsigned long a, long long b, unsigned long* ret) { return check_mul_uint32_int64(a, b, (uint32_t*)ret); }
+inline bool check_mul_ulong_ulonglong(unsigned long a, unsigned long long b, unsigned long* ret) { return check_mul_uint32_uint64(a, b, (uint32_t*)ret); }
+
 inline long long safe_mul_longlong_long(long long a, long b) { return safe_mul_int64_int32(a, b); }
 inline long long safe_mul_longlong_ulong(long long a, unsigned long b) { return safe_mul_int64_uint32(a, b); }
 
+inline bool check_mul_longlong_long(long long a, long b, long long* ret) { return check_mul_int64_int32(a, b, ret); }
+inline bool check_mul_longlong_ulong(long long a, unsigned long b, long long* ret) { return check_mul_int64_uint64(a, b, ret); }
+
 inline unsigned long long safe_mul_ulonglong_long(unsigned long long a, long b) { return safe_mul_uint64_int32(a, b); }
 inline unsigned long long safe_mul_ulonglong_ulong(unsigned long long a, unsigned long b) { return safe_mul_uint64_uint32(a, b); }
+
+inline bool check_mul_ulonglong_long(unsigned long long a, long b, unsigned long long* ret) { return check_mul_uint64_int32(a, b, ret); }
+inline bool check_mul_ulonglong_ulong(unsigned long long a, unsigned long b, unsigned long long* ret) { return check_mul_uint64_uint32(a, b, ret); }
 #endif
 
 inline long long safe_mul_longlong_int(long long a, int b) { return safe_mul_int64_int32(a, b); }
@@ -493,10 +716,20 @@ inline long long safe_mul_longlong_uint(long long a, unsigned int b) { return sa
 inline long long safe_mul_longlong_longlong(long long a, long long b) { return safe_mul_int64_int64(a, b); }
 inline long long safe_mul_longlong_ulonglong(long long a, unsigned long long b) { return safe_mul_int64_uint64(a, b); }
 
+inline bool check_mul_longlong_int(long long a, int b, long long* ret) { return check_mul_int64_int32(a, b, ret); }
+inline bool check_mul_longlong_uint(long long a, unsigned int b, long long* ret) { return check_mul_int64_uint32(a, b, ret); }
+inline bool check_mul_longlong_longlong(long long a, long long b, long long* ret) { return check_mul_int64_int64(a, b, ret); }
+inline bool check_mul_longlong_ulonglong(long long a, unsigned long long b, long long* ret) { return check_mul_int64_uint64(a, b, ret); }
+
 inline unsigned long long safe_mul_ulonglong_int(unsigned long long a, int b) { return safe_mul_uint64_int32(a, b); }
 inline unsigned long long safe_mul_ulonglong_uint(unsigned long long a, unsigned int b) { return safe_mul_uint64_uint32(a, b); }
 inline unsigned long long safe_mul_ulonglong_longlong(unsigned long long a, long long b) { return safe_mul_uint64_int64(a, b); }
 inline unsigned long long safe_mul_ulonglong_ulonglong(unsigned long long a, unsigned long long b) { return safe_mul_uint64_uint64(a, b); }
+
+inline bool check_mul_ulonglong_int(unsigned long long a, int b, unsigned long long* ret) { return check_mul_uint64_int32(a, b, ret); }
+inline bool check_mul_ulonglong_uint(unsigned long long a, unsigned int b, unsigned long long* ret) { return check_mul_uint64_uint32(a, b, ret); }
+inline bool check_mul_ulonglong_longlong(unsigned long long a, long long b, unsigned long long* ret) { return check_mul_uint64_int64(a, b, ret); }
+inline bool check_mul_ulonglong_ulonglong(unsigned long long a, unsigned long long b, unsigned long long* ret) { return check_mul_uint64_uint64(a, b, ret); }
 
 // Subtraction
 inline int safe_sub_int_int(int a, int b) { return safe_sub_int32_int32(a, b); }
@@ -504,17 +737,33 @@ inline int safe_sub_int_uint(int a, unsigned int b) { return safe_sub_int32_uint
 inline int safe_sub_int_longlong(int a, long long b) { return safe_sub_int32_int64(a, b); }
 inline int safe_sub_int_ulonglong(int a, unsigned long long b) { return safe_sub_int32_uint64(a, b); }
 
+inline bool check_sub_int_int(int a, int b, int* ret) { return check_sub_int32_int32(a, b, ret); }
+inline bool check_sub_int_uint(int a, unsigned int b, int* ret) { return check_sub_int32_uint32(a, b, ret); }
+inline bool check_sub_int_longlong(int a, long long b, int* ret) { return check_sub_int32_int64(a, b, ret); }
+inline bool check_sub_int_ulonglong(int a, unsigned long long b, int* ret) { return check_sub_int32_uint64(a, b, ret); }
+
 inline unsigned int safe_sub_uint_int(unsigned int a, int b) { return safe_sub_uint32_int32(a, b); }
 inline unsigned int safe_sub_uint_uint(unsigned int a, unsigned int b) { return safe_sub_uint32_uint32(a, b); }
 inline unsigned int safe_sub_uint_longlong(unsigned int a, long long b) { return safe_sub_uint32_int64(a, b); }
 inline unsigned int safe_sub_uint_ulonglong(unsigned int a, unsigned long long b) { return safe_sub_uint32_uint64(a, b); }
 
+inline bool check_sub_uint_int(unsigned int a, int b, unsigned int* ret) { return check_sub_uint32_int32(a, b, ret); }
+inline bool check_sub_uint_uint(unsigned int a, unsigned int b, unsigned int* ret) { return check_sub_uint32_uint32(a, b, ret); }
+inline bool check_sub_uint_longlong(unsigned int a, long long b, unsigned int* ret) { return check_sub_uint32_int64(a, b, ret); }
+inline bool check_sub_uint_ulonglong(unsigned int a, unsigned long long b, unsigned int* ret) { return check_sub_uint32_uint64(a, b, ret); }
+
 #if SAFE_MATH_LONG == 64
 inline int safe_sub_int_long(int a, long b) { return safe_sub_int32_int64(a, b); }
 inline int safe_sub_int_ulong(int a, unsigned long b) { return safe_sub_int32_uint64(a, b); }
 
+inline bool check_sub_int_long(int a, long b, int* ret) { return check_sub_int32_int64(a, b, ret); }
+inline bool check_sub_int_ulong(int a, unsigned long b, int* ret) { return check_sub_int32_uint64(a, b, ret); }
+
 inline unsigned int safe_sub_uint_long(unsigned int a, long b) { return safe_sub_uint32_int64(a, b); }
 inline unsigned int safe_sub_uint_ulong(unsigned int a, unsigned long b) { return safe_sub_uint32_uint64(a, b); }
+
+inline bool check_sub_uint_long(unsigned int a, long b, unsigned int* ret) { return check_sub_uint32_int64(a, b, ret); }
+inline bool check_sub_uint_ulong(unsigned int a, unsigned long b, unsigned int* ret) { return check_sub_uint32_uint64(a, b, ret); }
 
 inline long safe_sub_long_int(long a, int b) { return safe_sub_int64_int32(a, b); }
 inline long safe_sub_long_uint(long a, unsigned int b) { return safe_sub_int64_uint32(a, b); }
@@ -523,6 +772,13 @@ inline long safe_sub_long_ulong(long a, unsigned long b) { return safe_sub_int64
 inline long safe_sub_long_longlong(long a, long long b) { return safe_sub_int64_int64(a, b); }
 inline long safe_sub_long_ulonglong(long a, unsigned long long b) { return safe_sub_int64_uint64(a, b); }
 
+inline bool check_sub_long_int(long a, int b, long* ret) { return check_sub_int64_int32(a, b, ret); }
+inline bool check_sub_long_uint(long a, unsigned int b, long* ret) { return check_sub_int64_uint32(a, b, ret); }
+inline bool check_sub_long_long(long a, long b, long* ret) { return check_sub_int64_int64(a, b, ret); }
+inline bool check_sub_long_ulong(long a, unsigned long b, long* ret) { return check_sub_int64_uint64(a, b, ret); }
+inline bool check_sub_long_longlong(long a, long long b, long* ret) { return check_sub_int64_int64(a, b, ret); }
+inline bool check_sub_long_ulonglong(long a, unsigned long long b, long* ret) { return check_sub_int64_uint64(a, b, ret); }
+
 inline unsigned long safe_sub_ulong_int(unsigned long a, int b) { return safe_sub_uint64_int32(a, b); }
 inline unsigned long safe_sub_ulong_uint(unsigned long a, unsigned int b) { return safe_sub_uint64_uint32(a, b); }
 inline unsigned long safe_sub_ulong_long(unsigned long a, long b) { return safe_sub_uint64_int64(a, b); }
@@ -530,17 +786,36 @@ inline unsigned long safe_sub_ulong_ulong(unsigned long a, unsigned long b) { re
 inline unsigned long safe_sub_ulong_longlong(unsigned long a, long long b) { return safe_sub_uint64_int64(a, b); }
 inline unsigned long safe_sub_ulong_ulonglong(unsigned long a, unsigned long long b) { return safe_sub_uint64_uint64(a, b); }
 
+inline bool check_sub_ulong_int(unsigned long a, int b, unsigned long* ret) { return check_sub_uint64_int32(a, b, ret); }
+inline bool check_sub_ulong_uint(unsigned long a, unsigned int b, unsigned long* ret) { return check_sub_uint64_uint32(a, b, ret); }
+inline bool check_sub_ulong_long(unsigned long a, long b, unsigned long* ret) { return check_sub_uint64_int64(a, b, ret); }
+inline bool check_sub_ulong_ulong(unsigned long a, unsigned long b, unsigned long* ret) { return check_sub_uint64_uint64(a, b, ret); }
+inline bool check_sub_ulong_longlong(unsigned long a, long long b, unsigned long* ret) { return check_sub_uint64_int64(a, b, ret); }
+inline bool check_sub_ulong_ulonglong(unsigned long a, unsigned long long b, unsigned long* ret) { return check_sub_uint64_uint64(a, b, ret); }
+
 inline long long safe_sub_longlong_long(long long a, long b) { return safe_sub_int64_int64(a, b); }
 inline long long safe_sub_longlong_ulong(long long a, unsigned long b) { return safe_sub_int64_uint64(a, b); }
 
+inline bool check_sub_longlong_long(long long a, long b, long long* ret) { return check_sub_int64_int64(a, b, ret); }
+inline bool check_sub_longlong_ulong(long long a, unsigned long b, long long* ret) { return check_sub_int64_uint64(a, b, ret); }
+
 inline unsigned long long safe_sub_ulonglong_long(unsigned long long a, long b) { return safe_sub_uint64_int64(a, b); }
 inline unsigned long long safe_sub_ulonglong_ulong(unsigned long long a, unsigned long b) { return safe_sub_uint64_uint64(a, b); }
+
+inline bool check_sub_ulonglong_long(unsigned long long a, long b, unsigned long long* ret) { return check_sub_uint64_int64(a, b, ret); }
+inline bool check_sub_ulonglong_ulong(unsigned long long a, unsigned long b, unsigned long long* ret) { return check_sub_uint64_uint64(a, b, ret); }
 #else
 inline int safe_sub_int_long(int a, long b) { return safe_sub_int32_int32(a, b); }
 inline int safe_sub_int_ulong(int a, unsigned long b) { return safe_sub_int32_uint32(a, b); }
 
+inline bool check_sub_int_long(int a, long b, int* ret) { return check_sub_int32_int32(a, b, ret); }
+inline bool check_sub_int_ulong(int a, unsigned long b, int* ret) { return check_sub_int32_uint32(a, b, ret); }
+
 inline unsigned int safe_sub_uint_long(unsigned int a, long b) { return safe_sub_uint32_int32(a, b); }
 inline unsigned int safe_sub_uint_ulong(unsigned int a, unsigned long b) { return safe_sub_uint32_uint32(a, b); }
+
+inline bool check_sub_uint_long(unsigned int a, long b, unsigned int* ret) { return check_sub_uint32_int32(a, b, ret); }
+inline bool check_sub_uint_ulong(unsigned int a, unsigned long b, unsigned int* ret) { return check_sub_uint32_uint32(a, b, ret); }
 
 inline long safe_sub_long_int(long a, int b) { return safe_sub_int32_int32(a, b); }
 inline long safe_sub_long_uint(long a, unsigned int b) { return safe_sub_int32_uint32(a, b); }
@@ -549,6 +824,13 @@ inline long safe_sub_long_ulong(long a, unsigned long b) { return safe_sub_int32
 inline long safe_sub_long_longlong(long a, long long b) { return safe_sub_int32_int64(a, b); }
 inline long safe_sub_long_ulonglong(long a, unsigned long long b) { return safe_sub_int32_uint64(a, b); }
 
+inline bool check_sub_long_int(long a, int b, long* ret) { return check_sub_int32_int32(a, b, (int32_t*)ret); }
+inline bool check_sub_long_uint(long a, unsigned int b, long* ret) { return check_sub_int32_uint32(a, b, (int32_t*)ret); }
+inline bool check_sub_long_long(long a, long b, long* ret) { return check_sub_int32_int32(a, b, (int32_t*)ret); }
+inline bool check_sub_long_ulong(long a, unsigned long b, long* ret) { return check_sub_int32_uint32(a, b, (int32_t*)ret); }
+inline bool check_sub_long_longlong(long a, long long b, long* ret) { return check_sub_int32_int64(a, b, (int32_t*)ret); }
+inline bool check_sub_long_ulonglong(long a, unsigned long long b, long* ret) { return check_sub_int32_uint64(a, b, (int32_t*)ret); }
+
 inline unsigned long safe_sub_ulong_int(unsigned long a, int b) { return safe_sub_uint32_int32(a, b); }
 inline unsigned long safe_sub_ulong_uint(unsigned long a, unsigned int b) { return safe_sub_uint32_uint32(a, b); }
 inline unsigned long safe_sub_ulong_long(unsigned long a, long b) { return safe_sub_uint32_int32(a, b); }
@@ -556,11 +838,24 @@ inline unsigned long safe_sub_ulong_ulong(unsigned long a, unsigned long b) { re
 inline unsigned long safe_sub_ulong_longlong(unsigned long a, long long b) { return safe_sub_uint32_int64(a, b); }
 inline unsigned long safe_sub_ulong_ulonglong(unsigned long a, unsigned long long b) { return safe_sub_uint32_uint64(a, b); }
 
+inline bool check_sub_ulong_int(unsigned long a, int b, unsigned long* ret) { return check_sub_uint32_int32(a, b, (uint32_t*)ret); }
+inline bool check_sub_ulong_uint(unsigned long a, unsigned int b, unsigned long* ret) { return check_sub_uint32_uint32(a, b, (uint32_t*)ret); }
+inline bool check_sub_ulong_long(unsigned long a, long b, unsigned long* ret) { return check_sub_uint32_int32(a, b, (uint32_t*)ret); }
+inline bool check_sub_ulong_ulong(unsigned long a, unsigned long b, unsigned long* ret) { return check_sub_uint32_uint32(a, b, (uint32_t*)ret); }
+inline bool check_sub_ulong_longlong(unsigned long a, long long b, unsigned long* ret) { return check_sub_uint32_int64(a, b, (uint32_t*)ret); }
+inline bool check_sub_ulong_ulonglong(unsigned long a, unsigned long long b, unsigned long* ret) { return check_sub_uint32_uint64(a, b, (uint32_t*)ret); }
+
 inline long long safe_sub_longlong_long(long long a, long b) { return safe_sub_int64_int32(a, b); }
 inline long long safe_sub_longlong_ulong(long long a, unsigned long b) { return safe_sub_int64_uint32(a, b); }
 
+inline bool check_sub_longlong_long(long long a, long b, long long* ret) { return check_sub_int64_int32(a, b, ret); }
+inline bool check_sub_longlong_ulong(long long a, unsigned long b, long long* ret) { return check_sub_int64_uint32(a, b, ret); }
+
 inline unsigned long long safe_sub_ulonglong_long(unsigned long long a, long b) { return safe_sub_uint64_int32(a, b); }
 inline unsigned long long safe_sub_ulonglong_ulong(unsigned long long a, unsigned long b) { return safe_sub_uint64_uint32(a, b); }
+
+inline bool check_sub_ulonglong_long(unsigned long long a, long b, unsigned long long* ret) { return check_sub_uint64_int32(a, b, ret); }
+inline bool check_sub_ulonglong_ulong(unsigned long long a, unsigned long b, unsigned long long* ret) { return check_sub_uint64_uint64(a, b, ret); }
 #endif
 
 inline long long safe_sub_longlong_int(long long a, int b) { return safe_sub_int64_int32(a, b); }
@@ -568,10 +863,20 @@ inline long long safe_sub_longlong_uint(long long a, unsigned int b) { return sa
 inline long long safe_sub_longlong_longlong(long long a, long long b) { return safe_sub_int64_int64(a, b); }
 inline long long safe_sub_longlong_ulonglong(long long a, unsigned long long b) { return safe_sub_int64_uint64(a, b); }
 
+inline bool check_sub_longlong_int(long long a, int b, long long* ret) { return check_sub_int64_int32(a, b, ret); }
+inline bool check_sub_longlong_uint(long long a, unsigned int b, long long* ret) { return check_sub_int64_uint32(a, b, ret); }
+inline bool check_sub_longlong_longlong(long long a, long long b, long long* ret) { return check_sub_int64_int64(a, b, ret); }
+inline bool check_sub_longlong_ulonglong(long long a, unsigned long long b, long long* ret) { return check_sub_int64_uint64(a, b, ret); }
+
 inline unsigned long long safe_sub_ulonglong_int(unsigned long long a, int b) { return safe_sub_uint64_int32(a, b); }
 inline unsigned long long safe_sub_ulonglong_uint(unsigned long long a, unsigned int b) { return safe_sub_uint64_uint32(a, b); }
 inline unsigned long long safe_sub_ulonglong_longlong(unsigned long long a, long long b) { return safe_sub_uint64_int64(a, b); }
 inline unsigned long long safe_sub_ulonglong_ulonglong(unsigned long long a, unsigned long long b) { return safe_sub_uint64_uint64(a, b); }
+
+inline bool check_sub_ulonglong_int(unsigned long long a, int b, unsigned long long* ret) { return check_sub_uint64_int32(a, b, ret); }
+inline bool check_sub_ulonglong_uint(unsigned long long a, unsigned int b, unsigned long long* ret) { return check_sub_uint64_uint32(a, b, ret); }
+inline bool check_sub_ulonglong_longlong(unsigned long long a, long long b, unsigned long long* ret) { return check_sub_uint64_int64(a, b, ret); }
+inline bool check_sub_ulonglong_ulonglong(unsigned long long a, unsigned long long b, unsigned long long* ret) { return check_sub_uint64_uint64(a, b, ret); }
 
 // Division
 inline int safe_div_int_int(int a, int b) { return safe_div_int32_int32(a, b); }
@@ -579,17 +884,33 @@ inline int safe_div_int_uint(int a, unsigned int b) { return safe_div_int32_uint
 inline int safe_div_int_longlong(int a, long long b) { return safe_div_int32_int64(a, b); }
 inline int safe_div_int_ulonglong(int a, unsigned long long b) { return safe_div_int32_uint64(a, b); }
 
+inline bool check_div_int_int(int a, int b, int* ret) { return check_div_int32_int32(a, b, ret); }
+inline bool check_div_int_uint(int a, unsigned int b, int* ret) { return check_div_int32_uint32(a, b, ret); }
+inline bool check_div_int_longlong(int a, long long b, int* ret) { return check_div_int32_int64(a, b, ret); }
+inline bool check_div_int_ulonglong(int a, unsigned long long b, int* ret) { return check_div_int32_uint64(a, b, ret); }
+
 inline unsigned int safe_div_uint_int(unsigned int a, int b) { return safe_div_uint32_int32(a, b); }
 inline unsigned int safe_div_uint_uint(unsigned int a, unsigned int b) { return safe_div_uint32_uint32(a, b); }
 inline unsigned int safe_div_uint_longlong(unsigned int a, long long b) { return safe_div_uint32_int64(a, b); }
 inline unsigned int safe_div_uint_ulonglong(unsigned int a, unsigned long long b) { return safe_div_uint32_uint64(a, b); }
 
+inline bool check_div_uint_int(unsigned int a, int b, unsigned int* ret) { return check_div_uint32_int32(a, b, ret); }
+inline bool check_div_uint_uint(unsigned int a, unsigned int b, unsigned int* ret) { return check_div_uint32_uint32(a, b, ret); }
+inline bool check_div_uint_longlong(unsigned int a, long long b, unsigned int* ret) { return check_div_uint32_int64(a, b, ret); }
+inline bool check_div_uint_ulonglong(unsigned int a, unsigned long long b, unsigned int* ret) { return check_div_uint32_uint64(a, b, ret); }
+
 #if SAFE_MATH_LONG == 64
 inline int safe_div_int_long(int a, long b) { return safe_div_int32_int64(a, b); }
 inline int safe_div_int_ulong(int a, unsigned long b) { return safe_div_int32_uint64(a, b); }
 
+inline bool check_div_int_long(int a, long b, int* ret) { return check_div_int32_int64(a, b, ret); }
+inline bool check_div_int_ulong(int a, unsigned long b, int* ret) { return check_div_int32_uint64(a, b, ret); }
+
 inline unsigned int safe_div_uint_long(unsigned int a, long b) { return safe_div_uint32_int64(a, b); }
 inline unsigned int safe_div_uint_ulong(unsigned int a, unsigned long b) { return safe_div_uint32_uint64(a, b); }
+
+inline bool check_div_uint_long(unsigned int a, long b, unsigned int* ret) { return check_div_uint32_int64(a, b, ret); }
+inline bool check_div_uint_ulong(unsigned int a, unsigned long b, unsigned int* ret) { return check_div_uint32_uint64(a, b, ret); }
 
 inline long safe_div_long_int(long a, int b) { return safe_div_int64_int32(a, b); }
 inline long safe_div_long_uint(long a, unsigned int b) { return safe_div_int64_uint32(a, b); }
@@ -598,6 +919,13 @@ inline long safe_div_long_ulong(long a, unsigned long b) { return safe_div_int64
 inline long safe_div_long_longlong(long a, long long b) { return safe_div_int64_int64(a, b); }
 inline long safe_div_long_ulonglong(long a, unsigned long long b) { return safe_div_int64_uint64(a, b); }
 
+inline bool check_div_long_int(long a, int b, long* ret) { return check_div_int64_int32(a, b, ret); }
+inline bool check_div_long_uint(long a, unsigned int b, long* ret) { return check_div_int64_uint32(a, b, ret); }
+inline bool check_div_long_long(long a, long b, long* ret) { return check_div_int64_int64(a, b, ret); }
+inline bool check_div_long_ulong(long a, unsigned long b, long* ret) { return check_div_int64_uint64(a, b, ret); }
+inline bool check_div_long_longlong(long a, long long b, long* ret) { return check_div_int64_int64(a, b, ret); }
+inline bool check_div_long_ulonglong(long a, unsigned long long b, long* ret) { return check_div_int64_uint64(a, b, ret); }
+
 inline unsigned long safe_div_ulong_int(unsigned long a, int b) { return safe_div_uint64_int32(a, b); }
 inline unsigned long safe_div_ulong_uint(unsigned long a, unsigned int b) { return safe_div_uint64_uint32(a, b); }
 inline unsigned long safe_div_ulong_long(unsigned long a, long b) { return safe_div_uint64_int64(a, b); }
@@ -605,17 +933,36 @@ inline unsigned long safe_div_ulong_ulong(unsigned long a, unsigned long b) { re
 inline unsigned long safe_div_ulong_longlong(unsigned long a, long long b) { return safe_div_uint64_int64(a, b); }
 inline unsigned long safe_div_ulong_ulonglong(unsigned long a, unsigned long long b) { return safe_div_uint64_uint64(a, b); }
 
+inline bool check_div_ulong_int(unsigned long a, int b, unsigned long* ret) { return check_div_uint64_int32(a, b, ret); }
+inline bool check_div_ulong_uint(unsigned long a, unsigned int b, unsigned long* ret) { return check_div_uint64_uint32(a, b, ret); }
+inline bool check_div_ulong_long(unsigned long a, long b, unsigned long* ret) { return check_div_uint64_int64(a, b, ret); }
+inline bool check_div_ulong_ulong(unsigned long a, unsigned long b, unsigned long* ret) { return check_div_uint64_uint64(a, b, ret); }
+inline bool check_div_ulong_longlong(unsigned long a, long long b, unsigned long* ret) { return check_div_uint64_int64(a, b, ret); }
+inline bool check_div_ulong_ulonglong(unsigned long a, unsigned long long b, unsigned long* ret) { return check_div_uint64_uint64(a, b, ret); }
+
 inline long long safe_div_longlong_long(long long a, long b) { return safe_div_int64_int64(a, b); }
 inline long long safe_div_longlong_ulong(long long a, unsigned long b) { return safe_div_int64_uint64(a, b); }
 
+inline bool check_div_longlong_long(long long a, long b, long long* ret) { return check_div_int64_int64(a, b, ret); }
+inline bool check_div_longlong_ulong(long long a, unsigned long b, long long* ret) { return check_div_int64_uint64(a, b, ret); }
+
 inline unsigned long long safe_div_ulonglong_long(unsigned long long a, long b) { return safe_div_uint64_int64(a, b); }
 inline unsigned long long safe_div_ulonglong_ulong(unsigned long long a, unsigned long b) { return safe_div_uint64_uint64(a, b); }
+
+inline bool check_div_ulonglong_long(unsigned long long a, long b, unsigned long long* ret) { return check_div_uint64_int64(a, b, ret); }
+inline bool check_div_ulonglong_ulong(unsigned long long a, unsigned long b, unsigned long long* ret) { return check_div_uint64_uint64(a, b, ret); }
 #else
 inline int safe_div_int_long(int a, long b) { return safe_div_int32_int32(a, b); }
 inline int safe_div_int_ulong(int a, unsigned long b) { return safe_div_int32_uint32(a, b); }
 
+inline bool check_div_int_long(int a, long b, int* ret) { return check_div_int32_int32(a, b, ret); }
+inline bool check_div_int_ulong(int a, unsigned long b, int* ret) { return check_div_int32_uint32(a, b, ret); }
+
 inline unsigned int safe_div_uint_long(unsigned int a, long b) { return safe_div_uint32_int32(a, b); }
 inline unsigned int safe_div_uint_ulong(unsigned int a, unsigned long b) { return safe_div_uint32_uint32(a, b); }
+
+inline bool check_div_uint_long(unsigned int a, long b, unsigned int* ret) { return check_div_uint32_int32(a, b, ret); }
+inline bool check_div_uint_ulong(unsigned int a, unsigned long b, unsigned int* ret) { return check_div_uint32_uint32(a, b, ret); }
 
 inline long safe_div_long_int(long a, int b) { return safe_div_int32_int32(a, b); }
 inline long safe_div_long_uint(long a, unsigned int b) { return safe_div_int32_uint32(a, b); }
@@ -624,6 +971,13 @@ inline long safe_div_long_ulong(long a, unsigned long b) { return safe_div_int32
 inline long safe_div_long_longlong(long a, long long b) { return safe_div_int32_int64(a, b); }
 inline long safe_div_long_ulonglong(long a, unsigned long long b) { return safe_div_int32_uint64(a, b); }
 
+inline bool check_div_long_int(long a, int b, long* ret) { return check_div_int32_int32(a, b, (int32_t*)ret); }
+inline bool check_div_long_uint(long a, unsigned int b, long* ret) { return check_div_int32_uint32(a, b, (int32_t*)ret); }
+inline bool check_div_long_long(long a, long b, long* ret) { return check_div_int32_int32(a, b, (int32_t*)ret); }
+inline bool check_div_long_ulong(long a, unsigned long b, long* ret) { return check_div_int32_uint32(a, b, (int32_t*)ret); }
+inline bool check_div_long_longlong(long a, long long b, long* ret) { return check_div_int32_int64(a, b, (int32_t*)ret); }
+inline bool check_div_long_ulonglong(long a, unsigned long long b, long* ret) { return check_div_int32_uint64(a, b, (int32_t*)ret); }
+
 inline unsigned long safe_div_ulong_int(unsigned long a, int b) { return safe_div_uint32_int32(a, b); }
 inline unsigned long safe_div_ulong_uint(unsigned long a, unsigned int b) { return safe_div_uint32_uint32(a, b); }
 inline unsigned long safe_div_ulong_long(unsigned long a, long b) { return safe_div_uint32_int32(a, b); }
@@ -631,11 +985,24 @@ inline unsigned long safe_div_ulong_ulong(unsigned long a, unsigned long b) { re
 inline unsigned long safe_div_ulong_longlong(unsigned long a, long long b) { return safe_div_uint32_int64(a, b); }
 inline unsigned long safe_div_ulong_ulonglong(unsigned long a, unsigned long long b) { return safe_div_uint32_uint64(a, b); }
 
+inline bool check_div_ulong_int(unsigned long a, int b, unsigned long* ret) { return check_div_uint32_int32(a, b, (uint32_t*)ret); }
+inline bool check_div_ulong_uint(unsigned long a, unsigned int b, unsigned long* ret) { return check_div_uint32_uint32(a, b, (uint32_t*)ret); }
+inline bool check_div_ulong_long(unsigned long a, long b, unsigned long* ret) { return check_div_uint32_int32(a, b, (uint32_t*)ret); }
+inline bool check_div_ulong_ulong(unsigned long a, unsigned long b, unsigned long* ret) { return check_div_uint32_uint64(a, b, (uint32_t*)ret); }
+inline bool check_div_ulong_longlong(unsigned long a, long long b, unsigned long* ret) { return check_div_uint32_int64(a, b, (uint32_t*)ret); }
+inline bool check_div_ulong_ulonglong(unsigned long a, unsigned long long b, unsigned long* ret) { return check_div_uint32_uint64(a, b, (uint32_t*)ret); }
+
 inline long long safe_div_longlong_long(long long a, long b) { return safe_div_int64_int32(a, b); }
 inline long long safe_div_longlong_ulong(long long a, unsigned long b) { return safe_div_int64_uint32(a, b); }
 
+inline bool check_div_longlong_long(long long a, long b, long long* ret) { return check_div_int64_int32(a, b, ret); }
+inline bool check_div_longlong_ulong(long long a, unsigned long b, long long* ret) { return check_div_int64_uint32(a, b, ret); }
+
 inline unsigned long long safe_div_ulonglong_long(unsigned long long a, long b) { return safe_div_uint64_int32(a, b); }
 inline unsigned long long safe_div_ulonglong_ulong(unsigned long long a, unsigned long b) { return safe_div_uint64_uint32(a, b); }
+
+inline bool check_div_ulonglong_long(unsigned long long a, long b, unsigned long long* ret) { return check_div_uint64_int32(a, b, ret); }
+inline bool check_div_ulonglong_ulong(unsigned long long a, unsigned long b, unsigned long long* ret) { return check_div_uint64_uint32(a, b, ret); }
 #endif
 
 inline long long safe_div_longlong_int(long long a, int b) { return safe_div_int64_int32(a, b); }
@@ -643,10 +1010,20 @@ inline long long safe_div_longlong_uint(long long a, unsigned int b) { return sa
 inline long long safe_div_longlong_longlong(long long a, long long b) { return safe_div_int64_int64(a, b); }
 inline long long safe_div_longlong_ulonglong(long long a, unsigned long long b) { return safe_div_int64_uint64(a, b); }
 
+inline bool check_div_longlong_int(long long a, int b, long long* ret) { return check_div_int64_int32(a, b, ret); }
+inline bool check_div_longlong_uint(long long a, unsigned int b, long long* ret) { return check_div_int64_uint32(a, b, ret); }
+inline bool check_div_longlong_longlong(long long a, long long b, long long* ret) { return check_div_int64_int64(a, b, ret); }
+inline bool check_div_longlong_ulonglong(long long a, unsigned long long b, long long* ret) { return check_div_int64_uint64(a, b, ret); }
+
 inline unsigned long long safe_div_ulonglong_int(unsigned long long a, int b) { return safe_div_uint64_int32(a, b); }
 inline unsigned long long safe_div_ulonglong_uint(unsigned long long a, unsigned int b) { return safe_div_uint64_uint32(a, b); }
 inline unsigned long long safe_div_ulonglong_longlong(unsigned long long a, long long b) { return safe_div_uint64_int64(a, b); }
 inline unsigned long long safe_div_ulonglong_ulonglong(unsigned long long a, unsigned long long b) { return safe_div_uint64_uint64(a, b); }
+
+inline bool check_div_ulonglong_int(unsigned long long a, int b, unsigned long long* ret) { return check_div_uint64_int32(a, b, ret); }
+inline bool check_div_ulonglong_uint(unsigned long long a, unsigned int b, unsigned long long* ret) { return check_div_uint64_uint32(a, b, ret); }
+inline bool check_div_ulonglong_longlong(unsigned long long a, long long b, unsigned long long* ret) { return check_div_uint64_int64(a, b, ret); }
+inline bool check_div_ulonglong_ulonglong(unsigned long long a, unsigned long long b, unsigned long long* ret) { return check_div_uint64_uint64(a, b, ret); }
 
 #ifdef __cplusplus
 }

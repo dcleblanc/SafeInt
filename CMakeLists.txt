@@ -24,5 +24,6 @@ set(CMAKE_CXX_STANDARD_REQUIRED True)
 
 add_subdirectory(Test/ClangTest)
 add_subdirectory(Test/GccTest)
+add_subdirectory(Test/MsvcTest)
 
 enable_testing()

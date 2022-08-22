@@ -57,6 +57,14 @@ extern "C"
 #define SAFEINT_WEAK
 #endif
 
+#if SAFEINT_COMPILER == VISUAL_STUDIO_COMPILER
+    // limits.h checks __STDC_WANT_SECURE_LIB__, but doesn't include what sets it
+#if !defined __STDC_WANT_SECURE_LIB__
+#define __STDC_WANT_SECURE_LIB__ 0
+#endif
+
+#endif
+
 #include <stdint.h>
 #include <stdbool.h>
 #include <limits.h>
@@ -116,7 +124,8 @@ extern "C"
 #define SAFE_MATH_FAIL_DEFINED
 #include <stdlib.h>
 
-SAFEINT_NORETURN void safe_math_fail(const char* msg)
+SAFEINT_NORETURN
+inline void safe_math_fail(const char* msg)
 {
     (void)msg;
     abort();

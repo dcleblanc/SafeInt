@@ -160,6 +160,7 @@ else()
 
     add_executable(safe_math_compile_clang
         ../c_safe_math/safe_math_compile.c
+        ../c_safe_math/compile_test.c
         ../../safe_math.h
         ../../safe_math_impl.h
     )
