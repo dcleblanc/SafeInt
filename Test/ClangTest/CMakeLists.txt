@@ -111,7 +111,7 @@ else()
         ../../SafeInt.hpp
     )
 
-    target_compile_options(CompileTest_clang PUBLIC -Wall)
+    target_compile_options(CompileTest_clang PUBLIC -Wall -Wextra)
 
     add_executable(CompileTest_clang14
         ../CompileTest.cpp

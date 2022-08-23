@@ -5800,6 +5800,12 @@ public:
         m_int = (T)SafeInt< T, E >( (U)u );
     }
 
+    _CONSTEXPR14 SafeInt(const SafeInt< T, E >& t) SAFEINT_CPP_THROW : m_int(0)
+    {
+        static_assert(safeint_internal::numeric_type< T >::isInt, "Integer type required");
+        m_int = t.m_int;
+    }
+
     template < typename U >
     _CONSTEXPR14 SafeInt( const U& i ) SAFEINT_CPP_THROW : m_int(0)
     {
@@ -6639,7 +6645,7 @@ private:
 template <typename P>
 _CONSTEXPR11 SafeInt<ptrdiff_t, SafeIntDefaultExceptionHandler> SafePtrDiff(const P* p1, const P* p2) SAFEINT_CPP_THROW
 {
-    return SafeInt<ptrdiff_t, SafeIntDefaultExceptionHandler>( p1 - p2 );
+    return ( p1 - p2 );
 }
 
 // Comparison operators
