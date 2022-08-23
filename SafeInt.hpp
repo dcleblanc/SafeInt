@@ -435,8 +435,6 @@ inline void SafeIntExceptionAssert() SAFEINT_NOTHROW {}
     #endif
 #endif
 
-template < typename E > class SafeIntExceptionHandler;
-
 #if SAFEINT_EXCEPTION_METHOD == SAFEINT_EXCEPTION_CPP
 
 class SAFEINT_VISIBLE SafeIntException
@@ -453,6 +451,8 @@ public:
 // whether it was put there correctly in the first place
 namespace safeint_exception_handlers
 {
+    template < typename E > class SafeIntExceptionHandler;
+
     // Some users may have applications that do not use C++ exceptions
     // and cannot compile the following class. If that is the case,
     // either SafeInt_InvalidParameter must be defined as the default,
