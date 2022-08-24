@@ -10,7 +10,7 @@
 
 // C wants a prototype, if all warnings enabled
 #if !defined SAFE_MATH_FAIL_DEFINED
-static inline void safe_math_fail(const char* msg);
+inline void safe_math_fail(const char* msg);
 #endif
 
 #include "safe_math_impl.h"

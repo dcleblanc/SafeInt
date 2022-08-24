@@ -125,7 +125,7 @@ extern "C"
 #include <stdlib.h>
 
 SAFEINT_NORETURN
-static inline void safe_math_fail(const char* msg)
+inline void safe_math_fail(const char* msg)
 {
     (void)msg;
     abort();

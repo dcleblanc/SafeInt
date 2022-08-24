@@ -2,6 +2,7 @@
 #pragma warning(disable: 4464 5045) // include path contains .., Qspectre mitigation
 #endif
 
+#include <stdio.h>
 #include "../../safe_math.h"
 
 void safe_cast_compile(void)
@@ -86,6 +87,19 @@ void safe_cast_compile(void)
 	ret_llong = safe_cast_longlong_ulonglong(in_ullong);
 	ret_ullong = safe_cast_ulonglong_longlong(in_llong);
 
+	// quench warnings about unused variables
+	if(ret_char ||
+		ret_schar ||
+		ret_uchar ||
+		ret_short ||
+		ret_ushort ||
+		ret_int ||
+		ret_uint ||
+		ret_long ||
+		ret_ulong ||
+		ret_llong ||
+		ret_ullong)
+		printf(" ");
 }
 
 void check_cast_compile(void)
@@ -162,6 +176,9 @@ void check_cast_compile(void)
 	ret = check_cast_ulong_longlong(in_llong);
 	ret = check_cast_longlong_ulonglong(in_ullong);
 	ret = check_cast_ulonglong_longlong(in_llong);
+
+	if(ret) 
+		printf(" ");
 }
 
 void safe_add_compile(void)
@@ -236,6 +253,14 @@ void safe_add_compile(void)
 	ret_ullong = safe_add_ulonglong_uint(arg_ullong, arg_uint);
 	ret_ullong = safe_add_ulonglong_longlong(arg_ullong, arg_llong);
 	ret_ullong = safe_add_ulonglong_ulonglong(arg_ullong, arg_ullong);
+
+	if(ret_int ||
+		ret_uint ||
+		ret_long ||
+		ret_ulong ||
+		ret_llong ||
+		ret_ullong) printf(" ");
+
 }
 
 void check_add_compile(void)
@@ -378,6 +403,13 @@ void safe_mul_compile(void)
 	ret_ullong = safe_mul_ulonglong_longlong(arg_ullong, arg_llong);
 	ret_ullong = safe_mul_ulonglong_ulonglong(arg_ullong, arg_ullong);
 
+	if(ret_int ||
+		ret_uint ||
+		ret_long ||
+		ret_ulong ||
+		ret_llong ||
+		ret_ullong) printf(" ");
+
 }
 
 void check_mul_compile(void)
@@ -447,4 +479,6 @@ void check_mul_compile(void)
 	ret = check_mul_ulonglong_longlong(arg_ullong, arg_llong, &arg_ullong);
 	ret = check_mul_ulonglong_ulonglong(arg_ullong, arg_ullong, &arg_ullong);
 
+	if(ret)
+		printf(" ");
 }

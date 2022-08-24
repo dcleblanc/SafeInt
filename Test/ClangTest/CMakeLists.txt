@@ -120,7 +120,16 @@ else()
         ../../SafeInt.hpp
     )
 
-    target_compile_options(CompileTest_clang14 PUBLIC -Wall -std=c++14)
+    target_compile_options(CompileTest_clang14 PUBLIC -Wall  -Wextra -std=c++14)
+
+    add_executable(CompileTest_clang17
+    ../CompileTest.cpp
+    ../ConstExpr.cpp 
+    ../CleanCompile.cpp
+    ../../SafeInt.hpp
+    )
+
+    target_compile_options(CompileTest_clang17 PUBLIC -Wall  -Wextra -std=c++17)
 
     add_executable(CompileTest_clang14_NoEH
         ../CompileTest.cpp
@@ -129,7 +138,16 @@ else()
         ../../SafeInt.hpp
     )
 
-    target_compile_options(CompileTest_clang14_NoEH PUBLIC -Wall -std=c++14 -fno-exceptions)
+    target_compile_options(CompileTest_clang14_NoEH PUBLIC -Wall  -Wextra -std=c++14 -fno-exceptions)
+
+    add_executable(CompileTest_clang17_NoEH
+        ../CompileTest.cpp
+        ../ConstExpr.cpp 
+        ../CleanCompile.cpp
+        ../../SafeInt.hpp
+    )
+
+    target_compile_options(CompileTest_clang17_NoEH PUBLIC -Wall  -Wextra -std=c++17 -fno-exceptions)
 
     add_executable(CompileTest_clang98
         ../CompileTest.cpp
