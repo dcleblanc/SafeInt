@@ -32,7 +32,7 @@ else()
     set(CMAKE_CXX_COMPILER ${MSVC_CL})
 
     # the standard level is already at C++11, which is what we need for runtime tests
-    add_compile_options(/Wall)
+    add_compile_options(/Wall /wd4710 /wd4711)
 
     # This will test whatever the mainline code can do, typically using int128
     add_executable(SafeIntTest_msvc 
@@ -117,7 +117,7 @@ else()
     ../c_safe_math/safe_math_test_div.cpp
     ../c_safe_math/safe_math_test_mult.cpp
     ../c_safe_math/safe_math_test_sub.cpp
-    ../c_safe_math/compile_test.cpp
+    ../c_safe_math/compile_test.c
     ../AddTestCase.cpp
     ../DivTestCase.cpp
     ../MultTestCase.cpp

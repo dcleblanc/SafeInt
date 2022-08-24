@@ -414,9 +414,9 @@ enum SafeIntError
 // Now we need to define an exception handler
 // Internally defined exception handlers might assert
 #if defined SAFEINT_ASSERT_ON_EXCEPTION
-inline void SafeIntExceptionAssert() SAFEINT_NOTHROW { SAFEINT_ASSERT(false); }
+static inline void SafeIntExceptionAssert() SAFEINT_NOTHROW { SAFEINT_ASSERT(false); }
 #else
-inline void SafeIntExceptionAssert() SAFEINT_NOTHROW {}
+static inline void SafeIntExceptionAssert() SAFEINT_NOTHROW {}
 #endif
 
 #define SAFEINT_EXCEPTION_WIN32 0
@@ -5085,7 +5085,7 @@ public:
 
         // We need the absolute value of std::numeric_limits<T>::min()
         // This will give it to us without extraneous compiler warnings
-        const std::uint64_t AbsMinIntT = (std::uint64_t)std::numeric_limits<T>::max() + 1;
+        _CONSTEXPR11 std::uint64_t AbsMinIntT = (std::uint64_t)std::numeric_limits<T>::max() + 1;
 
         if( lhs < 0 )
         {

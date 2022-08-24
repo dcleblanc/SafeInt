@@ -2,7 +2,7 @@
 // Licensed under the MIT License.
 
 #if !defined __GNUC__
-#pragma warning( disable: 4571 4820 4514 4987 4710 4309 4986 4548 4189)
+#pragma warning( disable: 4571 4820 4514 4987 4710 4309 4986 4548 4189 4866)
 // relative include path contains '..'
 // (function) selected for automatic inline expansion
 #pragma warning( disable: 4464 4711 )
@@ -11,6 +11,7 @@
 #endif
 
 #include "../SafeInt.hpp"
+
 
 void ConstExpr();
 
