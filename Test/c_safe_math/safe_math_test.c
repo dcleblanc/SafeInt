@@ -16,8 +16,8 @@ void sub_test(void);
 
 int main(int argc, char* argv[])
 {
-	argc;
-	argv;
+	(void)argc;
+	(void)argv;
 
 	add_test();
 	mult_test();

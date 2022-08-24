@@ -123,6 +123,15 @@ else()
 
     target_compile_options(CompileTest_gcc14_NoEH PUBLIC -Wall -std=c++14 -fno-exceptions)
 
+    add_executable(CompileTest_gcc98
+    ../CompileTest.cpp
+    ../ConstExpr.cpp 
+    ../CleanCompile.cpp
+    ../../SafeInt.hpp
+    )
+
+    target_compile_options(CompileTest_gcc98 PUBLIC -D SAFEINT_USE_CPLUSCPLUS_98 -Wall -std=c++98 -fno-exceptions)
+
     add_executable(safe_math_test_gcc
     ../c_safe_math/safe_math_test.c
     ../c_safe_math/safe_math_test.h
@@ -141,6 +150,7 @@ else()
 
     add_executable(safe_math_compile_gcc
     ../c_safe_math/safe_math_compile.c
+    ../c_safe_math/compile_test.c
     ../../safe_math.h
     ../../safe_math_impl.h
 )
