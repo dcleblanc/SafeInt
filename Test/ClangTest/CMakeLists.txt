@@ -174,7 +174,7 @@ else()
         )
 
     target_compile_definitions(safe_math_test_clang PUBLIC)
-    target_compile_options(safe_math_test_clang PUBLIC)
+    target_compile_options(safe_math_test_clang PUBLIC -Wall)
 
     add_executable(safe_math_compile_clang
         ../c_safe_math/safe_math_compile.c
@@ -183,9 +183,9 @@ else()
         ../../safe_math_impl.h
     )
 
-    target_compile_options(safe_math_compile_clang PUBLIC -Wall)
+    target_compile_options(safe_math_compile_clang PUBLIC -Weverything -Werror=incompatible-pointer-types)
 
-endif()
+ endif()
 
 enable_testing()
 

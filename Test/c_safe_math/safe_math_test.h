@@ -1,15 +1,21 @@
 // Licensed under the MIT License.
 // Copyright David LeBlanc - dcl@dleblanc.net
 
+#if defined _MSC_VER
 #pragma warning(push)
 #pragma warning(disable: 4365) // signed/unsigned mismatch in iostream
+#endif
+
 #include <exception>
 #include <assert.h>
 #include <iostream>
 #include <string>
-#pragma warning(pop)
 
+#if defined _MSC_VER
+#pragma warning(pop)
 #pragma warning(disable: 4514 5045 4464 4820)
+#endif
+
 
 #if defined __clang__ || defined __GNUC__
 #define NORETURN __attribute__((noreturn))
@@ -30,7 +36,9 @@ NORETURN inline void safe_math_fail(const char* msg)
 #include "../TestCase.h"
 
 // Suppress warnings in test files
+#if defined _MSC_VER
 #pragma warning(disable: 4838)
+#endif
 
 template <typename T, typename U>
 struct check_test

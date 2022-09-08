@@ -5,7 +5,9 @@
 #include <stdio.h>
 #include "../../safe_math.h"
 
-void safe_cast_compile(void)
+void call_functions(void);
+
+static void safe_cast_compile(void)
 {
 	char ret_char;
 	signed char ret_schar;
@@ -77,7 +79,6 @@ void safe_cast_compile(void)
 	ret_long = safe_cast_long_ulonglong(in_ullong);
 	ret_ulong = safe_cast_ulong_long(in_long);
 	ret_ulong = safe_cast_ulong_ulonglong(in_ullong);
-	ret_ulong = safe_cast_ulong_longlong(in_llong);
 	ret_long = safe_cast_long_ulong(in_ulong);
 	ret_long = safe_cast_long_longlong(in_llong);
 	ret_long = safe_cast_long_ulonglong(in_ullong);
@@ -102,7 +103,7 @@ void safe_cast_compile(void)
 		printf(" ");
 }
 
-void check_cast_compile(void)
+static void check_cast_compile(void)
 {
 	int ret;
 	int in_int = 1;
@@ -167,13 +168,12 @@ void check_cast_compile(void)
 	ret = check_cast_long_ulonglong(in_ullong);
 	ret = check_cast_ulong_long(in_long);
 	ret = check_cast_ulong_ulonglong(in_ullong);
-	ret = check_cast_ulong_longlong(in_ullong);
+	ret = check_cast_ulong_longlong(in_llong);
 	ret = check_cast_long_ulong(in_ulong);
 	ret = check_cast_long_longlong(in_llong);
 	ret = check_cast_long_ulonglong(in_ullong);
 	ret = check_cast_ulong_long(in_long);
 	ret = check_cast_ulong_ulonglong(in_ullong);
-	ret = check_cast_ulong_longlong(in_llong);
 	ret = check_cast_longlong_ulonglong(in_ullong);
 	ret = check_cast_ulonglong_longlong(in_llong);
 
@@ -181,7 +181,7 @@ void check_cast_compile(void)
 		printf(" ");
 }
 
-void safe_add_compile(void)
+static void safe_add_compile(void)
 {
 	int ret_int;
 	unsigned int ret_uint;
@@ -263,7 +263,7 @@ void safe_add_compile(void)
 
 }
 
-void check_add_compile(void)
+static void check_add_compile(void)
 {
 	bool ret;
 	int arg_int = 1;
@@ -331,7 +331,7 @@ void check_add_compile(void)
 		ret = check_add_ulonglong_ulonglong(arg_ullong, arg_ullong, &arg_ullong);
 }
 
-void safe_mul_compile(void)
+static void safe_mul_compile(void)
 {
 	int ret_int;
 	unsigned int ret_uint;
@@ -412,7 +412,7 @@ void safe_mul_compile(void)
 
 }
 
-void check_mul_compile(void)
+static void check_mul_compile(void)
 {
 	bool ret;
 	int arg_int = 1;
@@ -481,4 +481,14 @@ void check_mul_compile(void)
 
 	if(ret)
 		printf(" ");
+}
+
+void call_functions(void)
+{
+	safe_add_compile();
+	check_add_compile();
+	safe_mul_compile();
+	check_mul_compile();
+	safe_cast_compile();
+	check_cast_compile();
 }
