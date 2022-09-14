@@ -461,6 +461,29 @@ SIZE_T_CAST_NEEDED - some very old compilers need a specific cast for cases wher
 
 SAFEINT_DISABLE_ADDRESS_OPERATOR - there is a `T* operator &()` defined, which returns a pointer to the underlying integer. This likely isn't a good idea, and doesn't comply with modern C++ style. It also prevents being able to get a SafeInt\<T\>*. If it offends you, and you'd like to make it go away, define this value.
 
+## Using SafeInt with std::unordered_set and std::unordered_map
+
+To use the SafeInt class with the std::unordered_set and std::unordered_map, an easy work-around would be to simply extract the value, and make our declaration as follows:
+
+```
+SafeInt<uint64_t> s;
+std::unordered_set<uint64_t> uset {(uint64_t)s};
+```
+
+This is a little inconvenient, we'd have to be careful to reconstruct a SafeInt when obtaining the value.
+
+What is a nicer approach is to create a specialization for std::hash:
+
+```
+template<typename T>
+struct std::hash< SafeInt<T> >
+{
+    std::size_t operator()(const SafeInt<T>& s) const
+    {
+        return std::hash<T>()(static_cast<const T>(s));
+    }
+};
+```
 ## Examples
 SafeInt is designed to be a drop-in replacement for any integer type, and because it is "sticky" and most operations on a SafeInt and other integer type will emit a temporary SafeInt, many cases can be solved merely by changing:
 
@@ -475,6 +498,7 @@ Further operations on variable x will be checked.
 ### Variable length structure allocation
 Consider the case where we have a variable length structure, and a user-supplied count of objects, and then wish to calculate the space needed. We might have code like the following:
 
+```
     struct foo
     {
         unsigned int version;
@@ -487,19 +511,19 @@ Consider the case where we have a variable length structure, and a user-supplied
         size_t cb = sizeof(short) * (count - 1) + sizeof(foo);
         return (foo*)malloc(cb);
     }
-
+```
 This code can be made safe simply by taking advantage of operator precedence:
-
+```
     foo* alloc_foo(int count)
     {
         size_t cb = SafeInt<size_t>(sizeof(short)) * (count - 1) + sizeof(foo);
         return (foo*)malloc(cb);
     }
-
+```
 Here's what happens, step by step:
-1) A SafeInt<size_t> is initialized with sizeof(char), this is safe.
-2) Multiplication is performed with (count - 1). Note that if count is not positive, the resulting temporary SafeInt<size_t> (which is unsigned) will throw because it cannot represent a negative number. If the multiplication were to overflow, this would also be checked.
-3) The addition is performed and is checked, resulting in a temporary variable of type SafeInt<size_t>.
+1) A `SafeInt<size_t>` is initialized with `sizeof(char)`, this is safe.
+2) Multiplication is performed with (count - 1). Note that if count is not positive, the resulting temporary `SafeInt<size_t>` (which is unsigned) will throw because it cannot represent a negative number. If the multiplication were to overflow, this would also be checked.
+3) The addition is performed and is checked, resulting in a temporary variable of type `SafeInt<size_t>`.
 4) Assignment to cb is validated, in this case being a no-op because the types are the same.
 
 Let's consider some alternatives - if we'd done this instead:
@@ -526,13 +550,13 @@ This is not correct, because the multiplication isn't checked, only the addition
 
 ### Array index
 Choice of type to use can have some interesting considerations. Let's look at the following code:
-
+```
     char buffer[0x4000];
     int offset = fcn1();
     int advance = fcn2();
 
     char test = buffer[offset + advance];
-
+```
 This is clearly dangerous, depending on the values of offset and advance, we could be accessing memory well outside the buffer in both directions. It's sometimes good to use the same types as the compiler would, and the accessing an array takes a ptrdiff_t as an argument (32-bit or 64-bit signed). Consider this fix:
 
     char test = buffer[SafeInt<ptrdiff_t>(offset) + advance];
@@ -542,16 +566,16 @@ The addition is now checked, but if you're compiling for x64, ptrdiff_t is an in
     char test = buffer[SafeInt<size_t>(offset) + advance];
 
 This at least won't access memory before the buffer, but might go well beyond the buffer. A better fix would be:
-
+```
     size_t index = SafeInt<size_t>(offset) + advance;
     char test = index < sizeof(buffer) ? buffer[index] : '\0';
-
+```
 Alternately, if offset and advance shouldn't be negative, and you'd like to throw if index is invalid, this works:
-
+```
     SafeInt<size_t> index = SafeInt<size_t>(offset) + SafeInt<size_t>(advance);
     index = index < sizeof(buffer) ? index : -1; // force an exception
     char test = buffer[index];
-
+```
 ### Counter-examples
 It should go without saying, but this has been seen in code and doesn't check the addition:
 
@@ -562,17 +586,17 @@ A common (but untidy) thing a developer might do is to put the following in a he
     #define BAD_ERROR -1
 
 They then write a long function along these lines:
-
+```
     unsigned long retval = 0;
-    // many line of code follow, we do math on retval
+    // many lines of code follow, we do math on retval
     // Check for errors
     if(SomethingBad())
         retval = BAD_ERROR;
 
     // Do some cleanup
     return retval;
-
-You're worried about the math, so you just change retval to a SafeInt\<unsigned long\>, and don't notice that BAD_ERROR is a negative int. Now you've just changed the behavior of the function from having a legitimate handled error path to throwing an exception if SomethingBad() returns true. 
+```
+You're worried about the math, so you just change retval to a `SafeInt<unsigned long>`, and don't notice that BAD_ERROR is a negative int. Now you've just changed the behavior of the function from having a legitimate handled error path to throwing an exception if SomethingBad() returns true. 
 
 When you replace a base integer type with a SafeInt, be sure to review all the code that touches it. This could easily be fixed by changing the define to:
 
@@ -587,14 +611,14 @@ The ternary operator wants both values on each side of the ':' to be the same ty
     return SomethingBad() ? throw SafeIntException() : retval;
 
 This example is less of a problem, but will cause a performance degredation:
-
+```
     const unsigned long foo_max = 0x4000;
 
     for(int i = 0; i < foo_max; ++i)
     {
         DoStuff(i);
     }
-
+```
 The compiler tells you that there's a signed/unsigned mis-match, and you've found that SafeInt is good at making warnings go away, so you do this:
 
     for(SafeInt<int> i = 0; i < foo_max; ++i)
