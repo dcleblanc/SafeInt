@@ -551,6 +551,8 @@ typedef safeint_exception_handlers::SafeInt_InvalidParameter InvalidParameterExc
 #define SAFEINT_EXCEPTION_HANDLER_CPP 0
 #endif
 
+#endif // defined SafeIntDefaultExceptionHandler
+
 // If an error handler is chosen other than C++ exceptions, such as Win32 exceptions, fail fast, 
 // or abort, then all methods become no throw. Some teams track throw() annotations closely,
 // and the following option provides for this.
@@ -559,8 +561,6 @@ typedef safeint_exception_handlers::SafeInt_InvalidParameter InvalidParameterExc
 #else
 #define SAFEINT_CPP_THROW SAFEINT_NOTHROW
 #endif
-
-#endif // defined SafeIntDefaultExceptionHandler
 
 namespace safeint_internal
 {
