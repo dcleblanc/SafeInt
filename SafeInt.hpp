@@ -5491,12 +5491,6 @@ public:
         m_int = (T)SafeInt< T, E >( (U)u );
     }
 
-    _CONSTEXPR14 SafeInt(const SafeInt< T, E >& t) SAFEINT_CPP_THROW : m_int(0)
-    {
-        static_assert(safeint_internal::numeric_type< T >::isInt, "Integer type required");
-        m_int = t.m_int;
-    }
-
     template < typename U >
     _CONSTEXPR14 SafeInt( const U& i ) SAFEINT_CPP_THROW : m_int(0)
     {
