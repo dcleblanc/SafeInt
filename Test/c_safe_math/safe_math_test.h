@@ -10,6 +10,7 @@
 #include <assert.h>
 #include <iostream>
 #include <string>
+#include <cstdint>
 
 #if defined _MSC_VER
 #pragma warning(pop)
