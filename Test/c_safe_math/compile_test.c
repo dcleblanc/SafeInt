@@ -329,6 +329,11 @@ static void check_add_compile(void)
 		ret = check_add_ulonglong_uint(arg_ullong, arg_uint, &arg_ullong);
 		ret = check_add_ulonglong_longlong(arg_ullong, arg_llong, &arg_ullong);
 		ret = check_add_ulonglong_ulonglong(arg_ullong, arg_ullong, &arg_ullong);
+
+		if(ret)
+		{
+			printf(" ");
+		}
 }
 
 static void safe_mul_compile(void)

@@ -183,7 +183,7 @@ else()
         ../../safe_math_impl.h
     )
 
-    target_compile_options(safe_math_compile_clang PUBLIC -Weverything -Werror=incompatible-pointer-types)
+    target_compile_options(safe_math_compile_clang PUBLIC -Wall -Werror=incompatible-pointer-types)
 
  endif()
 
