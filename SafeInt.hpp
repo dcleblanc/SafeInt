@@ -396,6 +396,12 @@ enum SafeIntError
 // If the user has defined a custom exception handler, assume it is a C++
 // exception handler, unless user tell us it isn't, or we already know
 // we can't have exceptions
+
+// Note - SAFEINT_EXCEPTION_HANDLER_CPP == 1 
+// implies that the handler can throw, and 
+// adjusts SAFE_INT_CPP_THROW to match
+// If that isn't what you want, define it
+// and SafeInt will use what you prefer.
 #if !defined SAFEINT_EXCEPTION_HANDLER_CPP
 
 #if SAFE_INT_HAS_EXCEPTIONS
@@ -551,16 +557,22 @@ typedef safeint_exception_handlers::SafeInt_InvalidParameter InvalidParameterExc
 #define SAFEINT_EXCEPTION_HANDLER_CPP 0
 #endif
 
+#endif // defined SafeIntDefaultExceptionHandler
+
 // If an error handler is chosen other than C++ exceptions, such as Win32 exceptions, fail fast, 
 // or abort, then all methods become no throw. Some teams track throw() annotations closely,
 // and the following option provides for this.
+
+// If someone has defined their own exception handler, 
+// it is at least possible they might have also defined 
+// the throw annotation.
+#if !defined SAFEINT_CPP_THROW
 #if SAFEINT_EXCEPTION_HANDLER_CPP
 #define SAFEINT_CPP_THROW
 #else
 #define SAFEINT_CPP_THROW SAFEINT_NOTHROW
 #endif
-
-#endif // defined SafeIntDefaultExceptionHandler
+#endif // SAFEINT_CPP_THROW
 
 namespace safeint_internal
 {
