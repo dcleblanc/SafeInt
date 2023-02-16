@@ -5491,12 +5491,8 @@ public:
         m_int = (T)SafeInt< T, E >( (U)u );
     }
 
-    _CONSTEXPR14 SafeInt(const SafeInt< T, E >& t) SAFEINT_CPP_THROW : m_int(0)
-    {
-        static_assert(safeint_internal::numeric_type< T >::isInt, "Integer type required");
-        m_int = t.m_int;
-    }
-
+    // Default constructor and move constructor cannot be declared,
+    // or gcc 8.x and 9.x breaks
     template < typename U >
     _CONSTEXPR14 SafeInt( const U& i ) SAFEINT_CPP_THROW : m_int(0)
     {
@@ -5505,12 +5501,6 @@ public:
         // SafeCast will throw exceptions if i won't fit in type T
         
         SafeCastHelper< T, U, GetCastMethod< T, U >::method >::template CastThrow< E >( i, m_int );
-    }
-
-    // Add a move constructor
-    _CONSTEXPR14 SafeInt(SafeInt<T>&& t) : m_int(t.m_int)
-    {
-        t.m_int = 0;
     }
 
     // The destructor is intentionally commented out - no destructor
@@ -5533,30 +5523,12 @@ public:
         return *this;
     }
 
-    _CONSTEXPR14 SafeInt< T, E >& operator =( const T& rhs ) SAFEINT_NOTHROW
-    {
-        m_int = rhs;
-        return *this;
-    }
-
-    // Move assignment
-    _CONSTEXPR14 SafeInt< T, E >& operator=( SafeInt<T>&& t)
-    {
-        m_int = t.m_int;
-        t.m_int = 0;
-        return *this;
-    }
-
+    // Note - move assignment and assignment operator from SafeInt<T> cannot be declared
+    // or it will break under some gcc versions.
     template < typename U >
     _CONSTEXPR14 SafeInt< T, E >& operator =( const SafeInt< U, E >& rhs ) SAFEINT_CPP_THROW
     {
         SafeCastHelper< T, U, GetCastMethod< T, U >::method >::template CastThrow< E >( rhs.Ref(), m_int );
-        return *this;
-    }
-
-    _CONSTEXPR14 SafeInt< T, E >& operator =( const SafeInt< T, E >& rhs ) SAFEINT_NOTHROW
-    {
-        m_int = rhs.m_int;
         return *this;
     }
 
