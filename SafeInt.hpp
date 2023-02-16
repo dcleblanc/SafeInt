@@ -5507,11 +5507,16 @@ public:
         SafeCastHelper< T, U, GetCastMethod< T, U >::method >::template CastThrow< E >( i, m_int );
     }
 
+    // Add a move constructor
+    _CONSTEXPR14 SafeInt(SafeInt<T>&& t) : m_int(t.m_int)
+    {
+        t.m_int = 0;
+    }
+
     // The destructor is intentionally commented out - no destructor
     // vs. a do-nothing destructor makes a huge difference in
     // inlining characteristics. It wasn't doing anything anyway.
     // ~SafeInt(){};
-
 
     // now start overloading operators
     // assignment operator
@@ -5531,6 +5536,14 @@ public:
     _CONSTEXPR14 SafeInt< T, E >& operator =( const T& rhs ) SAFEINT_NOTHROW
     {
         m_int = rhs;
+        return *this;
+    }
+
+    // Move assignment
+    _CONSTEXPR14 SafeInt< T, E >& operator=( SafeInt<T>&& t)
+    {
+        m_int = t.m_int;
+        t.m_int = 0;
         return *this;
     }
 
