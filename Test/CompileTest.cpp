@@ -257,6 +257,32 @@ void CompileType()
 
 }
 
+void MoveRegression()
+{
+	#if CPLUSPLUS_STD == CPLUSPLUS_17
+	#include <variant>
+	#include <string>
+
+	template<typename... T>
+	class Union {
+	public:
+		Union() = default;
+		Union& operator=(Union&&) noexcept = default;
+
+		template<typename F>
+		Union& operator=(F&& t) {
+			value = std::forward<F>(t);
+			return *this;
+		}
+
+		std::variant<T...> value;
+	};
+
+	Union<std::string, SafeInt<int64_t>> x;
+	Union<std::string, SafeInt<int64_t>> y;
+	x = std::move(y);
+	#endif
+}
 void CompileMe()
 {
 	CompileType<char>();
@@ -277,7 +303,7 @@ void CompileMe()
 	CompileSigned<signed int>();
 	CompileSigned<signed long>();
 	CompileSigned<signed long long>();
-
+	MoveRegression();
 }
 
 /*
