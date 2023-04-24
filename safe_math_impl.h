@@ -16,7 +16,7 @@ and are originally copyrighted to Microsoft.
 #define C_SAFE_MATH_IMPL
 
 #if defined _MSC_VER
-// Inline expansion warnings
+// static inline expansion warnings
 #pragma warning(disable:4710 4711)
 #endif
 
@@ -125,7 +125,7 @@ extern "C"
 #include <stdlib.h>
 
 SAFEINT_NORETURN
-inline void safe_math_fail(const char* msg)
+static inline void safe_math_fail(const char* msg)
 {
     (void)msg;
     abort();
@@ -154,10 +154,10 @@ inline void safe_math_fail(const char* msg)
 // Purpose of this is to negate an int in a way
 // where the compiler won't remove it if the input is a 
 // compile time constant MIN_INT
-inline int32_t negate32(int32_t in) { return (int32_t)(~(uint32_t)in + 1); }
-inline int64_t negate64(int64_t in) { return (int64_t)(~(uint64_t)in + 1); }
+static inline int32_t negate32(int32_t in) { return (int32_t)(~(uint32_t)in + 1); }
+static inline int64_t negate64(int64_t in) { return (int64_t)(~(uint64_t)in + 1); }
 
-inline uint32_t safe_abs32(int32_t in)
+static inline uint32_t safe_abs32(int32_t in)
 {
     if (in < 0)
         return ~(uint32_t)in + 1;
@@ -165,7 +165,7 @@ inline uint32_t safe_abs32(int32_t in)
     return (uint32_t)in;
 }
 
-inline uint64_t safe_abs64(int64_t in)
+static inline uint64_t safe_abs64(int64_t in)
 {
     if (in < 0)
         return ~(uint64_t)in + 1;
@@ -175,32 +175,32 @@ inline uint64_t safe_abs64(int64_t in)
 
 // Checked casting functions
 // 0 if the cast is safe, non-zero if unsafe
-inline int check_cast_int8_int32(int32_t in) { return (in < INT8_MIN || in > INT8_MAX); }
-inline int check_cast_int8_uint32(uint32_t in) { return in > INT8_MAX; }
-inline int check_cast_int8_int64(int64_t in) { return in < INT8_MIN || in > INT8_MAX; }
-inline int check_cast_int8_uint64(uint64_t in) { return (in > INT8_MAX); }
-inline int check_cast_int16_int32(int32_t in) { return in < INT16_MIN || in > INT16_MAX; }
-inline int check_cast_int16_uint32(uint32_t in) { return (in > INT16_MAX); }
-inline int check_cast_int16_int64(int64_t in) { return (in < INT16_MIN || in > INT16_MAX); }
-inline int check_cast_int16_uint64(uint64_t in) { return (in > INT16_MAX); }
-inline int check_cast_int32_uint32(uint32_t in) { return (in > INT32_MAX); }
-inline int check_cast_int32_int64(int64_t in) { return (in < INT32_MIN || in > INT32_MAX); }
-inline int check_cast_int32_uint64(uint64_t in) { return (in > INT32_MAX); }
-inline int check_cast_int64_uint64(uint64_t in) { return (in > INT64_MAX); }
-inline int check_cast_uint8_int32(int32_t in) { return (in < 0 || in > UINT8_MAX); }
-inline int check_cast_uint8_uint32(uint32_t in) { return (in > UINT8_MAX); }
-inline int check_cast_uint8_int64(int64_t in) { return (in < 0 || in > UINT8_MAX); }
-inline int check_cast_uint8_uint64(uint64_t in) { return (in > UINT8_MAX); }
-inline int check_cast_uint16_int32(int32_t in) { return (in < 0 || in > UINT16_MAX); }
-inline int check_cast_uint16_uint32(uint32_t in) { return (in > UINT16_MAX); }
-inline int check_cast_uint16_int64(int64_t in) { return (in < 0 || in > UINT16_MAX); }
-inline int check_cast_uint16_uint64(uint64_t in) { return (in > UINT16_MAX); }
-inline int check_cast_uint32_int32(int32_t in) { return (in < 0); }
-inline int check_cast_uint32_int64(int64_t in) { return (in < 0 || in > UINT32_MAX); }
-inline int check_cast_uint32_uint64(uint64_t in) { return (in > UINT32_MAX); }
-inline int check_cast_uint64_int64(int64_t in) { return (in < 0); }
+static inline int check_cast_int8_int32(int32_t in) { return (in < INT8_MIN || in > INT8_MAX); }
+static inline int check_cast_int8_uint32(uint32_t in) { return in > INT8_MAX; }
+static inline int check_cast_int8_int64(int64_t in) { return in < INT8_MIN || in > INT8_MAX; }
+static inline int check_cast_int8_uint64(uint64_t in) { return (in > INT8_MAX); }
+static inline int check_cast_int16_int32(int32_t in) { return in < INT16_MIN || in > INT16_MAX; }
+static inline int check_cast_int16_uint32(uint32_t in) { return (in > INT16_MAX); }
+static inline int check_cast_int16_int64(int64_t in) { return (in < INT16_MIN || in > INT16_MAX); }
+static inline int check_cast_int16_uint64(uint64_t in) { return (in > INT16_MAX); }
+static inline int check_cast_int32_uint32(uint32_t in) { return (in > INT32_MAX); }
+static inline int check_cast_int32_int64(int64_t in) { return (in < INT32_MIN || in > INT32_MAX); }
+static inline int check_cast_int32_uint64(uint64_t in) { return (in > INT32_MAX); }
+static inline int check_cast_int64_uint64(uint64_t in) { return (in > INT64_MAX); }
+static inline int check_cast_uint8_int32(int32_t in) { return (in < 0 || in > UINT8_MAX); }
+static inline int check_cast_uint8_uint32(uint32_t in) { return (in > UINT8_MAX); }
+static inline int check_cast_uint8_int64(int64_t in) { return (in < 0 || in > UINT8_MAX); }
+static inline int check_cast_uint8_uint64(uint64_t in) { return (in > UINT8_MAX); }
+static inline int check_cast_uint16_int32(int32_t in) { return (in < 0 || in > UINT16_MAX); }
+static inline int check_cast_uint16_uint32(uint32_t in) { return (in > UINT16_MAX); }
+static inline int check_cast_uint16_int64(int64_t in) { return (in < 0 || in > UINT16_MAX); }
+static inline int check_cast_uint16_uint64(uint64_t in) { return (in > UINT16_MAX); }
+static inline int check_cast_uint32_int32(int32_t in) { return (in < 0); }
+static inline int check_cast_uint32_int64(int64_t in) { return (in < 0 || in > UINT32_MAX); }
+static inline int check_cast_uint32_uint64(uint64_t in) { return (in > UINT32_MAX); }
+static inline int check_cast_uint64_int64(int64_t in) { return (in < 0); }
 
-inline int8_t safe_cast_int8_int32(int32_t in)
+static inline int8_t safe_cast_int8_int32(int32_t in)
 {
     if (!check_cast_int8_int32(in))
         safe_math_fail("safe_math_fail safe_cast_int8_int32");
@@ -208,7 +208,7 @@ inline int8_t safe_cast_int8_int32(int32_t in)
     return (int8_t)in;
 }
 
-inline int8_t safe_cast_int8_uint32(uint32_t in)
+static inline int8_t safe_cast_int8_uint32(uint32_t in)
 {
     if (check_cast_int8_uint32(in))
         safe_math_fail("safe_math_fail safe_cast_int8_uint32");
@@ -216,7 +216,7 @@ inline int8_t safe_cast_int8_uint32(uint32_t in)
     return (int8_t)in;
 }
 
-inline int8_t safe_cast_int8_int64(int64_t in)
+static inline int8_t safe_cast_int8_int64(int64_t in)
 {
     if (check_cast_int8_int64(in))
         safe_math_fail("safe_math_fail safe_cast_int8_int64");
@@ -224,7 +224,7 @@ inline int8_t safe_cast_int8_int64(int64_t in)
     return (int8_t)in;
 }
 
-inline int8_t safe_cast_int8_uint64(uint64_t in)
+static inline int8_t safe_cast_int8_uint64(uint64_t in)
 {
     if (check_cast_int8_uint64(in))
         safe_math_fail("safe_math_fail safe_cast_int8_uint64");
@@ -232,7 +232,7 @@ inline int8_t safe_cast_int8_uint64(uint64_t in)
     return (int8_t)in;
 }
 
-inline int16_t safe_cast_int16_int32(int32_t in)
+static inline int16_t safe_cast_int16_int32(int32_t in)
 {
     if (check_cast_int16_int32(in))
         safe_math_fail("safe_math_fail safe_cast_int16_int32");
@@ -240,7 +240,7 @@ inline int16_t safe_cast_int16_int32(int32_t in)
     return (int16_t)in;
 }
 
-inline int16_t safe_cast_int16_uint32(uint32_t in)
+static inline int16_t safe_cast_int16_uint32(uint32_t in)
 {
     if (check_cast_int16_uint32(in))
         safe_math_fail("safe_math_fail safe_cast_int16_uint32");
@@ -248,7 +248,7 @@ inline int16_t safe_cast_int16_uint32(uint32_t in)
     return (int16_t)in;
 }
 
-inline int16_t safe_cast_int16_int64(int64_t in)
+static inline int16_t safe_cast_int16_int64(int64_t in)
 {
     if (check_cast_int16_int64(in))
         safe_math_fail("safe_math_fail safe_cast_int16_int64");
@@ -256,7 +256,7 @@ inline int16_t safe_cast_int16_int64(int64_t in)
     return (int16_t)in;
 }
 
-inline int16_t safe_cast_int16_uint64(uint64_t in)
+static inline int16_t safe_cast_int16_uint64(uint64_t in)
 {
     if (in > INT16_MAX)
         safe_math_fail("safe_math_fail safe_cast_int16_uint64");
@@ -264,7 +264,7 @@ inline int16_t safe_cast_int16_uint64(uint64_t in)
     return (int16_t)in;
 }
 
-inline int32_t safe_cast_int32_uint32(uint32_t in)
+static inline int32_t safe_cast_int32_uint32(uint32_t in)
 {
     if (check_cast_int32_uint32(in))
         safe_math_fail("safe_math_fail safe_cast_int32_uint32");
@@ -272,7 +272,7 @@ inline int32_t safe_cast_int32_uint32(uint32_t in)
     return (int32_t)in;
 }
 
-inline int32_t safe_cast_int32_int64(int64_t in)
+static inline int32_t safe_cast_int32_int64(int64_t in)
 {
     if (check_cast_int32_int64(in))
         safe_math_fail("safe_math_fail safe_cast_int32_int64");
@@ -280,7 +280,7 @@ inline int32_t safe_cast_int32_int64(int64_t in)
     return (int32_t)in;
 }
 
-inline int32_t safe_cast_int32_uint64(uint64_t in)
+static inline int32_t safe_cast_int32_uint64(uint64_t in)
 {
     if (check_cast_int32_uint64(in))
         safe_math_fail("safe_math_fail safe_cast_int32_uint64");
@@ -288,7 +288,7 @@ inline int32_t safe_cast_int32_uint64(uint64_t in)
     return (int32_t)in;
 }
 
-inline int64_t safe_cast_int64_uint64(uint64_t in)
+static inline int64_t safe_cast_int64_uint64(uint64_t in)
 {
     if (check_cast_int64_uint64(in))
         safe_math_fail("safe_math_fail safe_cast_int64_uint64");
@@ -296,7 +296,7 @@ inline int64_t safe_cast_int64_uint64(uint64_t in)
     return (int64_t)in;
 }
 
-inline uint8_t safe_cast_uint8_int32(int32_t in)
+static inline uint8_t safe_cast_uint8_int32(int32_t in)
 {
     if (check_cast_uint8_int32(in))
         safe_math_fail("safe_math_fail safe_cast_uint8_int32");
@@ -304,7 +304,7 @@ inline uint8_t safe_cast_uint8_int32(int32_t in)
     return (uint8_t)in;
 }
 
-inline uint8_t safe_cast_uint8_uint32(uint32_t in)
+static inline uint8_t safe_cast_uint8_uint32(uint32_t in)
 {
     if (check_cast_uint8_uint32(in))
         safe_math_fail("safe_math_fail safe_cast_uint8_uint32");
@@ -312,7 +312,7 @@ inline uint8_t safe_cast_uint8_uint32(uint32_t in)
     return (uint8_t)in;
 }
 
-inline uint8_t safe_cast_uint8_int64(int64_t in)
+static inline uint8_t safe_cast_uint8_int64(int64_t in)
 {
     if (check_cast_uint8_int64(in))
         safe_math_fail("safe_math_fail safe_cast_uint8_int64");
@@ -320,7 +320,7 @@ inline uint8_t safe_cast_uint8_int64(int64_t in)
     return (uint8_t)in;
 }
 
-inline uint8_t safe_cast_uint8_uint64(uint64_t in)
+static inline uint8_t safe_cast_uint8_uint64(uint64_t in)
 {
     if (check_cast_uint8_uint64(in))
         safe_math_fail("safe_math_fail safe_cast_uint8_uint64");
@@ -328,7 +328,7 @@ inline uint8_t safe_cast_uint8_uint64(uint64_t in)
     return (uint8_t)in;
 }
 
-inline uint16_t safe_cast_uint16_int32(int32_t in)
+static inline uint16_t safe_cast_uint16_int32(int32_t in)
 {
     if (check_cast_uint16_int32(in))
         safe_math_fail("safe_math_fail safe_cast_uint16_int32");
@@ -336,7 +336,7 @@ inline uint16_t safe_cast_uint16_int32(int32_t in)
     return (uint16_t)in;
 }
 
-inline uint16_t safe_cast_uint16_uint32(uint32_t in)
+static inline uint16_t safe_cast_uint16_uint32(uint32_t in)
 {
     if (check_cast_uint16_uint32(in))
         safe_math_fail("safe_math_fail safe_cast_uint16_uint32");
@@ -344,7 +344,7 @@ inline uint16_t safe_cast_uint16_uint32(uint32_t in)
     return (uint16_t)in;
 }
 
-inline uint16_t safe_cast_uint16_int64(int64_t in)
+static inline uint16_t safe_cast_uint16_int64(int64_t in)
 {
     if (check_cast_uint16_int64(in))
         safe_math_fail("safe_math_fail safe_cast_uint16_int64");
@@ -352,7 +352,7 @@ inline uint16_t safe_cast_uint16_int64(int64_t in)
     return (uint16_t)in;
 }
 
-inline uint16_t safe_cast_uint16_uint64(uint64_t in)
+static inline uint16_t safe_cast_uint16_uint64(uint64_t in)
 {
     if (check_cast_uint16_uint64(in))
         safe_math_fail("safe_math_fail safe_cast_int16_uint64");
@@ -360,7 +360,7 @@ inline uint16_t safe_cast_uint16_uint64(uint64_t in)
     return (uint16_t)in;
 }
 
-inline uint32_t safe_cast_uint32_int32(int32_t in)
+static inline uint32_t safe_cast_uint32_int32(int32_t in)
 {
     if (check_cast_uint32_int32(in))
         safe_math_fail("safe_math_fail safe_cast_uint32_int32");
@@ -368,7 +368,7 @@ inline uint32_t safe_cast_uint32_int32(int32_t in)
     return (uint32_t)in;
 }
 
-inline uint32_t safe_cast_uint32_int64(int64_t in)
+static inline uint32_t safe_cast_uint32_int64(int64_t in)
 {
     if (check_cast_uint32_int64(in))
         safe_math_fail("safe_math_fail safe_cast_int32_int64");
@@ -376,7 +376,7 @@ inline uint32_t safe_cast_uint32_int64(int64_t in)
     return (uint32_t)in;
 }
 
-inline uint32_t safe_cast_uint32_uint64(uint64_t in)
+static inline uint32_t safe_cast_uint32_uint64(uint64_t in)
 {
     if (check_cast_uint32_uint64(in))
         safe_math_fail("safe_math_fail safe_cast_uint32_uint64");
@@ -384,7 +384,7 @@ inline uint32_t safe_cast_uint32_uint64(uint64_t in)
     return (uint32_t)in;
 }
 
-inline uint64_t safe_cast_uint64_int64(int64_t in)
+static inline uint64_t safe_cast_uint64_int64(int64_t in)
 {
     if (check_cast_uint64_int64(in))
         safe_math_fail("safe_math_fail safe_cast_int64_uint64");
@@ -405,31 +405,31 @@ inline uint64_t safe_cast_uint64_int64(int64_t in)
     size of the same type, for example, uint16 -> uint32.
 */
 
-inline int32_t safe_add_int32_int32(int32_t a, int32_t b)
+static inline int32_t safe_add_int32_int32(int32_t a, int32_t b)
 {
     return safe_cast_int32_int64((int64_t)a + b);
 }
 
-inline bool check_add_int32_int32(int32_t a, int32_t b, int32_t* ret)
+static inline bool check_add_int32_int32(int32_t a, int32_t b, int32_t* ret)
 {
     int64_t tmp = (int64_t)a + b;
     *ret = (int32_t)tmp;
     return check_cast_int32_int64(tmp) == 0;
 }
 
-inline int32_t safe_add_int32_uint32(int32_t a, uint32_t b)
+static inline int32_t safe_add_int32_uint32(int32_t a, uint32_t b)
 {
     return safe_cast_int32_int64((int64_t)a + b);
 }
 
-inline bool check_add_int32_uint32(int32_t a, uint32_t b, int32_t* ret)
+static inline bool check_add_int32_uint32(int32_t a, uint32_t b, int32_t* ret)
 {
     int64_t tmp = (int64_t)a + b;
     *ret = (int32_t)tmp;
     return check_cast_int32_int64(tmp) == 0;
 }
 
-inline int32_t safe_add_int32_int64(int32_t a, int64_t b)
+static inline int32_t safe_add_int32_int64(int32_t a, int64_t b)
 {
     int64_t tmp = (int64_t)((uint64_t)a + (uint64_t)b);
     
@@ -449,7 +449,7 @@ inline int32_t safe_add_int32_int64(int32_t a, int64_t b)
     return safe_cast_int32_int64(tmp);
 }
 
-inline bool check_add_int32_int64(int32_t a, int64_t b, int32_t* ret)
+static inline bool check_add_int32_int64(int32_t a, int64_t b, int32_t* ret)
 {
     int64_t tmp = (int64_t)((uint64_t)a + (uint64_t)b);
     *ret = (int32_t)tmp;
@@ -470,7 +470,7 @@ inline bool check_add_int32_int64(int32_t a, int64_t b, int32_t* ret)
     return check_cast_int32_int64(tmp) == 0;
 }
 
-inline int32_t safe_add_int32_uint64(int32_t a, uint64_t b)
+static inline int32_t safe_add_int32_uint64(int32_t a, uint64_t b)
 {
     if ((uint32_t)(b >> 32) == 0)
     {
@@ -487,7 +487,7 @@ inline int32_t safe_add_int32_uint64(int32_t a, uint64_t b)
     safe_math_fail("safe_math_fail safe_add_int32_uint64");
 }
 
-inline bool check_add_int32_uint64(int32_t a, uint64_t b, int32_t* ret)
+static inline bool check_add_int32_uint64(int32_t a, uint64_t b, int32_t* ret)
 {
     if ((uint32_t)(b >> 32) == 0)
     {
@@ -505,19 +505,19 @@ inline bool check_add_int32_uint64(int32_t a, uint64_t b, int32_t* ret)
     return false;
 }
 
-inline uint32_t safe_add_uint32_int32(uint32_t a, int32_t b)
+static inline uint32_t safe_add_uint32_int32(uint32_t a, int32_t b)
 {
     return safe_cast_uint32_int64((int64_t)a + b);
 }
 
-inline bool check_add_uint32_int32(uint32_t a, int32_t b, uint32_t* ret)
+static inline bool check_add_uint32_int32(uint32_t a, int32_t b, uint32_t* ret)
 {
     int64_t tmp = (int64_t)a + b;
     *ret = (uint32_t)tmp;
     return check_cast_uint32_int64(tmp) == 0;
 }
 
-inline uint32_t safe_add_uint32_uint32(uint32_t a, uint32_t b)
+static inline uint32_t safe_add_uint32_uint32(uint32_t a, uint32_t b)
 {
     uint32_t tmp = a + b;
     
@@ -529,14 +529,14 @@ inline uint32_t safe_add_uint32_uint32(uint32_t a, uint32_t b)
     return tmp;
 }
 
-inline bool check_add_uint32_uint32(uint32_t a, uint32_t b, uint32_t* ret)
+static inline bool check_add_uint32_uint32(uint32_t a, uint32_t b, uint32_t* ret)
 {
     uint32_t tmp = a + b;
     *ret = tmp;
     return tmp >= a;
 }
 
-inline uint32_t safe_add_uint32_int64(uint32_t a, int64_t b)
+static inline uint32_t safe_add_uint32_int64(uint32_t a, int64_t b)
 {
     if (b < 0)
     {
@@ -558,7 +558,7 @@ inline uint32_t safe_add_uint32_int64(uint32_t a, int64_t b)
     safe_math_fail("safe_math_fail safe_add_uint32_int64");
 }
 
-inline bool check_add_uint32_int64(uint32_t a, int64_t b, uint32_t* ret)
+static inline bool check_add_uint32_int64(uint32_t a, int64_t b, uint32_t* ret)
 {
     if (b < 0)
     {
@@ -582,7 +582,7 @@ inline bool check_add_uint32_int64(uint32_t a, int64_t b, uint32_t* ret)
     return false;
 }
 
-inline uint32_t safe_add_uint32_uint64(uint32_t a, uint64_t b)
+static inline uint32_t safe_add_uint32_uint64(uint32_t a, uint64_t b)
 {
     uint64_t tmp = (uint64_t)a + b;
     
@@ -594,7 +594,7 @@ inline uint32_t safe_add_uint32_uint64(uint32_t a, uint64_t b)
     safe_math_fail("safe_math_fail safe_add_uint32_uint64");
 }
 
-inline bool check_add_uint32_uint64(uint32_t a, uint64_t b, uint32_t* ret)
+static inline bool check_add_uint32_uint64(uint32_t a, uint64_t b, uint32_t* ret)
 {
     uint64_t tmp = (uint64_t)a + b;
     *ret = (uint32_t)tmp;
@@ -602,7 +602,7 @@ inline bool check_add_uint32_uint64(uint32_t a, uint64_t b, uint32_t* ret)
     return (tmp >= a && tmp <= UINT32_MAX);
 }
 
-inline int64_t safe_add_int64_int32(int64_t a, int32_t b)
+static inline int64_t safe_add_int64_int32(int64_t a, int32_t b)
 {
     int64_t tmp = (int64_t)((uint64_t)a + (uint64_t)b);
 
@@ -622,7 +622,7 @@ inline int64_t safe_add_int64_int32(int64_t a, int32_t b)
     return tmp;
 }
 
-inline bool check_add_int64_int32(int64_t a, int32_t b, int64_t* ret)
+static inline bool check_add_int64_int32(int64_t a, int32_t b, int64_t* ret)
 {
     int64_t tmp = (int64_t)((uint64_t)a + (uint64_t)b);
     *ret = tmp;
@@ -643,7 +643,7 @@ inline bool check_add_int64_int32(int64_t a, int32_t b, int64_t* ret)
     return true;
 }
 
-inline int64_t safe_add_int64_uint32(int64_t a, uint32_t b)
+static inline int64_t safe_add_int64_uint32(int64_t a, uint32_t b)
 {
     uint64_t tmp = (uint64_t)a + (uint64_t)b;
 
@@ -655,7 +655,7 @@ inline int64_t safe_add_int64_uint32(int64_t a, uint32_t b)
     safe_math_fail("safe_math_fail safe_add_int64_uint32");
 }
 
-inline bool check_add_int64_uint32(int64_t a, uint32_t b, int64_t* ret)
+static inline bool check_add_int64_uint32(int64_t a, uint32_t b, int64_t* ret)
 {
     uint64_t tmp = (uint64_t)a + (uint64_t)b;
     *ret = (int64_t)tmp;
@@ -663,7 +663,7 @@ inline bool check_add_int64_uint32(int64_t a, uint32_t b, int64_t* ret)
     return ((int64_t)tmp >= a);
 }
 
-inline int64_t safe_add_int64_int64(int64_t a, int64_t b)
+static inline int64_t safe_add_int64_int64(int64_t a, int64_t b)
 {
     int64_t tmp = (int64_t)((uint64_t)a + (uint64_t)b);
 
@@ -683,7 +683,7 @@ inline int64_t safe_add_int64_int64(int64_t a, int64_t b)
     return tmp;
 }
 
-inline bool check_add_int64_int64(int64_t a, int64_t b, int64_t* ret)
+static inline bool check_add_int64_int64(int64_t a, int64_t b, int64_t* ret)
 {
     int64_t tmp = (int64_t)((uint64_t)a + (uint64_t)b);
     *ret = tmp;
@@ -704,7 +704,7 @@ inline bool check_add_int64_int64(int64_t a, int64_t b, int64_t* ret)
     return true;
 }
 
-inline int64_t safe_add_int64_uint64(int64_t a, uint64_t b)
+static inline int64_t safe_add_int64_uint64(int64_t a, uint64_t b)
 {
     uint64_t tmp = (uint64_t)a + b;
 
@@ -716,7 +716,7 @@ inline int64_t safe_add_int64_uint64(int64_t a, uint64_t b)
     safe_math_fail("safe_math_fail safe_add_int64_uint64");
 }
 
-inline bool check_add_int64_uint64(int64_t a, uint64_t b, int64_t* ret)
+static inline bool check_add_int64_uint64(int64_t a, uint64_t b, int64_t* ret)
 {
     uint64_t tmp = (uint64_t)a + b;
     *ret = (int64_t)tmp;
@@ -724,7 +724,7 @@ inline bool check_add_int64_uint64(int64_t a, uint64_t b, int64_t* ret)
     return ((int64_t)tmp >= a);
 }
 
-inline uint64_t safe_add_uint64_int32(uint64_t a, int32_t b)
+static inline uint64_t safe_add_uint64_int32(uint64_t a, int32_t b)
 {
     uint64_t tmp = 0;
 
@@ -753,7 +753,7 @@ inline uint64_t safe_add_uint64_int32(uint64_t a, int32_t b)
     safe_math_fail("safe_math_fail safe_add_uint64_int32");
 }
 
-inline bool check_add_uint64_int32(uint64_t a, int32_t b, uint64_t* ret)
+static inline bool check_add_uint64_int32(uint64_t a, int32_t b, uint64_t* ret)
 {
     uint64_t tmp = 0;
 
@@ -785,7 +785,7 @@ inline bool check_add_uint64_int32(uint64_t a, int32_t b, uint64_t* ret)
 }
 
 
-inline uint64_t safe_add_uint64_uint32(uint64_t a, uint32_t b)
+static inline uint64_t safe_add_uint64_uint32(uint64_t a, uint32_t b)
 {
     uint64_t tmp = (uint64_t)a + (uint64_t)b;
 
@@ -798,7 +798,7 @@ inline uint64_t safe_add_uint64_uint32(uint64_t a, uint32_t b)
     safe_math_fail("safe_math_fail safe_add_uint64_uint32");
 }
 
-inline bool check_add_uint64_uint32(uint64_t a, uint32_t b, uint64_t* ret)
+static inline bool check_add_uint64_uint32(uint64_t a, uint32_t b, uint64_t* ret)
 {
     uint64_t tmp = (uint64_t)a + (uint64_t)b;
     *ret = tmp;
@@ -807,7 +807,7 @@ inline bool check_add_uint64_uint32(uint64_t a, uint32_t b, uint64_t* ret)
     return (tmp >= a);
 }
 
-inline uint64_t safe_add_uint64_int64(uint64_t a, int64_t b)
+static inline uint64_t safe_add_uint64_int64(uint64_t a, int64_t b)
 {
     uint64_t tmp = 0;
 
@@ -836,7 +836,7 @@ inline uint64_t safe_add_uint64_int64(uint64_t a, int64_t b)
     safe_math_fail("safe_math_fail safe_add_uint64_int64");
 }
 
-inline bool check_add_uint64_int64(uint64_t a, int64_t b, uint64_t* ret)
+static inline bool check_add_uint64_int64(uint64_t a, int64_t b, uint64_t* ret)
 {
     uint64_t tmp = 0;
 
@@ -867,7 +867,7 @@ inline bool check_add_uint64_int64(uint64_t a, int64_t b, uint64_t* ret)
     return false;
 }
 
-inline uint64_t safe_add_uint64_uint64(uint64_t a, uint64_t b)
+static inline uint64_t safe_add_uint64_uint64(uint64_t a, uint64_t b)
 {
     uint64_t tmp = a + b;
 
@@ -877,7 +877,7 @@ inline uint64_t safe_add_uint64_uint64(uint64_t a, uint64_t b)
     return tmp;
 }
 
-inline bool check_add_uint64_uint64(uint64_t a, uint64_t b, uint64_t* ret)
+static inline bool check_add_uint64_uint64(uint64_t a, uint64_t b, uint64_t* ret)
 {
     uint64_t tmp = a + b;
     *ret = tmp;
@@ -893,7 +893,7 @@ inline bool check_add_uint64_uint64(uint64_t a, uint64_t b, uint64_t* ret)
 // Multiplication primatives
 #if SAFEINT_MULTIPLY_METHOD == SAFEINT_MULTIPLY_INT128
 
-inline int MultiplyUint64(uint64_t a, uint64_t b, uint64_t* pRet)
+static inline int MultiplyUint64(uint64_t a, uint64_t b, uint64_t* pRet)
 {
     unsigned __int128 tmp = (unsigned __int128)a * (unsigned __int128)b;
 
@@ -906,7 +906,7 @@ inline int MultiplyUint64(uint64_t a, uint64_t b, uint64_t* pRet)
     return SAFE_INT_MUL_FAIL;
 }
 
-inline int MultiplyInt64(int64_t a, int64_t b, int64_t* pRet)
+static inline int MultiplyInt64(int64_t a, int64_t b, int64_t* pRet)
 {
     __int128 tmp = (__int128)a * (__int128)b;
     *pRet = (int64_t)tmp;
@@ -935,7 +935,7 @@ inline int MultiplyInt64(int64_t a, int64_t b, int64_t* pRet)
 #elif SAFEINT_MULTIPLY_METHOD == SAFEINT_MULTIPLY_INTRINSICS // Implies Visual Studio compiler
 
 // As usual, unsigned is easy
-inline int MultiplyUint64(uint64_t a, uint64_t b, uint64_t * pRet)
+static inline int MultiplyUint64(uint64_t a, uint64_t b, uint64_t * pRet)
 {
     uint64_t ulHigh = 0;
     *pRet = _umul128(a, b, &ulHigh);
@@ -943,7 +943,7 @@ inline int MultiplyUint64(uint64_t a, uint64_t b, uint64_t * pRet)
 }
 
 // Signed, is not so easy
-inline int MultiplyInt64(int64_t a, int64_t b, int64_t* pRet)
+static inline int MultiplyInt64(int64_t a, int64_t b, int64_t* pRet)
 {
     int64_t llHigh = 0;
     *pRet = _mul128(a, b, &llHigh);
@@ -973,19 +973,19 @@ inline int MultiplyInt64(int64_t a, int64_t b, int64_t* pRet)
 }
 #elif SAFEINT_MULTIPLY_METHOD == SAFEINT_MULTIPLY_BUILTIN // Implies gcc or clang
 
-inline int MultiplyUint64(uint64_t a, uint64_t b, uint64_t* pRet)
+static inline int MultiplyUint64(uint64_t a, uint64_t b, uint64_t* pRet)
 {
     return !__builtin_umulll_overflow(a, b, (unsigned long long*)pRet) ? SAFE_INT_MUL_SUCCESS : SAFE_INT_MUL_FAIL;
 }
 
-inline int MultiplyInt64(int64_t a, int64_t b, int64_t* pRet)
+static inline int MultiplyInt64(int64_t a, int64_t b, int64_t* pRet)
 {
     return !__builtin_smulll_overflow(a, b, (long long*)pRet) ? SAFE_INT_MUL_SUCCESS : SAFE_INT_MUL_FAIL;
 }
 
 #elif SAFEINT_MULTIPLY_METHOD == SAFEINT_MULTIPLY_MATH // Just going to have to do the math...
 
-inline int MultiplyUint64(uint64_t a, uint64_t b, uint64_t* pRet)
+static inline int MultiplyUint64(uint64_t a, uint64_t b, uint64_t* pRet)
 {
     uint32_t a_high = a >> 32;
     uint32_t a_low = (uint32_t)a;
@@ -1027,7 +1027,7 @@ inline int MultiplyUint64(uint64_t a, uint64_t b, uint64_t* pRet)
     return *pRet >= tmp2 ? SAFE_INT_MUL_SUCCESS : SAFE_INT_MUL_FAIL;
 }
 
-inline int MultiplyInt64(int64_t a, int64_t b, int64_t* pRet)
+static inline int MultiplyInt64(int64_t a, int64_t b, int64_t* pRet)
 {
     bool aNegative = false;
     bool bNegative = false;
@@ -1079,33 +1079,33 @@ inline int MultiplyInt64(int64_t a, int64_t b, int64_t* pRet)
 # error Intrinsics enabled, no available intrinics defined
 #endif
 
-inline int32_t safe_mul_int32_int32(int32_t a, int32_t b)
+static inline int32_t safe_mul_int32_int32(int32_t a, int32_t b)
 {
     int64_t tmp = (int64_t)a * (int64_t)b;
     return safe_cast_int32_int64(tmp);
 }
 
-inline bool check_mul_int32_int32(int32_t a, int32_t b, int32_t* ret)
+static inline bool check_mul_int32_int32(int32_t a, int32_t b, int32_t* ret)
 {
     int64_t tmp = (int64_t)a * (int64_t)b;
     *ret = (int32_t)tmp;
     return check_cast_int32_int64(tmp) == 0;
 }
 
-inline int32_t safe_mul_int32_uint32(int32_t a, uint32_t b)
+static inline int32_t safe_mul_int32_uint32(int32_t a, uint32_t b)
 {
     int64_t tmp = (int64_t)a * (int64_t)b;
     return safe_cast_int32_int64(tmp);
 }
 
-inline bool check_mul_int32_uint32(int32_t a, uint32_t b, int32_t* ret)
+static inline bool check_mul_int32_uint32(int32_t a, uint32_t b, int32_t* ret)
 {
     int64_t tmp = (int64_t)a * (int64_t)b;
     *ret = (int32_t)tmp;
     return check_cast_int32_int64(tmp) == 0;
 }
 
-inline int32_t safe_mul_int32_int64(int32_t a, int64_t b)
+static inline int32_t safe_mul_int32_int64(int32_t a, int64_t b)
 {
     int64_t tmp = 0;
 
@@ -1117,7 +1117,7 @@ inline int32_t safe_mul_int32_int64(int32_t a, int64_t b)
     safe_math_fail("safe_math_fail safe_mul_int32_int64");
 }
 
-inline bool check_mul_int32_int64(int32_t a, int64_t b, int32_t* ret)
+static inline bool check_mul_int32_int64(int32_t a, int64_t b, int32_t* ret)
 {
     int64_t tmp = 0;
 
@@ -1130,7 +1130,7 @@ inline bool check_mul_int32_int64(int32_t a, int64_t b, int32_t* ret)
     return false;
 }
 
-inline int32_t safe_mul_int32_uint64(int32_t a, uint64_t b)
+static inline int32_t safe_mul_int32_uint64(int32_t a, uint64_t b)
 {
     uint64_t tmp = 0;
     if (a < 0)
@@ -1154,7 +1154,7 @@ inline int32_t safe_mul_int32_uint64(int32_t a, uint64_t b)
     safe_math_fail("safe_math_fail safe_mul_int32_uint64");
 }
 
-inline bool check_mul_int32_uint64(int32_t a, uint64_t b, int32_t* ret)
+static inline bool check_mul_int32_uint64(int32_t a, uint64_t b, int32_t* ret)
 {
     uint64_t tmp = 0;
     if (a < 0)
@@ -1180,33 +1180,33 @@ inline bool check_mul_int32_uint64(int32_t a, uint64_t b, int32_t* ret)
     return false;
 }
 
-inline uint32_t safe_mul_uint32_int32(uint32_t a, int32_t b)
+static inline uint32_t safe_mul_uint32_int32(uint32_t a, int32_t b)
 {
     int64_t tmp = (int64_t)a * (int64_t)b;
     return safe_cast_uint32_int64(tmp);
 }
 
-inline bool check_mul_uint32_int32(uint32_t a, int32_t b, uint32_t* ret)
+static inline bool check_mul_uint32_int32(uint32_t a, int32_t b, uint32_t* ret)
 {
     int64_t tmp = (int64_t)a * (int64_t)b;
     *ret = (uint32_t)tmp;
     return check_cast_uint32_int64(tmp) == 0;
 }
 
-inline uint32_t safe_mul_uint32_uint32(uint32_t a, uint32_t b)
+static inline uint32_t safe_mul_uint32_uint32(uint32_t a, uint32_t b)
 {
     uint64_t tmp = (uint64_t)a * (uint64_t)b;
     return safe_cast_uint32_uint64(tmp);
 }
 
-inline bool check_mul_uint32_uint32(uint32_t a, uint32_t b, uint32_t* ret)
+static inline bool check_mul_uint32_uint32(uint32_t a, uint32_t b, uint32_t* ret)
 {
     uint64_t tmp = (uint64_t)a * (uint64_t)b;
     *ret = (uint32_t)tmp;
     return check_cast_uint32_uint64(tmp) == 0;
 }
 
-inline uint32_t safe_mul_uint32_int64(uint32_t a, int64_t b)
+static inline uint32_t safe_mul_uint32_int64(uint32_t a, int64_t b)
 {
     int64_t tmp = 0;
 
@@ -1218,7 +1218,7 @@ inline uint32_t safe_mul_uint32_int64(uint32_t a, int64_t b)
     safe_math_fail("safe_math_fail safe_mul_uint32_int64");
 }
 
-inline bool check_mul_uint32_int64(uint32_t a, int64_t b, uint32_t* ret)
+static inline bool check_mul_uint32_int64(uint32_t a, int64_t b, uint32_t* ret)
 {
     int64_t tmp = 0;
 
@@ -1231,7 +1231,7 @@ inline bool check_mul_uint32_int64(uint32_t a, int64_t b, uint32_t* ret)
     return false;
 }
 
-inline uint32_t safe_mul_uint32_uint64(uint32_t a, uint64_t b)
+static inline uint32_t safe_mul_uint32_uint64(uint32_t a, uint64_t b)
 {
     uint64_t tmp = 0;
 
@@ -1243,7 +1243,7 @@ inline uint32_t safe_mul_uint32_uint64(uint32_t a, uint64_t b)
     safe_math_fail("safe_math_fail safe_mul_uint32_uint64");
 }
 
-inline bool check_mul_uint32_uint64(uint32_t a, uint64_t b, uint32_t* ret)
+static inline bool check_mul_uint32_uint64(uint32_t a, uint64_t b, uint32_t* ret)
 {
     uint64_t tmp = 0;
 
@@ -1256,7 +1256,7 @@ inline bool check_mul_uint32_uint64(uint32_t a, uint64_t b, uint32_t* ret)
     return false;
 }
 
-inline int64_t safe_mul_int64_int32(int64_t a, int32_t b)
+static inline int64_t safe_mul_int64_int32(int64_t a, int32_t b)
 {
     int64_t tmp = 0;
 
@@ -1268,7 +1268,7 @@ inline int64_t safe_mul_int64_int32(int64_t a, int32_t b)
     safe_math_fail("safe_math_fail safe_mul_int64_int32");
 }
 
-inline bool check_mul_int64_int32(int64_t a, int32_t b, int64_t* ret)
+static inline bool check_mul_int64_int32(int64_t a, int32_t b, int64_t* ret)
 {
     int64_t tmp = 0;
 
@@ -1281,7 +1281,7 @@ inline bool check_mul_int64_int32(int64_t a, int32_t b, int64_t* ret)
     return false;
 }
 
-inline int64_t safe_mul_int64_uint32(int64_t a, uint32_t b)
+static inline int64_t safe_mul_int64_uint32(int64_t a, uint32_t b)
 {
     int64_t tmp = 0;
 
@@ -1293,7 +1293,7 @@ inline int64_t safe_mul_int64_uint32(int64_t a, uint32_t b)
     safe_math_fail("safe_math_fail safe_mul_int64_uint32");
 }
 
-inline bool check_mul_int64_uint32(int64_t a, uint32_t b, int64_t* ret)
+static inline bool check_mul_int64_uint32(int64_t a, uint32_t b, int64_t* ret)
 {
     int64_t tmp = 0;
 
@@ -1306,7 +1306,7 @@ inline bool check_mul_int64_uint32(int64_t a, uint32_t b, int64_t* ret)
     return false;
 }
 
-inline int64_t safe_mul_int64_int64(int64_t a, int64_t b)
+static inline int64_t safe_mul_int64_int64(int64_t a, int64_t b)
 {
     int64_t tmp = 0;
 
@@ -1318,7 +1318,7 @@ inline int64_t safe_mul_int64_int64(int64_t a, int64_t b)
     safe_math_fail("safe_math_fail safe_mul_int64_int64");
 }
 
-inline bool check_mul_int64_int64(int64_t a, int64_t b, int64_t* ret)
+static inline bool check_mul_int64_int64(int64_t a, int64_t b, int64_t* ret)
 {
     int64_t tmp = 0;
 
@@ -1331,7 +1331,7 @@ inline bool check_mul_int64_int64(int64_t a, int64_t b, int64_t* ret)
     return false;
 }
 
-inline int64_t safe_mul_int64_uint64(int64_t a, uint64_t b)
+static inline int64_t safe_mul_int64_uint64(int64_t a, uint64_t b)
 {
     uint64_t tmp = 0;
 
@@ -1355,7 +1355,7 @@ inline int64_t safe_mul_int64_uint64(int64_t a, uint64_t b)
     safe_math_fail("safe_math_fail safe_mul_int64_uint64");
 }
 
-inline bool check_mul_int64_uint64(int64_t a, uint64_t b, int64_t* ret)
+static inline bool check_mul_int64_uint64(int64_t a, uint64_t b, int64_t* ret)
 {
     uint64_t tmp = 0;
 
@@ -1381,7 +1381,7 @@ inline bool check_mul_int64_uint64(int64_t a, uint64_t b, int64_t* ret)
     return false;
 }
 
-inline uint64_t safe_mul_uint64_int32(uint64_t a, int32_t b)
+static inline uint64_t safe_mul_uint64_int32(uint64_t a, int32_t b)
 {
     uint64_t tmp;
 
@@ -1401,7 +1401,7 @@ inline uint64_t safe_mul_uint64_int32(uint64_t a, int32_t b)
     safe_math_fail("safe_math_fail safe_mul_uint64_int32");
 }
 
-inline bool check_mul_uint64_int32(uint64_t a, int32_t b, uint64_t* ret)
+static inline bool check_mul_uint64_int32(uint64_t a, int32_t b, uint64_t* ret)
 {
     uint64_t tmp;
 
@@ -1425,7 +1425,7 @@ inline bool check_mul_uint64_int32(uint64_t a, int32_t b, uint64_t* ret)
     return false;
 }
 
-inline uint64_t safe_mul_uint64_uint32(uint64_t a, uint32_t b)
+static inline uint64_t safe_mul_uint64_uint32(uint64_t a, uint32_t b)
 {
     uint64_t tmp;
 
@@ -1437,7 +1437,7 @@ inline uint64_t safe_mul_uint64_uint32(uint64_t a, uint32_t b)
     safe_math_fail("safe_math_fail safe_mul_uint64_uint32");
 }
 
-inline bool check_mul_uint64_uint32(uint64_t a, uint32_t b, uint64_t* ret)
+static inline bool check_mul_uint64_uint32(uint64_t a, uint32_t b, uint64_t* ret)
 {
     uint64_t tmp;
 
@@ -1450,7 +1450,7 @@ inline bool check_mul_uint64_uint32(uint64_t a, uint32_t b, uint64_t* ret)
     return false;
 }
 
-inline uint64_t safe_mul_uint64_int64(uint64_t a, int64_t b)
+static inline uint64_t safe_mul_uint64_int64(uint64_t a, int64_t b)
 {
     uint64_t tmp;
 
@@ -1470,7 +1470,7 @@ inline uint64_t safe_mul_uint64_int64(uint64_t a, int64_t b)
     safe_math_fail("safe_math_fail safe_mul_uint64_int64");
 }
 
-inline bool check_mul_uint64_int64(uint64_t a, int64_t b, uint64_t* ret)
+static inline bool check_mul_uint64_int64(uint64_t a, int64_t b, uint64_t* ret)
 {
     uint64_t tmp;
 
@@ -1494,7 +1494,7 @@ inline bool check_mul_uint64_int64(uint64_t a, int64_t b, uint64_t* ret)
     return false;
 }
 
-inline uint64_t safe_mul_uint64_uint64(uint64_t a, uint64_t b)
+static inline uint64_t safe_mul_uint64_uint64(uint64_t a, uint64_t b)
 {
     uint64_t tmp;
 
@@ -1506,12 +1506,12 @@ inline uint64_t safe_mul_uint64_uint64(uint64_t a, uint64_t b)
     safe_math_fail("safe_math_fail safe_mul_uint64_uint64");
 }
 
-inline bool check_mul_uint64_uint64(uint64_t a, uint64_t b, uint64_t* ret)
+static inline bool check_mul_uint64_uint64(uint64_t a, uint64_t b, uint64_t* ret)
 {
     return (MultiplyUint64(a, b, ret) == SAFE_INT_MUL_SUCCESS);
 }
 
-inline int32_t safe_div_int32_int32(int32_t a, int32_t b)
+static inline int32_t safe_div_int32_int32(int32_t a, int32_t b)
 {
     if (b != 0 && !(a == INT32_MIN && b == -1))
     {
@@ -1520,7 +1520,7 @@ inline int32_t safe_div_int32_int32(int32_t a, int32_t b)
     safe_math_fail("safe_math_fail safe_div_int32_int32");
 }
 
-inline bool check_div_int32_int32(int32_t a, int32_t b, int32_t* ret)
+static inline bool check_div_int32_int32(int32_t a, int32_t b, int32_t* ret)
 {
     if (b != 0 && !(a == INT32_MIN && b == -1))
     {
@@ -1530,7 +1530,7 @@ inline bool check_div_int32_int32(int32_t a, int32_t b, int32_t* ret)
     return false;
 }
 
-inline int32_t safe_div_int32_uint32(int32_t a, uint32_t b)
+static inline int32_t safe_div_int32_uint32(int32_t a, uint32_t b)
 {
     if (b != 0)
     {
@@ -1539,7 +1539,7 @@ inline int32_t safe_div_int32_uint32(int32_t a, uint32_t b)
     safe_math_fail("safe_math_fail safe_div_int32_uint32");
 }
 
-inline bool check_div_int32_uint32(int32_t a, uint32_t b, int32_t* ret)
+static inline bool check_div_int32_uint32(int32_t a, uint32_t b, int32_t* ret)
 {
     if (b != 0)
     {
@@ -1550,7 +1550,7 @@ inline bool check_div_int32_uint32(int32_t a, uint32_t b, int32_t* ret)
     return false;
 }
 
-inline int32_t safe_div_int32_int64(int32_t a, int64_t b)
+static inline int32_t safe_div_int32_int64(int32_t a, int64_t b)
 {
     if (b != 0 && !(a == INT32_MIN && b == -1))
     {
@@ -1559,7 +1559,7 @@ inline int32_t safe_div_int32_int64(int32_t a, int64_t b)
     safe_math_fail("safe_math_fail safe_div_int32_int64");
 }
 
-inline bool check_div_int32_int64(int32_t a, int64_t b, int32_t* ret)
+static inline bool check_div_int32_int64(int32_t a, int64_t b, int32_t* ret)
 {
     if (b != 0 && !(a == INT32_MIN && b == -1))
     {
@@ -1570,7 +1570,7 @@ inline bool check_div_int32_int64(int32_t a, int64_t b, int32_t* ret)
     return false;
 }
 
-inline int32_t safe_div_int32_uint64(int32_t a, uint64_t b)
+static inline int32_t safe_div_int32_uint64(int32_t a, uint64_t b)
 {
     if (b == 0)
     {
@@ -1589,7 +1589,7 @@ inline int32_t safe_div_int32_uint64(int32_t a, uint64_t b)
     }
 }
 
-inline bool check_div_int32_uint64(int32_t a, uint64_t b, int32_t* ret)
+static inline bool check_div_int32_uint64(int32_t a, uint64_t b, int32_t* ret)
 {
     if (b == 0)
     {
@@ -1610,7 +1610,7 @@ inline bool check_div_int32_uint64(int32_t a, uint64_t b, int32_t* ret)
     }
 }
 
-inline uint32_t safe_div_uint32_int32(uint32_t a, int32_t b)
+static inline uint32_t safe_div_uint32_int32(uint32_t a, int32_t b)
 {
     // Follow original SafeInt logic for this case
     if (b == 0) // div 0 always a problem
@@ -1640,7 +1640,7 @@ inline uint32_t safe_div_uint32_int32(uint32_t a, int32_t b)
     safe_math_fail("safe_math_fail safe_div_uint32_int32");
 }
 
-inline bool check_div_uint32_int32(uint32_t a, int32_t b, uint32_t* ret)
+static inline bool check_div_uint32_int32(uint32_t a, int32_t b, uint32_t* ret)
 {
     // Follow original SafeInt logic for this case
     if (b == 0) // div 0 always a problem
@@ -1673,7 +1673,7 @@ inline bool check_div_uint32_int32(uint32_t a, int32_t b, uint32_t* ret)
     return false;
 }
 
-inline uint32_t safe_div_uint32_uint32(uint32_t a, uint32_t b)
+static inline uint32_t safe_div_uint32_uint32(uint32_t a, uint32_t b)
 {
     if (b > 0)
     {
@@ -1682,7 +1682,7 @@ inline uint32_t safe_div_uint32_uint32(uint32_t a, uint32_t b)
     safe_math_fail("safe_math_fail safe_div_uint32_uint32");
 }
 
-inline bool check_div_uint32_uint32(uint32_t a, uint32_t b, uint32_t* ret)
+static inline bool check_div_uint32_uint32(uint32_t a, uint32_t b, uint32_t* ret)
 {
     if (b > 0)
     {
@@ -1693,7 +1693,7 @@ inline bool check_div_uint32_uint32(uint32_t a, uint32_t b, uint32_t* ret)
     return false;
 }
 
-inline uint32_t safe_div_uint32_int64(uint32_t a, int64_t b)
+static inline uint32_t safe_div_uint32_int64(uint32_t a, int64_t b)
 {
     // Follow original SafeInt logic for this case
     if (b == 0) // div 0 always a problem
@@ -1723,7 +1723,7 @@ inline uint32_t safe_div_uint32_int64(uint32_t a, int64_t b)
     safe_math_fail("safe_math_fail safe_div_uint32_int64");
 }
 
-inline bool check_div_uint32_int64(uint32_t a, int64_t b, uint32_t* ret)
+static inline bool check_div_uint32_int64(uint32_t a, int64_t b, uint32_t* ret)
 {
     // Follow original SafeInt logic for this case
     if (b == 0) // div 0 always a problem
@@ -1756,7 +1756,7 @@ inline bool check_div_uint32_int64(uint32_t a, int64_t b, uint32_t* ret)
     return false;
 }
 
-inline uint32_t safe_div_uint32_uint64(uint32_t a, uint64_t b)
+static inline uint32_t safe_div_uint32_uint64(uint32_t a, uint64_t b)
 {
     if (b > 0)
     {
@@ -1765,7 +1765,7 @@ inline uint32_t safe_div_uint32_uint64(uint32_t a, uint64_t b)
     safe_math_fail("safe_math_fail safe_div_uint32_uint64");
 }
 
-inline bool check_div_uint32_uint64(uint32_t a, uint64_t b, uint32_t* ret)
+static inline bool check_div_uint32_uint64(uint32_t a, uint64_t b, uint32_t* ret)
 {
     if (b > 0)
     {
@@ -1775,7 +1775,7 @@ inline bool check_div_uint32_uint64(uint32_t a, uint64_t b, uint32_t* ret)
     return false;
 }
 
-inline int64_t safe_div_int64_int32(int64_t a, int32_t b)
+static inline int64_t safe_div_int64_int32(int64_t a, int32_t b)
 {
     if(b == 0 || (b == -1 && a == INT64_MIN))
         safe_math_fail("safe_math_fail safe_div_int64_int32");
@@ -1783,7 +1783,7 @@ inline int64_t safe_div_int64_int32(int64_t a, int32_t b)
     return a / b;
 }
 
-inline bool check_div_int64_int32(int64_t a, int32_t b, int64_t* ret)
+static inline bool check_div_int64_int32(int64_t a, int32_t b, int64_t* ret)
 {
     if (b == 0 || (b == -1 && a == INT64_MIN))
         return false;
@@ -1792,7 +1792,7 @@ inline bool check_div_int64_int32(int64_t a, int32_t b, int64_t* ret)
     return true;
 }
 
-inline int64_t safe_div_int64_uint32(int64_t a, uint32_t b)
+static inline int64_t safe_div_int64_uint32(int64_t a, uint32_t b)
 {
     if (b == 0)
         safe_math_fail("safe_math_fail safe_div_int64_int32");
@@ -1800,7 +1800,7 @@ inline int64_t safe_div_int64_uint32(int64_t a, uint32_t b)
     return a / b;
 }
 
-inline bool check_div_int64_uint32(int64_t a, uint32_t b, int64_t* ret)
+static inline bool check_div_int64_uint32(int64_t a, uint32_t b, int64_t* ret)
 {
     if (b == 0)
         return false;
@@ -1809,7 +1809,7 @@ inline bool check_div_int64_uint32(int64_t a, uint32_t b, int64_t* ret)
     return true;
 }
 
-inline int64_t safe_div_int64_int64(int64_t a, int64_t b)
+static inline int64_t safe_div_int64_int64(int64_t a, int64_t b)
 {
     if (b == 0 || (b == -1 && a == INT64_MIN))
         safe_math_fail("safe_math_fail safe_div_int64_int32");
@@ -1817,7 +1817,7 @@ inline int64_t safe_div_int64_int64(int64_t a, int64_t b)
     return a / b;
 }
 
-inline bool check_div_int64_int64(int64_t a, int64_t b, int64_t* ret)
+static inline bool check_div_int64_int64(int64_t a, int64_t b, int64_t* ret)
 {
     if (b == 0 || (b == -1 && a == INT64_MIN))
         return false;
@@ -1827,7 +1827,7 @@ inline bool check_div_int64_int64(int64_t a, int64_t b, int64_t* ret)
 
 }
 
-inline int64_t safe_div_int64_uint64(int64_t a, uint64_t b)
+static inline int64_t safe_div_int64_uint64(int64_t a, uint64_t b)
 {
     if (b == 0)
         safe_math_fail("safe_math_fail safe_div_int64_int32");
@@ -1845,7 +1845,7 @@ inline int64_t safe_div_int64_uint64(int64_t a, uint64_t b)
     }
 }
 
-inline bool check_div_int64_uint64(int64_t a, uint64_t b, int64_t* ret)
+static inline bool check_div_int64_uint64(int64_t a, uint64_t b, int64_t* ret)
 {
     if (b == 0)
         return false;
@@ -1864,7 +1864,7 @@ inline bool check_div_int64_uint64(int64_t a, uint64_t b, int64_t* ret)
         return true;
 }
 
-inline uint64_t safe_div_uint64_int32(uint64_t a, int32_t b)
+static inline uint64_t safe_div_uint64_int32(uint64_t a, int32_t b)
 {
     // Follow original SafeInt logic for this case
     if (b == 0) // div 0 always a problem
@@ -1894,7 +1894,7 @@ inline uint64_t safe_div_uint64_int32(uint64_t a, int32_t b)
     safe_math_fail("safe_math_fail safe_div_int64_int32");
 }
 
-inline bool check_div_uint64_int32(uint64_t a, int32_t b, uint64_t* ret)
+static inline bool check_div_uint64_int32(uint64_t a, int32_t b, uint64_t* ret)
 {
     // Follow original SafeInt logic for this case
     if (b == 0) // div 0 always a problem
@@ -1927,7 +1927,7 @@ inline bool check_div_uint64_int32(uint64_t a, int32_t b, uint64_t* ret)
     return false;
 }
 
-inline uint64_t safe_div_uint64_uint32(uint64_t a, uint32_t b)
+static inline uint64_t safe_div_uint64_uint32(uint64_t a, uint32_t b)
 {
     if (b != 0)
         return a / b;
@@ -1935,7 +1935,7 @@ inline uint64_t safe_div_uint64_uint32(uint64_t a, uint32_t b)
     safe_math_fail("safe_math_fail safe_div_int64_uint32");
 }
 
-inline bool check_div_uint64_uint32(uint64_t a, uint32_t b, uint64_t* ret)
+static inline bool check_div_uint64_uint32(uint64_t a, uint32_t b, uint64_t* ret)
 {
     if (b != 0)
     {
@@ -1946,7 +1946,7 @@ inline bool check_div_uint64_uint32(uint64_t a, uint32_t b, uint64_t* ret)
     return false;
 }
 
-inline uint64_t safe_div_uint64_int64(uint64_t a, int64_t b)
+static inline uint64_t safe_div_uint64_int64(uint64_t a, int64_t b)
 {
     // Follow original SafeInt logic for this case
     if (b == 0) // div 0 always a problem
@@ -1976,7 +1976,7 @@ inline uint64_t safe_div_uint64_int64(uint64_t a, int64_t b)
     safe_math_fail("safe_math_fail safe_div_int64_int32");
 }
 
-inline bool check_div_uint64_int64(uint64_t a, int64_t b, uint64_t* ret)
+static inline bool check_div_uint64_int64(uint64_t a, int64_t b, uint64_t* ret)
 {
     // Follow original SafeInt logic for this case
     if (b == 0) // div 0 always a problem
@@ -2009,7 +2009,7 @@ inline bool check_div_uint64_int64(uint64_t a, int64_t b, uint64_t* ret)
     return false;
 }
 
-inline uint64_t safe_div_uint64_uint64(uint64_t a, uint64_t b)
+static inline uint64_t safe_div_uint64_uint64(uint64_t a, uint64_t b)
 {
     if (b != 0)
         return a / b;
@@ -2017,7 +2017,7 @@ inline uint64_t safe_div_uint64_uint64(uint64_t a, uint64_t b)
     safe_math_fail("safe_math_fail safe_div_int64_uint32");
 }
 
-inline bool check_div_uint64_uint64(uint64_t a, uint64_t b, uint64_t* ret)
+static inline bool check_div_uint64_uint64(uint64_t a, uint64_t b, uint64_t* ret)
 {
     if (b != 0)
     {
@@ -2028,33 +2028,33 @@ inline bool check_div_uint64_uint64(uint64_t a, uint64_t b, uint64_t* ret)
     return false;
 }
 
-inline int32_t safe_sub_int32_int32(int32_t a, int32_t b)
+static inline int32_t safe_sub_int32_int32(int32_t a, int32_t b)
 {
     int64_t tmp = (int64_t)a - (int64_t)b;
     return safe_cast_int32_int64(tmp);
 }
 
-inline bool check_sub_int32_int32(int32_t a, int32_t b, int32_t* ret)
+static inline bool check_sub_int32_int32(int32_t a, int32_t b, int32_t* ret)
 {
     int64_t tmp = (int64_t)a - (int64_t)b;
     *ret = (int32_t)tmp;
     return check_cast_int32_int64(tmp) == 0;
 }
 
-inline int32_t safe_sub_int32_uint32(int32_t a, uint32_t b)
+static inline int32_t safe_sub_int32_uint32(int32_t a, uint32_t b)
 {
     int64_t tmp = (int64_t)a - (int64_t)b;
     return safe_cast_int32_int64(tmp);
 }
 
-inline bool check_sub_int32_uint32(int32_t a, uint32_t b, int32_t* ret)
+static inline bool check_sub_int32_uint32(int32_t a, uint32_t b, int32_t* ret)
 {
     int64_t tmp = (int64_t)a - (int64_t)b;
     *ret = (int32_t)tmp;
     return check_cast_int32_int64(tmp) == 0;
 }
 
-inline int32_t safe_sub_int32_int64(int32_t a, int64_t b)
+static inline int32_t safe_sub_int32_int64(int32_t a, int64_t b)
 {
     // We have 4 fairly complex cases:
     // lhs positive, rhs positive - rhs could be larger than lhs can represent
@@ -2107,7 +2107,7 @@ inline int32_t safe_sub_int32_int64(int32_t a, int64_t b)
     safe_math_fail("safe_math_fail safe_sub_int32_int64");
 }
 
-inline bool check_sub_int32_int64(int32_t a, int64_t b, int32_t* ret)
+static inline bool check_sub_int32_int64(int32_t a, int64_t b, int32_t* ret)
 {
     // See above for documentation
     int64_t tmp = (int64_t)((uint64_t)a - (uint64_t)b);
@@ -2159,7 +2159,7 @@ inline bool check_sub_int32_int64(int32_t a, int64_t b, int32_t* ret)
     return false;
 }
 
-inline int32_t safe_sub_int32_uint64(int32_t a, uint64_t b)
+static inline int32_t safe_sub_int32_uint64(int32_t a, uint64_t b)
 {
     // We need the absolute value of INT32_MIN
     // This will give it to us without extraneous compiler warnings
@@ -2183,7 +2183,7 @@ inline int32_t safe_sub_int32_uint64(int32_t a, uint64_t b)
     safe_math_fail("safe_math_fail safe_sub_int32_uint64");
 }
 
-inline bool check_sub_int32_uint64(int32_t a, uint64_t b, int32_t* ret)
+static inline bool check_sub_int32_uint64(int32_t a, uint64_t b, int32_t* ret)
 {
     // We need the absolute value of INT32_MIN
     // This will give it to us without extraneous compiler warnings
@@ -2209,20 +2209,20 @@ inline bool check_sub_int32_uint64(int32_t a, uint64_t b, int32_t* ret)
     return false;
 }
 
-inline uint32_t safe_sub_uint32_int32(uint32_t a, int32_t b)
+static inline uint32_t safe_sub_uint32_int32(uint32_t a, int32_t b)
 {
     int64_t tmp = (int64_t)a - (int64_t)b;
     return safe_cast_uint32_int64(tmp);
 }
 
-inline bool check_sub_uint32_int32(uint32_t a, int32_t b, uint32_t* ret)
+static inline bool check_sub_uint32_int32(uint32_t a, int32_t b, uint32_t* ret)
 {
     int64_t tmp = (int64_t)a - (int64_t)b;
     *ret = (uint32_t)tmp;
     return check_cast_uint32_int64(tmp) == 0;
 }
 
-inline uint32_t safe_sub_uint32_uint32(uint32_t a, uint32_t b)
+static inline uint32_t safe_sub_uint32_uint32(uint32_t a, uint32_t b)
 {
     if (a >= b)
         return a - b;
@@ -2230,7 +2230,7 @@ inline uint32_t safe_sub_uint32_uint32(uint32_t a, uint32_t b)
     safe_math_fail("safe_math_fail safe_sub_uint32_uint32");
 }
 
-inline bool check_sub_uint32_uint32(uint32_t a, uint32_t b, uint32_t* ret)
+static inline bool check_sub_uint32_uint32(uint32_t a, uint32_t b, uint32_t* ret)
 {
     if (a >= b)
     {
@@ -2241,7 +2241,7 @@ inline bool check_sub_uint32_uint32(uint32_t a, uint32_t b, uint32_t* ret)
     return false;
 }
 
-inline uint32_t safe_sub_uint32_int64(uint32_t a, int64_t b)
+static inline uint32_t safe_sub_uint32_int64(uint32_t a, int64_t b)
 {
     // must first see if rhs is positive or negative
     if (b >= 0)
@@ -2268,7 +2268,7 @@ inline uint32_t safe_sub_uint32_int64(uint32_t a, int64_t b)
     safe_math_fail("safe_math_fail safe_sub_uint32_int64");
 }
 
-inline bool check_sub_uint32_int64(uint32_t a, int64_t b, uint32_t* ret)
+static inline bool check_sub_uint32_int64(uint32_t a, int64_t b, uint32_t* ret)
 {
     // must first see if rhs is positive or negative
     if (b >= 0)
@@ -2297,7 +2297,7 @@ inline bool check_sub_uint32_int64(uint32_t a, int64_t b, uint32_t* ret)
     return false;
 }
 
-inline uint32_t safe_sub_uint32_uint64(uint32_t a, uint64_t b)
+static inline uint32_t safe_sub_uint32_uint64(uint32_t a, uint64_t b)
 {
     if (a >= b)
         return (uint32_t)(a - b);
@@ -2305,7 +2305,7 @@ inline uint32_t safe_sub_uint32_uint64(uint32_t a, uint64_t b)
     safe_math_fail("safe_math_fail safe_sub_uint32_uint64");
 }
 
-inline bool check_sub_uint32_uint64(uint32_t a, uint64_t b, uint32_t* ret)
+static inline bool check_sub_uint32_uint64(uint32_t a, uint64_t b, uint32_t* ret)
 {
     if (a >= b)
     {
@@ -2315,7 +2315,7 @@ inline bool check_sub_uint32_uint64(uint32_t a, uint64_t b, uint32_t* ret)
     return false;
 }
 
-inline int64_t safe_sub_int64_int32(int64_t a, int32_t b)
+static inline int64_t safe_sub_int64_int32(int64_t a, int32_t b)
 {
     // we have essentially 4 cases:
     //
@@ -2338,7 +2338,7 @@ inline int64_t safe_sub_int64_int32(int64_t a, int32_t b)
     return tmp;
 }
 
-inline bool check_sub_int64_int32(int64_t a, int32_t b, int64_t* ret)
+static inline bool check_sub_int64_int32(int64_t a, int32_t b, int64_t* ret)
 {
     int64_t tmp = (int64_t)((uint64_t)a - (uint64_t)b);
 
@@ -2355,7 +2355,7 @@ inline bool check_sub_int64_int32(int64_t a, int32_t b, int64_t* ret)
     return true;
 }
 
-inline int64_t safe_sub_int64_uint32(int64_t a, uint32_t b)
+static inline int64_t safe_sub_int64_uint32(int64_t a, uint32_t b)
 {
     // lhs is a 64-bit int, rhs unsigned int32 or smaller
     // perform test as unsigned to prevent unwanted optimizations
@@ -2369,7 +2369,7 @@ inline int64_t safe_sub_int64_uint32(int64_t a, uint32_t b)
     safe_math_fail("safe_math_fail safe_sub_int64_int64");
 }
 
-inline bool check_sub_int64_uint32(int64_t a, uint32_t b, int64_t* ret)
+static inline bool check_sub_int64_uint32(int64_t a, uint32_t b, int64_t* ret)
 {
     uint64_t tmp = (uint64_t)a - (uint64_t)b;
 
@@ -2382,7 +2382,7 @@ inline bool check_sub_int64_uint32(int64_t a, uint32_t b, int64_t* ret)
     return false;
 }
 
-inline int64_t safe_sub_int64_int64(int64_t a, int64_t b)
+static inline int64_t safe_sub_int64_int64(int64_t a, int64_t b)
 {
     // we have essentially 4 cases:
     //
@@ -2405,7 +2405,7 @@ inline int64_t safe_sub_int64_int64(int64_t a, int64_t b)
     return tmp;
 }
 
-inline bool check_sub_int64_int64(int64_t a, int64_t b, int64_t* ret)
+static inline bool check_sub_int64_int64(int64_t a, int64_t b, int64_t* ret)
 {
     int64_t tmp = (int64_t)((uint64_t)a - (uint64_t)b);
 
@@ -2422,7 +2422,7 @@ inline bool check_sub_int64_int64(int64_t a, int64_t b, int64_t* ret)
     return true;
 }
 
-inline int64_t safe_sub_int64_uint64(int64_t a, uint64_t b)
+static inline int64_t safe_sub_int64_uint64(int64_t a, uint64_t b)
 {
     // if we subtract, and it gets larger, there's a problem
     // Perform test as unsigned to prevent unwanted optimizations
@@ -2436,7 +2436,7 @@ inline int64_t safe_sub_int64_uint64(int64_t a, uint64_t b)
     safe_math_fail("safe_math_fail safe_sub_int64_uint64");
 }
 
-inline bool check_sub_int64_uint64(int64_t a, uint64_t b, int64_t* ret)
+static inline bool check_sub_int64_uint64(int64_t a, uint64_t b, int64_t* ret)
 {
     uint64_t tmp = (uint64_t)a - b;
     *ret = (int64_t)tmp;
@@ -2444,7 +2444,7 @@ inline bool check_sub_int64_uint64(int64_t a, uint64_t b, int64_t* ret)
     return ((int64_t)tmp <= a);
 }
 
-inline uint64_t safe_sub_uint64_int32(uint64_t a, int32_t b)
+static inline uint64_t safe_sub_uint64_int32(uint64_t a, int32_t b)
 {
     // lhs is an uint64_t, rhs signed
     // must first see if rhs is positive or negative
@@ -2468,7 +2468,7 @@ inline uint64_t safe_sub_uint64_int32(uint64_t a, int32_t b)
     safe_math_fail("safe_math_fail safe_sub_uint64_int32");
 }
 
-inline bool check_sub_uint64_int32(uint64_t a, int32_t b, uint64_t* ret)
+static inline bool check_sub_uint64_int32(uint64_t a, int32_t b, uint64_t* ret)
 {
     if (b >= 0)
     {
@@ -2494,7 +2494,7 @@ inline bool check_sub_uint64_int32(uint64_t a, int32_t b, uint64_t* ret)
     return false;
 }
 
-inline uint64_t safe_sub_uint64_uint32(uint64_t a, uint32_t b)
+static inline uint64_t safe_sub_uint64_uint32(uint64_t a, uint32_t b)
 {
     uint64_t tmp = a - b;
 
@@ -2504,14 +2504,14 @@ inline uint64_t safe_sub_uint64_uint32(uint64_t a, uint32_t b)
     safe_math_fail("safe_math_fail safe_sub_uint64_uint32");
 }
 
-inline bool check_sub_uint64_uint32(uint64_t a, uint32_t b, uint64_t* ret)
+static inline bool check_sub_uint64_uint32(uint64_t a, uint32_t b, uint64_t* ret)
 {
     uint64_t tmp = a - b;
     *ret = tmp;
     return (tmp <= a);
 }
 
-inline uint64_t safe_sub_uint64_int64(uint64_t a, int64_t b)
+static inline uint64_t safe_sub_uint64_int64(uint64_t a, int64_t b)
 {
     uint64_t result = 0;
 
@@ -2535,7 +2535,7 @@ inline uint64_t safe_sub_uint64_int64(uint64_t a, int64_t b)
     safe_math_fail("safe_math_fail safe_sub_uint64_int64");
 }
 
-inline bool check_sub_uint64_int64(uint64_t a, int64_t b, uint64_t* ret)
+static inline bool check_sub_uint64_int64(uint64_t a, int64_t b, uint64_t* ret)
 {
     uint64_t result = 0;
 
@@ -2563,7 +2563,7 @@ inline bool check_sub_uint64_int64(uint64_t a, int64_t b, uint64_t* ret)
     return false;
 }
 
-inline uint64_t safe_sub_uint64_uint64(uint64_t a, uint64_t b)
+static inline uint64_t safe_sub_uint64_uint64(uint64_t a, uint64_t b)
 {
     uint64_t tmp = a - b;
 
@@ -2573,7 +2573,7 @@ inline uint64_t safe_sub_uint64_uint64(uint64_t a, uint64_t b)
     safe_math_fail("safe_math_fail safe_sub_uint64_uint64");
 }
 
-inline bool check_sub_uint64_uint64(uint64_t a, uint64_t b, uint64_t* ret)
+static inline bool check_sub_uint64_uint64(uint64_t a, uint64_t b, uint64_t* ret)
 {
     uint64_t tmp = a - b;
     *ret = tmp;
