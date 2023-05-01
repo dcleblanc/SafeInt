@@ -1,0 +1,42 @@
+[
+  {
+    "Id": "40572",
+    "Title": "Shouldn't implicit conversion to a built-in type be checked at compile time?",
+    "LatestDate": "2008-11-29T13:07:20.893-08:00"
+  },
+  {
+    "Id": "41098",
+    "Title": "Overloading operator &",
+    "LatestDate": "2008-12-01T14:42:49.853-08:00"
+  },
+  {
+    "Id": "59376",
+    "Title": "SafeInt shipped with Visual C++ 2010 beta",
+    "LatestDate": "2009-06-21T04:37:16.417-07:00"
+  },
+  {
+    "Id": "60193",
+    "Title": "SafeInt at Boost?",
+    "LatestDate": "2011-09-25T14:57:01.043-07:00"
+  },
+  {
+    "Id": "82177",
+    "Title": "SafeInt with double",
+    "LatestDate": "2010-01-28T13:46:09.773-08:00"
+  },
+  {
+    "Id": "216022",
+    "Title": "Why no assembly?",
+    "LatestDate": "2010-06-15T10:08:03.72-07:00"
+  },
+  {
+    "Id": "578321",
+    "Title": "How do I get SafeInt to work with boost::format?",
+    "LatestDate": "2015-03-13T19:25:13.187-07:00"
+  },
+  {
+    "Id": "651967",
+    "Title": "SafeInt strategy for implicit cast to larger type",
+    "LatestDate": "2016-03-18T08:52:43.627-07:00"
+  }
+]

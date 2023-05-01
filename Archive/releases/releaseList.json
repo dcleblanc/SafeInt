@@ -1,0 +1,281 @@
+[
+  {
+    "Id": "0",
+    "Name": "SafeInt 3.0.17",
+    "DevelopmentStatus": "Stable",
+    "Description": "See home page for extended comments on differences between 3.0.17 and 3.0.16. This release passes all the internal verification tests, but has not yet been validated against all of the compilers we support. It does address the issues reported by John Regehr as of today. Once it has been verified against all of the compilers, and has been verified not to emit more warnings, we'll move it to stable.\n\nVery minor update from last night - added LL and ULL 3 places to remove a few warnings.\n\n12/18/12 - Updated to normalize whitespace. No functional changes.",
+    "ReleasedDatge": "0001-01-01T00:00:00",
+    "ModifiedDate": "2012-12-18T14:48:48.613-08:00",
+    "Files": [
+      {
+        "Id": "fe9e5f68-e87c-4d06-99ba-38e251685ee3",
+        "FileName": "stl4.txt",
+        "Url": "./0/fe9e5f68-e87c-4d06-99ba-38e251685ee3",
+        "Type": "Source Code",
+        "UploadDate": "2012-12-18T14:48:38.643-08:00"
+      }
+    ]
+  },
+  {
+    "Id": "1",
+    "Name": "SafeInt 3.0.16",
+    "DevelopmentStatus": "Stable",
+    "Description": "Latest version - see home page for details.\n\nNote - updated as of 8/9/11 to remove some unneeded defines.\n8/10/11 - tweaked the decision making around defining nullptr to make it more automatic",
+    "ReleasedDatge": "0001-01-01T00:00:00",
+    "ModifiedDate": "2011-08-10T10:38:45.86-07:00",
+    "Files": [
+      {
+        "Id": "26d0fa7b-f435-4473-9fcd-cca79df26a2b",
+        "FileName": "SafeInt3.hpp",
+        "Url": "./1/26d0fa7b-f435-4473-9fcd-cca79df26a2b",
+        "Type": "Application",
+        "UploadDate": "2011-08-10T10:38:40.627-07:00"
+      }
+    ]
+  },
+  {
+    "Id": "2",
+    "Name": "SafeInt Runtime Tests - 3.0.15",
+    "DevelopmentStatus": "Stable",
+    "Description": "This release contains the runtime tests for SafeInt. \n\nWhen run, it should output:\n\nVerifying Multiplication:\nVerifying Division:\nVerifying Subtraction:\n...\n\nIf it prints \"Error in case ...\", then there's a problem.\n\nThese tests have been validated as of SafeInt version 3.0.15. You will also require SafeInt3.hpp in order to compile.\n\nNote - compiles with zero warnings at /Wall on Visual Studio 2010. We're working towards few to no warnings on gcc as well.\n\nMany thanks to Jeffrey Walton of OWASP for completing MultVerify, DivVerify, and adding the addition, subtraction, increment/decrement and modulus checks. His subtraction test suite found an actual runtime bug in the case of unsigned __int64, signed __int64 when the signed portion is negative.\n\nUpdate - 7/31 - added increment/decrement checks.",
+    "ReleasedDatge": "0001-01-01T00:00:00",
+    "ModifiedDate": "2011-07-31T11:42:54.997-07:00",
+    "Files": [
+      {
+        "Id": "03341531-4469-41de-828a-99296ce6da81",
+        "FileName": "AddVerify.cpp",
+        "Url": "./2/03341531-4469-41de-828a-99296ce6da81",
+        "Type": "Source Code",
+        "UploadDate": "2011-07-30T18:08:08.247-07:00"
+      },
+      {
+        "Id": "cf02261f-f677-4d91-bf29-0874dddb235d",
+        "FileName": "DivVerify.cpp",
+        "Url": "./2/cf02261f-f677-4d91-bf29-0874dddb235d",
+        "Type": "Source Code",
+        "UploadDate": "2011-07-30T18:08:08.277-07:00"
+      },
+      {
+        "Id": "897eb476-1995-4424-9e49-61735c4d4cc9",
+        "FileName": "ModVerify.cpp",
+        "Url": "./2/897eb476-1995-4424-9e49-61735c4d4cc9",
+        "Type": "Source Code",
+        "UploadDate": "2011-07-30T18:08:08.373-07:00"
+      },
+      {
+        "Id": "6d6d4169-7710-4b61-ab85-2d174bdfe42e",
+        "FileName": "MultVerify.cpp",
+        "Url": "./2/6d6d4169-7710-4b61-ab85-2d174bdfe42e",
+        "Type": "Source Code",
+        "UploadDate": "2011-07-30T18:08:08.387-07:00"
+      },
+      {
+        "Id": "000863be-1862-4547-8b24-ea5b02f4a3ac",
+        "FileName": "SubVerify.cpp",
+        "Url": "./2/000863be-1862-4547-8b24-ea5b02f4a3ac",
+        "Type": "Source Code",
+        "UploadDate": "2011-07-30T18:08:08.387-07:00"
+      },
+      {
+        "Id": "aded0b28-e3c0-4388-90fb-c81beb02a4af",
+        "FileName": "TestMain.cpp",
+        "Url": "./2/aded0b28-e3c0-4388-90fb-c81beb02a4af",
+        "Type": "Source Code",
+        "UploadDate": "2011-07-31T11:42:49.53-07:00"
+      },
+      {
+        "Id": "90bdd0ec-2af5-4daf-8b16-a03a87da4b93",
+        "FileName": "TestMain.h",
+        "Url": "./2/90bdd0ec-2af5-4daf-8b16-a03a87da4b93",
+        "Type": "Source Code",
+        "UploadDate": "2011-07-31T11:42:49.543-07:00"
+      },
+      {
+        "Id": "a6a8e446-991c-4780-bffb-c27c962c4425",
+        "FileName": "IncDecVerify.cpp",
+        "Url": "./2/a6a8e446-991c-4780-bffb-c27c962c4425",
+        "Type": "Source Code",
+        "UploadDate": "2011-07-31T11:42:49.497-07:00"
+      }
+    ]
+  },
+  {
+    "Id": "3",
+    "Name": "SafeInt 3.0.15",
+    "DevelopmentStatus": "Stable",
+    "Description": "This release contains several updates that make it work properly with 64-bit gcc, and also contains several fixes that will reduce the warning count on gcc - unimportant warnings were suppressed for the Microsoft compiler, but not for gcc.\n\nNotable changes - \nSome refactoring was done to eliminate compile-time constant conditionals in the various corner case methods, such as division by a SafeInt.\nMore spots were found where I had over-specified the function argument when the template specialization implied a 64-bit int of some type. These issues occur because 64-bit gcc has 64-bit longs. (Thanks Ahmed for the additional testing).\n\nThe test harness has been greatly extended - many thanks to Jeffrey Walton, and a runtime bug has been found (and corrected) in unsigned __int64, signed __int64 cases where the signed int is negative.\n\nFuture directions - I suspect there will be more warning reduction work needed on gcc, and there should be throw() annotations that understand whether we're throwing C++ exceptions, or doing something else. If we're throwing Win32 exceptions, or terminating the app, then SafeInt can be properly used in non-throwing methods without causing warnings.\n\nUpdate - 7/25 - \nFixed extra typename instances that didn't annoy Visual Studio, but did annoy gcc. (More thanks to Ahmed)\nGot rid of yet more warnings.\nFolded SafeIntGcc.hpp into SafeInt3.hpp.\nAdded a C_ASSERT to ensure that we're really dealing with 2's complement negative numbers.\n\nAn issue that has come up is that gcc might decide at least some of the time that it can optimize away signed integer overflow checks. The source has been reviewed, and most of the addition template specializations are not affected due to a general approach of upcasting, and then checking for the result being out of bounds. Some of them may need to be checked, and we'll try to create repro scenarios. If there are cases that repro, two things will happen - the first is that an update to the runtime checks will be made to cause them to fail if the compiler is optimizing away the checks. The second is that we'll attempt to rewrite them in terms of unsigned numbers, which they won't optimize away. Stay tuned - 3.0.16 may be coming soon.",
+    "ReleasedDatge": "0001-01-01T00:00:00",
+    "ModifiedDate": "2011-07-30T18:12:33.927-07:00",
+    "Files": [
+      {
+        "Id": "f2e38baa-c9b6-43cf-9c54-0664c7f8152d",
+        "FileName": "SafeInt3.hpp",
+        "Url": "./3/f2e38baa-c9b6-43cf-9c54-0664c7f8152d",
+        "Type": "Source Code",
+        "UploadDate": "2011-07-30T18:12:28.927-07:00"
+      },
+      {
+        "Id": "b214ba78-4429-435e-b70b-3cb7b467dcca",
+        "FileName": "SafeIntTest.cpp",
+        "Url": "./3/b214ba78-4429-435e-b70b-3cb7b467dcca",
+        "Type": "Source Code",
+        "UploadDate": "2011-07-24T17:16:28.467-07:00"
+      }
+    ]
+  },
+  {
+    "Id": "4",
+    "Name": "SafeInt 3.0.14",
+    "DevelopmentStatus": "Stable",
+    "Description": "This release adds 64-bit intrinsic function support for the Microsoft x64 compiler, which makes 64-bit multiplication code much smaller and presumably faster. If something like intrinsics (e.g., _mul128) exist for gcc that we can use, please let me know, and I'll work on adding them.\n\nIt also corrects one more typo in the ill-fated 3.0.13 release that prevents it from compiling for one specific multiplication operation.\n\nRemaining known work items:\n\n1) Last time I checked, the version of gcc required by Apple didn't have sufficiently compliant template support, and won't compile. I need to merge in the changes that remove portions of the class so it will compile.\n\n2) We should have a more comprehensive and thorough test harness for all other operations.\n\nFiles:\n\nSafeInt3.hpp - the main int overflow class\nSafeIntGcc.hpp - a header used to get SafeInt3.hpp compiling on gcc 4.3.2 and later\nSafeIntTest.cpp - contains the compile-time sanity checks \nTestMain.cpp - Calls main() for the run-time sanity checks\nMultVerify.cpp - checks 64-bit multiplication operations for both throwing and non-throwing implementations\n\nVersion History:\n3.0.13 - contains fixes where some template specializations were overly specialized, which caused problems for the gcc x64 compiler. Also contains a fix for a runtime bug where (int)-1 * (unsigned __int64)0x80000000 failed when it should not have.\n3.0.12 - Public branch from the original code that is used internally at Microsoft, numerous fixes needed because the gcc comiler is picky about different things than the Microsoft compiler.",
+    "ReleasedDatge": "0001-01-01T00:00:00",
+    "ModifiedDate": "2011-07-30T18:13:03.287-07:00",
+    "Files": [
+      {
+        "Id": "038b6928-a51e-48dd-8e6b-9534faf54dd8",
+        "FileName": "safeint3.hpp",
+        "Url": "./4/038b6928-a51e-48dd-8e6b-9534faf54dd8",
+        "Type": "Source Code",
+        "UploadDate": "2010-02-15T17:17:22.49-08:00"
+      },
+      {
+        "Id": "83b0f314-6f72-4738-8d60-4b92b833afd4",
+        "FileName": "MultVerify.cpp",
+        "Url": "./4/83b0f314-6f72-4738-8d60-4b92b833afd4",
+        "Type": "Source Code",
+        "UploadDate": "2010-02-15T17:17:22.523-08:00"
+      },
+      {
+        "Id": "c6f2c27e-20fa-42c8-bb90-6aafa4bf57b2",
+        "FileName": "TestMain.cpp",
+        "Url": "./4/c6f2c27e-20fa-42c8-bb90-6aafa4bf57b2",
+        "Type": "Source Code",
+        "UploadDate": "2010-02-15T17:17:22.537-08:00"
+      },
+      {
+        "Id": "50be700f-8bf2-405c-b754-9c7b5cf876e4",
+        "FileName": "SafeIntTest.cpp",
+        "Url": "./4/50be700f-8bf2-405c-b754-9c7b5cf876e4",
+        "Type": "Source Code",
+        "UploadDate": "2010-02-15T17:17:22.537-08:00"
+      },
+      {
+        "Id": "750f638f-6b97-4690-b2a8-be10d1b6d691",
+        "FileName": "SafeIntGcc.hpp",
+        "Url": "./4/750f638f-6b97-4690-b2a8-be10d1b6d691",
+        "Type": "Source Code",
+        "UploadDate": "2010-02-15T17:17:22.553-08:00"
+      }
+    ]
+  },
+  {
+    "Id": "5",
+    "Name": "SafeInt 3.0.13",
+    "DevelopmentStatus": "Stable",
+    "Description": "This version of SafeInt corrects a problem where various partial specializations dealing with 64-bit ints were over-specified. The error was that the method enum was forcing the parameter to an __int64 or unsigned __int64, but the specialization still required an __int64. This isn't an issue on the Microsoft compiler where 'long long' == __int64, but on the gcc compiler, you could have long, long long, or long int, which are all really __int64, but the compiler sees it as different types. This is actually an improvement - makes the code more flexible and correct overall.\n\nFor example:\n\nThis implies that T == unsigned __int64, U == unsigned __int64 (or equivalent)\ntemplate < > class MultiplicationHelper< unsigned __int64, unsigned __int64, MultiplicationState_Uint64Uint64 >\n\nThis is the fixed version - we didn't need to restrict T, U to just unsigned __int64\ntemplate < typename T, typename U > class MultiplicationHelper< T, U, MultiplicationState_Uint64Uint64 >\n\nNote - updated as of 2/9 to fix typo that was causing it not to compile, but it looks like I'm the only one downloading it, so...\n\nPerhaps 13 is really an unlucky number - fixed a 2nd typo, and apparently somehow lost all my intrinsics changes on my home dev box. I'll do that on 3.0.14, coming shortly\n\nThe verification class is complete, but it did catch one bug - repro looks like this:\n\nSafeInt<int> si(-1);\n\nsi *= (unsigned __int64)0x80000000;\n\nShould succeed, previously would fail.\n\n\n\nVersion 3.0.12p release notes - \n\nThis release fixes the issues reported by Niels Dekker regarding standards compliance, as well as fixes for the floating point operators.\n\nIt also adds support for gcc 4.3.2, and creates the start of a test harness.\n\n12/3/08 - Uploaded new copy of SafeIntTest.cpp - there was a typo on one of the lines that amazingly enough actually compiled. Still compiles, so no harm done.\n\nNote - Seems that the MacOS gcc may not be the most current, and this does not compile correctly on MacOS. Seems to get confused by:\n\nSafeInt<T>& operator %=(SafeInt<U> su)\nand \nU operator %=(SafeInt<T>)\n\nwhen supplied with 2 SafeInts, despite the fact that the first is an exact match. We may be able to get it working by removing some operators.\n\nAdditionally, I've created SafeIntGcc.hpp, which needs to be included before SafeInt3.hpp. It is used to set up #defines to allow use of int8, int16, int32 and int64, which are all Microsoft-specific. \n\nThe Microsoft compiler is also happy with ptrdifft, where gcc on Linux seems to want <cstddef> included, and gcc also doesn't seem to natively know about intptrt or uintptr_t - there could be better ways to get these set up than what I've done here.\n\nThe compile test harness now effectively compiles every method using every appropriate combination of types. Some minor tweaks had to be made to make gcc happy with various things, but runtime behavior has not been changed.\n\nTwo elements of the test harness remain to be created:\n1) Test all of the enums used for partial template specialization to ensure full coverage. This has been done in the internal Microsoft test harness, but an external version should be created in case someone wants to branch the code.\n2) Full runtime checking of all operations. This is a large work item.\n\nBecause there is now full compile-time coverage under gcc, this is now getting moved to released stage.",
+    "ReleasedDatge": "0001-01-01T00:00:00",
+    "ModifiedDate": "2010-02-12T17:27:46.353-08:00",
+    "Files": [
+      {
+        "Id": "2a0d436e-0983-4178-8833-1a5fe7c20826",
+        "FileName": "safeint3.hpp",
+        "Url": "./5/2a0d436e-0983-4178-8833-1a5fe7c20826",
+        "Type": "Application",
+        "UploadDate": "2010-02-12T17:27:44.807-08:00"
+      },
+      {
+        "Id": "e4d7ceeb-f3e8-4aa6-b201-90136e4d96d9",
+        "FileName": "TestMain.cpp",
+        "Url": "./5/e4d7ceeb-f3e8-4aa6-b201-90136e4d96d9",
+        "Type": "Application",
+        "UploadDate": "2010-02-12T15:39:34.243-08:00"
+      },
+      {
+        "Id": "110a5919-51ac-4c8c-a2a9-44dfdace7130",
+        "FileName": "MultVerify.cpp",
+        "Url": "./5/110a5919-51ac-4c8c-a2a9-44dfdace7130",
+        "Type": "Application",
+        "UploadDate": "2010-02-12T15:39:34.26-08:00"
+      },
+      {
+        "Id": "50eb19e5-a7d4-4e92-bbbc-6c181a7efbc1",
+        "FileName": "SafeIntTest.cpp",
+        "Url": "./5/50eb19e5-a7d4-4e92-bbbc-6c181a7efbc1",
+        "Type": "Source Code",
+        "UploadDate": "2010-02-12T15:48:43.41-08:00"
+      },
+      {
+        "Id": "e70cf0f8-8430-418a-9b08-67a883a83b09",
+        "FileName": "SafeIntGcc.hpp",
+        "Url": "./5/e70cf0f8-8430-418a-9b08-67a883a83b09",
+        "Type": "Source Code",
+        "UploadDate": "2010-02-12T15:48:43.427-08:00"
+      }
+    ]
+  },
+  {
+    "Id": "6",
+    "Name": "SafeInt 3.0.12p",
+    "DevelopmentStatus": "Stable",
+    "Description": "This release fixes the issues reported by Niels Dekker regarding standards compliance, as well as fixes for the floating point operators.\n\nIt also adds support for gcc 4.3.2, and creates the start of a test harness.\n\n12/3/08 - Uploaded new copy of SafeIntTest.cpp - there was a typo on one of the lines that amazingly enough actually compiled. Still compiles, so no harm done.\n\nNote - Seems that the MacOS gcc may not be the most current, and this does not compile correctly on MacOS. Seems to get confused by:\n\nSafeInt<T>& operator %=(SafeInt<U> su)\nand \nU operator %=(SafeInt<T>)\n\nwhen supplied with 2 SafeInts, despite the fact that the first is an exact match. We may be able to get it working by removing some operators.\n\nAdditionally, I've created SafeIntGcc.hpp, which needs to be included before SafeInt3.hpp. It is used to set up #defines to allow use of __int8, __int16, __int32 and __int64, which are all Microsoft-specific. \n\nThe Microsoft compiler is also happy with ptrdiff_t, where gcc on Linux seems to want <cstddef> included, and gcc also doesn't seem to natively know about intptr_t or uintptr_t - there could be better ways to get these set up than what I've done here.\n\nThe compile test harness now effectively compiles every method using every appropriate combination of types. Some minor tweaks had to be made to make gcc happy with various things, but runtime behavior has not been changed.\n\nTwo elements of the test harness remain to be created:\n  1) Test all of the enums used for partial template specialization to ensure full coverage. This has been done in the internal Microsoft test harness, but an external version should be created in case someone wants to branch the code.\n  2) Full runtime checking of all operations. This is a large work item.\n\nBecause there is now full compile-time coverage under gcc, this is now getting moved to released stage.",
+    "ReleasedDatge": "0001-01-01T00:00:00",
+    "ModifiedDate": "2008-12-04T00:14:47.45-08:00",
+    "Files": [
+      {
+        "Id": "4b80d0fc-4d0d-47bf-ac51-a347230ac093",
+        "FileName": "SafeInt3.hpp",
+        "Url": "./6/4b80d0fc-4d0d-47bf-ac51-a347230ac093",
+        "Type": "Source Code",
+        "UploadDate": "2008-11-30T13:45:22.287-08:00"
+      },
+      {
+        "Id": "fe83b094-b551-4eba-8826-f0a0a7e0c231",
+        "FileName": "SafeIntTest.cpp",
+        "Url": "./6/fe83b094-b551-4eba-8826-f0a0a7e0c231",
+        "Type": "Source Code",
+        "UploadDate": "2008-12-04T00:14:47.137-08:00"
+      },
+      {
+        "Id": "954bf457-6293-4257-a27e-7a4bbdd1274e",
+        "FileName": "SafeIntGcc.hpp",
+        "Url": "./6/954bf457-6293-4257-a27e-7a4bbdd1274e",
+        "Type": "Source Code",
+        "UploadDate": "2008-11-23T14:10:59.16-08:00"
+      }
+    ]
+  },
+  {
+    "Id": "7",
+    "Name": "SafeInt 3.0.11",
+    "DevelopmentStatus": "Stable",
+    "Description": "The most current release version of SafeInt. If you need gcc support, version 3.0.12 (see Planned releases) provides that, but it hasn't been thoroughly verified.",
+    "ReleasedDatge": "0001-01-01T00:00:00",
+    "ModifiedDate": "2008-11-23T17:11:05.75-08:00",
+    "Files": [
+      {
+        "Id": "92d4435c-7f82-428f-9df1-e19034e89ff0",
+        "FileName": "safeint3.hpp",
+        "Url": "./7/92d4435c-7f82-428f-9df1-e19034e89ff0",
+        "Type": "Source Code",
+        "UploadDate": "2008-09-30T13:27:56.4-07:00"
+      }
+    ]
+  },
+  {
+    "Id": "8",
+    "Name": "SafeInt 3.0.18",
+    "DevelopmentStatus": "Stable",
+    "Description": "I haven't completed moving the code, but this project will be moving to:\n\nhttps://github.com/dcleblanc/SafeInt\n\n\nThis release provides more complete support for both clang and gcc, as well as beginning to use some C++11 features.\n\nIt compiles cleanly at:\n\nVisual Studio - /Wall\ngcc - /Wall\nclang -Weverything\n\nSubstantial work has been done to ensure that all three top-tier compilers work well, and the conditional compilations only apply to the intended compiler.\n\nA compromise was made to allow an enum type to be used as an argument to a SafeInt instance - if type_traits is included, that is now used to determine if something is an int or an enum.\n\nIn addition, people doing cross-platform work may have encountered some difficulties due to the Visual Studio version of SafeInt being somewhat different than this version. This new version can be used as a drop-in replacement for the Visual Studio version with just a few defines set. I would encourage users to standardize on the CodePlex version going forward.\n\nUpdates from previous beta version:\n\n1) clang will sometimes pretend to be either Visual Studio and/or gcc, so check it first, then gcc, and finally Visual Studio, which never pretends to be clang.\n\n2) Allow the conditional throw decoration to be more configurable until we full support conditional noexcept.\n\nVery minor updates to allow better attribute marking on gcc and clang.\n\nMany thanks to Tomasz Kukielka for all of his help with this update.",
+    "ReleasedDatge": "0001-01-01T00:00:00",
+    "ModifiedDate": "2017-10-23T15:01:29.433-07:00",
+    "Files": [
+      {
+        "Id": "05b0d609-4839-4737-b75d-8e1aeb7846f0",
+        "FileName": "SafeInt3.hpp",
+        "Url": "./8/05b0d609-4839-4737-b75d-8e1aeb7846f0",
+        "Type": "Source Code",
+        "UploadDate": "2014-12-03T15:15:38.887-08:00"
+      }
+    ]
+  }
+]

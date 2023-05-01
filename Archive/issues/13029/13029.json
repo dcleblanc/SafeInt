@@ -1,0 +1,50 @@
+{
+  "WorkItem": {
+    "AffectedComponent": {
+      "Name": "",
+      "DisplayName": ""
+    },
+    "ClosedComment": "",
+    "ClosedDate": null,
+    "CommentCount": 0,
+    "Custom": null,
+    "Description": "VS 2010 gives a linker error:\n \nError\t95\terror LNK2005: \"bool __cdecl IntrinsicMultiplyUint64(unsigned __int64 const &,unsigned __int64 const &,unsigned __int64 *)\" (?IntrinsicMultiplyUint64@@YA_NAEB_K0PEA_K@Z) already defined in...\n \nAdding \"inline\" to those function definitions resolves the errors.",
+    "LastUpdatedDate": "2013-02-13T18:31:03.84-08:00",
+    "PlannedForRelease": "",
+    "ReleaseVisibleToPublic": false,
+    "Priority": {
+      "Name": "Low",
+      "Severity": 50,
+      "Id": 1
+    },
+    "ProjectName": "SafeInt",
+    "ReportedDate": "2011-02-16T12:40:52.14-08:00",
+    "Status": {
+      "Name": "Proposed",
+      "Id": 1
+    },
+    "ReasonClosed": {
+      "Name": "Unassigned"
+    },
+    "Summary": "IntrinsicMultiplyUint64 and IntrinsicMultiplyInt64 missing \"inline\" keyword",
+    "Type": {
+      "Name": "Issue",
+      "Id": 3
+    },
+    "VoteCount": 1,
+    "Id": 13029
+  },
+  "FileAttachments": [],
+  "Comments": [
+    {
+      "Message": "I'll get this fixed in 3.0.15 - thanks for reporting it.",
+      "PostedDate": "2011-03-22T11:24:12.78-07:00",
+      "Id": -2147483648
+    },
+    {
+      "Message": "",
+      "PostedDate": "2013-02-13T18:31:03.84-08:00",
+      "Id": -2147483648
+    }
+  ]
+}

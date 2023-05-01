@@ -1,0 +1,45 @@
+{
+  "WorkItem": {
+    "AffectedComponent": {
+      "Name": "",
+      "DisplayName": ""
+    },
+    "ClosedComment": "",
+    "ClosedDate": null,
+    "CommentCount": 0,
+    "Custom": null,
+    "Description": "The following code produces an overflow but doesn't throw:\n\n```\nSafeInt<int64_t> v = pow(2.0, 63.0);\n```\n\nFor an explanation, see <http://stackoverflow.com/a/30424410/1956010>",
+    "LastUpdatedDate": "2016-12-01T16:24:04.227-08:00",
+    "PlannedForRelease": "",
+    "ReleaseVisibleToPublic": false,
+    "Priority": {
+      "Name": "Unassigned",
+      "Severity": 0,
+      "Id": 0
+    },
+    "ProjectName": "SafeInt",
+    "ReportedDate": "2016-06-06T12:07:21.883-07:00",
+    "Status": {
+      "Name": "Proposed",
+      "Id": 1
+    },
+    "ReasonClosed": {
+      "Name": "Unassigned"
+    },
+    "Summary": "SafeInt<int64_t> v = pow(2.0, 63.0) doesn't throw",
+    "Type": {
+      "Name": "Unassigned",
+      "Id": 5
+    },
+    "VoteCount": 1,
+    "Id": 17676
+  },
+  "FileAttachments": [],
+  "Comments": [
+    {
+      "Message": "My apologies for not noticing this earlier. Here's the problem - as noted in the stackoverflow comment INT_MAX and INT_MIN (for 64-bit) don't have exact representations. The double returned by pow is this:\r\n\r\n9.2233720368547758e+18\r\n\r\nIn this code - SafeCastHelper < T, U, CastFromFloat > we have:\r\n\r\n        if( u <= (U)IntTraits< T >::maxInt &&\n            u >= (U)IntTraits< T >::minInt )\r\n\r\nwhich succeeds. Now if we look at IntTraits< T >::maxInt, which is 0x7fffffffffffffff, that's \r\n\r\n9223372036854775807\r\n\r\nNotice that the double has truncated the '07' off the end because of precision loss. This means that you're feeding a value in that's actually less than the range of an int64. To be clear, you're exercising an untested corner case - the support for floating point is really just a best effort.\r\n\r\nWhen we perform the test, we cast back to double, which could put us in trouble - we have this - \nu <= (U)IntTraits< T >::maxInt\r\n\r\nBut it tests out as equal, and so we do what seems to be the right thing, and then we try to cast it to type T, and it comes out as negative! This is certainly _not_ by design.\r\n\r\nThis then goes and causes the following assembly:\r\n\r\n00007FF7F2B617DE  cvttsd2si   rax,mmword ptr [u]  \n00007FF7F2B617E7  mov         rcx,qword ptr [t]  \n00007FF7F2B617EE  mov         qword ptr [rcx],rax  \r\n\r\nSo it looks to me like the cvttsd2si instruction is not behaving as one would expect - it is documented as truncating, but it is not documented as changing sign. If you go bigger than this exact value, then it behaves as expected, and will throw.\r\n\r\nYour suggestion of doing this:\r\n\r\nif (!(my_double >= -9223372036854775808.0   // -2^63\n   && my_double <   9223372036854775808.0)  // 2^63\r\n\r\nis a good one, and I'll update the class to use that type of comparison to avoid the problem.\r\n\r\n",
+      "PostedDate": "2016-12-01T16:24:04.227-08:00",
+      "Id": -2147483648
+    }
+  ]
+}

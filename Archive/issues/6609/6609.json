@@ -1,0 +1,60 @@
+{
+  "WorkItem": {
+    "AffectedComponent": {
+      "Name": "",
+      "DisplayName": ""
+    },
+    "ClosedComment": "",
+    "ClosedDate": null,
+    "CommentCount": 0,
+    "Custom": null,
+    "Description": "Hello David,\n \na great piece of work you've done here, congratulations. A thing though that I'm missing are the unit tests for all that code (I'm certain you've got these). The reason I'm asking is that I'd like to use it on WinCE platforms too (with CPUs like MIPS, MIPSFP and ARMV4I). I wouldn't do it without proper testing first, which is a hard thing to do without all the test cases. Are there any chances to make them public?",
+    "LastUpdatedDate": "2013-02-13T18:31:05.17-08:00",
+    "PlannedForRelease": "",
+    "ReleaseVisibleToPublic": false,
+    "Priority": {
+      "Name": "Low",
+      "Severity": 50,
+      "Id": 1
+    },
+    "ProjectName": "SafeInt",
+    "ReportedDate": "2008-11-16T06:44:58.56-08:00",
+    "Status": {
+      "Name": "Proposed",
+      "Id": 1
+    },
+    "ReasonClosed": {
+      "Name": "Unassigned"
+    },
+    "Summary": "Publish SafeInt tests",
+    "Type": {
+      "Name": "Issue",
+      "Id": 3
+    },
+    "VoteCount": 2,
+    "Id": 6609
+  },
+  "FileAttachments": [],
+  "Comments": [
+    {
+      "Message": "What would be better is that we should create tests that can be kept here. Our internal Office tests are a bit messy (though thorough), and there are now Visual Studio tests as well. I don't want to try and keep internal stuff in sync with external stuff, and I have to get high level sign-off to make internal code public.\r\n\r\nUsing a little 20-20 hindsight, having seen 2-3 iterations of the unit testing for this class, here's what we need:\r\n\r\n1) Compile time tests. Compile time tests have to include all 11 base integer types, and should also include wchar_t, size_t, ptrdiff_t, uintptr_t and intptr_t. Compile time tests need to instantiate every method with every combination of types. Next, the enums that are internal to the implementation need to be checked to make sure all of them are hit at least once, and that no combination of types falls out into the error enum value. We also need to deal with const and non-const. All this stuff should be working now, and this is reflected in internal test rigs.\r\n\r\n2) Run-time tests - operations either need to be valid, or throw. Run-time tests can just run against the 8 integer types we're supporting right now. In most cases, upcasting to __int64 will be an adequate test, but if a 64-bit type is involved, checking for an overflow is trickier. The current code that does this is based on code that generates the test code, as it's highly repetitive. Interesting values to check are 2^n, 2^n-1, and 2^n+1, and 0.",
+      "PostedDate": "2008-11-21T11:57:25.743-08:00",
+      "Id": -2147483648
+    },
+    {
+      "Message": "I have added the compile-time tests to release 3.0.12p. All that's there at the moment is the constructors and the casting operators. I have also added you as a developer, so that if you feel like adding to the compile-time tests, I think you can edit them (assuming I have CodePlex set up correctly).",
+      "PostedDate": "2008-11-23T14:21:23.537-08:00",
+      "Id": -2147483648
+    },
+    {
+      "Message": "Oops - I added Niels as a developer, not you. If you'd like to work on the test rig, let me know, I'll add you, too.",
+      "PostedDate": "2008-11-23T14:22:47.227-08:00",
+      "Id": -2147483648
+    },
+    {
+      "Message": "",
+      "PostedDate": "2013-02-13T18:31:05.17-08:00",
+      "Id": -2147483648
+    }
+  ]
+}

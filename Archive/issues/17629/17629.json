@@ -1,0 +1,45 @@
+{
+  "WorkItem": {
+    "AffectedComponent": {
+      "Name": "",
+      "DisplayName": ""
+    },
+    "ClosedComment": "",
+    "ClosedDate": null,
+    "CommentCount": 0,
+    "Custom": null,
+    "Description": "I posted this question on a forum in MSDN [Prev question] (https://social.msdn.microsoft.com/Forums/vstudio/en-US/751fd20b-896e-494c-953e-a618b8cf5247/why-was-the-address-operator-overloaded-in-safeint-class?forum=vcgeneral#b28efc1c-8ce2-4ddf-b8cf-4a0773c064bb). It was wrongly worded and I didn't get a satisfactory response.\n\nI am reporting this as a bug. Let me know if this isn't a bug.\n\nI have a huge code base which I am migrating to use SafeInt<T,E>. The integer types in my code have been typedef'd to userdefined types for ease of modification of types. \n\nFor ex: situations like moving to SafeInt<T,E>. My issue pertains to the fact that &(address operator) has been overloaded to return T* instead of SafeInt<T, E> * .\n\n__Consider the following snippet.__\n\n```\n#include \"SomeHeaderWithTypedefs.h\"\n//other headers...\n\nvoid someFunction(MyInt* intPointerArgument); //Function signature I have.\n\nint main()\n{\t\n   MyInt anIntVar = 10;\t\n   someFunction(&anIntVar);\n}\n```\n\n```\n//Contents of SomeHeaderWithTypedefs.h\n\n//Old Typedef:\ntypedef int MyInt;\n\n//New Typedef:\ntypedef SafeInt<int> MyInt;\n```\n\nChanging the above typedef to point to SafeInt should not break my code where I send address of \"MyInt\" to the function.\n\nIt breaks because the &(address operator) has been overloaded to return T* for \"ease of use\". This breaks basic functionality and should not be so. \n\n__A Workaround__\nTo fix the above code I have to change everyplace I try to use the address of MyInt to the following\n\n```\nstd::addressof(varOfMyIntType);\n```\n\nI hope this is a convincing argument to categorize this functionality as a bug. \n\n-Phani.",
+    "LastUpdatedDate": "2016-12-01T16:43:15.827-08:00",
+    "PlannedForRelease": "",
+    "ReleaseVisibleToPublic": false,
+    "Priority": {
+      "Name": "Unassigned",
+      "Severity": 0,
+      "Id": 0
+    },
+    "ProjectName": "SafeInt",
+    "ReportedDate": "2016-03-17T10:30:32.117-07:00",
+    "Status": {
+      "Name": "Proposed",
+      "Id": 1
+    },
+    "ReasonClosed": {
+      "Name": "Unassigned"
+    },
+    "Summary": "The address operator(&) overload breaks basic expectation from SafeInt<T,E> class",
+    "Type": {
+      "Name": "Unassigned",
+      "Id": 5
+    },
+    "VoteCount": 1,
+    "Id": 17629
+  },
+  "FileAttachments": [],
+  "Comments": [
+    {
+      "Message": "I apologize for the very long delay in answering. This was something that I went back and forth on - from the code:\r\n\r\n    // Or if SafeInt< T, E >::Ptr() is inconvenient, use the overload\n    // operator &\n    // This allows you to do unsafe things!\n    // It is meant to allow you to more easily\n    // pass a SafeInt into things like ReadFile\n    T* operator &() SAFEINT_NOTHROW { return &m_int; }\n    const T* operator &() const SAFEINT_NOTHROW { return &m_int; }\r\n\r\nIt seemed like a much more common problem that we would have this:\r\n\r\nint x = fcn();\r\n\r\n... lots of code ...\nFcnThatWantsIntPtr(&x);\r\n\r\nIf we suddenly pass it a SafeInt that it wasn't expecting, that breaks, too. It seemed unusual to want to pass around a SafeInt by pointer, and that if you really needed to pass a SafeInt, then it would be best done by reference - after all, this is C++.\r\n\r\nThe typedef gets you into some tricky places, which you have run into.\r\n\r\nThe reason for the existence of const T* Ptr() const SAFEINT_NOTHROW { return &m_int; } is that if you wanted to comment out:\r\n\r\n    T* operator &() SAFEINT_NOTHROW { return &m_int; }\n    const T* operator &() const SAFEINT_NOTHROW { return &m_int; }\r\n\r\nthen you could do so, use the nice helper functions where it now doesn't compile. I have an awful lot of conditional compilation based on whether some define is set. This hasn't been a common ask, and because the header is open source, I think maybe the best approach for you would be to comment out those two lines, and not complicate your code with lots of std::addressof declarations.\r\n\r\nI might add this as a conditional compile just to bring it to the top as an option. I apologize that this has been inconvenient.\n",
+      "PostedDate": "2016-12-01T16:43:15.827-08:00",
+      "Id": -2147483648
+    }
+  ]
+}
