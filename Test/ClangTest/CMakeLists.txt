@@ -184,11 +184,12 @@ else()
         # Do not care if the test harness isn't padded precisely
         -Wno-padded
         # This should be a false positive, nodiscard is wrapped in detection logic
-        -Wno-c++17-attribute-extensions
+        # Note - this warning is -Wno-cxx-attribute-extension on v14 on Apple
+        # but is -Wc++17-attribute-ext on v15 on Linux
         # Not worried about -Wglobal-constructors in test code
         -Wno-global-constructors
         # Enable this when upgrading to new compiler version, or if just want to check
-        -Weverything
+        # -Weverything
         )
 
     add_executable(safe_math_compile_clang
