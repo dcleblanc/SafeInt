@@ -187,8 +187,6 @@ else()
         -Wno-c++17-attribute-extensions
         # Not worried about -Wglobal-constructors in test code
         -Wno-global-constructors
-        # Conversion in hundreds of lines of test code is not a concern - consider fixing later
-        -Wno-sign-conversion
         # Enable this when upgrading to new compiler version, or if just want to check
         #-Weverything
         )
