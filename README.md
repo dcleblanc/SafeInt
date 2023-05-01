@@ -17,3 +17,5 @@ My bug priority is as follows:
 1a) There's a cool new thing in the standard you'd like me to support, for example constexpr support was added most recently.
 2) You are trying to use the library in an unsupported environment, and you'd like changes so it builds cleanly with your compiler settings. Depending on what this entails, I'll do my best to work with these.
 3) The code could be tidier - while the goal is to use very clean, standard C++, it's nearly 7300 LOC, and it isn't perfect. I might take these if I happen to be making changes in that area. Or if you can show me that a change results in more efficient assembly, which makes it category (1).
+
+Note - the large Archive directory tree has been moved to the archive branch, and deleted from master. It is only of dubious historical interest.
