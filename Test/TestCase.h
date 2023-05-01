@@ -35,20 +35,14 @@ struct OpName
 		default:
 			return "";
 		}
-	};
+	}
 };
 
 template <typename T, typename U, int op>
 struct TestCase
 {
-	const TestCase<T, U, op>& operator=(const TestCase<T, U, op>& in)
-	{
-		this->x = in.x;
-		this->y = in.y;
-		this->fExpected = in.fExpected;
-		return *this;
-	}
-
+	TestCase(T _x, U _y, bool f) : 
+		x(_x), y(_y), fExpected(f) { }
 	T x;
 	U y;
 	bool fExpected;
@@ -58,7 +52,7 @@ template <typename T, typename U, int op>
 class TestVector
 {
 public:
-	TestVector();
+	TestVector() : test_cases(nullptr), count(0), current(0) {}
 
 	void Reset() { current = 0; }
 	bool Done() const { return current >= count; }
@@ -149,3 +143,4 @@ public:
 	bool enable;
 };
 
+extern "C" void add_test();

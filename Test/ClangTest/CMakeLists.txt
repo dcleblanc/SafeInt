@@ -11,8 +11,8 @@ set(CMAKE_CXX_STANDARD_REQUIRED True)
 
 # Compile time tests are:
 # - default C++11
-# - C++14
-# - TODO - consider adding in 17, 20 just to see if anything breaks
+# - C++14, C++17
+# - TODO - consider adding in 20, 23 just to see if anything breaks
 # - compile without exceptions
 
 # test for clang++
@@ -59,7 +59,7 @@ else()
         ../../SafeInt.hpp
     )
 
-    target_compile_options(SafeIntTest_clang PUBLIC -fsanitize-trap=undefined)
+    target_compile_options(SafeIntTest_clang PUBLIC -Werror -fsanitize-trap=undefined)
 
     # Forces use of the older, less efficient code that can't use either int128 or intrinsics
     add_executable(SafeIntTest_clang_NoIntrinsic
@@ -80,7 +80,7 @@ else()
 )
 
     target_compile_definitions(SafeIntTest_clang_NoIntrinsic PUBLIC "SAFEINT_USE_INTRINSICS=0" "SAFEINT_HAS_INT128=0")
-    target_compile_options(SafeIntTest_clang_NoIntrinsic PUBLIC -fsanitize-trap=undefined)
+    target_compile_options(SafeIntTest_clang_NoIntrinsic PUBLIC -Werror -fsanitize-trap=undefined)
 
     # Forces use of either intrinsics or the older code
     add_executable(SafeIntTest_clang_NoInt128
@@ -101,7 +101,7 @@ else()
 )
 
     target_compile_definitions(SafeIntTest_clang_NoInt128 PUBLIC "SAFEINT_HAS_INT128=0")
-    target_compile_options(SafeIntTest_clang_NoInt128 PUBLIC -fsanitize-trap=undefined)
+    target_compile_options(SafeIntTest_clang_NoInt128 PUBLIC -Werror -fsanitize-trap=undefined)
 
     # compilation tests, these are good if they just build
     add_executable(CompileTest_clang
@@ -111,7 +111,7 @@ else()
         ../../SafeInt.hpp
     )
 
-    target_compile_options(CompileTest_clang PUBLIC -Wall -Wextra)
+    target_compile_options(CompileTest_clang PUBLIC -Wall -Wextra -Werror)
 
     add_executable(CompileTest_clang14
         ../CompileTest.cpp
@@ -120,7 +120,7 @@ else()
         ../../SafeInt.hpp
     )
 
-    target_compile_options(CompileTest_clang14 PUBLIC -Wall  -Wextra -std=c++14)
+    target_compile_options(CompileTest_clang14 PUBLIC -Wall  -Wextra -Werror -std=c++14)
 
     add_executable(CompileTest_clang17
     ../CompileTest.cpp
@@ -129,7 +129,7 @@ else()
     ../../SafeInt.hpp
     )
 
-    target_compile_options(CompileTest_clang17 PUBLIC -Wall  -Wextra -std=c++17)
+    target_compile_options(CompileTest_clang17 PUBLIC -Wall -Wextra -Werror -std=c++17)
 
     add_executable(CompileTest_clang14_NoEH
         ../CompileTest.cpp
@@ -138,7 +138,7 @@ else()
         ../../SafeInt.hpp
     )
 
-    target_compile_options(CompileTest_clang14_NoEH PUBLIC -Wall  -Wextra -std=c++14 -fno-exceptions)
+    target_compile_options(CompileTest_clang14_NoEH PUBLIC -Wall -Wextra -Werror -std=c++14 -fno-exceptions)
 
     add_executable(CompileTest_clang17_NoEH
         ../CompileTest.cpp
@@ -147,7 +147,7 @@ else()
         ../../SafeInt.hpp
     )
 
-    target_compile_options(CompileTest_clang17_NoEH PUBLIC -Wall  -Wextra -std=c++17 -fno-exceptions)
+    target_compile_options(CompileTest_clang17_NoEH PUBLIC -Wall -Wextra -Werror -std=c++17 -fno-exceptions)
 
     add_executable(CompileTest_clang98
         ../CompileTest.cpp
@@ -156,7 +156,7 @@ else()
         ../../SafeInt.hpp
     )
 
-    target_compile_options(CompileTest_clang98 PUBLIC -D SAFEINT_USE_CPLUSCPLUS_98 -Wall -std=c++98 -fno-exceptions)
+    target_compile_options(CompileTest_clang98 PUBLIC -D SAFEINT_USE_CPLUSCPLUS_98 -Wall -Wextra -Werror -std=c++98 -fno-exceptions)
 
     add_executable(safe_math_test_clang
         ../c_safe_math/safe_math_test.c
@@ -174,7 +174,24 @@ else()
         )
 
     target_compile_definitions(safe_math_test_clang PUBLIC)
-    target_compile_options(safe_math_test_clang PUBLIC -Wall)
+    target_compile_options(safe_math_test_clang PUBLIC 
+        -Wall 
+        -Wextra 
+        -Werror 
+        -Wno-old-style-cast
+        # Ignore warning about using long long
+        -Wno-c++98-compat-pedantic 
+        # Do not care if the test harness isn't padded precisely
+        -Wno-padded
+        # This should be a false positive, nodiscard is wrapped in detection logic
+        -Wno-c++17-attribute-extensions
+        # Not worried about -Wglobal-constructors in test code
+        -Wno-global-constructors
+        # Conversion in hundreds of lines of test code is not a concern - consider fixing later
+        -Wno-sign-conversion
+        # Enable this when upgrading to new compiler version, or if just want to check
+        #-Weverything
+        )
 
     add_executable(safe_math_compile_clang
         ../c_safe_math/safe_math_compile.c
@@ -183,8 +200,18 @@ else()
         ../../safe_math_impl.h
     )
 
-    target_compile_options(safe_math_compile_clang PUBLIC -Wall -Werror=incompatible-pointer-types)
-
+    target_compile_options(safe_math_compile_clang PUBLIC 
+        -Wall 
+        -Wextra 
+        -Wincompatible-pointer-types 
+        -Wreserved-identifier
+        -Wdeclaration-after-statement
+        -Wc++98-compat
+        -Werror
+    # As per clang documentation, enable this periodically to check, -Wall, -Wextra
+    # won't give you experimental warnings.
+    #   -Weverything
+        )
  endif()
 
 enable_testing()

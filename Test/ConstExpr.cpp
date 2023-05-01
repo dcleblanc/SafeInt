@@ -33,7 +33,7 @@ public:
 namespace TestConstExpr
 {
 	template <typename T, typename U>
-	_CONSTEXPR11 bool LessThanTest()
+	SAFEINT_CONSTEXPR11 bool LessThanTest()
 	{
 		return
 			(U)2 < SafeInt<T>(3) &&
@@ -42,7 +42,7 @@ namespace TestConstExpr
 	}
 
 	template <typename T, typename U>
-	_CONSTEXPR11 bool GreaterThanTest()
+	SAFEINT_CONSTEXPR11 bool GreaterThanTest()
 	{
 		return
 			(U)2 > SafeInt<T>(3) &&
@@ -51,7 +51,7 @@ namespace TestConstExpr
 	}
 
 	template <typename T, typename U>
-	_CONSTEXPR11 bool LessThanEqualTest()
+	SAFEINT_CONSTEXPR11 bool LessThanEqualTest()
 	{
 		return
 			(U)2 <= SafeInt<T>(3) &&
@@ -60,7 +60,7 @@ namespace TestConstExpr
 	}
 
 	template <typename T, typename U>
-	_CONSTEXPR11 bool GreaterThanEqualTest()
+	SAFEINT_CONSTEXPR11 bool GreaterThanEqualTest()
 	{
 		return
 			(U)2 >= SafeInt<T>(3) &&
@@ -69,7 +69,7 @@ namespace TestConstExpr
 	}
 
 	template <typename T, typename U>
-	_CONSTEXPR11 bool EqualTest()
+	SAFEINT_CONSTEXPR11 bool EqualTest()
 	{
 		return
 			(U)2 == SafeInt<T>(3) &&
@@ -80,7 +80,7 @@ namespace TestConstExpr
 	}
 
 	template <typename T, typename U>
-	_CONSTEXPR11 bool NotEqualTest()
+	SAFEINT_CONSTEXPR11 bool NotEqualTest()
 	{
 		return
 			(U)2 != SafeInt<T>(3) &&
@@ -117,14 +117,14 @@ namespace TestConstExpr
 	}
 
 	template <typename T>
-	_CONSTEXPR11 T ConstConstructor()
+	SAFEINT_CONSTEXPR11 T ConstConstructor()
 	{
 		// Constructors, also add in the useless unary + operator
 		return SafeInt<T>() + SafeInt<T>(1) + SafeInt<T>(false) + (+SafeInt<T>(3));
 	}
 
 	template <typename T>
-	_CONSTEXPR11 bool ConstBool()
+	SAFEINT_CONSTEXPR11 bool ConstBool()
 	{
 		return (bool)SafeInt<T>(2) && !SafeInt<T>(0);
 	}
@@ -137,7 +137,7 @@ namespace TestConstExpr
 	}
 
 	template <typename T>
-	_CONSTEXPR11 SafeInt<T> ConstSafeInt()
+	SAFEINT_CONSTEXPR11 SafeInt<T> ConstSafeInt()
 	{
 		return SafeInt<T>(1);
 	}
@@ -167,7 +167,7 @@ namespace TestConstExpr
 
 #if CPLUSPLUS_STD == CPLUSPLUS_14
 	template <typename T, typename U>
-	_CONSTEXPR14 T DivOperator()
+	SAFEINT_CONSTEXPR14 T DivOperator()
 	{
 		// Have to explicitly force this operator
 		// to be used
@@ -179,7 +179,7 @@ namespace TestConstExpr
 	}
 
 	template <typename T, typename U>
-	_CONSTEXPR14 T AddOperator()
+	SAFEINT_CONSTEXPR14 T AddOperator()
 	{
 		// Have to explicitly force this operator
 		// to be used
@@ -191,7 +191,7 @@ namespace TestConstExpr
 	}
 
 	template <typename T, typename U>
-	_CONSTEXPR14 T SubOperator()
+	SAFEINT_CONSTEXPR14 T SubOperator()
 	{
 		// Have to explicitly force this operator
 		// to be used
@@ -203,7 +203,7 @@ namespace TestConstExpr
 	}
 
 	template <typename T, typename U>
-	_CONSTEXPR14 T LShiftOperator()
+	SAFEINT_CONSTEXPR14 T LShiftOperator()
 	{
 		// Have to explicitly force this operator
 		// to be used
@@ -217,7 +217,7 @@ namespace TestConstExpr
 	}
 
 	template <typename T, typename U>
-	_CONSTEXPR14 U LShiftOperator2()
+	SAFEINT_CONSTEXPR14 U LShiftOperator2()
 	{
 		// Have to explicitly force this operator
 		// to be used
@@ -229,7 +229,7 @@ namespace TestConstExpr
 	}
 
 	template <typename T, typename U>
-	_CONSTEXPR14 T RShiftOperator()
+	SAFEINT_CONSTEXPR14 T RShiftOperator()
 	{
 		// Have to explicitly force this operator
 		// to be used
@@ -242,7 +242,7 @@ namespace TestConstExpr
 	}
 
 	template <typename T, typename U>
-	_CONSTEXPR14 U RShiftOperator2()
+	SAFEINT_CONSTEXPR14 U RShiftOperator2()
 	{
 		// Have to explicitly force this operator
 		// to be used
@@ -254,7 +254,7 @@ namespace TestConstExpr
 	}
 
 	template <typename T, typename U>
-	_CONSTEXPR14 T AndOperator()
+	SAFEINT_CONSTEXPR14 T AndOperator()
 	{
 		// Have to explicitly force this operator
 		// to be used
@@ -267,7 +267,7 @@ namespace TestConstExpr
 	}
 
 	template <typename T, typename U>
-	_CONSTEXPR14 U AndOperator2()
+	SAFEINT_CONSTEXPR14 U AndOperator2()
 	{
 		// Have to explicitly force this operator
 		// to be used
@@ -279,7 +279,7 @@ namespace TestConstExpr
 	}
 
 	template <typename T, typename U>
-	_CONSTEXPR14 T XorOperator()
+	SAFEINT_CONSTEXPR14 T XorOperator()
 	{
 		// Have to explicitly force this operator
 		// to be used
@@ -292,7 +292,7 @@ namespace TestConstExpr
 	}
 
 	template <typename T, typename U>
-	_CONSTEXPR14 U XorOperator2()
+	SAFEINT_CONSTEXPR14 U XorOperator2()
 	{
 		// Have to explicitly force this operator
 		// to be used
@@ -304,7 +304,7 @@ namespace TestConstExpr
 	}
 
 	template <typename T, typename U>
-	_CONSTEXPR14 T OrOperator()
+	SAFEINT_CONSTEXPR14 T OrOperator()
 	{
 		// Have to explicitly force this operator
 		// to be used
@@ -317,7 +317,7 @@ namespace TestConstExpr
 	}
 
 	template <typename T, typename U>
-	_CONSTEXPR14 U OrOperator2()
+	SAFEINT_CONSTEXPR14 U OrOperator2()
 	{
 		// Have to explicitly force this operator
 		// to be used
@@ -329,14 +329,14 @@ namespace TestConstExpr
 	}
 
 	template <typename T, typename U>
-	_CONSTEXPR14 bool SafeCastTest()
+	SAFEINT_CONSTEXPR14 bool SafeCastTest()
 	{
 		U to = 0;
 		return SafeCast((T)3, to);
 	}
 
 	template <typename T, typename U>
-	_CONSTEXPR14 bool SafeModulusTest()
+	SAFEINT_CONSTEXPR14 bool SafeModulusTest()
 	{
 		U u = 2;
 		T result = 0;
@@ -344,7 +344,7 @@ namespace TestConstExpr
 	}
 
 	template <typename T, typename U>
-	_CONSTEXPR14 bool SafeMultiplyTest()
+	SAFEINT_CONSTEXPR14 bool SafeMultiplyTest()
 	{
 		U u = 2;
 		T result = 0;
@@ -352,7 +352,7 @@ namespace TestConstExpr
 	}
 
 	template <typename T, typename U>
-	_CONSTEXPR14 bool SafeDivideTest()
+	SAFEINT_CONSTEXPR14 bool SafeDivideTest()
 	{
 		U u = 2;
 		T result = 0;
@@ -360,7 +360,7 @@ namespace TestConstExpr
 	}
 
 	template <typename T, typename U>
-	_CONSTEXPR14 bool SafeAddTest()
+	SAFEINT_CONSTEXPR14 bool SafeAddTest()
 	{
 		U u = 2;
 		T result = 0;
@@ -558,7 +558,7 @@ namespace TestConstExpr
 	}
 
 	template <typename T, typename U>
-	_CONSTEXPR14 T ConstMultiplyTU()
+	SAFEINT_CONSTEXPR14 T ConstMultiplyTU()
 	{
 		return (SafeInt<T>(2) * (U)1) + (U(4) * SafeInt<T>(3)) + (SafeInt<T>(6) * SafeInt<T>(5));
 	}
@@ -580,7 +580,7 @@ namespace TestConstExpr
 	}
 
 	template <typename T, typename U>
-	_CONSTEXPR14 T ConstSubtractTU()
+	SAFEINT_CONSTEXPR14 T ConstSubtractTU()
 	{
 		return (SafeInt<T>(2) - (U)1) + (U(4) - SafeInt<T>(3)) + (SafeInt<T>(6) - SafeInt<T>(5));
 	}
@@ -602,7 +602,7 @@ namespace TestConstExpr
 	}
 
 	template <typename T, typename U>
-	_CONSTEXPR14 T ConstAddTU()
+	SAFEINT_CONSTEXPR14 T ConstAddTU()
 	{
 		return (SafeInt<T>(1) + (U)2) + (U(3) + SafeInt<T>(4)) + (SafeInt<T>(5) + SafeInt<T>(6));
 	}
@@ -624,19 +624,19 @@ namespace TestConstExpr
 	}
 
 	template <typename T>
-	_CONSTEXPR14 T PrefixInc(T i)
+	SAFEINT_CONSTEXPR14 T PrefixInc(T i)
 	{
 		return ++SafeInt<T>(i);
 	}
 
 	template <typename T>
-	_CONSTEXPR14 T PostfixInc(T i)
+	SAFEINT_CONSTEXPR14 T PostfixInc(T i)
 	{
 		return SafeInt<T>(i)++;
 	}
 
 	template <typename T>
-	_CONSTEXPR14 void SignedOnly()
+	SAFEINT_CONSTEXPR14 void SignedOnly()
 	{
 		static_assert(-SafeInt<T>((T)1), "operator -");
 	}

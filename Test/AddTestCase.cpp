@@ -1978,7 +1978,7 @@ static const TestCase< std::int64_t, std::uint64_t, OpType::Add > int64_uint64[]
 	{ 0x8000000000000000, 0xffffffffffffffff, true},
 	{ 0x8000000000000001, 0xffffffffffffffff, false},
 	{ 0xfffffffffffffffe, 0xffffffffffffffff, false},
-	{ 0xffffffffffffffff, 0xffffffffffffffff, false},
+	{ 0xffffffffffffffffLL, 0xffffffffffffffff, false},
 };
 
 template<>

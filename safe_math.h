@@ -216,8 +216,8 @@ extern "C"
 #endif
 
 // Not going to support odd sizes of things
-extern char __CHECK_SHORT_IS_16__[1 / ((sizeof(short)-2) ? 0 : 1)];
-extern char __CHECK_INT_IS_32__[1 / ((sizeof(int) - 4) ? 0 : 1)];
+extern char SAFE_MATH_CHECK_SHORT_IS_16[1 / ((sizeof(short)-2) ? 0 : 1)];
+extern char SAFE_MATH_CHECK_INT_IS_32[1 / ((sizeof(int) - 4) ? 0 : 1)];
 
 // In order to help keep people from making mistakes by 
 // incorrectly guessing which types match which of the intXX types,
