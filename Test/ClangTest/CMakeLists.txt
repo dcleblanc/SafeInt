@@ -188,7 +188,7 @@ else()
         # Not worried about -Wglobal-constructors in test code
         -Wno-global-constructors
         # Enable this when upgrading to new compiler version, or if just want to check
-        #-Weverything
+        -Weverything
         )
 
     add_executable(safe_math_compile_clang
