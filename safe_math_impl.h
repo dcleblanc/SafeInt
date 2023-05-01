@@ -909,8 +909,8 @@ static inline int MultiplyUint64(uint64_t a, uint64_t b, uint64_t* pRet)
 static inline int MultiplyInt64(int64_t a, int64_t b, int64_t* pRet)
 {
     __int128 tmp = (__int128)a * (__int128)b;
-    *pRet = (int64_t)tmp;
     int64_t tmp_high = (int64_t)((unsigned __int128)tmp >> 64);
+    *pRet = (int64_t)tmp;
 
     // If only one input is negative, result must be negative, or zero
     if ((a ^ b) < 0)
