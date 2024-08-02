@@ -259,7 +259,7 @@ void CompileType()
 
 void MoveRegression()
 {
-	#if CPLUSPLUS_STD == CPLUSPLUS_17
+	#if CPLUSPLUS_STD == SAFEINT_CPLUSPLUS_17
 	#include <variant>
 	#include <string>
 

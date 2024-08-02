@@ -165,7 +165,7 @@ namespace TestConstExpr
 		static const int pl = +ConstSafeInt<T>();
 	}
 
-#if CPLUSPLUS_STD == CPLUSPLUS_14
+#if CPLUSPLUS_STD == SAFEINT_CPLUSPLUS_14
 	template <typename T, typename U>
 	SAFEINT_CONSTEXPR14 T DivOperator()
 	{
@@ -650,7 +650,7 @@ namespace TestConstExpr
 		SignedOnly<signed long long>();
 	}
 
-#endif // CPLUSPLUS_14
+#endif // SAFEINT_CPLUSPLUS_14
 
 	template <typename T>
 	void ConstExprTestT()
@@ -659,7 +659,7 @@ namespace TestConstExpr
 		ComparisonTestT<T>();
 		ConstCastTestT<T>();
 
-#if CPLUSPLUS_STD == CPLUSPLUS_14
+#if CPLUSPLUS_STD == SAFEINT_CPLUSPLUS_14
 		StaticAssertTest<T>();
 		TestSignedOnly();
 

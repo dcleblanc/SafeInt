@@ -100,6 +100,15 @@ else()
 
     target_compile_options(CompileTest_msvc17 PUBLIC /std:c++17)
 
+    add_executable(CompileTest_msvc20
+    ../CompileTest.cpp
+    ../ConstExpr.cpp 
+    ../CleanCompile.cpp
+    ../../SafeInt.hpp
+    )
+
+    target_compile_options(CompileTest_msvc20 PUBLIC /std:c++20)
+
     # compilation tests, these are good if they just build
     add_executable(CompileTest_msvc_noexcept
     ../CompileTest.cpp
