@@ -3,7 +3,7 @@
 
 /*-----------------------------------------------------------------------------------------------------------
 SafeInt.hpp
-Version 3.0.27p
+Version 3.0.28p
 
 This header implements an integer handling class designed to catch
 unsafe integer operations
@@ -5374,6 +5374,20 @@ public:
     }
 };
 
+template < typename T, typename U > 
+SAFE_INT_NODISCARD _CONSTEXPR14 bool valid_bitcount(U bits)
+{
+    if (!std::numeric_limits< U >::is_signed || bits >= 0)
+    {
+        if (bits < (int)safeint_internal::int_traits< T >::bitCount)
+        {
+            return true;
+        }
+    }
+
+    return false;
+}
+
 /*****************  External functions ****************************************/
 
 // External functions that can be used where you only need to check one operation
@@ -6003,25 +6017,26 @@ public:
     // code path is exactly the same as for SafeInt< U, E > as rhs
 
     // Left shift
-    // Also, shifting > bitcount is undefined - trap in debug
-    #define ShiftAssert(x) SAFEINT_ASSERT(x)
 
     template < typename U >
     _CONSTEXPR14 SafeInt< T, E > operator <<( U bits ) const SAFEINT_NOTHROW
     {
-        ShiftAssert( !std::numeric_limits< U >::is_signed || bits >= 0 );
-        ShiftAssert( bits < (int)safeint_internal::int_traits< T >::bitCount );
+        if (valid_bitcount<T, U>(bits))
+        {
+            return SafeInt< T, E >((T)(m_int << bits));
+        }
 
-        return SafeInt< T, E >( (T)( m_int << bits ) );
+        E::SafeIntOnOverflow();
     }
 
     template < typename U >
     _CONSTEXPR14 SafeInt< T, E > operator <<( SafeInt< U, E > bits ) const SAFEINT_NOTHROW
     {
-        ShiftAssert( !std::numeric_limits< U >::is_signed || (U)bits >= 0 );
-        ShiftAssert( (U)bits < (int)safeint_internal::int_traits< T >::bitCount );
-
-        return SafeInt< T, E >( (T)( m_int << (U)bits ) );
+        if (valid_bitcount<T, U>(bits))
+        {
+            return SafeInt< T, E >((T)(m_int << (U)bits));
+        }
+        E::SafeIntOnOverflow();
     }
 
     // Left shift assignment
@@ -6029,61 +6044,73 @@ public:
     template < typename U >
     _CONSTEXPR14 SafeInt< T, E >& operator <<=( U bits ) SAFEINT_NOTHROW
     {
-        ShiftAssert( !std::numeric_limits< U >::is_signed || bits >= 0 );
-        ShiftAssert( bits < (int)safeint_internal::int_traits< T >::bitCount );
+        if (valid_bitcount<T, U>(bits))
+        {
+            m_int <<= bits;
+            return *this;
+        }
 
-        m_int <<= bits;
-        return *this;
+        E::SafeIntOnOverflow();
     }
 
     template < typename U >
     _CONSTEXPR14 SafeInt< T, E >& operator <<=( SafeInt< U, E > bits ) SAFEINT_NOTHROW
     {
-        ShiftAssert( !std::numeric_limits< U >::is_signed || (U)bits >= 0 );
-        ShiftAssert( (U)bits < (int)safeint_internal::int_traits< T >::bitCount );
+        if (valid_bitcount<T, U>(bits))
+        {
+            m_int <<= (U)bits;
+            return *this;
+        }
 
-        m_int <<= (U)bits;
-        return *this;
+        E::SafeIntOnOverflow();
     }
 
     // Right shift
     template < typename U >
     _CONSTEXPR14 SafeInt< T, E > operator >>( U bits ) const SAFEINT_NOTHROW
     {
-        ShiftAssert( !std::numeric_limits< U >::is_signed || bits >= 0 );
-        ShiftAssert( bits < (int)safeint_internal::int_traits< T >::bitCount );
+        if (valid_bitcount<T, U>(bits))
+        {
+            return SafeInt< T, E >((T)(m_int >> bits));
+        }
 
-        return SafeInt< T, E >( (T)( m_int >> bits ) );
+        E::SafeIntOnOverflow();
     }
 
     template < typename U >
     _CONSTEXPR14 SafeInt< T, E > operator >>( SafeInt< U, E > bits ) const SAFEINT_NOTHROW
     {
-        ShiftAssert( !std::numeric_limits< U >::is_signed || (U)bits >= 0 );
-        ShiftAssert( (U)bits < (int)safeint_internal::int_traits< T >::bitCount );
+        if (valid_bitcount<T, U>(bits))
+        {
+            return SafeInt< T, E >((T)(m_int >> (U)bits));
+        }
 
-        return SafeInt< T, E >( (T)(m_int >> (U)bits) );
+        E::SafeIntOnOverflow();
     }
 
     // Right shift assignment
     template < typename U >
     _CONSTEXPR14 SafeInt< T, E >& operator >>=( U bits ) SAFEINT_NOTHROW
     {
-        ShiftAssert( !std::numeric_limits< U >::is_signed || bits >= 0 );
-        ShiftAssert( bits < (int)safeint_internal::int_traits< T >::bitCount );
+        if (valid_bitcount<T, U>(bits))
+        {
+            m_int >>= bits;
+            return *this;
+        }
 
-        m_int >>= bits;
-        return *this;
+        E::SafeIntOnOverflow();
     }
 
     template < typename U >
     _CONSTEXPR14 SafeInt< T, E >& operator >>=( SafeInt< U, E > bits ) SAFEINT_NOTHROW
     {
-        ShiftAssert( !std::numeric_limits< U >::is_signed || (U)bits >= 0 );
-        ShiftAssert( (U)bits < (int)safeint_internal::int_traits< T >::bitCount );
+        if (valid_bitcount<T, U>(bits))
+        {
+            m_int >>= (U)bits;
+            return *this;
+        }
 
-        m_int >>= (U)bits;
-        return *this;
+        E::SafeIntOnOverflow();
     }
 
     // Bitwise operators
