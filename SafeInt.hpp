@@ -5374,10 +5374,31 @@ public:
     }
 };
 
+template < typename U, int signed > class bits_not_negative;
+
+// Signed case
+template < typename U > class bits_not_negative < U, true >
+{
+public:
+    SAFE_INT_NODISCARD _CONSTEXPR14 static bool value(U bits)
+    {
+        return bits >= 0;
+    }
+};
+
+template < typename U > class bits_not_negative < U, false >
+{
+public:
+    SAFE_INT_NODISCARD _CONSTEXPR14 static bool value(U)
+    {
+        return true;
+    }
+};
+
 template < typename T, typename U > 
 SAFE_INT_NODISCARD _CONSTEXPR14 bool valid_bitcount(U bits)
 {
-    if (!std::numeric_limits< U >::is_signed || bits >= 0)
+    if (bits_not_negative<U, std::numeric_limits< U >::is_signed>::value(bits))
     {
         if (bits < (int)safeint_internal::int_traits< T >::bitCount)
         {
@@ -6945,20 +6966,24 @@ SAFEINT_CONSTEXPR14 T*& operator >>=( T*& lhs, SafeInt< U, E > ) SAFEINT_NOTHROW
 template < typename T, typename U, typename E >
 SAFEINT_CONSTEXPR14 SafeInt< U, E > operator <<( U lhs, SafeInt< T, E > bits ) SAFEINT_NOTHROW
 {
-    ShiftAssert( !std::numeric_limits< T >::is_signed || (T)bits >= 0 );
-    ShiftAssert( (T)bits < (int)safeint_internal::int_traits< U >::bitCount );
+    if (valid_bitcount<T, U>(bits))
+    {
+        return SafeInt< U, E >((U)(lhs << (T)bits));
+    }
 
-    return SafeInt< U, E >( (U)( lhs << (T)bits ) );
+    E::SafeIntOnOverflow();
 }
 
 // Right shift
 template < typename T, typename U, typename E >
 SAFEINT_CONSTEXPR14 SafeInt< U, E > operator >>( U lhs, SafeInt< T, E > bits ) SAFEINT_NOTHROW
 {
-    ShiftAssert( !std::numeric_limits< T >::is_signed || (T)bits >= 0 );
-    ShiftAssert( (T)bits < (int)safeint_internal::int_traits< U >::bitCount );
+    if (valid_bitcount<T, U>(bits))
+    {
+        return SafeInt< U, E >((U)(lhs >> (T)bits));
+    }
 
-    return SafeInt< U, E >( (U)( lhs >> (T)bits ) );
+    E::SafeIntOnOverflow();
 }
 
 // Bitwise operators
