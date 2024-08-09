@@ -5382,6 +5382,8 @@ public:
 template < typename T, typename U >
 SAFE_INT_NODISCARD _CONSTEXPR11 inline bool SafeCast( const T From, U& To ) SAFEINT_NOTHROW
 {
+    // Cast from enum is allowed, cast to enum is not.
+    static_assert(!std::is_enum<U>::value, "Enum not allowed");
     return SafeCastHelper< U, T, GetCastMethod< U, T >::method >::Cast( From, To );
 }
 
@@ -5467,6 +5469,8 @@ public:
     _CONSTEXPR11 SafeInt() SAFEINT_NOTHROW : m_int(0)
     {
         static_assert( safeint_internal::numeric_type< T >::isInt, "Integer type required" );
+        // This wasn't compiling before, but make it explicit
+        static_assert(!std::is_enum<T>::value, "Enum not allowed");
     }
 
     // Having a constructor for every type of int
@@ -5475,6 +5479,7 @@ public:
     _CONSTEXPR11 SafeInt( const T& i ) SAFEINT_NOTHROW : m_int(i)
     {
         static_assert(safeint_internal::numeric_type< T >::isInt, "Integer type required");
+        static_assert(!std::is_enum<T>::value, "Enum not allowed");
         //always safe
     }
 
@@ -5482,18 +5487,21 @@ public:
     _CONSTEXPR11 SafeInt( bool b ) SAFEINT_NOTHROW : m_int((T)(b ? 1 : 0))
     {
         static_assert(safeint_internal::numeric_type< T >::isInt, "Integer type required");
+        static_assert(!std::is_enum<T>::value, "Enum not allowed");
     }
 
     template < typename U >
     _CONSTEXPR14 SafeInt(const SafeInt< U, E >& u) SAFEINT_CPP_THROW : m_int(0)
     {
         static_assert(safeint_internal::numeric_type< T >::isInt, "Integer type required");
+        static_assert(!std::is_enum<T>::value, "Enum not allowed");
         m_int = (T)SafeInt< T, E >( (U)u );
     }
 
     _CONSTEXPR14 SafeInt(const SafeInt< T, E >& t) SAFEINT_CPP_THROW : m_int(0)
     {
         static_assert(safeint_internal::numeric_type< T >::isInt, "Integer type required");
+        static_assert(!std::is_enum<T>::value, "Enum not allowed");
         m_int = t.m_int;
     }
 
@@ -5502,6 +5510,7 @@ public:
     {
         // m_int must be initialized to something to work with constexpr, because if it throws, then m_int is unknown
         static_assert(safeint_internal::numeric_type< T >::isInt, "Integer type required");
+        static_assert(!std::is_enum<T>::value, "Enum not allowed");
         // SafeCast will throw exceptions if i won't fit in type T
         
         SafeCastHelper< T, U, GetCastMethod< T, U >::method >::template CastThrow< E >( i, m_int );
