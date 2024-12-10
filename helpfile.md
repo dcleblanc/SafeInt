@@ -324,7 +324,7 @@ The shift operators have the following signatures:
     SafeInt< U, E > operator >>( U lhs, SafeInt< T, E > bits )
 
 Note:
-Shift operations where the right argument is larger than the number of bits in the left argument type minus 1 is implementation-defined behavior. SafeInt will attempt to help you avoid this by causing an assert in debug builds. If you prefer to have a stronger reaction, create a custom SAFEINT_ASSERT that throws or causes a fault in both debug and release builds. Shifting by a negative bit count also doesn't make sense, and is also trapped.
+Shift operations where the right argument is larger than the number of bits in the left argument type minus 1 is implementation-defined behavior. Undefined behavior, such as shifting by a negative count or more bits than the type has will throw an exception.
 
 ### Methods
 SafeInt has a a small number of methods that help with common problems, such as aligning a value, getting a pointer to the raw integer type, and helping to manage pointer arithmetic.
