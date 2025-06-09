@@ -5380,7 +5380,7 @@ template < typename U, int signed > class bits_not_negative;
 template < typename U > class bits_not_negative < U, true >
 {
 public:
-    SAFE_INT_NODISCARD _CONSTEXPR14 static bool value(U bits)
+    SAFE_INT_NODISCARD SAFEINT_CONSTEXPR14 static bool value(U bits)
     {
         return bits >= 0;
     }
@@ -5389,14 +5389,14 @@ public:
 template < typename U > class bits_not_negative < U, false >
 {
 public:
-    SAFE_INT_NODISCARD _CONSTEXPR14 static bool value(U)
+    SAFE_INT_NODISCARD SAFEINT_CONSTEXPR14 static bool value(U)
     {
         return true;
     }
 };
 
 template < typename T, typename U > 
-SAFE_INT_NODISCARD _CONSTEXPR14 bool valid_bitcount(U bits)
+SAFE_INT_NODISCARD SAFEINT_CONSTEXPR14 bool valid_bitcount(U bits)
 {
     if (bits_not_negative<U, std::numeric_limits< U >::is_signed>::value(bits))
     {
