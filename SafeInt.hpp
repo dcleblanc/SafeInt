@@ -6025,7 +6025,7 @@ public:
     // Left shift
 
     template < typename U >
-    SAFEINT_CONSTEXPR14 SafeInt< T, E > operator <<( U bits ) const SAFEINT_NOTHROW
+    SAFEINT_CONSTEXPR14 SafeInt< T, E > operator <<( U bits ) const
     {
         if (valid_bitcount<T, U>(bits))
         {
@@ -6036,7 +6036,7 @@ public:
     }
 
     template < typename U >
-    SAFEINT_CONSTEXPR14 SafeInt< T, E > operator <<( SafeInt< U, E > bits ) const SAFEINT_NOTHROW
+    SAFEINT_CONSTEXPR14 SafeInt< T, E > operator <<( SafeInt< U, E > bits ) const
     {
         if (valid_bitcount<T, U>(bits))
         {
@@ -6048,7 +6048,7 @@ public:
     // Left shift assignment
 
     template < typename U >
-    SAFEINT_CONSTEXPR14 SafeInt< T, E >& operator <<=( U bits ) SAFEINT_NOTHROW
+    SAFEINT_CONSTEXPR14 SafeInt< T, E >& operator <<=( U bits )
     {
         if (valid_bitcount<T, U>(bits))
         {
@@ -6060,7 +6060,7 @@ public:
     }
 
     template < typename U >
-    SAFEINT_CONSTEXPR14 SafeInt< T, E >& operator <<=( SafeInt< U, E > bits ) SAFEINT_NOTHROW
+    SAFEINT_CONSTEXPR14 SafeInt< T, E >& operator <<=( SafeInt< U, E > bits )
     {
         if (valid_bitcount<T, U>(bits))
         {
@@ -6073,7 +6073,7 @@ public:
 
     // Right shift
     template < typename U >
-    SAFEINT_CONSTEXPR14 SafeInt< T, E > operator >>( U bits ) const SAFEINT_NOTHROW
+    SAFEINT_CONSTEXPR14 SafeInt< T, E > operator >>( U bits ) const
     {
         if (valid_bitcount<T, U>(bits))
         {
@@ -6084,7 +6084,7 @@ public:
     }
 
     template < typename U >
-    SAFEINT_CONSTEXPR14 SafeInt< T, E > operator >>( SafeInt< U, E > bits ) const SAFEINT_NOTHROW
+    SAFEINT_CONSTEXPR14 SafeInt< T, E > operator >>( SafeInt< U, E > bits ) const
     {
         if (valid_bitcount<T, U>(bits))
         {
@@ -6096,7 +6096,7 @@ public:
 
     // Right shift assignment
     template < typename U >
-    SAFEINT_CONSTEXPR14 SafeInt< T, E >& operator >>=( U bits ) SAFEINT_NOTHROW
+    SAFEINT_CONSTEXPR14 SafeInt< T, E >& operator >>=( U bits )
     {
         if (valid_bitcount<T, U>(bits))
         {
@@ -6108,7 +6108,7 @@ public:
     }
 
     template < typename U >
-    SAFEINT_CONSTEXPR14 SafeInt< T, E >& operator >>=( SafeInt< U, E > bits ) SAFEINT_NOTHROW
+    SAFEINT_CONSTEXPR14 SafeInt< T, E >& operator >>=( SafeInt< U, E > bits )
     {
         if (valid_bitcount<T, U>(bits))
         {
