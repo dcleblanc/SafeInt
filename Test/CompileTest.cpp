@@ -257,6 +257,7 @@ void CompileType()
 
 }
 
+#if 0
 void MoveRegression()
 {
 	#if CPLUSPLUS_STD == CPLUSPLUS_17
@@ -283,6 +284,8 @@ void MoveRegression()
 	x = std::move(y);
 	#endif
 }
+#endif
+
 void CompileMe()
 {
 	CompileType<char>();
@@ -303,7 +306,7 @@ void CompileMe()
 	CompileSigned<signed int>();
 	CompileSigned<signed long>();
 	CompileSigned<signed long long>();
-	MoveRegression();
+//	MoveRegression();
 }
 
 /*

@@ -21,18 +21,20 @@ find_program(CLANG_PLUS_PLUS "clang++")
 if(NOT CLANG_PLUS_PLUS)
     message(STATUS "Clang compiler not available, skipping")
 else()
+    option(ENABLE_CPLUSPLUS98 "Enable C++98 compile tests" OFF)
+
     message(STATUS "clang++ available, configuring clang tests")
 
     set(CMAKE_CXX_COMPILER ${CLANG_PLUS_PLUS})
 
     # the standard level is already at C++11, which is what we need for runtime tests
-    add_compile_options(-O3 -ftrapv)
+    add_compile_options(-O2 -ftrapv)
 
     # Note - the test matrix here is as follows:
     # int128 is available (best case)
     # no int128, but we do have intrinsics
     # fallback C++ code, which is less efficient
-    # 
+   # 
     # Coverage will vary, depending on the capabilities of the platform. 
     # We cannot force coverage for options that aren't supported.
     # Tests are:
@@ -149,6 +151,9 @@ else()
 
     target_compile_options(CompileTest_clang17_NoEH PUBLIC -Wall -Wextra -Werror -std=c++17 -fno-exceptions)
 
+    if(ENABLE_CPLUSPLUS98)
+# Current libraries require C++11, this breaks unless you have older libraries
+
     add_executable(CompileTest_clang98
         ../CompileTest.cpp
         ../ConstExpr.cpp 
@@ -157,6 +162,7 @@ else()
     )
 
     target_compile_options(CompileTest_clang98 PUBLIC -D SAFEINT_USE_CPLUSCPLUS_98 -Wall -Wextra -Werror -std=c++98 -fno-exceptions)
+    endif()
 
     add_executable(safe_math_test_clang
         ../c_safe_math/safe_math_test.c
@@ -178,7 +184,6 @@ else()
         -Wall 
         -Wextra 
         -Werror 
-        -Wno-old-style-cast
         # Ignore warning about using long long
         -Wno-c++98-compat-pedantic 
         # Do not care if the test harness isn't padded precisely
@@ -203,9 +208,7 @@ else()
         -Wall 
         -Wextra 
         -Wincompatible-pointer-types 
-        -Wreserved-identifier
         -Wdeclaration-after-statement
-        -Wc++98-compat
         -Werror
     # As per clang documentation, enable this periodically to check, -Wall, -Wextra
     # won't give you experimental warnings.

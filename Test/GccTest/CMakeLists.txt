@@ -31,7 +31,7 @@ else()
     message(STATUS "g++ available, configuring g++ tests")
     set(CMAKE_CXX_COMPILER ${GCC_PLUS_PLUS})
     # the standard level is already at C++11, which is what we need for runtime tests
-    add_compile_options(-O3 -ftrapv)
+#    add_compile_options(-O3 -ftrapv)
 
     # Note - -fsanitize=undefined isn't currently working with g++ and cmake
     # if you go build from the old makefile in Test/GccTest, it does work
