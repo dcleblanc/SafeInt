@@ -134,7 +134,7 @@ Please read helpfile.md before using the class.
 // Also, allow the user to force this, in case the compiler
 // doesn't support the __cpp_exceptions feature
 #if !defined SAFE_INT_HAS_EXCEPTIONS
-    #if __cpp_exceptions >= 199711L
+    #if defined(__cpp_exceptions) && __cpp_exceptions >= 199711L
         #define SAFE_INT_HAS_EXCEPTIONS 1
     #else
         #define SAFE_INT_HAS_EXCEPTIONS 0
