@@ -6025,7 +6025,7 @@ public:
     // Left shift
 
     template < typename U >
-    SAFEINT_CONSTEXPR14 SafeInt< T, E > operator <<( U bits ) const SAFEINT_NOTHROW
+    SAFEINT_CONSTEXPR14 SafeInt< T, E > operator <<( U bits ) const SAFEINT_CPP_THROW
     {
         if (valid_bitcount<T, U>(bits))
         {
@@ -6036,7 +6036,7 @@ public:
     }
 
     template < typename U >
-    SAFEINT_CONSTEXPR14 SafeInt< T, E > operator <<( SafeInt< U, E > bits ) const SAFEINT_NOTHROW
+    SAFEINT_CONSTEXPR14 SafeInt< T, E > operator <<( SafeInt< U, E > bits ) const SAFEINT_CPP_THROW
     {
         if (valid_bitcount<T, U>(bits))
         {
@@ -6048,7 +6048,7 @@ public:
     // Left shift assignment
 
     template < typename U >
-    SAFEINT_CONSTEXPR14 SafeInt< T, E >& operator <<=( U bits ) SAFEINT_NOTHROW
+    SAFEINT_CONSTEXPR14 SafeInt< T, E >& operator <<=( U bits ) SAFEINT_CPP_THROW
     {
         if (valid_bitcount<T, U>(bits))
         {
@@ -6060,7 +6060,7 @@ public:
     }
 
     template < typename U >
-    SAFEINT_CONSTEXPR14 SafeInt< T, E >& operator <<=( SafeInt< U, E > bits ) SAFEINT_NOTHROW
+    SAFEINT_CONSTEXPR14 SafeInt< T, E >& operator <<=( SafeInt< U, E > bits ) SAFEINT_CPP_THROW
     {
         if (valid_bitcount<T, U>(bits))
         {
@@ -6073,7 +6073,7 @@ public:
 
     // Right shift
     template < typename U >
-    SAFEINT_CONSTEXPR14 SafeInt< T, E > operator >>( U bits ) const SAFEINT_NOTHROW
+    SAFEINT_CONSTEXPR14 SafeInt< T, E > operator >>( U bits ) const SAFEINT_CPP_THROW
     {
         if (valid_bitcount<T, U>(bits))
         {
@@ -6084,7 +6084,7 @@ public:
     }
 
     template < typename U >
-    SAFEINT_CONSTEXPR14 SafeInt< T, E > operator >>( SafeInt< U, E > bits ) const SAFEINT_NOTHROW
+    SAFEINT_CONSTEXPR14 SafeInt< T, E > operator >>( SafeInt< U, E > bits ) const SAFEINT_CPP_THROW
     {
         if (valid_bitcount<T, U>(bits))
         {
@@ -6096,7 +6096,7 @@ public:
 
     // Right shift assignment
     template < typename U >
-    SAFEINT_CONSTEXPR14 SafeInt< T, E >& operator >>=( U bits ) SAFEINT_NOTHROW
+    SAFEINT_CONSTEXPR14 SafeInt< T, E >& operator >>=( U bits ) SAFEINT_CPP_THROW
     {
         if (valid_bitcount<T, U>(bits))
         {
@@ -6108,7 +6108,7 @@ public:
     }
 
     template < typename U >
-    SAFEINT_CONSTEXPR14 SafeInt< T, E >& operator >>=( SafeInt< U, E > bits ) SAFEINT_NOTHROW
+    SAFEINT_CONSTEXPR14 SafeInt< T, E >& operator >>=( SafeInt< U, E > bits ) SAFEINT_CPP_THROW
     {
         if (valid_bitcount<T, U>(bits))
         {
@@ -6854,14 +6854,14 @@ SAFEINT_CONSTEXPR14 T& operator |=( T& lhs, SafeInt< U, E > rhs ) SAFEINT_NOTHRO
 }
 
 template < typename T, typename U, typename E >
-SAFEINT_CONSTEXPR14 T& operator <<=( T& lhs, SafeInt< U, E > rhs ) SAFEINT_NOTHROW
+SAFEINT_CONSTEXPR14 T& operator <<=( T& lhs, SafeInt< U, E > rhs ) SAFEINT_CPP_THROW
 {
     lhs = (T)( SafeInt< T, E >( lhs ) << (U)rhs );
     return lhs;
 }
 
 template < typename T, typename U, typename E >
-SAFEINT_CONSTEXPR14 T& operator >>=( T& lhs, SafeInt< U, E > rhs ) SAFEINT_NOTHROW
+SAFEINT_CONSTEXPR14 T& operator >>=( T& lhs, SafeInt< U, E > rhs ) SAFEINT_CPP_THROW
 {
     lhs = (T)( SafeInt< T, E >( lhs ) >> (U)rhs );
     return lhs;
@@ -6964,7 +6964,7 @@ SAFEINT_CONSTEXPR14 T*& operator >>=( T*& lhs, SafeInt< U, E > ) SAFEINT_NOTHROW
 
 // Left shift
 template < typename T, typename U, typename E >
-SAFEINT_CONSTEXPR14 SafeInt< U, E > operator <<( U lhs, SafeInt< T, E > bits ) SAFEINT_NOTHROW
+SAFEINT_CONSTEXPR14 SafeInt< U, E > operator <<( U lhs, SafeInt< T, E > bits ) SAFEINT_CPP_THROW
 {
     if (valid_bitcount<U, T>(bits))
     {
@@ -6976,7 +6976,7 @@ SAFEINT_CONSTEXPR14 SafeInt< U, E > operator <<( U lhs, SafeInt< T, E > bits ) S
 
 // Right shift
 template < typename T, typename U, typename E >
-SAFEINT_CONSTEXPR14 SafeInt< U, E > operator >>( U lhs, SafeInt< T, E > bits ) SAFEINT_NOTHROW
+SAFEINT_CONSTEXPR14 SafeInt< U, E > operator >>( U lhs, SafeInt< T, E > bits ) SAFEINT_CPP_THROW
 {
     if (valid_bitcount<U, T>(bits))
     {
