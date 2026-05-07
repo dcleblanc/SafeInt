@@ -6966,7 +6966,7 @@ SAFEINT_CONSTEXPR14 T*& operator >>=( T*& lhs, SafeInt< U, E > ) SAFEINT_NOTHROW
 template < typename T, typename U, typename E >
 SAFEINT_CONSTEXPR14 SafeInt< U, E > operator <<( U lhs, SafeInt< T, E > bits ) SAFEINT_NOTHROW
 {
-    if (valid_bitcount<T, U>(bits))
+    if (valid_bitcount<U, T>(bits))
     {
         return SafeInt< U, E >((U)(lhs << (T)bits));
     }
@@ -6978,7 +6978,7 @@ SAFEINT_CONSTEXPR14 SafeInt< U, E > operator <<( U lhs, SafeInt< T, E > bits ) S
 template < typename T, typename U, typename E >
 SAFEINT_CONSTEXPR14 SafeInt< U, E > operator >>( U lhs, SafeInt< T, E > bits ) SAFEINT_NOTHROW
 {
-    if (valid_bitcount<T, U>(bits))
+    if (valid_bitcount<U, T>(bits))
     {
         return SafeInt< U, E >((U)(lhs >> (T)bits));
     }
