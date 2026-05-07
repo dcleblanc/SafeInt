@@ -5395,19 +5395,102 @@ public:
     }
 };
 
-template < typename T, typename U > 
-SAFE_INT_NODISCARD SAFEINT_CONSTEXPR14 bool valid_bitcount(U bits)
-{
-    if (bits_not_negative<U, std::numeric_limits< U >::is_signed>::value(bits))
-    {
-        if (bits < (int)safeint_internal::int_traits< T >::bitCount)
-        {
-            return true;
-        }
-    }
+// Shift validation uses the enum-dispatch pattern used elsewhere in this file
+// (see BinaryMethod / BinaryAndHelper, AdditionMethod / AdditionHelper, etc.):
+// a compile-time enum value is computed from properties of T, and a helper
+// class template is specialized on that enum to perform the validation.
+//
+// Three states cover the shift rules:
+//
+//   ShiftState_RightShift
+//       Any T.  The lhs value does not affect well-definedness of >> on any
+//       supported platform; only the bit count needs to be in [0, bitCount<T>).
+//
+//   ShiftState_LeftShiftUnsigned
+//       Unsigned T.  Wraparound is well-defined; only the bit count matters,
+//       same range as right shift.
+//
+//   ShiftState_LeftShiftSigned
+//       Signed T.  Bit count must be in [0, bitCount<T> - 1), AND the lhs
+//       value must not have any bits set that would shift into or past the
+//       sign bit.  Shifting a negative signed value, or shifting a positive
+//       value into the sign bit, is undefined behavior pre-C++20.
+//
+// The signed-left-shift value check uses an unsigned-cast trick to fold both
+// failure modes (negative lhs, and positive lhs that would overflow into the
+// sign bit) into one comparison: a negative lhs casts to a large unsigned
+// value that exceeds the threshold, and a too-large positive lhs fails
+// directly.
 
-    return false;
-}
+enum ShiftState
+{
+    ShiftState_RightShift,
+    ShiftState_LeftShiftUnsigned,
+    ShiftState_LeftShiftSigned
+};
+
+// IsLeftShift is a non-type bool: true selects a left-shift state based on
+// signedness of T; false selects ShiftState_RightShift unconditionally.
+template < typename T, bool IsLeftShift > class ShiftMethod
+{
+public:
+    enum
+    {
+        method = !IsLeftShift                            ? ShiftState_RightShift :
+                 std::numeric_limits< T >::is_signed     ? ShiftState_LeftShiftSigned
+                                                         : ShiftState_LeftShiftUnsigned
+    };
+};
+
+template < typename T, typename U, int method > class ShiftHelper;
+
+template < typename T, typename U > class ShiftHelper< T, U, ShiftState_RightShift >
+{
+public:
+    SAFE_INT_NODISCARD SAFEINT_CONSTEXPR14 static bool ValidBitcount(T /*lhs*/, U bits) SAFEINT_NOTHROW
+    {
+        if (bits_not_negative<U, std::numeric_limits< U >::is_signed>::value(bits))
+        {
+            if (bits < (int)safeint_internal::int_traits< T >::bitCount)
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+};
+
+template < typename T, typename U > class ShiftHelper< T, U, ShiftState_LeftShiftUnsigned >
+{
+public:
+    SAFE_INT_NODISCARD SAFEINT_CONSTEXPR14 static bool ValidBitcount(T /*lhs*/, U bits) SAFEINT_NOTHROW
+    {
+        if (bits_not_negative<U, std::numeric_limits< U >::is_signed>::value(bits))
+        {
+            if (bits < (int)safeint_internal::int_traits< T >::bitCount)
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+};
+
+template < typename T, typename U > class ShiftHelper< T, U, ShiftState_LeftShiftSigned >
+{
+public:
+    SAFE_INT_NODISCARD SAFEINT_CONSTEXPR14 static bool ValidBitcount(T lhs, U bits) SAFEINT_NOTHROW
+    {
+        if (!bits_not_negative<U, std::numeric_limits< U >::is_signed>::value(bits))
+            return false;
+
+        if (bits >= (int)safeint_internal::int_traits< T >::bitCount - 1)
+            return false;
+
+        typedef typename std::make_unsigned< T >::type UT;
+        return (UT)lhs <= (UT)(std::numeric_limits< T >::max() >> bits);
+    }
+};
 
 /*****************  External functions ****************************************/
 
@@ -6027,7 +6110,7 @@ public:
     template < typename U >
     SAFEINT_CONSTEXPR14 SafeInt< T, E > operator <<( U bits ) const SAFEINT_CPP_THROW
     {
-        if (valid_bitcount<T, U>(bits))
+        if (ShiftHelper< T, U, ShiftMethod< T, true >::method >::ValidBitcount(m_int, bits))
         {
             return SafeInt< T, E >((T)(m_int << bits));
         }
@@ -6038,7 +6121,7 @@ public:
     template < typename U >
     SAFEINT_CONSTEXPR14 SafeInt< T, E > operator <<( SafeInt< U, E > bits ) const SAFEINT_CPP_THROW
     {
-        if (valid_bitcount<T, U>(bits))
+        if (ShiftHelper< T, U, ShiftMethod< T, true >::method >::ValidBitcount(m_int, bits))
         {
             return SafeInt< T, E >((T)(m_int << (U)bits));
         }
@@ -6050,7 +6133,7 @@ public:
     template < typename U >
     SAFEINT_CONSTEXPR14 SafeInt< T, E >& operator <<=( U bits ) SAFEINT_CPP_THROW
     {
-        if (valid_bitcount<T, U>(bits))
+        if (ShiftHelper< T, U, ShiftMethod< T, true >::method >::ValidBitcount(m_int, bits))
         {
             m_int <<= bits;
             return *this;
@@ -6062,7 +6145,7 @@ public:
     template < typename U >
     SAFEINT_CONSTEXPR14 SafeInt< T, E >& operator <<=( SafeInt< U, E > bits ) SAFEINT_CPP_THROW
     {
-        if (valid_bitcount<T, U>(bits))
+        if (ShiftHelper< T, U, ShiftMethod< T, true >::method >::ValidBitcount(m_int, bits))
         {
             m_int <<= (U)bits;
             return *this;
@@ -6075,7 +6158,7 @@ public:
     template < typename U >
     SAFEINT_CONSTEXPR14 SafeInt< T, E > operator >>( U bits ) const SAFEINT_CPP_THROW
     {
-        if (valid_bitcount<T, U>(bits))
+        if (ShiftHelper< T, U, ShiftMethod< T, false >::method >::ValidBitcount(m_int, bits))
         {
             return SafeInt< T, E >((T)(m_int >> bits));
         }
@@ -6086,7 +6169,7 @@ public:
     template < typename U >
     SAFEINT_CONSTEXPR14 SafeInt< T, E > operator >>( SafeInt< U, E > bits ) const SAFEINT_CPP_THROW
     {
-        if (valid_bitcount<T, U>(bits))
+        if (ShiftHelper< T, U, ShiftMethod< T, false >::method >::ValidBitcount(m_int, bits))
         {
             return SafeInt< T, E >((T)(m_int >> (U)bits));
         }
@@ -6098,7 +6181,7 @@ public:
     template < typename U >
     SAFEINT_CONSTEXPR14 SafeInt< T, E >& operator >>=( U bits ) SAFEINT_CPP_THROW
     {
-        if (valid_bitcount<T, U>(bits))
+        if (ShiftHelper< T, U, ShiftMethod< T, false >::method >::ValidBitcount(m_int, bits))
         {
             m_int >>= bits;
             return *this;
@@ -6110,7 +6193,7 @@ public:
     template < typename U >
     SAFEINT_CONSTEXPR14 SafeInt< T, E >& operator >>=( SafeInt< U, E > bits ) SAFEINT_CPP_THROW
     {
-        if (valid_bitcount<T, U>(bits))
+        if (ShiftHelper< T, U, ShiftMethod< T, false >::method >::ValidBitcount(m_int, bits))
         {
             m_int >>= (U)bits;
             return *this;
@@ -6966,7 +7049,7 @@ SAFEINT_CONSTEXPR14 T*& operator >>=( T*& lhs, SafeInt< U, E > ) SAFEINT_NOTHROW
 template < typename T, typename U, typename E >
 SAFEINT_CONSTEXPR14 SafeInt< U, E > operator <<( U lhs, SafeInt< T, E > bits ) SAFEINT_CPP_THROW
 {
-    if (valid_bitcount<U, T>(bits))
+    if (ShiftHelper< U, T, ShiftMethod< U, true >::method >::ValidBitcount(lhs, bits))
     {
         return SafeInt< U, E >((U)(lhs << (T)bits));
     }
@@ -6978,7 +7061,7 @@ SAFEINT_CONSTEXPR14 SafeInt< U, E > operator <<( U lhs, SafeInt< T, E > bits ) S
 template < typename T, typename U, typename E >
 SAFEINT_CONSTEXPR14 SafeInt< U, E > operator >>( U lhs, SafeInt< T, E > bits ) SAFEINT_CPP_THROW
 {
-    if (valid_bitcount<U, T>(bits))
+    if (ShiftHelper< U, T, ShiftMethod< U, false >::method >::ValidBitcount(lhs, bits))
     {
         return SafeInt< U, E >((U)(lhs >> (T)bits));
     }
