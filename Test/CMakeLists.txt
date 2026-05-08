@@ -5,6 +5,7 @@ add_executable(SafeInt_Test
     IncDecVerify.cpp
     ModVerify.cpp
     MultVerify.cpp
+    ShiftVerify.cpp
     SubVerify.cpp
     TestMain.cpp
     TestMain.h)

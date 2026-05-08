@@ -42,5 +42,6 @@ int main(int, char**)
     mod_verify::ModVerify();
     incdec_verify::IncDecVerify();
     negation_verify::NegationVerify();
+    shift_verify::ShiftVerify();
     return 0;
 }

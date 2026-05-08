@@ -48,6 +48,7 @@ else()
         ../ModVerify.cpp 
         ../MultVerify.cpp 
         ../MultTestCase.cpp
+        ../ShiftVerify.cpp 
         ../SubVerify.cpp 
         ../SubTestCase.cpp
         ../TestMain.cpp
@@ -66,6 +67,7 @@ else()
         ../ModVerify.cpp 
         ../MultVerify.cpp 
         ../MultTestCase.cpp
+        ../ShiftVerify.cpp 
         ../SubVerify.cpp 
         ../SubTestCase.cpp
         ../TestMain.cpp
@@ -86,6 +88,7 @@ else()
         ../ModVerify.cpp 
         ../MultVerify.cpp 
         ../MultTestCase.cpp
+        ../ShiftVerify.cpp 
         ../SubVerify.cpp 
         ../SubTestCase.cpp
         ../TestMain.cpp
