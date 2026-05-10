@@ -42,5 +42,9 @@ int main(int, char**)
     mod_verify::ModVerify();
     incdec_verify::IncDecVerify();
     negation_verify::NegationVerify();
+    shift_verify::ShiftVerify();
+#if defined SAFEINT_TEST_ALIGN
+    align_verify::AlignVerify();
+#endif
     return 0;
 }

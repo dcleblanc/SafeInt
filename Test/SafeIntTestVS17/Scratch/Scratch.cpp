@@ -13,10 +13,10 @@ Use this to check specific scenarios
 
 int main(int argc, char** argv)
 {
-    std::string s = "12345678";
+    std::uint32_t lhs = 1;            // U = std::uint32_t
+    SafeInt<std::uint64_t> bits = 40; // T = std::uint64_t
 
-    SafeInt<uint64_t> a = 1;
-    int64_t b = 2;
+    auto foo = lhs << bits;
 
-    return a - b;
+    return 0;
 }

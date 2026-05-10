@@ -9,3 +9,5 @@ build/
 /Test/MsvcTest/CMakeSettings.json
 /.vs
 Test/c_safe_math/c_safe_math.vcxproj
+/Test/SafeIntTestVS17/Scratch/Scratch.exe
+/Test/SafeIntTestVS17/Scratch/Scratch.obj

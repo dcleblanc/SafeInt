@@ -30,4 +30,8 @@ namespace mod_verify { void ModVerify(); }
 namespace incdec_verify { void IncDecVerify(); }
 namespace cast_verify { void CastVerify(); }
 namespace negation_verify { void NegationVerify(); }
+namespace shift_verify { void ShiftVerify(); }
+#if defined SAFEINT_TEST_ALIGN
+namespace align_verify { void AlignVerify(); }
+#endif
 
