@@ -648,6 +648,7 @@ namespace safeint_internal
     {
     public:
         static_assert(safeint_internal::numeric_type< T >::isInt, "Integer type required");
+        static_assert(sizeof(T) <= 8, "SafeInt supports integer types up to 64 bits");
 
         enum
         {
