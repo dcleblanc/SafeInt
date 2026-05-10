@@ -11,14 +11,14 @@ clean:
 	rm -f *.err
 
 
-SafeIntTest: ../AddVerify.cpp ../CastVerify.cpp ../DivVerify.cpp ../IncDecVerify.cpp ../ModVerify.cpp ../MultVerify.cpp ../SubVerify.cpp ../TestMain.cpp ../TestMain.h ../../SafeInt.hpp
-	g++ --std=c++11 -O3 ../AddVerify.cpp ../CastVerify.cpp ../DivVerify.cpp ../IncDecVerify.cpp ../ModVerify.cpp ../MultVerify.cpp ../SubVerify.cpp ../TestMain.cpp -o SafeIntTest 2> SafeIntTest.err
+SafeIntTest: ../AddVerify.cpp ../CastVerify.cpp ../DivVerify.cpp ../IncDecVerify.cpp ../ModVerify.cpp ../MultVerify.cpp ../SubVerify.cpp ../ShiftVerify.cpp ../TestMain.cpp ../TestMain.h ../../SafeInt.hpp
+	g++ --std=c++11 -O3 ../AddVerify.cpp ../CastVerify.cpp ../DivVerify.cpp ../IncDecVerify.cpp ../ModVerify.cpp ../MultVerify.cpp ../SubVerify.cpp ../ShiftVerify.cpp ../TestMain.cpp -o SafeIntTest 2> SafeIntTest.err
 
-SafeIntTest_NoIntrinsic: ../AddVerify.cpp ../CastVerify.cpp ../DivVerify.cpp ../IncDecVerify.cpp ../ModVerify.cpp ../MultVerify.cpp ../SubVerify.cpp ../TestMain.cpp ../TestMain.h ../../SafeInt.hpp
-	g++ --std=c++11 -O3 -D SAFEINT_USE_INTRINSICS=0 -fsanitize=undefined -ftrapv ../AddVerify.cpp ../CastVerify.cpp ../DivVerify.cpp ../IncDecVerify.cpp ../ModVerify.cpp ../MultVerify.cpp ../SubVerify.cpp ../TestMain.cpp -o SafeIntTest_NoIntrinsic 2> SafeIntTest_NoIntrinsic.err
+SafeIntTest_NoIntrinsic: ../AddVerify.cpp ../CastVerify.cpp ../DivVerify.cpp ../IncDecVerify.cpp ../ModVerify.cpp ../MultVerify.cpp ../SubVerify.cpp ../ShiftVerify.cpp ../TestMain.cpp ../TestMain.h ../../SafeInt.hpp
+	g++ --std=c++11 -O3 -D SAFEINT_USE_INTRINSICS=0 -fsanitize=undefined -ftrapv ../AddVerify.cpp ../CastVerify.cpp ../DivVerify.cpp ../IncDecVerify.cpp ../ModVerify.cpp ../MultVerify.cpp ../SubVerify.cpp ../ShiftVerify.cpp ../TestMain.cpp -o SafeIntTest_NoIntrinsic 2> SafeIntTest_NoIntrinsic.err
 
-SafeIntTest_NoInt128: ../AddVerify.cpp ../CastVerify.cpp ../DivVerify.cpp ../IncDecVerify.cpp ../ModVerify.cpp ../MultVerify.cpp ../SubVerify.cpp ../TestMain.cpp ../TestMain.h ../../SafeInt.hpp
-	g++ --std=c++11 -O3 -D SAFEINT_HAS_INT128=0 -fsanitize=undefined -ftrapv ../AddVerify.cpp ../CastVerify.cpp ../DivVerify.cpp ../IncDecVerify.cpp ../ModVerify.cpp ../MultVerify.cpp ../SubVerify.cpp ../TestMain.cpp -o SafeIntTest_NoInt128 2> SafeIntTest_NoInt128.err
+SafeIntTest_NoInt128: ../AddVerify.cpp ../CastVerify.cpp ../DivVerify.cpp ../IncDecVerify.cpp ../ModVerify.cpp ../MultVerify.cpp ../SubVerify.cpp ../ShiftVerify.cpp ../TestMain.cpp ../TestMain.h ../../SafeInt.hpp
+	g++ --std=c++11 -O3 -D SAFEINT_HAS_INT128=0 -fsanitize=undefined -ftrapv ../AddVerify.cpp ../CastVerify.cpp ../DivVerify.cpp ../IncDecVerify.cpp ../ModVerify.cpp ../MultVerify.cpp ../SubVerify.cpp ../ShiftVerify.cpp ../TestMain.cpp -o SafeIntTest_NoInt128 2> SafeIntTest_NoInt128.err
 
 CompileTest: ../CompileTest.cpp ../../SafeInt.hpp ../ConstExpr.cpp ../CleanCompile.cpp
 	g++ -Wall --std=c++11 -O3 ../CompileTest.cpp ../ConstExpr.cpp ../CleanCompile.cpp -o CompileTest 2> CompileTest.err

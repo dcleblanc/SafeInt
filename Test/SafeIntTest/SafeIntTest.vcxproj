@@ -153,6 +153,7 @@
     <ClCompile Include="..\ModVerify.cpp" />
     <ClCompile Include="..\MultVerify.cpp" />
     <ClCompile Include="..\SubVerify.cpp" />
+    <ClCompile Include="..\ShiftVerify.cpp" />
     <ClCompile Include="..\TestMain.cpp" />
   </ItemGroup>
   <ItemGroup>
