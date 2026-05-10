@@ -5395,6 +5395,64 @@ public:
     }
 };
 
+// Tag-dispatched test for "is this value negative?" that does not write the
+// `lhs < 0` comparison when T is unsigned.  Avoids the compile-time-constant-
+// conditional warnings (e.g. MSVC C4127) that would otherwise fire on the
+// dead unsigned branch of any caller that handles both signed and unsigned T
+// through one template body.
+template < typename T, int is_signed > class lhs_is_negative;
+
+// Signed case
+template < typename T > class lhs_is_negative < T, true >
+{
+public:
+    SAFE_INT_NODISCARD SAFEINT_CONSTEXPR14 static bool value(T lhs)
+    {
+        return lhs < 0;
+    }
+};
+
+// Unsigned case
+template < typename T > class lhs_is_negative < T, false >
+{
+public:
+    SAFE_INT_NODISCARD SAFEINT_CONSTEXPR14 static bool value(T)
+    {
+        return false;
+    }
+};
+
+// Performs the alignment addition and mask in a way that avoids signed-
+// overflow UB.  For signed T the addition (m_int + AlignValue) overflows
+// when m_int is near max(T), which is undefined behavior; perform the
+// addition in the unsigned counterpart of T so the wrap is well-defined,
+// then cast back.  The post-check in the caller will detect the wrap by
+// observing m_int <= 0.  For unsigned T no special handling is needed
+// (wraparound is already well-defined), but the parallel specialization
+// keeps the call-site warning-clean across both signednesses.
+template < typename T, int is_signed > class align_addmask;
+
+// Signed T
+template < typename T > class align_addmask < T, true >
+{
+public:
+    SAFE_INT_NODISCARD SAFEINT_CONSTEXPR14 static T value( T lhs, T align_value )
+    {
+        typedef typename std::make_unsigned< T >::type UT;
+        return (T)( ( (UT)lhs + (UT)align_value ) & ~(UT)align_value );
+    }
+};
+
+// Unsigned T
+template < typename T > class align_addmask < T, false >
+{
+public:
+    SAFE_INT_NODISCARD SAFEINT_CONSTEXPR14 static T value( T lhs, T align_value )
+    {
+        return (T)( ( lhs + align_value ) & ~align_value );
+    }
+};
+
 // Shift validation uses the enum-dispatch pattern used elsewhere in this file
 // (see BinaryMethod / BinaryAndHelper, AdditionMethod / AdditionHelper, etc.):
 // a compile-time enum value is computed from properties of T, and a helper
@@ -6360,22 +6418,32 @@ public:
     template < alignBits bits >
     const SafeInt< T, E >& Align() SAFEINT_CPP_THROW
     {
+        // Can't align unsigned numbers on bitCount (e.g., 8 bits = 256, unsigned char max = 255)
+        // or signed numbers on bitCount-1 (e.g., 7 bits = 128, signed char max = 127).
+        // Also makes no sense to try to align on negative or no bits.
+        static_assert( bits >= 0, "Cannot align on a negative bit count" );
+        static_assert(
+            std::numeric_limits< T >::is_signed
+                ? bits < (int)safeint_internal::int_traits< T >::bitCount - 1
+                : bits < (int)safeint_internal::int_traits< T >::bitCount,
+            "Alignment bit count is too large for type T" );
+
         // Zero is always aligned
         if( m_int == 0 )
             return *this;
 
-        // We don't support aligning negative numbers at this time
-        // Can't align unsigned numbers on bitCount (e.g., 8 bits = 256, unsigned char max = 255)
-        // or signed numbers on bitCount-1 (e.g., 7 bits = 128, signed char max = 127).
-        // Also makes no sense to try to align on negative or no bits.
-
-        ShiftAssert( ( ( std::numeric_limits< T >::is_signed && bits < (int)safeint_internal::int_traits< T >::bitCount - 1 )
-                    || ( !std::numeric_limits< T >::is_signed && bits < (int)safeint_internal::int_traits< T >::bitCount ) ) &&
-                    bits >= 0 && ( !std::numeric_limits< T >::is_signed || m_int > 0 ) );
+        // We don't support aligning negative numbers.  The post-mask check
+        // below would usually catch a negative result, but only by relying
+        // on signed-overflow UB to wrap predictably -- so reject up front.
+        if( lhs_is_negative< T, std::numeric_limits< T >::is_signed >::value( m_int ) )
+            E::SafeIntOnOverflow();
 
         const T AlignValue = ( (T)1 << bits ) - 1;
 
-        m_int = (T)( ( m_int + AlignValue ) & ~AlignValue );
+        // Perform the addition in unsigned for signed T to avoid the
+        // signed-overflow UB on (m_int + AlignValue) near max(T).  The
+        // post-check below will still detect the wrap.
+        m_int = align_addmask< T, std::numeric_limits< T >::is_signed >::value( m_int, AlignValue );
 
         if( m_int <= 0 )
             E::SafeIntOnOverflow();

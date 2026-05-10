@@ -41,6 +41,7 @@ else()
     add_executable(SafeIntTest_gcc 
         ../AddVerify.cpp 
         ../AddTestCase.cpp
+        ../AlignVerify.cpp 
         ../CastVerify.cpp 
         ../DivVerify.cpp 
         ../DivTestCase.cpp
@@ -55,6 +56,7 @@ else()
         ../TestMain.h
         ../../SafeInt.hpp
     )
+    target_compile_definitions(SafeIntTest_gcc PRIVATE SAFEINT_TEST_ALIGN)
 
     # Forces use of the older, less efficient code that can't use either int128 or intrinsics
     add_executable(SafeIntTest_gcc_NoIntrinsic

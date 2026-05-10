@@ -1,5 +1,6 @@
 add_executable(SafeInt_Test
     AddVerify.cpp
+    AlignVerify.cpp
     CastVerify.cpp
     DivVerify.cpp
     IncDecVerify.cpp
@@ -10,6 +11,7 @@ add_executable(SafeInt_Test
     TestMain.cpp
     TestMain.h)
 target_link_libraries(SafeInt_Test PRIVATE SafeInt)
+target_compile_definitions(SafeInt_Test PRIVATE SAFEINT_TEST_ALIGN)
 
 add_executable(SafeInt_CompileTest
     CleanCompile.cpp
