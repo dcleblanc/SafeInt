@@ -18,117 +18,142 @@ Please read helpfile.md before using the class.
 
 // It is a bit tricky to sort out what compiler we are actually using,
 // do this once here, and avoid cluttering the code
-#define VISUAL_STUDIO_COMPILER 0
-#define CLANG_COMPILER 1
-#define GCC_COMPILER 2
-#define UNKNOWN_COMPILER -1
+#define SAFEINT_COMPILER_VISUAL_STUDIO 0
+#define SAFEINT_COMPILER_CLANG         1
+#define SAFEINT_COMPILER_GCC           2
+#define SAFEINT_COMPILER_UNKNOWN      -1
 
 // Clang will sometimes pretend to be Visual Studio
 // and does pretend to be gcc. Check it first, as nothing else pretends to be clang
 #if defined __clang__
-#define SAFEINT_COMPILER CLANG_COMPILER
+#define SAFEINT_COMPILER SAFEINT_COMPILER_CLANG
 #elif defined __GNUC__
-#define SAFEINT_COMPILER GCC_COMPILER
+#define SAFEINT_COMPILER SAFEINT_COMPILER_GCC
 #elif defined _MSC_VER
-#define SAFEINT_COMPILER VISUAL_STUDIO_COMPILER
+#define SAFEINT_COMPILER SAFEINT_COMPILER_VISUAL_STUDIO
 #else
-#define SAFEINT_COMPILER UNKNOWN_COMPILER
+#define SAFEINT_COMPILER SAFEINT_COMPILER_UNKNOWN
 #endif
 
-#define CPLUSPLUS_98 0
-#define CPLUSPLUS_11 1
-#define CPLUSPLUS_14 2
-#define CPLUSPLUS_17 3
+#define SAFEINT_CPLUSPLUS_98 0
+#define SAFEINT_CPLUSPLUS_11 1
+#define SAFEINT_CPLUSPLUS_14 2
+#define SAFEINT_CPLUSPLUS_17 3
 
 // Determine C++ support level
-#if SAFEINT_COMPILER == CLANG_COMPILER || SAFEINT_COMPILER == GCC_COMPILER
+#if SAFEINT_COMPILER == SAFEINT_COMPILER_CLANG || SAFEINT_COMPILER == SAFEINT_COMPILER_GCC
 
 #if __cplusplus < 201103L
-#define CPLUSPLUS_STD CPLUSPLUS_98
+#define SAFEINT_CPLUSPLUS_STD SAFEINT_CPLUSPLUS_98
 #elif __cplusplus < 201402L
-#define CPLUSPLUS_STD CPLUSPLUS_11
+#define SAFEINT_CPLUSPLUS_STD SAFEINT_CPLUSPLUS_11
 #elif __cplusplus < 201703L
-#define CPLUSPLUS_STD CPLUSPLUS_14
+#define SAFEINT_CPLUSPLUS_STD SAFEINT_CPLUSPLUS_14
 #else 
-#define CPLUSPLUS_STD CPLUSPLUS_17
+#define SAFEINT_CPLUSPLUS_STD SAFEINT_CPLUSPLUS_17
 #endif
 
-#elif SAFEINT_COMPILER == VISUAL_STUDIO_COMPILER
+#elif SAFEINT_COMPILER == SAFEINT_COMPILER_VISUAL_STUDIO
 
 // This needs additional testing to get more versions of _MSCVER
 #if _MSC_VER < 1900 // Prior to VS 2015, need more testing to determine support
-#define CPLUSPLUS_STD CPLUSPLUS_98
+#define SAFEINT_CPLUSPLUS_STD SAFEINT_CPLUSPLUS_98
 
 #elif _MSC_VER < 1910 // VS 2015
-#define CPLUSPLUS_STD CPLUSPLUS_11
+#define SAFEINT_CPLUSPLUS_STD SAFEINT_CPLUSPLUS_11
 
 #else // VS 2017 or later
 // Note - there is a __cpp_constexpr test now, but everything prior to VS 2017 reports incorrect values
-// and this version always supports at least the CPLUSPLUS_14 approach
-#define CPLUSPLUS_STD CPLUSPLUS_14
+// and this version always supports at least the SAFEINT_CPLUSPLUS_14 approach
+#define SAFEINT_CPLUSPLUS_STD SAFEINT_CPLUSPLUS_14
 
 #endif 
 
 #else
 // Unknown compiler, assume C++ 98
-#define CPLUSPLUS_STD CPLUSPLUS_98
+#define SAFEINT_CPLUSPLUS_STD SAFEINT_CPLUSPLUS_98
 #endif // Determine C++ support level
 
 #if !defined SAFEINT_USE_CPLUSCPLUS_98
-#if (SAFEINT_COMPILER == CLANG_COMPILER || SAFEINT_COMPILER == GCC_COMPILER) && CPLUSPLUS_STD < CPLUSPLUS_11
+#if (SAFEINT_COMPILER == SAFEINT_COMPILER_CLANG || SAFEINT_COMPILER == SAFEINT_COMPILER_GCC) && SAFEINT_CPLUSPLUS_STD < SAFEINT_CPLUSPLUS_11
 #error Must compile with --std=c++11, preferably --std=c++14 to use constexpr improvements
 #endif
 #endif
 
-#define CONSTEXPR_NONE 0
-#define CONSTEXPR_CPP11 1
-#define CONSTEXPR_CPP14 2
+#define SAFEINT_CONSTEXPR_NONE 0
+#define SAFEINT_CONSTEXPR_CPP11 1
+#define SAFEINT_CONSTEXPR_CPP14 2
 
 // Let's try to use the new standard to determine feature compliance
 // If the user has an unknown compiler, or just for testing, allow forcing this setting
-#if !defined CONSTEXPR_SUPPORT
+#if !defined SAFEINT_CONSTEXPR_SUPPORT
 
 #if defined __cpp_constexpr
 // If it is gcc or clang, at least recent versions, then we have -std=c++11 or -std=c++14
 // This won't be set otherwise, but the headers won't compile, either
 #if __cpp_constexpr >= 201304L
-#define CONSTEXPR_SUPPORT CONSTEXPR_CPP14 // Clang, gcc, Visual Studio 2017 or later
+#define SAFEINT_CONSTEXPR_SUPPORT SAFEINT_CONSTEXPR_CPP14 // Clang, gcc, Visual Studio 2017 or later
 #elif __cpp_constexpr >= 200704L 
-#define CONSTEXPR_SUPPORT CONSTEXPR_CPP11 // Clang, gcc with -std=c++11, Visual Studio 2015
+#define SAFEINT_CONSTEXPR_SUPPORT SAFEINT_CONSTEXPR_CPP11 // Clang, gcc with -std=c++11, Visual Studio 2015
 #else
-#define CONSTEXPR_SUPPORT CONSTEXPR_NONE
+#define SAFEINT_CONSTEXPR_SUPPORT SAFEINT_CONSTEXPR_NONE
 #endif
 
 #else // !defined __cpp_constexpr
 // Visual Studio is somehow not playing nice. shows __cpp_constexpr visually as defined, but won't compile
-#if SAFEINT_COMPILER == VISUAL_STUDIO_COMPILER
-#if CPLUSPLUS_STD == CPLUSPLUS_14
-#define CONSTEXPR_SUPPORT CONSTEXPR_CPP14
-#elif CPLUSPLUS_STD == CPLUSPLUS_11
-#define CONSTEXPR_SUPPORT CONSTEXPR_CPP11
+#if SAFEINT_COMPILER == SAFEINT_COMPILER_VISUAL_STUDIO
+#if SAFEINT_CPLUSPLUS_STD == SAFEINT_CPLUSPLUS_14
+#define SAFEINT_CONSTEXPR_SUPPORT SAFEINT_CONSTEXPR_CPP14
+#elif SAFEINT_CPLUSPLUS_STD == SAFEINT_CPLUSPLUS_11
+#define SAFEINT_CONSTEXPR_SUPPORT SAFEINT_CONSTEXPR_CPP11
 #else
-#define CONSTEXPR_SUPPORT CONSTEXPR_NONE
+#define SAFEINT_CONSTEXPR_SUPPORT SAFEINT_CONSTEXPR_NONE
 #endif
 #else
-#define CONSTEXPR_SUPPORT CONSTEXPR_NONE
+#define SAFEINT_CONSTEXPR_SUPPORT SAFEINT_CONSTEXPR_NONE
 #endif
 
 #endif // defined __cpp_constexpr
 
-#endif // !defined CONSTEXPR_SUPPORT
+#endif // !defined SAFEINT_CONSTEXPR_SUPPORT
 
-#if CONSTEXPR_SUPPORT == CONSTEXPR_NONE
+#if SAFEINT_CONSTEXPR_SUPPORT == SAFEINT_CONSTEXPR_NONE
 #define SAFEINT_CONSTEXPR11
 #define SAFEINT_CONSTEXPR14
-#elif CONSTEXPR_SUPPORT == CONSTEXPR_CPP11
+#elif SAFEINT_CONSTEXPR_SUPPORT == SAFEINT_CONSTEXPR_CPP11
 #define SAFEINT_CONSTEXPR11 constexpr
 #define SAFEINT_CONSTEXPR14
-#elif CPLUSPLUS_STD >= CPLUSPLUS_14
+#elif SAFEINT_CPLUSPLUS_STD >= SAFEINT_CPLUSPLUS_14
 #define SAFEINT_CONSTEXPR11 constexpr
 #define SAFEINT_CONSTEXPR14 constexpr
 #else
-#error "Unexpected value of CPLUSPLUS_STD"
+#error "Unexpected value of SAFEINT_CPLUSPLUS_STD"
 #endif
+
+// Backwards-compatibility aliases for unprefixed macros.  These names polluted
+// the global preprocessor namespace and are now spelled SAFEINT_<NAME>.  The
+// old names remain as aliases for callers that reference them directly (e.g.
+// in their own #if conditions).  Define SAFEINT_NO_LEGACY_MACROS before
+// including this header to opt out of the aliases and get a clean namespace.
+#if !defined SAFEINT_NO_LEGACY_MACROS
+
+#define VISUAL_STUDIO_COMPILER SAFEINT_COMPILER_VISUAL_STUDIO
+#define CLANG_COMPILER         SAFEINT_COMPILER_CLANG
+#define GCC_COMPILER           SAFEINT_COMPILER_GCC
+#define UNKNOWN_COMPILER       SAFEINT_COMPILER_UNKNOWN
+
+#define CPLUSPLUS_98  SAFEINT_CPLUSPLUS_98
+#define CPLUSPLUS_11  SAFEINT_CPLUSPLUS_11
+#define CPLUSPLUS_14  SAFEINT_CPLUSPLUS_14
+#define CPLUSPLUS_17  SAFEINT_CPLUSPLUS_17
+#define CPLUSPLUS_STD SAFEINT_CPLUSPLUS_STD
+
+#define CONSTEXPR_NONE    SAFEINT_CONSTEXPR_NONE
+#define CONSTEXPR_CPP11   SAFEINT_CONSTEXPR_CPP11
+#define CONSTEXPR_CPP14   SAFEINT_CONSTEXPR_CPP14
+#define CONSTEXPR_SUPPORT SAFEINT_CONSTEXPR_SUPPORT
+
+#endif // !defined SAFEINT_NO_LEGACY_MACROS
 
 // Determine whether exceptions are enabled by the compiler
 // Also, allow the user to force this, in case the compiler
@@ -148,11 +173,11 @@ Please read helpfile.md before using the class.
 We can check for these with:
 
 #if defined(__GNUC__) && (__GNUC__ >= 4)
-#define CHECK_RESULT __attribute__ ((warn_unused_result))
+#define SAFEINT_CHECK_RESULT __attribute__ ((warn_unused_result))
 #elif defined(_MSC_VER) && (_MSC_VER >= 1700)
-#define CHECK_RESULT _Check_return_
+#define SAFEINT_CHECK_RESULT _Check_return_
 #else
-#define CHECK_RESULT
+#define SAFEINT_CHECK_RESULT
 #endif
 
 */
@@ -172,7 +197,7 @@ We can check for these with:
 #endif
 
 // Enable compiling with /Wall under VC
-#if SAFEINT_COMPILER == VISUAL_STUDIO_COMPILER
+#if SAFEINT_COMPILER == SAFEINT_COMPILER_VISUAL_STUDIO
 // Off by default - unreferenced inline function has been removed
 // Note - this intentionally leaks from the header, doesn't quench the warnings otherwise
 // Also disable Spectre mitigation warning
@@ -184,7 +209,7 @@ We can check for these with:
 #endif
 
 // More defines to accomodate compiler differences
-#if SAFEINT_COMPILER == GCC_COMPILER || SAFEINT_COMPILER == CLANG_COMPILER
+#if SAFEINT_COMPILER == SAFEINT_COMPILER_GCC || SAFEINT_COMPILER == SAFEINT_COMPILER_CLANG
 #define SAFEINT_NORETURN __attribute__((noreturn))
 #define SAFEINT_STDCALL
 #define SAFEINT_VISIBLE __attribute__ ((__visibility__("default")))
@@ -200,7 +225,7 @@ We can check for these with:
 // Other compilers might turn these into exceptions, and some users may want to not have throw() enabled.
 // In addition, some error handlers may not throw C++ exceptions, which makes everything no throw.
 // noexcept requires C++11
-#if defined SAFEINT_REMOVE_NOTHROW || CPLUSPLUS_STD == CPLUSPLUS_98
+#if defined SAFEINT_REMOVE_NOTHROW || SAFEINT_CPLUSPLUS_STD == SAFEINT_CPLUSPLUS_98
 #define SAFEINT_NOTHROW
 #else
 #define SAFEINT_NOTHROW noexcept
@@ -236,7 +261,7 @@ We can check for these with:
 
 #if !defined SAFEINT_USE_INTRINSICS
 // If it is the Visual Studio compiler, then it has to be 64-bit, and not ARM64EC
-#if SAFEINT_COMPILER == VISUAL_STUDIO_COMPILER
+#if SAFEINT_COMPILER == SAFEINT_COMPILER_VISUAL_STUDIO
     #if defined _M_AMD64 && !defined _M_ARM64EC
         #include <intrin.h>
         #define SAFEINT_USE_INTRINSICS 1
@@ -245,7 +270,7 @@ We can check for these with:
     #endif
 #else
     // Else for gcc and clang, we can use builtin functions
-    #if SAFEINT_COMPILER == CLANG_COMPILER || SAFEINT_COMPILER == GCC_COMPILER
+    #if SAFEINT_COMPILER == SAFEINT_COMPILER_CLANG || SAFEINT_COMPILER == SAFEINT_COMPILER_GCC
         #define SAFEINT_USE_INTRINSICS 1
     #else
         #define SAFEINT_USE_INTRINSICS 0
@@ -255,7 +280,7 @@ We can check for these with:
 #endif
 
 // The gcc and clang builtin functions are constexpr, but not the Microsoft intrinsics
-#if SAFEINT_USE_INTRINSICS && SAFEINT_COMPILER == VISUAL_STUDIO_COMPILER
+#if SAFEINT_USE_INTRINSICS && SAFEINT_COMPILER == SAFEINT_COMPILER_VISUAL_STUDIO
     #define SAFEINT_CONSTEXPR14_MULTIPLY 
 #else
     #define SAFEINT_CONSTEXPR14_MULTIPLY SAFEINT_CONSTEXPR14
@@ -268,7 +293,7 @@ We can check for these with:
 #define SAFEINT_ASSERT(x) assert(x)
 #endif
 
-#if SAFEINT_COMPILER == VISUAL_STUDIO_COMPILER
+#if SAFEINT_COMPILER == SAFEINT_COMPILER_VISUAL_STUDIO
 #pragma warning( pop )
 #endif
 
@@ -1734,7 +1759,7 @@ SAFEINT_CONSTEXPR14 inline bool MultiplyInt64(std::int64_t a, std::int64_t b, st
 
 #if SAFEINT_USE_INTRINSICS
 
-#if SAFEINT_COMPILER == VISUAL_STUDIO_COMPILER
+#if SAFEINT_COMPILER == SAFEINT_COMPILER_VISUAL_STUDIO
 // As usual, unsigned is easy
 inline bool MultiplyUint64( std::uint64_t a, std::uint64_t b, std::uint64_t* pRet ) SAFEINT_NOTHROW
 {
@@ -1772,7 +1797,7 @@ inline bool MultiplyInt64( std::int64_t a, std::int64_t b, std::int64_t* pRet ) 
     }
     return false;
 }
-#elif SAFEINT_COMPILER == GCC_COMPILER || SAFEINT_COMPILER == CLANG_COMPILER
+#elif SAFEINT_COMPILER == SAFEINT_COMPILER_GCC || SAFEINT_COMPILER == SAFEINT_COMPILER_CLANG
 
 SAFEINT_CONSTEXPR14 inline bool MultiplyUint64(std::uint64_t a, std::uint64_t b, std::uint64_t* pRet) SAFEINT_NOTHROW
 {
