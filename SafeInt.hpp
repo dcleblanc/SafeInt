@@ -1038,16 +1038,23 @@ public:
 
 template < typename T, typename U > class SafeCastHelper < T, U, CastFromEnum >
 {
+    // Route through the enum's actual underlying type rather than always
+    // through int.  Wide enums (underlying_type wider than int, or values
+    // that don't fit in int) were previously truncated by static_cast<int>
+    // before the range check ran -- a SafeInt<uint64_t> built from an
+    // enum class : uint64_t value of 0x100000001 would silently store 1.
+    // (Issue #77.)
+    typedef typename std::underlying_type< U >::type underlying;
 public:
     SAFE_INT_NODISCARD SAFEINT_CONSTEXPR14 static bool Cast(U u, T& t) SAFEINT_NOTHROW
     {
-        return SafeCastHelper< T, int, GetCastMethod< T, int >::method >::Cast(static_cast<int>(u), t);
+        return SafeCastHelper< T, underlying, GetCastMethod< T, underlying >::method >::Cast(static_cast<underlying>(u), t);
     }
 
     template < typename E >
     SAFEINT_CONSTEXPR14 static void CastThrow(U u, T& t) SAFEINT_CPP_THROW
     {
-        SafeCastHelper< T, int, GetCastMethod< T, int >::method >::template CastThrow< E >(static_cast<int>(u), t);
+        SafeCastHelper< T, underlying, GetCastMethod< T, underlying >::method >::template CastThrow< E >(static_cast<underlying>(u), t);
     }
 };
 
