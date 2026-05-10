@@ -445,9 +445,9 @@ enum SafeIntError
 // Now we need to define an exception handler
 // Internally defined exception handlers might assert
 #if defined SAFEINT_ASSERT_ON_EXCEPTION
-static inline void SafeIntExceptionAssert() SAFEINT_NOTHROW { SAFEINT_ASSERT(false); }
+inline void SafeIntExceptionAssert() SAFEINT_NOTHROW { SAFEINT_ASSERT(false); }
 #else
-static inline void SafeIntExceptionAssert() SAFEINT_NOTHROW {}
+inline void SafeIntExceptionAssert() SAFEINT_NOTHROW {}
 #endif
 
 #define SAFEINT_EXCEPTION_WIN32 0
