@@ -149,14 +149,29 @@ else()
 
     target_compile_options(CompileTest_clang17_NoEH PUBLIC -Wall -Wextra -Werror -std=c++17 -fno-exceptions)
 
-    add_executable(CompileTest_clang98
-        ../CompileTest.cpp
-        ../ConstExpr.cpp 
-        ../CleanCompile.cpp
-        ../../SafeInt.hpp
-    )
+    # Probe whether the C++ standard library headers are still usable under
+    # -std=c++98.  As of libstdc++ 13, even <cstdint> hard-errors under
+    # c++98 mode; clang on Linux uses libstdc++ by default, so it inherits
+    # this restriction.
+    if(NOT DEFINED SAFEINT_CLANG_HAS_CPP98)
+        try_compile(SAFEINT_CLANG_HAS_CPP98
+            ${CMAKE_CURRENT_BINARY_DIR}/cxx98_probe
+            ${CMAKE_CURRENT_SOURCE_DIR}/../cxx98_probe.cpp
+            COMPILE_DEFINITIONS -std=c++98)
+    endif()
 
-    target_compile_options(CompileTest_clang98 PUBLIC -D SAFEINT_USE_CPLUSCPLUS_98 -Wall -Wextra -Werror -std=c++98 -fno-exceptions)
+    if(SAFEINT_CLANG_HAS_CPP98)
+        add_executable(CompileTest_clang98
+            ../CompileTest.cpp
+            ../ConstExpr.cpp 
+            ../CleanCompile.cpp
+            ../../SafeInt.hpp
+        )
+
+        target_compile_options(CompileTest_clang98 PUBLIC -D SAFEINT_USE_CPLUSCPLUS_98 -Wall -Wextra -Werror -std=c++98 -fno-exceptions)
+    else()
+        message(STATUS "Skipping CompileTest_clang98: c++98 headers not usable on this toolchain")
+    endif()
 
     add_executable(safe_math_test_clang
         ../c_safe_math/safe_math_test.c

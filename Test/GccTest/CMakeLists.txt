@@ -132,14 +132,29 @@ else()
 
     target_compile_options(CompileTest_gcc14_NoEH PUBLIC -Wall -std=c++14 -fno-exceptions)
 
-    add_executable(CompileTest_gcc98
-    ../CompileTest.cpp
-    ../ConstExpr.cpp 
-    ../CleanCompile.cpp
-    ../../SafeInt.hpp
-    )
+    # Probe whether the C++ standard library headers are still usable under
+    # -std=c++98.  As of gcc 13 / libstdc++ 13, even <cstdint> hard-errors
+    # under c++98 mode (#error in <bits/c++0x_warning.h>), so the c++98
+    # CompileTest target is unbuildable on those toolchains.
+    if(NOT DEFINED SAFEINT_GCC_HAS_CPP98)
+        try_compile(SAFEINT_GCC_HAS_CPP98
+            ${CMAKE_CURRENT_BINARY_DIR}/cxx98_probe
+            ${CMAKE_CURRENT_SOURCE_DIR}/../cxx98_probe.cpp
+            COMPILE_DEFINITIONS -std=c++98)
+    endif()
 
-    target_compile_options(CompileTest_gcc98 PUBLIC -D SAFEINT_USE_CPLUSCPLUS_98 -Wall -std=c++98 -fno-exceptions)
+    if(SAFEINT_GCC_HAS_CPP98)
+        add_executable(CompileTest_gcc98
+        ../CompileTest.cpp
+        ../ConstExpr.cpp 
+        ../CleanCompile.cpp
+        ../../SafeInt.hpp
+        )
+
+        target_compile_options(CompileTest_gcc98 PUBLIC -D SAFEINT_USE_CPLUSCPLUS_98 -Wall -std=c++98 -fno-exceptions)
+    else()
+        message(STATUS "Skipping CompileTest_gcc98: c++98 headers not usable on this toolchain")
+    endif()
 
     add_executable(safe_math_test_gcc
     ../c_safe_math/safe_math_test.c
