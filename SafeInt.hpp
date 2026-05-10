@@ -5442,6 +5442,16 @@ SAFE_INT_NODISCARD SAFEINT_CONSTEXPR14 bool valid_bitcount(U bits)
 template < typename T, typename U >
 SAFE_INT_NODISCARD SAFEINT_CONSTEXPR11 inline bool SafeCast( const T From, U& To ) SAFEINT_NOTHROW
 {
+    // std::numeric_limits is unspecialized for enum types; max() and min()
+    // return 0 by default, which silently makes the range check in
+    // SafeCastHelper trivially fail for any non-zero From value.  Reject
+    // enum destinations at compile time.  If the caller actually wants this,
+    // they can cast their enum variable to its underlying type, call
+    // SafeCast, and assign the result back.
+    static_assert(!std::is_enum<U>::value,
+        "SafeCast destination type must not be an enum.  std::numeric_limits "
+        "is unspecialized for enums and the range check would be incorrect.  "
+        "Cast to the underlying type instead.");
     return SafeCastHelper< U, T, GetCastMethod< U, T >::method >::Cast( From, To );
 }
 
