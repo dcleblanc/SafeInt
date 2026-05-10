@@ -5608,7 +5608,7 @@ public:
             return false;
 
         typedef typename std::make_unsigned< T >::type UT;
-        return (UT)lhs <= (UT)(std::numeric_limits< T >::max() >> bits);
+        return (UT)lhs <= (UT)(safeint_internal::safeint_max< T >() >> bits);
     }
 };
 
