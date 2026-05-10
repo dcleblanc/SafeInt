@@ -36,6 +36,9 @@
     <ClCompile Include="..\..\SubVerify.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\ShiftVerify.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\TestMain.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
