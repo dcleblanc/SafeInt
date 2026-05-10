@@ -4812,7 +4812,10 @@ public:
     SAFE_INT_NODISCARD SAFEINT_CONSTEXPR14 static bool Subtract( const U& lhs, const T& rhs, T& result ) SAFEINT_NOTHROW
     {
         // lhs std::int64_t, rhs any signed int (including std::int64_t)
-        std::int64_t tmp = lhs - rhs;
+        // Perform the subtraction in unsigned to avoid signed-overflow UB
+        // for inputs near the int64 boundaries (e.g. INT64_MAX - (-1)).
+        // The post-check below then validates the wrapped result.
+        std::int64_t tmp = (std::int64_t)((std::uint64_t)lhs - (std::uint64_t)rhs);
 
         // we have essentially 4 cases:
         //
@@ -4847,7 +4850,10 @@ public:
     SAFEINT_CONSTEXPR14 static void SubtractThrow( const U& lhs, const T& rhs, T& result ) SAFEINT_CPP_THROW
     {
         // lhs std::int64_t, rhs any signed int (including std::int64_t)
-        std::int64_t tmp = lhs - rhs;
+        // Perform the subtraction in unsigned to avoid signed-overflow UB
+        // for inputs near the int64 boundaries (e.g. INT64_MAX - (-1)).
+        // The post-check below then validates the wrapped result.
+        std::int64_t tmp = (std::int64_t)((std::uint64_t)lhs - (std::uint64_t)rhs);
 
         // we have essentially 4 cases:
         //
@@ -5007,7 +5013,10 @@ public:
     SAFE_INT_NODISCARD SAFEINT_CONSTEXPR14 static bool Subtract( const U& lhs, const T& rhs, T& result ) SAFEINT_NOTHROW
     {
         // lhs is any signed int32 or smaller, rhs is int64
-        std::int64_t tmp = (std::int64_t)lhs - rhs;
+        // Perform the subtraction in unsigned to avoid signed-overflow UB
+        // for inputs near the int64 boundaries (e.g. 1 - INT64_MIN).  The
+        // post-check below then validates the wrapped result.
+        std::int64_t tmp = (std::int64_t)((std::uint64_t)lhs - (std::uint64_t)rhs);
 
         if( ( lhs >= 0 && rhs < 0 && tmp < lhs ) ||
             ( rhs > 0 && tmp > lhs ) )
@@ -5024,7 +5033,10 @@ public:
     SAFEINT_CONSTEXPR14 static void SubtractThrow( const U& lhs, const T& rhs, T& result ) SAFEINT_CPP_THROW
     {
         // lhs is any signed int32 or smaller, rhs is int64
-        std::int64_t tmp = (std::int64_t)lhs - rhs;
+        // Perform the subtraction in unsigned to avoid signed-overflow UB
+        // for inputs near the int64 boundaries (e.g. 1 - INT64_MIN).  The
+        // post-check below then validates the wrapped result.
+        std::int64_t tmp = (std::int64_t)((std::uint64_t)lhs - (std::uint64_t)rhs);
 
         if( ( lhs >= 0 && rhs < 0 && tmp < lhs ) ||
             ( rhs > 0 && tmp > lhs ) )
