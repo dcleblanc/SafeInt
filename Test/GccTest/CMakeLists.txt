@@ -119,6 +119,24 @@ else()
 
     target_compile_options(CompileTest_gcc17 PUBLIC -Wall -std=c++17)
 
+    add_executable(CompileTest_gcc20
+        ../CompileTest.cpp
+        ../ConstExpr.cpp 
+        ../CleanCompile.cpp
+        ../../SafeInt.hpp
+    )
+
+    target_compile_options(CompileTest_gcc20 PUBLIC -Wall -std=c++20)
+
+    add_executable(CompileTest_gcc23
+        ../CompileTest.cpp
+        ../ConstExpr.cpp 
+        ../CleanCompile.cpp
+        ../../SafeInt.hpp
+    )
+
+    target_compile_options(CompileTest_gcc23 PUBLIC -Wall -std=c++23)
+
     add_executable(CompileTest_gcc14
         ../CompileTest.cpp
         ../ConstExpr.cpp 
