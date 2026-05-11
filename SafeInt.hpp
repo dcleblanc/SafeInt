@@ -39,6 +39,8 @@ Please read helpfile.md before using the class.
 #define SAFEINT_CPLUSPLUS_11 1
 #define SAFEINT_CPLUSPLUS_14 2
 #define SAFEINT_CPLUSPLUS_17 3
+#define SAFEINT_CPLUSPLUS_20 4
+#define SAFEINT_CPLUSPLUS_23 5
 
 // Determine C++ support level
 #if SAFEINT_COMPILER == SAFEINT_COMPILER_CLANG || SAFEINT_COMPILER == SAFEINT_COMPILER_GCC
@@ -49,8 +51,13 @@ Please read helpfile.md before using the class.
 #define SAFEINT_CPLUSPLUS_STD SAFEINT_CPLUSPLUS_11
 #elif __cplusplus < 201703L
 #define SAFEINT_CPLUSPLUS_STD SAFEINT_CPLUSPLUS_14
-#else 
+#elif __cplusplus < 202002L
 #define SAFEINT_CPLUSPLUS_STD SAFEINT_CPLUSPLUS_17
+#elif __cplusplus < 202100L
+#define SAFEINT_CPLUSPLUS_STD SAFEINT_CPLUSPLUS_20
+#else
+// gcc reports 202100L for C++23 (draft); clang reports 202302L
+#define SAFEINT_CPLUSPLUS_STD SAFEINT_CPLUSPLUS_23
 #endif
 
 #elif SAFEINT_COMPILER == SAFEINT_COMPILER_VISUAL_STUDIO
@@ -62,12 +69,30 @@ Please read helpfile.md before using the class.
 #elif _MSC_VER < 1910 // VS 2015
 #define SAFEINT_CPLUSPLUS_STD SAFEINT_CPLUSPLUS_11
 
-#else // VS 2017 or later
+#elif _MSC_VER < 1920 // VS 2017
 // Note - there is a __cpp_constexpr test now, but everything prior to VS 2017 reports incorrect values
 // and this version always supports at least the SAFEINT_CPLUSPLUS_14 approach
 #define SAFEINT_CPLUSPLUS_STD SAFEINT_CPLUSPLUS_14
 
-#endif 
+#elif _MSC_VER < 1930 // VS 2019
+// VS 2019 supports C++17 fully; C++20 support was added incrementally,
+// use _MSVC_LANG to detect whether /std:c++20 was passed
+#if defined(_MSVC_LANG) && _MSVC_LANG >= 202002L
+#define SAFEINT_CPLUSPLUS_STD SAFEINT_CPLUSPLUS_20
+#else
+#define SAFEINT_CPLUSPLUS_STD SAFEINT_CPLUSPLUS_17
+#endif
+
+#else // VS 2022 or later
+#if defined(_MSVC_LANG) && _MSVC_LANG > 202002L
+#define SAFEINT_CPLUSPLUS_STD SAFEINT_CPLUSPLUS_23
+#elif defined(_MSVC_LANG) && _MSVC_LANG >= 202002L
+#define SAFEINT_CPLUSPLUS_STD SAFEINT_CPLUSPLUS_20
+#else
+#define SAFEINT_CPLUSPLUS_STD SAFEINT_CPLUSPLUS_17
+#endif
+
+#endif
 
 #else
 // Unknown compiler, assume C++ 98
