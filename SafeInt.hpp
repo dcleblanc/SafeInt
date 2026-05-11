@@ -184,7 +184,7 @@ We can check for these with:
 
 // Begin with the standard way of testing for attributes
 // Can use downlevel approaches if there's demand for it
-#if defined __has_cpp_attribute && __has_cpp_attribute(nodiscard) >= 201603L
+#if defined __has_cpp_attribute && __has_cpp_attribute(nodiscard) >= 201603L && SAFEINT_CPLUSPLUS_STD >= SAFEINT_CPLUSPLUS_17
 #define SAFE_INT_HAS_NODISCARD 1
 #else
 #define SAFE_INT_HAS_NODISCARD 0
