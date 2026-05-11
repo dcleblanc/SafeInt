@@ -1752,7 +1752,7 @@ template < typename T, typename U > class LargeIntRegMultiply;
 
 SAFEINT_CONSTEXPR14 inline bool MultiplyUint64(std::uint64_t a, std::uint64_t b, std::uint64_t* pRet) SAFEINT_NOTHROW
 {
-    safeint_uint128_t tmp = (unsigned __int128)a * (unsigned __int128)b;
+    safeint_uint128_t tmp = (safeint_uint128_t)a * (safeint_uint128_t)b;
 
     if ((tmp >> 64) == 0)
     {
