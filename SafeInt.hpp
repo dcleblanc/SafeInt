@@ -249,6 +249,8 @@ We can check for these with:
 
 #if defined __SIZEOF_INT128__ && __SIZEOF_INT128__ == 16
 #define SAFEINT_HAS_INT128 1
+__extension__ typedef          __int128 safeint_int128_t;
+__extension__ typedef unsigned __int128 safeint_uint128_t;
 #else
 #define SAFEINT_HAS_INT128 0
 #endif
@@ -1981,7 +1983,7 @@ template < typename T, typename U > class LargeIntRegMultiply;
 
 SAFEINT_CONSTEXPR14 inline bool MultiplyUint64(std::uint64_t a, std::uint64_t b, std::uint64_t* pRet) SAFEINT_NOTHROW
 {
-    unsigned __int128 tmp = (unsigned __int128)a * (unsigned __int128)b;
+    safeint_uint128_t tmp = (safeint_uint128_t)a * (safeint_uint128_t)b;
 
     if ((tmp >> 64) == 0)
     {
@@ -1994,9 +1996,9 @@ SAFEINT_CONSTEXPR14 inline bool MultiplyUint64(std::uint64_t a, std::uint64_t b,
 
 SAFEINT_CONSTEXPR14 inline bool MultiplyInt64(std::int64_t a, std::int64_t b, std::int64_t* pRet) SAFEINT_NOTHROW
 {
-    __int128 tmp = (__int128)a * (__int128)b;
+    safeint_int128_t tmp = (safeint_int128_t)a * (safeint_int128_t)b;
     *pRet = (std::int64_t)tmp;
-    std::int64_t tmp_high = (std::int64_t)((unsigned __int128)tmp >> 64);
+    std::int64_t tmp_high = (std::int64_t)((safeint_uint128_t)tmp >> 64);
 
     // If only one input is negative, result must be negative, or zero
     if( (a ^ b) < 0 )
