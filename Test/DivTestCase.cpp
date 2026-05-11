@@ -2176,3 +2176,27 @@ template<> TestVector< std::int32_t, std::int32_t, OpType::Div>::TestVector() : 
     this->test_cases = int32_int32;
     this->count = COUNTOF(int32_int32);
 }
+
+// int32_t lhs / SafeInt<int64_t> rhs - exercises DivisionCornerCaseHelper2
+// when both types are signed and sizeof(lhs type) < sizeof(rhs type).
+// The key case is INT32_MIN / -1: result fits in int64_t even though it would
+// overflow int32_t, so it should succeed.
+static const TestCase< std::int32_t, std::int64_t, OpType::Div2 > int32_int64_2[] =
+{
+    { (std::int32_t)1,          (std::int64_t)1,    true },
+    { (std::int32_t)1,          (std::int64_t)-1,   true },
+    { (std::int32_t)0x7fffffff, (std::int64_t)1,    true },
+    { (std::int32_t)0x7fffffff, (std::int64_t)-1,   true },
+    // INT32_MIN / -1 overflows int32_t but fits in int64_t: succeeds
+    { (std::int32_t)0x80000000, (std::int64_t)-1,   true },
+    // INT32_MIN / 1: succeeds normally
+    { (std::int32_t)0x80000000, (std::int64_t)1,    true },
+    // divide by zero
+    { (std::int32_t)1,          (std::int64_t)0,    false },
+};
+
+template<> TestVector< std::int32_t, std::int64_t, OpType::Div2 >::TestVector() : current(0)
+{
+    this->test_cases = int32_int64_2;
+    this->count = COUNTOF(int32_int64_2);
+}

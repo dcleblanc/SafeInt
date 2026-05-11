@@ -880,6 +880,37 @@ void DivVerifyInt64Uint32_2()
    }
 }
 
+// Exercises DivisionCornerCaseHelper2: both types signed, sizeof(lhs) < sizeof(rhs).
+// Key case: INT32_MIN / SafeInt<int64_t>(-1) succeeds because result fits in int64_t.
+void DivVerifyInt32Int64_2()
+{
+    TestVector< std::int32_t, std::int64_t, OpType::Div2 > tests;
+    TestCase< std::int32_t, std::int64_t, OpType::Div2 > test = tests.GetNext();
+
+    while (!tests.Done())
+    {
+      bool fSuccess = true;
+      try
+      {
+         SafeInt<std::int64_t> si(test.y);
+         SafeInt<std::int64_t> si2;
+
+         si2 = test.x / si;
+      }
+      catch(...)
+      {
+         fSuccess = false;
+      }
+
+      if( fSuccess != test.fExpected )
+      {
+          err_msg( "Error in case int32_int64_2 throw: ", test.x, test.y, test.fExpected );
+      }
+
+      test = tests.GetNext();
+   }
+}
+
 namespace div_verify
 {
 
@@ -916,6 +947,9 @@ void DivVerify()
    DivVerifyInt64Uint64_2();
    DivVerifyInt64Uint32();
    DivVerifyInt64Uint32_2();
+
+   // int32 lhs / SafeInt<int64> rhs - DivisionCornerCaseHelper2
+   DivVerifyInt32Int64_2();
 }
 
 } //end namespace
