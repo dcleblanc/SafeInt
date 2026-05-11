@@ -932,19 +932,19 @@ public:
 template < typename FromType > class GetCastMethod < float, FromType >
 {
 public:
-    enum{ method = CastOK };
+    enum{ method = CastToFloat };
 };
 
 template < typename FromType > class GetCastMethod < double, FromType >
 {
 public:
-    enum{ method = CastOK };
+    enum{ method = CastToFloat };
 };
 
 template < typename FromType > class GetCastMethod < long double, FromType >
 {
 public:
-    enum{ method = CastOK };
+    enum{ method = CastToFloat };
 };
 
 template < typename ToType > class GetCastMethod < ToType, float >
@@ -983,52 +983,195 @@ public:
     }
 };
 
-template <typename T, bool> class float_cast_helper;
+// Float-to-int conversion.
+//
+// Determining whether a floating point value fits into an integer target
+// is structurally similar to the integer-to-integer cast helpers above:
+// the answer depends on the integer's size and signedness, not its exact
+// type. We reduce to the eight unique cases via an enum, the same way
+// CastMethod does for integer-to-integer casts.
+//
+// Acceptance rule: a value u is accepted iff truncation toward zero
+// (the C cast's behavior) produces an in-range T, with one extra policy:
+// any strictly-negative value is rejected for unsigned targets (even
+// -0.5, which would truncate to 0). -0.0 is accepted because -0.0 == 0.0.
+//
+// For signed T this means accepting the open interval (T_MIN - 1, T_MAX + 1).
+// For unsigned T it means accepting [0, T_MAX + 1), with -0.0 sneaking
+// through the lower bound via IEEE 754 zero-equality.
+//
+// Bound representability. T_MAX + 1 is always a power of two (2^N for
+// unsigned, 2^(N-1) for signed) and is exactly representable in any IEEE
+// 754 float type because powers of two need zero mantissa bits, only an
+// exponent. For unsigned T, the lower bound is 0.0, also trivially exact.
+// For signed T, the lower bound is T_MIN - 1; this is exactly representable
+// in U iff U has more than (bitcount of T - 1) mantissa bits. So:
+//
+//   T = int8  (bitcount 8):   need >= 8 mantissa bits.  All U types ok.
+//   T = int16 (bitcount 16):  need >= 16 mantissa bits. All U types ok.
+//   T = int32 (bitcount 32):  need >= 32 mantissa bits. float has 24, no.
+//                             double has 53, yes. long double depends on
+//                             platform (always >= 53, often more).
+//   T = int64 (bitcount 64):  need >= 64 mantissa bits. float and double
+//                             do not have enough. long double on 80-bit
+//                             and 128-bit platforms does; long double on
+//                             64-bit platforms (e.g. MSVC) does not.
+//
+// Where T_MIN - 1 is not exactly representable in U, there are also no
+// representable U values in the open interval (T_MIN - 1, T_MIN). So an
+// inclusive lower bound u >= T_MIN accepts exactly the same set of
+// representable U values that the ideal open bound would. We pick between
+// the open and inclusive forms at compile time via tag dispatch on
+// numeric_limits<U>::digits.
+//
+// All literals are written as U(...) so the comparison happens in U's
+// precision, with no implicit promotion. The cast-from-literal is always
+// exact in this code: every literal is a power of two or a small integer
+// within the relevant mantissa, by construction of the cases.
 
-template <typename T> class float_cast_helper <T, true> // Unsigned case
+enum FloatBoundsCase
+{
+    FloatBounds_Int8,
+    FloatBounds_Uint8,
+    FloatBounds_Int16,
+    FloatBounds_Uint16,
+    FloatBounds_Int32,
+    FloatBounds_Uint32,
+    FloatBounds_Int64,
+    FloatBounds_Uint64
+};
+
+template < typename T >
+class GetFloatBoundsCase
 {
 public:
-    SAFE_INT_NODISCARD SAFEINT_CONSTEXPR14 static bool  Test(double d)
+    enum
     {
-        const std::uint64_t signifDouble = 0x1fffffffffffff;
+        method = safeint_internal::int_traits< T >::isInt8   ? FloatBounds_Int8   :
+                 safeint_internal::int_traits< T >::isUint8  ? FloatBounds_Uint8  :
+                 safeint_internal::int_traits< T >::isInt16  ? FloatBounds_Int16  :
+                 safeint_internal::int_traits< T >::isUint16 ? FloatBounds_Uint16 :
+                 safeint_internal::int_traits< T >::isInt32  ? FloatBounds_Int32  :
+                 safeint_internal::int_traits< T >::isUint32 ? FloatBounds_Uint32 :
+                 safeint_internal::int_traits< T >::isInt64  ? FloatBounds_Int64  :
+                                                               FloatBounds_Uint64
+    };
+};
 
-        // Anything larger than this either is larger than 2^64-1, or cannot be represented by a double
-        const std::uint64_t maxUnsignedDouble = signifDouble << 11;
+template < int > class FloatBoundsHelper;
 
-        // There is the possibility of both negative and positive zero,
-        // but we'll allow either, since (-0.0 < 0) == false
-        // if we wanted to change that, then use the signbit() macro
-        if (d < 0 || d > static_cast<double>(maxUnsignedDouble))
-            return false;
-
-        // The input can now safely be cast to an unsigned long long
-        if (static_cast<std::uint64_t>(d) > safeint_internal::safeint_max<T>())
-            return false;
-
-        return true;
+template <> class FloatBoundsHelper < FloatBounds_Int8 >
+{
+public:
+    template < typename U > static bool InRange( U u ) SAFEINT_NOTHROW
+    {
+        return u > U(-129.0L) && u < U(128.0L);
     }
 };
 
-template <typename T> class float_cast_helper <T, false> // Signed case
+template <> class FloatBoundsHelper < FloatBounds_Uint8 >
 {
 public:
-    SAFE_INT_NODISCARD SAFEINT_CONSTEXPR14 static bool Test(double d)
+    template < typename U > static bool InRange( U u ) SAFEINT_NOTHROW
     {
-        const std::uint64_t signifDouble = 0x1fffffffffffff;
-        // This has to fit in 2^63-1
-        const std::uint64_t maxSignedDouble = signifDouble << 10;
-        // The smallest signed long long is easier
-        const std::int64_t minSignedDouble = static_cast<std::int64_t>(0x8000000000000000);
+        return u >= U(0.0L) && u < U(256.0L);
+    }
+};
 
-        if (d < static_cast<double>(minSignedDouble) || d > static_cast<double>(maxSignedDouble))
-            return false;
+template <> class FloatBoundsHelper < FloatBounds_Int16 >
+{
+public:
+    template < typename U > static bool InRange( U u ) SAFEINT_NOTHROW
+    {
+        return u > U(-32769.0L) && u < U(32768.0L);
+    }
+};
 
-        // And now cast to long long, and check against min and max for this type
-        std::int64_t test = static_cast<std::int64_t>(d);
-        if ((std::int64_t)test < (std::int64_t)safeint_internal::safeint_min<T>() || (std::int64_t)test >(std::int64_t)safeint_internal::safeint_max<T>())
-            return false;
+template <> class FloatBoundsHelper < FloatBounds_Uint16 >
+{
+public:
+    template < typename U > static bool InRange( U u ) SAFEINT_NOTHROW
+    {
+        return u >= U(0.0L) && u < U(65536.0L);
+    }
+};
 
-        return true;
+template <> class FloatBoundsHelper < FloatBounds_Uint32 >
+{
+public:
+    template < typename U > static bool InRange( U u ) SAFEINT_NOTHROW
+    {
+        return u >= U(0.0L) && u < U(4294967296.0L);
+    }
+};
+
+template <> class FloatBoundsHelper < FloatBounds_Uint64 >
+{
+public:
+    template < typename U > static bool InRange( U u ) SAFEINT_NOTHROW
+    {
+        return u >= U(0.0L) && u < U(18446744073709551616.0L);
+    }
+};
+
+// Int32 and Int64 use tag dispatch on whether T_MIN - 1 is exactly
+// representable in U.
+
+template <> class FloatBoundsHelper < FloatBounds_Int32 >
+{
+public:
+    template < typename U > static bool InRange( U u ) SAFEINT_NOTHROW
+    {
+        // T_MIN - 1 = -2^31 - 1 needs >= 32 mantissa bits to represent
+        // exactly. double (53) and long double (>= 53) qualify; float (24)
+        // does not.
+        return InRangeImpl(u,
+            std::integral_constant< bool,
+                (std::numeric_limits< U >::digits >= 32) >());
+    }
+
+private:
+    // T_MIN - 1 is exactly representable in U: open lower bound.
+    template < typename U >
+    static bool InRangeImpl( U u, std::true_type ) SAFEINT_NOTHROW
+    {
+        return u > U(-2147483649.0L) && u < U(2147483648.0L);
+    }
+
+    // T_MIN - 1 is not representable; gap from T_MIN-1 to T_MIN contains
+    // no representable U values; inclusive lower bound is equivalent.
+    template < typename U >
+    static bool InRangeImpl( U u, std::false_type ) SAFEINT_NOTHROW
+    {
+        return u >= U(-2147483648.0L) && u < U(2147483648.0L);
+    }
+};
+
+template <> class FloatBoundsHelper < FloatBounds_Int64 >
+{
+public:
+    template < typename U > static bool InRange( U u ) SAFEINT_NOTHROW
+    {
+        // T_MIN - 1 = -2^63 - 1 needs >= 64 mantissa bits. Not satisfied
+        // by float (24) or double (53). For long double, satisfied on
+        // 80-bit (mantissa 64) and 128-bit (mantissa 113); not satisfied
+        // on 64-bit-long-double platforms (e.g. MSVC).
+        return InRangeImpl(u,
+            std::integral_constant< bool,
+                (std::numeric_limits< U >::digits >= 64) >());
+    }
+
+private:
+    template < typename U >
+    static bool InRangeImpl( U u, std::true_type ) SAFEINT_NOTHROW
+    {
+        return u > U(-9223372036854775809.0L) && u < U(9223372036854775808.0L);
+    }
+
+    template < typename U >
+    static bool InRangeImpl( U u, std::false_type ) SAFEINT_NOTHROW
+    {
+        return u >= U(-9223372036854775808.0L) && u < U(9223372036854775808.0L);
     }
 };
 
@@ -1037,54 +1180,142 @@ template < typename T, typename U > class SafeCastHelper < T, U, CastFromFloat >
 {
 public:
 
-    SAFE_INT_NODISCARD static bool CheckFloatingPointCast(double d)
+    static bool Cast( U u, T& t ) SAFEINT_NOTHROW
     {
-        // A double can hold at most 53 bits of the value
-        // 53 bits is:
-        bool fValid = false;
+        // Reject NaN up front. The InRange check below would also reject
+        // NaN (every ordered comparison with NaN is false, so both halves
+        // of the && are false), but making it explicit keeps the rest of
+        // the code readable without requiring the reader to be a floating-
+        // point expert.
+        if (std::isnan(u)) { return false; }
 
-        switch (std::fpclassify(d))
+        if (!FloatBoundsHelper< GetFloatBoundsCase< T >::method >::InRange(u))
         {
-        case FP_NORMAL:    // A positive or negative normalized non - zero value
-        case FP_SUBNORMAL: // A positive or negative denormalized value
-        case FP_ZERO:      // A positive or negative zero value
-            fValid = true;
-            break;
-
-        case FP_NAN:       // A quiet, signaling, or indeterminate NaN
-        case FP_INFINITE:  // A positive or negative infinity
-        default:
-            fValid = false;
-            break;
-        }
-
-        if (!fValid)
             return false;
-
-        return float_cast_helper< T, !std::numeric_limits< T >::is_signed >::Test(d);
-    }
-
-    static bool  Cast( U u, T& t ) SAFEINT_NOTHROW
-    {
-        if(CheckFloatingPointCast(u))
-        {
-            t = (T)u;
-            return true;
         }
-        return false;
+
+        t = (T)u;
+        return true;
     }
 
     template < typename E >
     static void CastThrow( U u, T& t ) SAFEINT_CPP_THROW
     {
-        if (CheckFloatingPointCast(u))
+        if (std::isnan(u)) { E::SafeIntOnOverflow(); }
+
+        if (!FloatBoundsHelper< GetFloatBoundsCase< T >::method >::InRange(u))
         {
-            t = (T)u;
-            return;
+            E::SafeIntOnOverflow();
         }
-        E::SafeIntOnOverflow();
+
+        t = (T)u;
     }
 };
+
+
+// Int-to-float conversion.
+//
+// Casting an integer to a float can silently lose precision when the
+// integer has more significant bits than the float's mantissa can hold.
+// For example, the 54-bit int64 value 2^53 + 1 cannot be represented
+// exactly in a double (53-bit mantissa); it rounds to 2^53 or 2^53 + 2.
+//
+// By default this is allowed silently -- the user asked for a float,
+// they get one, and most code that converts integers to floats is fine
+// with the closest-representable result (graphics, statistics, interop
+// with float APIs). When SAFEINT_STRICT_FLOAT_CONVERSION is defined,
+// SafeInt instead throws on any precision loss, so the user is told
+// when bit-exact preservation isn't possible.
+//
+// Detection: round-trip via the float and compare. If (U)((T)u) == u
+// then the cast preserved every bit; otherwise some bits were lost.
+// This correctly handles values like (uint64_t)0x1234 << 13, which have
+// more total bits than the mantissa but whose significand fits (the
+// trailing zeros come "for free" via the float's exponent), as well as
+// powers of two of any magnitude.
+//
+// We dispatch on whether precision loss is even possible for this (T,U)
+// pair at compile time. When std::numeric_limits<U>::digits is no
+// greater than std::numeric_limits<T>::digits, every value of U is
+// exactly representable in T; no runtime check needed. This skips the
+// check entirely for small integer types into float, every standard
+// integer into double (except int64/uint64), and so on.
+
+template < typename T, typename U > class SafeCastHelper < T, U, CastToFloat >
+{
+public:
+    // T is the target float type; U is the source integer type.
+
+    SAFE_INT_NODISCARD SAFEINT_CONSTEXPR14 static bool Cast( U u, T& t ) SAFEINT_NOTHROW
+    {
+        return CastImpl( u, t, PrecisionLossPossible() );
+    }
+
+    template < typename E >
+    SAFEINT_CONSTEXPR14 static void CastThrow( U u, T& t ) SAFEINT_CPP_THROW
+    {
+        CastThrowImpl< E >( u, t, PrecisionLossPossible() );
+    }
+
+private:
+    typedef std::integral_constant< bool,
+        (std::numeric_limits< U >::digits > std::numeric_limits< T >::digits) >
+        PrecisionLossPossible;
+
+    // Precision loss not possible for this (T, U) pair: plain cast.
+    SAFEINT_CONSTEXPR14 static bool CastImpl( U u, T& t, std::false_type ) SAFEINT_NOTHROW
+    {
+        t = (T)u;
+        return true;
+    }
+
+    template < typename E >
+    SAFEINT_CONSTEXPR14 static void CastThrowImpl( U u, T& t, std::false_type ) SAFEINT_NOTHROW
+    {
+        t = (T)u;
+    }
+
+    // Precision loss is possible for this (T, U) pair. Under the strict
+    // flag, round-trip and reject any value that doesn't preserve. With
+    // the flag off, fall through to a plain cast (existing behavior).
+    //
+    // The round-trip uses SafeCastHelper<U, T, CastFromFloat>::Cast to
+    // go from the float back to U. This is important: the naive
+    // formulation (U)((T)u) is UB when the rounding pushes the float
+    // out of U's range, which happens at values near U's bounds (e.g.
+    // INT32_MAX casting to float rounds up to 2^31, which is outside
+    // int32 range, and (int32_t)2^31 is UB). The CastFromFloat helper
+    // does a defined range check first, treating "rounded out of range"
+    // as another form of precision loss.
+    SAFEINT_CONSTEXPR14 static bool CastImpl( U u, T& t, std::true_type ) SAFEINT_NOTHROW
+    {
+#ifdef SAFEINT_STRICT_FLOAT_CONVERSION
+        T f = (T)u;
+        U back;
+        if ( !SafeCastHelper< U, T, CastFromFloat >::Cast( f, back ) ) { return false; }
+        if ( back != u ) { return false; }
+        t = f;
+#else
+        t = (T)u;
+#endif
+        return true;
+    }
+
+    template < typename E >
+    SAFEINT_CONSTEXPR14 static void CastThrowImpl( U u, T& t, std::true_type ) SAFEINT_CPP_THROW
+    {
+#ifdef SAFEINT_STRICT_FLOAT_CONVERSION
+        T f = (T)u;
+        U back;
+        if ( !SafeCastHelper< U, T, CastFromFloat >::Cast( f, back ) ) { E::SafeIntOnOverflow(); }
+        if ( back != u ) { E::SafeIntOnOverflow(); }
+        t = f;
+#else
+        t = (T)u;
+#endif
+    }
+};
+
 
 template < typename T, typename U > class SafeCastHelper < T, U, CastFromEnum >
 {
