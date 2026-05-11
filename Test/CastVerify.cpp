@@ -462,11 +462,282 @@ namespace cast_verify
 		}
 	}
 
+	// ---- Int-to-float matrix tests (issue #69) -----------------------------
+	//
+	// Verifies the int-to-float cast operator across all eight integer
+	// source cases crossed with all three floating-point target types.
+	//
+	// The acceptance rule depends on whether SAFEINT_STRICT_FLOAT_CONVERSION
+	// is defined. In default mode, every cast succeeds with the closest-
+	// representable result (existing SafeInt behavior). In strict mode, any
+	// cast that would lose precision throws.
+	//
+	// An integer is exactly representable in a float F iff its odd part
+	// (value with trailing zeros stripped) has at most digits<F> significant
+	// bits. So 2^53 + 1 is NOT exact in a double (54 odd significant bits),
+	// but (uint64_t)0x1234 << 13 IS exact (only 13 significant bits, even
+	// though the value occupies 26 bits in total -- the trailing zeros come
+	// for free via the exponent).
+
+	static int g_intToFloatErrors = 0;
+
+	template <typename T, typename F>
+	static bool TryCastToFloat(T u, F& out)
+	{
+		try
+		{
+			SafeInt<T> s = u;
+			out = (F)s;
+			return true;
+		}
+		catch (...)
+		{
+			out = F(0);
+			return false;
+		}
+	}
+
+	template <typename T, typename F>
+	static void CheckIntToFloat(const char* sourceName, const char* targetName,
+	                            const char* caseName, T u, bool expectAccept)
+	{
+		F got = F(0);
+		bool accepted = TryCastToFloat<T, F>(u, got);
+
+		if (accepted != expectAccept)
+		{
+			std::cerr << "Error: SafeInt<" << sourceName << "> to "
+			          << targetName << " '" << caseName << "': expected "
+			          << (expectAccept ? "accept" : "reject") << ", got "
+			          << (accepted ? "accept" : "reject") << std::endl;
+			++g_intToFloatErrors;
+			return;
+		}
+
+		if (accepted)
+		{
+#ifdef SAFEINT_STRICT_FLOAT_CONVERSION
+			// In strict mode, an accepted cast preserved the value exactly,
+			// so the round-trip back is well-defined and must equal u.
+			T roundtrip = T(got);
+			if (roundtrip != u)
+			{
+				std::cerr << "Error: SafeInt<" << sourceName << "> to "
+				          << targetName << " '" << caseName
+				          << "': accepted under strict mode but value did not "
+				          << "round-trip" << std::endl;
+				++g_intToFloatErrors;
+			}
+#endif
+			// In default mode we don't verify the round-trip: a lossy cast
+			// can produce a float that's out of T's range (e.g. INT32_MAX
+			// rounds up to 2^31 as a float, which is one past int32 max),
+			// and casting that float back to T is undefined behavior.
+		}
+	}
+
+	template <typename T, typename F>
+	static void RunIntToFloatNegativeCommon(const char* /*sourceName*/, const char* /*targetName*/,
+	                                        std::false_type /* unsigned */)
+	{
+		// No negative cases for unsigned T.
+	}
+
+	template <typename T, typename F>
+	static void RunIntToFloatNegativeCommon(const char* sourceName, const char* targetName,
+	                                        std::true_type /* signed */)
+	{
+		CheckIntToFloat<T, F>(sourceName, targetName, "-1", T(-1), true);
+		CheckIntToFloat<T, F>(sourceName, targetName, "-42", T(-42), true);
+	}
+
+	// Cases that apply uniformly to every (T, F) pair, regardless of whether
+	// the pair can lose precision. Tests zero, small values, and large values
+	// that fit exactly even in the smallest mantissa (because they're powers
+	// of two or have lots of trailing zeros).
+	template <typename T, typename F>
+	static void RunIntToFloatCommonCases(const char* sourceName, const char* targetName)
+	{
+		CheckIntToFloat<T, F>(sourceName, targetName, "0", T(0), true);
+		CheckIntToFloat<T, F>(sourceName, targetName, "1", T(1), true);
+		CheckIntToFloat<T, F>(sourceName, targetName, "42", T(42), true);
+
+		RunIntToFloatNegativeCommon<T, F>(sourceName, targetName,
+		    std::integral_constant<bool, std::numeric_limits<T>::is_signed>());
+	}
+
+	// Run cases that exercise the precision boundary. Only meaningful when
+	// the (T, F) pair can lose precision -- i.e., when digits<T> > digits<F>.
+	// Tag-dispatched so the body isn't even compiled for non-lossy pairs;
+	// this also avoids constructing values like T(1) << digits<F> for cases
+	// where that shift would overflow T.
+
+	template <typename T, typename F>
+	static void RunIntToFloatNegativeBoundary(const char* /*sourceName*/, const char* /*targetName*/,
+	                                          std::false_type /* unsigned */)
+	{
+		// No T_MIN-as-power-of-two case for unsigned.
+	}
+
+	template <typename T, typename F>
+	static void RunIntToFloatNegativeBoundary(const char* sourceName, const char* targetName,
+	                                          std::true_type /* signed */)
+	{
+		T tmin = std::numeric_limits<T>::min();
+		CheckIntToFloat<T, F>(sourceName, targetName, "T_MIN (-2^N, power of two, exact)",
+		                      tmin, true);
+
+		// T_MIN + 1: 'bitcount - 1' significant bits, lossy when greater
+		// than digits<F>.
+		T tmin_plus_one = T(tmin + T(1));
+		CheckIntToFloat<T, F>(sourceName, targetName, "T_MIN + 1 (lossy when digits<T> > digits<F>)",
+		                      tmin_plus_one,
+#ifdef SAFEINT_STRICT_FLOAT_CONVERSION
+		                      false);
+#else
+		                      true);
+#endif
+	}
+
+	template <typename T, typename F>
+	static void RunIntToFloatBoundaryImpl(const char* /*sourceName*/, const char* /*targetName*/,
+	                                      std::false_type /* loss impossible */)
+	{
+		// Every T value fits exactly in F. No boundary to test here -- the
+		// common cases already covered the full range.
+	}
+
+	template <typename T, typename F>
+	static void RunIntToFloatBoundaryImpl(const char* sourceName, const char* targetName,
+	                                      std::true_type /* loss possible */)
+	{
+		const int p = std::numeric_limits<F>::digits;
+
+		// Pure power of two: exact regardless of bit count.
+		T pow2_at_boundary = T(1) << p;
+		CheckIntToFloat<T, F>(sourceName, targetName,
+		                      "2^digits<F> (power of two, exact)",
+		                      pow2_at_boundary, true);
+
+		// One less than a power of two: 'p' significant bits, fills the
+		// mantissa exactly.
+		T mantissa_fill = pow2_at_boundary - T(1);
+		CheckIntToFloat<T, F>(sourceName, targetName,
+		                      "2^digits<F> - 1 (mantissa fills exactly)",
+		                      mantissa_fill, true);
+
+		// One more than the boundary power of two: 'p + 1' significant
+		// bits with no trailing zeros, requires more mantissa than F has.
+		// Default mode accepts (silently rounds); strict mode rejects.
+		T one_past = pow2_at_boundary + T(1);
+		CheckIntToFloat<T, F>(sourceName, targetName,
+		                      "2^digits<F> + 1 (one bit too many, lossy)",
+		                      one_past,
+#ifdef SAFEINT_STRICT_FLOAT_CONVERSION
+		                      false);
+#else
+		                      true);
+#endif
+
+		// Sparse-but-large: a small significand shifted left, so total
+		// bit width exceeds digits<F> but odd part fits in the mantissa.
+		// This MUST be accepted in both modes -- it's not actually lossy.
+		// (Example from the SafeInt #69 discussion.)
+		// Shift 0x1234 (13 significant bits) left by (p - 12) so total
+		// width is p + 1 bits but the odd part is just 13 bits.
+		// Precondition digits<T> > digits<F> (== p) gives us digits<T> >= p+1,
+		// so the shifted value fits in T. And p is digits<F>, always >= 24
+		// for the float types SafeInt supports, so the shift count is >= 12.
+		T sparse = T(0x1234) << (p - 12);
+		CheckIntToFloat<T, F>(sourceName, targetName,
+		                      "0x1234 << (digits<F> - 12) (sparse, exact)",
+		                      sparse, true);
+
+		// Sparse value shifted just enough to be lossy: shift small value
+		// to the boundary, then add 1 to make the odd part too wide.
+		T sparse_plus_one = (T(0x1234) << (p - 12)) + T(1);
+		CheckIntToFloat<T, F>(sourceName, targetName,
+		                      "0x1234 << (digits<F> - 12) + 1 (lossy)",
+		                      sparse_plus_one,
+#ifdef SAFEINT_STRICT_FLOAT_CONVERSION
+		                      false);
+#else
+		                      true);
+#endif
+
+		// T_MAX: for the integer types that lose precision, T_MAX has
+		// all-ones in its mantissa and is lossy.
+		T tmax = std::numeric_limits<T>::max();
+		CheckIntToFloat<T, F>(sourceName, targetName, "T_MAX (lossy when digits<T> > digits<F>)",
+		                      tmax,
+#ifdef SAFEINT_STRICT_FLOAT_CONVERSION
+		                      false);
+#else
+		                      true);
+#endif
+
+		// T_MIN for signed: -2^(bitcount-1), a power of two, always exact.
+		RunIntToFloatNegativeBoundary<T, F>(sourceName, targetName,
+		    std::integral_constant<bool, std::numeric_limits<T>::is_signed>());
+	}
+
+	template <typename T, typename F>
+	static void RunIntToFloatBoundary(const char* sourceName, const char* targetName)
+	{
+		RunIntToFloatBoundaryImpl<T, F>(sourceName, targetName,
+		    std::integral_constant< bool,
+		        (std::numeric_limits<T>::digits > std::numeric_limits<F>::digits) >());
+	}
+
+	template <typename F>
+	static void RunIntToFloatForTarget(const char* targetName)
+	{
+		RunIntToFloatCommonCases<std::int8_t,   F>("int8",   targetName);
+		RunIntToFloatCommonCases<std::uint8_t,  F>("uint8",  targetName);
+		RunIntToFloatCommonCases<std::int16_t,  F>("int16",  targetName);
+		RunIntToFloatCommonCases<std::uint16_t, F>("uint16", targetName);
+		RunIntToFloatCommonCases<std::int32_t,  F>("int32",  targetName);
+		RunIntToFloatCommonCases<std::uint32_t, F>("uint32", targetName);
+		RunIntToFloatCommonCases<std::int64_t,  F>("int64",  targetName);
+		RunIntToFloatCommonCases<std::uint64_t, F>("uint64", targetName);
+
+		RunIntToFloatBoundary<std::int8_t,   F>("int8",   targetName);
+		RunIntToFloatBoundary<std::uint8_t,  F>("uint8",  targetName);
+		RunIntToFloatBoundary<std::int16_t,  F>("int16",  targetName);
+		RunIntToFloatBoundary<std::uint16_t, F>("uint16", targetName);
+		RunIntToFloatBoundary<std::int32_t,  F>("int32",  targetName);
+		RunIntToFloatBoundary<std::uint32_t, F>("uint32", targetName);
+		RunIntToFloatBoundary<std::int64_t,  F>("int64",  targetName);
+		RunIntToFloatBoundary<std::uint64_t, F>("uint64", targetName);
+	}
+
+	void TestIntToFloatMatrix()
+	{
+		RunIntToFloatForTarget<float>("float");
+		RunIntToFloatForTarget<double>("double");
+		RunIntToFloatForTarget<long double>("long double");
+
+		if (g_intToFloatErrors == 0)
+		{
+#ifdef SAFEINT_STRICT_FLOAT_CONVERSION
+			std::cout << "  All int-to-float cast checks passed (strict mode)." << std::endl;
+#else
+			std::cout << "  All int-to-float cast checks passed (default mode)." << std::endl;
+#endif
+		}
+		else
+		{
+			std::cout << "  " << g_intToFloatErrors
+			          << " int-to-float cast failures." << std::endl;
+		}
+	}
+
 	void CastVerify()
 	{
 		std::cout << "Verifying Casting:" << std::endl;
 		TestDouble();
 		TestFloat();
 		TestFloatToIntMatrix();
+		TestIntToFloatMatrix();
 	}
 }

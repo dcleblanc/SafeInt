@@ -932,19 +932,19 @@ public:
 template < typename FromType > class GetCastMethod < float, FromType >
 {
 public:
-    enum{ method = CastOK };
+    enum{ method = CastToFloat };
 };
 
 template < typename FromType > class GetCastMethod < double, FromType >
 {
 public:
-    enum{ method = CastOK };
+    enum{ method = CastToFloat };
 };
 
 template < typename FromType > class GetCastMethod < long double, FromType >
 {
 public:
-    enum{ method = CastOK };
+    enum{ method = CastToFloat };
 };
 
 template < typename ToType > class GetCastMethod < ToType, float >
@@ -1209,6 +1209,110 @@ public:
         }
 
         t = (T)u;
+    }
+};
+
+
+// Int-to-float conversion.
+//
+// Casting an integer to a float can silently lose precision when the
+// integer has more significant bits than the float's mantissa can hold.
+// For example, the 54-bit int64 value 2^53 + 1 cannot be represented
+// exactly in a double (53-bit mantissa); it rounds to 2^53 or 2^53 + 2.
+//
+// By default this is allowed silently -- the user asked for a float,
+// they get one, and most code that converts integers to floats is fine
+// with the closest-representable result (graphics, statistics, interop
+// with float APIs). When SAFEINT_STRICT_FLOAT_CONVERSION is defined,
+// SafeInt instead throws on any precision loss, so the user is told
+// when bit-exact preservation isn't possible.
+//
+// Detection: round-trip via the float and compare. If (U)((T)u) == u
+// then the cast preserved every bit; otherwise some bits were lost.
+// This correctly handles values like (uint64_t)0x1234 << 13, which have
+// more total bits than the mantissa but whose significand fits (the
+// trailing zeros come "for free" via the float's exponent), as well as
+// powers of two of any magnitude.
+//
+// We dispatch on whether precision loss is even possible for this (T,U)
+// pair at compile time. When std::numeric_limits<U>::digits is no
+// greater than std::numeric_limits<T>::digits, every value of U is
+// exactly representable in T; no runtime check needed. This skips the
+// check entirely for small integer types into float, every standard
+// integer into double (except int64/uint64), and so on.
+
+template < typename T, typename U > class SafeCastHelper < T, U, CastToFloat >
+{
+public:
+    // T is the target float type; U is the source integer type.
+
+    SAFE_INT_NODISCARD SAFEINT_CONSTEXPR14 static bool Cast( U u, T& t ) SAFEINT_NOTHROW
+    {
+        return CastImpl( u, t, PrecisionLossPossible() );
+    }
+
+    template < typename E >
+    SAFEINT_CONSTEXPR14 static void CastThrow( U u, T& t ) SAFEINT_CPP_THROW
+    {
+        CastThrowImpl< E >( u, t, PrecisionLossPossible() );
+    }
+
+private:
+    typedef std::integral_constant< bool,
+        (std::numeric_limits< U >::digits > std::numeric_limits< T >::digits) >
+        PrecisionLossPossible;
+
+    // Precision loss not possible for this (T, U) pair: plain cast.
+    SAFEINT_CONSTEXPR14 static bool CastImpl( U u, T& t, std::false_type ) SAFEINT_NOTHROW
+    {
+        t = (T)u;
+        return true;
+    }
+
+    template < typename E >
+    SAFEINT_CONSTEXPR14 static void CastThrowImpl( U u, T& t, std::false_type ) SAFEINT_NOTHROW
+    {
+        t = (T)u;
+    }
+
+    // Precision loss is possible for this (T, U) pair. Under the strict
+    // flag, round-trip and reject any value that doesn't preserve. With
+    // the flag off, fall through to a plain cast (existing behavior).
+    //
+    // The round-trip uses SafeCastHelper<U, T, CastFromFloat>::Cast to
+    // go from the float back to U. This is important: the naive
+    // formulation (U)((T)u) is UB when the rounding pushes the float
+    // out of U's range, which happens at values near U's bounds (e.g.
+    // INT32_MAX casting to float rounds up to 2^31, which is outside
+    // int32 range, and (int32_t)2^31 is UB). The CastFromFloat helper
+    // does a defined range check first, treating "rounded out of range"
+    // as another form of precision loss.
+    SAFEINT_CONSTEXPR14 static bool CastImpl( U u, T& t, std::true_type ) SAFEINT_NOTHROW
+    {
+#ifdef SAFEINT_STRICT_FLOAT_CONVERSION
+        T f = (T)u;
+        U back;
+        if ( !SafeCastHelper< U, T, CastFromFloat >::Cast( f, back ) ) { return false; }
+        if ( back != u ) { return false; }
+        t = f;
+#else
+        t = (T)u;
+#endif
+        return true;
+    }
+
+    template < typename E >
+    SAFEINT_CONSTEXPR14 static void CastThrowImpl( U u, T& t, std::true_type ) SAFEINT_CPP_THROW
+    {
+#ifdef SAFEINT_STRICT_FLOAT_CONVERSION
+        T f = (T)u;
+        U back;
+        if ( !SafeCastHelper< U, T, CastFromFloat >::Cast( f, back ) ) { E::SafeIntOnOverflow(); }
+        if ( back != u ) { E::SafeIntOnOverflow(); }
+        t = f;
+#else
+        t = (T)u;
+#endif
     }
 };
 
