@@ -214,8 +214,8 @@ void MultVerifyUint32Int32()
 
 void MultVerifyUint64Int64()
 {
-	TestVector< std::uint64_t, std::uint32_t, OpType::Mult > tests;
-	TestCase<std::uint64_t, std::uint32_t, OpType::Mult > test = tests.GetNext();
+	TestVector< std::uint64_t, std::int64_t, OpType::Mult > tests;
+	TestCase<std::uint64_t, std::int64_t, OpType::Mult > test = tests.GetNext();
 
 	while (!tests.Done())
 	{
@@ -349,8 +349,8 @@ void MultVerifyInt64Uint64()
 
 void MultVerifyInt64Int()
 {
-	TestVector< std::int64_t, std::int64_t, OpType::Mult > tests;
-	TestCase<std::int64_t, std::int64_t, OpType::Mult > test = tests.GetNext();
+	TestVector< std::int64_t, std::int32_t, OpType::Mult > tests;
+	TestCase<std::int64_t, std::int32_t, OpType::Mult > test = tests.GetNext();
 
 	while (!tests.Done())
 	{
@@ -384,8 +384,8 @@ void MultVerifyInt64Int()
 
 void MultVerifyInt64Uint32()
 {
-	TestVector< std::int64_t, std::int32_t, OpType::Mult > tests;
-	TestCase<std::int64_t, std::int32_t, OpType::Mult > test = tests.GetNext();
+	TestVector< std::int64_t, std::uint32_t, OpType::Mult > tests;
+	TestCase<std::int64_t, std::uint32_t, OpType::Mult > test = tests.GetNext();
 
 	while (!tests.Done())
 	{
