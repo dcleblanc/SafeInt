@@ -27,7 +27,7 @@ namespace mod_verify
 template<typename T>
 struct ModVerifyTest1
 {
-	ModVerifyTest1<T>()
+	ModVerifyTest1()
 	{
 		const size_t width = sizeof(T);
 		const size_t shift = width * CHAR_BIT - 1;
@@ -83,7 +83,7 @@ struct ModVerifyTest1
 template<typename T>
 struct ModVerifyTest2
 {
-	ModVerifyTest2<T>()
+	ModVerifyTest2()
 	{
 		const size_t width = sizeof(T);
 		const size_t shift = width * CHAR_BIT - 1;
