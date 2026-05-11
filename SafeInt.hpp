@@ -74,22 +74,16 @@ Please read helpfile.md before using the class.
 // and this version always supports at least the SAFEINT_CPLUSPLUS_14 approach
 #define SAFEINT_CPLUSPLUS_STD SAFEINT_CPLUSPLUS_14
 
-#elif _MSC_VER < 1930 // VS 2019
-// VS 2019 supports C++17 fully; C++20 support was added incrementally,
-// use _MSVC_LANG to detect whether /std:c++20 was passed
-#if defined(_MSVC_LANG) && _MSVC_LANG >= 202002L
-#define SAFEINT_CPLUSPLUS_STD SAFEINT_CPLUSPLUS_20
-#else
-#define SAFEINT_CPLUSPLUS_STD SAFEINT_CPLUSPLUS_17
-#endif
-
-#else // VS 2022 or later
+#else // VS 2019 or later - use _MSVC_LANG which correctly reflects /std: flag
 #if defined(_MSVC_LANG) && _MSVC_LANG > 202002L
 #define SAFEINT_CPLUSPLUS_STD SAFEINT_CPLUSPLUS_23
 #elif defined(_MSVC_LANG) && _MSVC_LANG >= 202002L
 #define SAFEINT_CPLUSPLUS_STD SAFEINT_CPLUSPLUS_20
-#else
+#elif defined(_MSVC_LANG) && _MSVC_LANG >= 201703L
 #define SAFEINT_CPLUSPLUS_STD SAFEINT_CPLUSPLUS_17
+#else
+// Default MSVC mode (no /std: flag, or /std:c++14) - at least C++14
+#define SAFEINT_CPLUSPLUS_STD SAFEINT_CPLUSPLUS_14
 #endif
 
 #endif

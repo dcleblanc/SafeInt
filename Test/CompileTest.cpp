@@ -265,6 +265,8 @@ template<typename... T>
 class Union {
 public:
 	Union() = default;
+	Union(const Union&) = delete;
+	Union& operator=(const Union&) = delete;
 	Union& operator=(Union&&) noexcept = default;
 
 	template<typename F>
