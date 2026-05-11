@@ -136,6 +136,24 @@ else()
 
     target_compile_options(CompileTest_clang17 PUBLIC -Wall -Wextra -Werror -std=c++17)
 
+    add_executable(CompileTest_clang20
+        ../CompileTest.cpp
+        ../ConstExpr.cpp 
+        ../CleanCompile.cpp
+        ../../SafeInt.hpp
+    )
+
+    target_compile_options(CompileTest_clang20 PUBLIC -Wall -Wextra -Werror -std=c++20)
+
+    add_executable(CompileTest_clang23
+        ../CompileTest.cpp
+        ../ConstExpr.cpp 
+        ../CleanCompile.cpp
+        ../../SafeInt.hpp
+    )
+
+    target_compile_options(CompileTest_clang23 PUBLIC -Wall -Wextra -Werror -std=c++23)
+
     add_executable(CompileTest_clang14_NoEH
         ../CompileTest.cpp
         ../ConstExpr.cpp 

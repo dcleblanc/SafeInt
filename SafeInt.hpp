@@ -5804,7 +5804,7 @@ public:
                  std::numeric_limits< T >::is_signed     ? ShiftState_LeftShiftSigned
                                                          : ShiftState_LeftShiftUnsigned,
 
-        isSignedLeftShift = (method == ShiftState_LeftShiftSigned)
+        isSignedLeftShift = (method == (int)ShiftState_LeftShiftSigned)
     };
 };
 
